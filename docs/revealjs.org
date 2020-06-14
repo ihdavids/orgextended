@@ -1,0 +1,38 @@
+* Reveal JS / Presenations
+  I have often used Reveal JS for presentations.
+  I find having a simple web based format that doesn't require a powerpoint player
+  to be quite convenient. 
+
+  My exporter is NOT as elaborate as the full emacs exporter
+  but it does a reasonable job.
+
+  [[file:orgrevealjs.org]] 
+
+** Themes
+   Reveal JS supports a set of builtin themes. These can be controlled with an orgmode comment as follows:
+
+   #+BEGIN_EXAMPLE 
+     #+REVEAL_THEME: league  
+   #+END_EXAMPLE 
+
+  Source block highlights can also be controlled in this manner:
+   #+BEGIN_EXAMPLE
+     #+REVEAL_HIGHLIGHT: zenburn   
+   #+END_EXAMPLE  
+
+   Most of these types of comments have a sublime config file equivalent:
+   - REVEAL_THEME: RevealTheme
+   - REVEAL_HIGHLIGHT: RevealHighlight 
+   - REVEAL_VLEVEL: RevealVLevel
+
+** Per Slide Properties
+   Reveal supports a wide variety of per slide properties. These can be specified by properties
+   in a property drawer.
+
+   #+BEGIN_EXAMPLE
+   	:PROPERTIES:
+	:reveal_background: images/name-of-image
+	:reveal_background_size: width-of-image
+	:reveal_background_trans: slide
+	:END:   
+   #+END_EXAMPLE 

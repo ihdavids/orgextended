@@ -1,0 +1,37 @@
+* Builtin HTML Exporter
+  Much like the reveal exporter OrgExtended has a simple
+  builtin HTML exporter.
+
+** Theming
+   The exporter works off the concept of a theme.
+   Your theme can be specified in several ways:
+
+   - In your sublime config file 
+     #+BEGIN_EXAMPLE
+        "HtmlStyle": "blocky",
+     #+END_EXAMPLE
+
+   - In the files header
+     #+BEGIN_EXAMPLE TYPE
+        #+HTML_STYLE: blocky  
+     #+END_EXAMPLE
+
+   Styles are defined as a grouping of files in an htmlstyles subfolder of your User directory.
+   These files are:
+
+   - <style>.css
+   - <style>_inheader.html
+   - <style>_heading.html
+   - <style>_footing.html
+
+   You can extend these using either config values or additional header comments in your file:
+
+   - HtmlInHeader HTML_INHEADER
+   - HtmlHeading  HTML_HEADING
+   - HtmlFooting  HTML_FOOTING
+   - HtmlCss      HTML_CSS
+
+   By default the exporter embeds highlightjs into the output to allow source blocks to be colorized.
+   I may extend this in the future.
+
+

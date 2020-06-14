@@ -1,0 +1,7 @@
+* Exporting
+  At the moment orgextended supports 3 ways of exporting you content.
+
+  1. [[file:pandoc.org][Pandoc]]
+  2. [[file:htmlexporter.org][Html]]
+  3. [[file:revealjs.org][RevealJs]]
+   

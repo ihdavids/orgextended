@@ -1,4 +1,4 @@
-* TODO Links
+* Links
 
   Links in org mode are a nested set of square brackets
 
@@ -9,22 +9,35 @@
   Pressing enter on a link will try to follow the link.
   If the link is a web reference org will try to open a web browser.
 
-** TODO Internal Links
-** TODO External Links
+  The link system I am using is based on the original orgmode for sublime text and
+  is extensible.
 
-* TODO Images
+* Images
   Org supports the ability to show images inline in the document
   These are done with Sublimes phantom support under an image link and do not count as lines of text.
   Org can download links off the web that reference images into a cache and display them locally.
+  This can lock up sublime while the images are downloaded so turn on visualization with care.
 
   - OrgShowAllImages - Shows all image links in the document
   - OrgHideAllImages - Hides all image links in the document
   - OrgShowImage - Shows a single image link in the document
   - OrgHideImage - Hides a single image link in the document
 
+  [[file:orgimages.gif]]
+
+  NOTE: You can ask that sublime visualize images by default in a file using a startup comment:
+
+  #+BEGIN_EXAMPLE
+  #+STARTUP: inlineimages
+  #+END_EXAMPLE
+
 * File and Line Number
 
   You can link by file and line number like so:
+
+  #+BEGIN_EXAMPLE
+  [[file:links.org::3][File and Line Number Example]]
+  #+END_EXAMPLE
 
   [[file:./links.org::3][File and Line Number Example]]
   
@@ -35,4 +48,8 @@
 
   You can link to a heading using the CUSTOM_ID property like so:
 
+  #+BEGIN_EXAMPLE
+  [[file:./links.org::#a-custom-id][Custom Id Example]]
+  #+END_EXAMPLE 
+  
   [[file:./links.org::#a-custom-id][Custom Id Example]]
