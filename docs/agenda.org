@@ -1,0 +1,16 @@
+* Agenda
+  The Agenda in org allows you to use scheduling markers on a task to help visualize
+  your goals for the day. The agenda is really a collection of aggregate filtered views
+  on a subset of your todo's.
+
+  [[file:agenda.gif]] 
+
+  Like most things in orgextended the agenda is a work in progress, and currently quite a mess
+  That said, there are some very useful pieces already present in the system.  
+
+  - Space on any item in the agenda will open that item in a seperate group.
+  - Enter on any item in the agenda will open that item in the current group.
+  - Ctrl+w will close the agenda view.
+  - The habit visualizer leaves something to be desired, it does not yet support the restart options that most habits
+    do in org, BUT, it is still present and gives you a semblance of how well you are tracking with your habits.
+
