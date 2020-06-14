@@ -6,7 +6,7 @@
   My exporter is NOT as elaborate as the full emacs exporter
   but it does a reasonable job.
 
-  [[file:orgrevealjs.org]] 
+  [[file:orgrevealjs.gif]] 
 
 ** Themes
    Reveal JS supports a set of builtin themes. These can be controlled with an orgmode comment as follows:
