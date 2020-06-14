@@ -2,6 +2,7 @@
 	OrgExtended supports standard visibility cycling within a node.
     
     #+ATTR_HTML: :width 100px
+    #+ATTR_ORG: :width 100
     [[file:orgfolding.gif]]
 
 
