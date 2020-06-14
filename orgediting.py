@@ -167,7 +167,10 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
             newState += " "
         self.bufferContents = self.todoRe.sub(r"\g<1>" + newState, self.bufferContents)
         # We have to do the editing in sequence because the reloads can get mixed up otherwise
-        self.fromState = fromState.strip()
+        if(fromState):
+            self.fromState = fromState.strip()
+        else:
+            self.fromState = ""
         self.newState  = newState.strip()
         # Recurring events do not hit the done state when you toggle them
         # They bounce back to TODO they just get a new note in them

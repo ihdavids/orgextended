@@ -15,6 +15,11 @@
 
    These are most useful when writing org files for [[file:pandoc.org][Export]] 
 
+** Tags
+   *OrgInsertTag* tries to help with the rapid insertion of tags.
+   The tooltip / suggestions are currently somewhat broken. I hope to improve this in the future.
+
+   [[file:inserttag.gif]]
 
 ** Todo Cycling
    Because changing the status of your task is something that you do
@@ -24,6 +29,15 @@
    - OrgChangeTodo - Will let you quickly change the state of
      a task. I don't support cycling at the moment, only picking from
      a quick list.
+
+   [[file:todoswitch.gif]]
+
+** Scheduling
+   Inserting dates and times is one of many things we do often in org.
+   I have started working on a date picker that can help /somewhat/ with
+   scheduling efforts.
+
+   [[file:scheduling.gif]]
 
 ** Priority Editing
    Todo mention priorities and editing them
