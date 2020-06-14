@@ -1,0 +1,10 @@
+<snippet>
+    <content>
+    <![CDATA[
+  #+BEGIN_EXAMPLE ${1:TYPE}
+  $2
+  #+END_EXAMPLE]]></content>
+    <tabTrigger>&lt;e</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>example block</description>
+</snippet>

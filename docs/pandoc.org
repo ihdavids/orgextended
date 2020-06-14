@@ -1,0 +1,42 @@
+* Pandoc
+  Writing a full export engine for all the possible target formats for org is
+  well beyond the scope of what I am capable of at this time.
+
+  That said, pandoc can be used to export org files!
+  This little plugin supports using pandoc for exporting to html or pdf
+  but requires some effort on your part.
+
+** HTML
+	TODO
+
+** PDF
+    Thoughts taken from here:
+    [[https://jdhao.github.io/2019/05/30/markdown2pdf_pandoc/][Markdown2Pdf]]
+
+    Specifying a font:
+
+    #+BEGIN_EXAMPLE
+    pandoc --pdf-engine=xelatex -V CJKmainfont="KaiTi" test.org -o test.pdf
+    #+END_EXAMPLE
+
+*** Syntax Highlighting
+
+    Finding a highlight:
+
+    #+BEGIN_EXAMPLE
+    pandoc --list-highlight-languages 
+    #+END_EXAMPLE
+
+    Using the highlight
+
+
+    #+BEGIN_EXAMPLE
+    pandoc --pdf-engine=xelatex --highlight-style zenburn test.org -o test.pdf 
+    #+END_EXAMPLE
+
+*** TOC (Numbered)
+
+    #+BEGIN_EXAMPLE
+    pandoc --pdf-engine=xelatex --toc -N -o test.pdf test.org
+    #+END_EXAMPLE
+

@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+
+** ${0:HEADING}]]></content>
+    <tabTrigger>hh</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>Heading Level 2</description>
+</snippet>

@@ -1,0 +1,1483 @@
+{
+	"name": "orgextended",
+	"variables": {
+		"bgcol": "#071812",
+		// Define variables here
+	},
+	"globals": {
+		"foreground": "#F8F8F2",
+		"background": "var(bgcol)",
+		"accent":     "#ffffff",
+		"selection":  "#9D550F",
+	    "selectionBackground": "#000000",
+	    "selectionForeground": "#FF0000",
+	    "caret":               "#FF55ff",
+	    "line_highlight":      "#373730"
+	},
+	"rules": [
+		{
+			"scope": "orgmode.break",
+			"foreground": "#ed188a",
+		},
+		{
+			"scope": "orgmode.page",
+			"foreground": "#f5eebf",
+		},
+		{
+			"scope": "orgmode.headline",
+			"foreground": "#14adfa",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgmode.headline2",
+			"foreground": "#bb86fc",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.headline3",
+			"foreground": "#03dac5",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.headline4",
+			"foreground": "#dfe6a1",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.headline5",
+			"foreground": "#018786",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.headline6",
+			"foreground": "#afe3de",
+			"font_style": "italic",
+		},
+		// Stars before the last star in a headline
+		// make these background to hide them.
+		{
+			"scope": "orgmode.preamble",
+			"foreground": "var(bgcol)",
+			"font_style": "italic",
+		},
+		// Maybe I can use regions to collapse these?
+		// Right now they look uber ugly
+		{
+			"scope": "orgmode.link",
+			"foreground": "#3cd7fa",
+			"font_style": "",
+		},
+		{
+			"scope": "orgmode.link.href",
+			"foreground": "#9999aa",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.link.text",
+			"foreground": "#4ce7fd",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.email",
+			"foreground": "#a188b3",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.deadline",
+			"foreground": "#d1771d",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.scheduled",
+			"foreground": "#d1771d",
+			"font_style": "italic",
+		},
+		// #+PRIORITIES: A B C
+		{
+			"scope": "orgmode.controltag",
+			"foreground": "#aaaaaa",
+		},
+		// controltag.text also exists
+		{
+			"scope": "orgmode.controltag.tag",
+			"foreground": "#aaaaaa",
+			"font_style": "italic",
+		},
+		// < DATETIME >
+		{
+			"scope": "orgmode.datetime",
+			"foreground": "#b0a497",
+		},
+		// [ DATETIME ]
+		{
+			"scope": "orgmode.unscheddatetime",
+			"foreground": "#b0a497",
+		},
+		// CLOSED: SCHEDULED: DEADLINE:		
+		{
+			"scope": "orgmode.statekeyword",
+			"foreground": "#d1771d",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.checkbox",
+			"foreground": "#c9be7b",
+		},
+		{
+			"scope": "orgmode.checkbox.checked",
+			"foreground": "#00FF00",
+		},
+		{
+			"scope": "orgmode.checkbox.blocked",
+			"foreground": "#FF0000",
+		},
+		{
+			"scope": "orgmode.tags",
+			"foreground": "#ded49b",
+		},
+		{
+			"scope": "orgmode.tags.headline",
+			"foreground": "#deff9b",
+		},		
+		{
+			"scope": "orgmode.priority",
+			"foreground": "#c27532",
+		},		
+		{
+			"scope": "orgmode.priority.value",
+			"foreground": "#f5a55f",
+		},		
+		{
+			"scope": "orgmode.priority.value.a",
+			"foreground": "#e05a7b",
+		},		
+		{
+			"scope": "orgmode.priority.value.b",
+			"foreground": "#f59a76",
+		},		
+		{
+			"scope": "orgmode.priority.value.c",
+			"foreground": "#fab978",
+		},		
+		{
+			"scope": "orgmode.priority.value.d",
+			"foreground": "#f5d976",
+		},		
+		{
+			"scope": "orgmode.priority.value.e",
+			"foreground": "#bcbfae",
+		},		
+		{
+			"scope": "orgmode.priority.value.general",
+			"foreground": "#b59eb5",
+		},		
+		{
+			"scope": "orgmode.state.todo",
+			"foreground": "#e6ab4c",
+		},		
+		{
+			"scope": "orgmode.state.blocked",
+			"foreground": "#FF0000",
+		},		
+		{
+			"scope": "orgmode.state.done",
+			"foreground": "#47c94f",
+		},		
+		{
+			"scope": "orgmode.state.cancelled",
+			"foreground": "#bab9b8",
+		},
+		{
+			"scope": "orgmode.state.meeting",
+			"foreground": "#dec7fc",
+		},
+		{
+			"scope": "orgmode.state.phone",
+			"foreground": "#77ebed",
+		},
+		{
+			"scope": "orgmode.state.note",
+			"foreground": "#d2a2e0",
+		},
+		{
+			"scope": "orgmode.state.doing",
+			"foreground": "#9c9c17",
+		},
+		{
+			"scope": "orgmode.state.inprogress",
+			"foreground": "#9c9c17",
+		},
+		{
+			"scope": "orgmode.state.next",
+			"foreground": "#37dae6",
+		},
+		{
+			"scope": "orgmode.state.reassigned",
+			"foreground": "#bab9b8",
+		},
+		{
+			"scope": "orgmode.tack",
+			"foreground": "#c993c4",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.follow_up",
+			"foreground": "#FF0000",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.fence",
+			"background": "#322830",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.fence.language",
+			"background": "#322830",
+			"foreground": "#f1bff2",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.raw.block",
+			"background": "#252520",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.table.block",
+			"background": "#272828",
+		},
+		{
+			"scope": "orgmode.bold",
+			"foreground": "#aaffaa",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.italics",
+			"foreground": "#aaffff",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.underline",
+			"foreground": "#aaaaff",
+			"font_style": "underline",
+		},
+		{
+			"scope": "orgmode.strikethrough",
+			"foreground": "#aaaaaa",
+		},
+		{
+			"scope": "orgmode.code",
+			"foreground": "#ffaaff",
+		},
+		{
+			"scope": "orgmode.verbatim",
+			"foreground": "#ffaaaa",
+		},
+        // MONOKAI EXTENDED COLORING
+
+		// Generic colorization
+		// function call
+		{ "scope": "support.function",                     "foreground": "#66d9ef", },
+		{ "scope": "keyword",                              "foreground": "#f92672", },
+		{ "scope": "comment",                              "foreground": "#75715e", },
+		{ "scope": "string",                               "foreground": "#e6db74", },
+		{ "scope": "constant.numeric",                     "foreground": "#be84ff", },
+		{ "scope": "constant.language",                    "foreground": "#be84ff", },
+		{ "scope": "meta.preprocessor",                    "foreground": "#be84ff", },
+		{ "scope": "constant.character",                   "foreground": "#be84ff", },
+		{ "scope": "constant.other",                       "foreground": "#be84ff", },
+		{ "scope": "variable.language",                    "foreground": "#ffffff", },
+		{ "scope": "variable.other",                       "foreground": "#ffffff", },
+		{ "scope": "storage",                              "foreground": "#f92672", },
+		{ "scope": "storage.type",                         "foreground": "#66d9ef", },
+		{ "scope": "entity.name.class",                    "foreground": "#66D9EF", "font_style": "underline" },
+		{ "scope": "entity.other.inherited-class",         "foreground": "#a6e22e", "font_style": "italic underline" },
+		{ "scope": "variable.parameter",                   "foreground": "#fd971f", "font_style": "italic" },
+		{ "scope": "entity.name.tag",                      "foreground": "#f92672", },
+		{ "scope": "entity.other.attribute-name",          "foreground": "#a6e22e", },
+		{ "scope": "entity.name.function",                 "foreground": "#a6e22e", },
+		{ "scope": "entity.constant",                      "foreground": "#66d9ef", },
+		{ "scope": "support.constant",                     "foreground": "#66d9ef", },
+		{ "scope": "support.type",                         "foreground": "#A6E22E", "font_style": "italic", },
+		{ "scope": "support.other.variable",                                        },
+		{ "scope": "string.constant",                      "foreground": "#66d9ef", },
+		{ "scope": "string.regexp",                        "foreground": "#f6aa11", },
+		{ "scope": "string.variable",                      "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.variable",      "foreground": "#ffffff", },
+		// Html / Xml
+		{ "scope": "meta.tag.sgml.doctype.xml",            "foreground": "#c8cecc", },
+		{ "scope": "declaration.sgml.html declaration.doctype",         "foreground": "#c8cecc", },
+		{ "scope": "declaration.sgml.html declaration.doctype entity",  "foreground": "#c8cecc", },
+		{ "scope": "declaration.sgml.html declaration.doctype string",  "foreground": "#c8cecc", },
+		{ "scope": "content.block.html",                                "foreground": "#7c7865", },
+		{ "scope": "entity.name.tag.script.html",                       "font_style": "italic",},
+		{ "scope": "text.html.basic meta.tag.other.html",               "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.any.html",                 "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.block.any",                "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.inline.any",               "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.structure.any.html",       "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.structure.any.html",       "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic source.js.embedded.html",           "foreground": "#a6e22e", },
+		{ "scope": "punctuation.separator.key-value.html",              "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic entity.other.attribute-name",       "foreground": "#a6e22e", },
+		{ "scope": "text.html.basic meta.tag.structure.any.html punctuation.definition.string.begin.html",       "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.string.begin.html",          "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.string.end.html",            "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.tag.end",                    "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.tag.begin",                  "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.tag",                        "foreground": "#ffffff", },
+		// Handlebars
+		{ "scope": "variable.parameter.handlebars",                     "foreground": "#f6aa11", },
+		{ "scope": "support.constant.handlebars",                       "foreground": "#66d9ef", },
+		{ "scope": "meta.function.block.start.handlebars",              "foreground": "#66d9ef", },
+		// CSS
+		{ "scope": "meta.preprocessor.at-rule",                            "foreground": "#f6aa11", },
+		{ "scope": "meta.selector.css entity.other.attribute-name.id",     "foreground": "#f6aa11", },
+		{ "scope": "meta.selector.css entity.other.attribute-name.class",  "foreground": "#a6e22e", },
+		{ "scope": "support.type.property-name.css",                       "foreground": "#66d9ef", },
+		{ "scope": "meta.constructor.argument.css",                        "foreground": "#f6aa11", },
+		{ "scope": "punctuation.section.property-list.css",                "foreground": "#ffffff", },
+		{ "scope": "punctuation.definition.tag.css",                       "foreground": "#f92672", },
+		{ "scope": "punctuation.separator.key-value.css",                  "foreground": "#ffffff", },
+		{ "scope": "punctuation.terminator.rule.css",                      "foreground": "#ffffff", },
+		{ "scope": "entity.other.attribute-name.pseudo-element.css",       "foreground": "#a6e22e", },
+		{ "scope": "entity.other.attribute-name.pseudo-class.css",         "foreground": "#a6e22e", },
+		{ "scope": "entity.other.attribute-name.pseudo-selector.css",      "foreground": "#a6e22e", },
+		// LESS Variables
+		{ "scope": "variable.other.less",                                  "foreground": "#ffffff", },
+		{ "scope": "variable.other.less.mixin",                            "foreground": "#e0fdce", "font_style": "italic"},
+		{ "scope": "entity.other.attribute-name.pseudo-element.less",      "foreground": "#ff9117", },
+		// Javascript
+		{ "scope": "meta.instance.constructor meta.function-call.constructor.js",                          "foreground": "#a6e22e", },
+		{ "scope": "meta.template.expression.js punctuation.definition.template-expression.begin.js",      "foreground": "#AFF132", },
+		{ "scope": "meta.template.expression.js punctuation.definition.template-expression.end.js",        "foreground": "#AFF132", },
+		{ "scope": "meta.template.expression.js punctuation.accessor",                                     "foreground": "#AFF132", },
+		{ "scope": "meta.function.js",                                                                     "foreground": "#a6e22e", },
+		{ "scope": "entity.name.function.js",                                                              "foreground": "#a6e22e", },
+		{ "scope": "support.function.dom.js",                                                              "foreground": "#a6e22e", },
+		{ "scope": "source.js meta.function.js punctuation.separator.parameter.function.js",               "foreground": "#ffffff", },
+		{ "scope": "meta.property.object.js",                                                              "foreground": "#ffffff", },
+		{ "scope": "keyword.operator.accessor.js",                                                         "foreground": "#ffffff", },
+		{ "scope": "source.js meta.group.braces.curly constant.other.object.key.js punctuation.separator.key-value.js", "foreground": "#ffffff", },
+		{ "scope": "source.js meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js", "foreground": "#ffffff", },
+		{ "scope": "support.type.object.module.js",                                                        "foreground": "#66d9ef", },
+		{ "scope": "source.js meta.function.declaration.js support.class.js",                              "foreground": "#66d9ef", },
+		{ "scope": "support.type.object.module.js support.type.object.module.js",                          "foreground": "#a6e22e", },
+		{ "scope": "storage.type.js",                                                                      "foreground": "#66d9ef", "font_style": "italic",},
+		{ "scope": "text.html.basic source.js.embedded.html",                                              "foreground": "#ffffff", },
+		{ "scope": "storage.type.function.js",                                                             "foreground": "#66d9ef", },
+		{ "scope": "constant.numeric.js",                                                                  "foreground": "#ae81ff", },
+    // <dict>
+    //   <key>name</key>
+    //   <string>JS: Literal language variable</string>
+    //   <key>scope</key>
+    //   <string>variable.language.arguments.js, variable.language.super.js, variable.language.this.js, variable.language.self.js, variable.language.proto.js, variable.language.constructor.js, variable.language.prototype.js</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string> italic</string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>JS: []</string>
+    //   <key>scope</key>
+    //   <string>meta.brace.square.js</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>JS: ()</string>
+    //   <key>scope</key>
+    //   <string>meta.brace.round, punctuation.definition.parameters.begin.js, punctuation.definition.parameters.end.js, punctuation.definition.group</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>JS: object literal {}</string>
+    //   <key>scope</key>
+    //   <string>meta.brace.curly.js, meta.object-literal.js</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>JSON String</string>
+    //   <key>scope</key>
+    //   <string>meta.structure.dictionary.json string.quoted.double.json</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#cfcfc2</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>CoffeeScript String Interpolated</string>
+    //   <key>scope</key>
+    //   <string>punctuation.section.embedded.coffee</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e69f66</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: []</string>
+    //   <key>scope</key>
+    //   <string>keyword.operator.index-start.php, keyword.operator.index-end.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Array</string>
+    //   <key>scope</key>
+    //   <string>meta.array.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Array()</string>
+    //   <key>scope</key>
+    //   <string>meta.array.php support.function.construct.php, meta.array.empty.php support.function.construct.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#e42e70</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Array Construct</string>
+    //   <key>scope</key>
+    //   <string>support.function.construct.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e42e70</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Storage Type Function</string>
+    //   <key>scope</key>
+    //   <string>storage.type.function.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f92672dd</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Numeric Constant</string>
+    //   <key>scope</key>
+    //   <string>constant.numeric.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#be84ff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: New</string>
+    //   <key>scope</key>
+    //   <string>keyword.other.new.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f6aa11</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: ::</string>
+    //   <key>scope</key>
+    //   <string>support.class.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Other Property</string>
+    //   <key>scope</key>
+    //   <string>variable.other.property.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f6aa11</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Class</string>
+    //   <key>scope</key>
+    //   <string>storage.modifier.extends.php, storage.type.class.php, keyword.operator.class.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Inherited Class</string>
+    //   <key>scope</key>
+    //   <string>meta.other.inherited-class.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Storage Type</string>
+    //   <key>scope</key>
+    //   <string>storage.type.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Function</string>
+    //   <key>scope</key>
+    //   <string>entity.name.function.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Function Construct</string>
+    //   <key>scope</key>
+    //   <string>support.function.construct.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Function Call</string>
+    //   <key>scope</key>
+    //   <string>entity.name.type.class.php, meta.function-call.php, meta.function-call.static.php, meta.function-call.object.php</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Comment</string>
+    //   <key>scope</key>
+    //   <string>keyword.other.phpdoc</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#7c7865</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>PHP: Source Emebedded</string>
+    //   <key>scope</key>
+    //   <string>source.php.embedded.block.html</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Invalid</string>
+    //   <key>scope</key>
+    //   <string>invalid</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#f92672</string>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#f8f8f0</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Invalid deprecated</string>
+    //   <key>scope</key>
+    //   <string>invalid.deprecated</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#ae81ff</string>
+    //     <key>foreground</key>
+    //     <string>#f8f8f0</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>diff.header</string>
+    //   <key>scope</key>
+    //   <string>meta.diff, meta.diff.header</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#75715e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>diff.deleted</string>
+    //   <key>scope</key>
+    //   <string>markup.deleted</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f92672</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>diff.inserted</string>
+    //   <key>scope</key>
+    //   <string>markup.inserted</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>diff.changed</string>
+    //   <key>scope</key>
+    //   <string>markup.changed</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e6db74</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>diff.range</string>
+    //   <key>scope</key>
+    //   <string>meta.diff, meta.diff.range</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#3bc0f0</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Python: storage</string>
+    //   <key>scope</key>
+    //   <string>storage.type.class.python, storage.type.function.python, storage.modifier.global.python</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Python: import</string>
+    //   <key>scope</key>
+    //   <string>keyword.control.import.python, keyword.control.import.from.python</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f92672dd</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Python: Support.exception</string>
+    //   <key>scope</key>
+    //   <string>support.type.exception.python</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Perl: variables</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.variable.perl, variable.other.readwrite.global.perl, variable.other.predefined.perl, keyword.operator.comparison.perl</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e42e70</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Perl: functions</string>
+    //   <key>scope</key>
+    //   <string>support.function.perl</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Perl: comments</string>
+    //   <key>scope</key>
+    //   <string>comment.line.number-sign.perl</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>italic</string>
+    //     <key>foreground</key>
+    //     <string>#75715e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Perl: quotes</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.string.begin.perl, punctuation.definition.string.end.perl</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Perl: char</string>
+    //   <key>scope</key>
+    //   <string>constant.character.escape.perl</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#dc322f</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Constant</string>
+    //   <key>scope</key>
+    //   <string>constant.language.ruby, constant.numeric.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ae81ff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Variable definition</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.variable.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#f6aa11</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Function Name</string>
+    //   <key>scope</key>
+    //   <string>meta.function.method.with-arguments.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Variable</string>
+    //   <key>scope</key>
+    //   <string>variable.language.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Function</string>
+    //   <key>scope</key>
+    //   <string>entity.name.function.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f6aa11</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Keyword Control</string>
+    //   <key>scope</key>
+    //   <string>keyword.control.ruby, keyword.control.def.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>bold</string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Class</string>
+    //   <key>scope</key>
+    //   <string>keyword.control.class.ruby, meta.class.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Class Name</string>
+    //   <key>scope</key>
+    //   <string>entity.name.type.class.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Keyword</string>
+    //   <key>scope</key>
+    //   <string>keyword.control.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Support Class</string>
+    //   <key>scope</key>
+    //   <string>support.class.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Special Method</string>
+    //   <key>scope</key>
+    //   <string>keyword.other.special-method.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Constant Other</string>
+    //   <key>scope</key>
+    //   <string>variable.other.constant.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: :symbol</string>
+    //   <key>scope</key>
+    //   <string>constant.other.symbol.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#f6f080</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Punctuation Section</string>
+    //   <key>scope</key>
+    //   <string>punctuation.section.embedded.ruby, punctuation.definition.string.begin.ruby, punctuation.definition.string.end.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#f92672</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Ruby: Special Method</string>
+    //   <key>scope</key>
+    //   <string>keyword.other.special-method.ruby</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e42e70</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: plain</string>
+    //   <key>scope</key>
+    //   <string>text.html.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: raw inline</string>
+    //   <key>scope</key>
+    //   <string>text.html.markdown markup.raw.inline</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ec3533</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: linebreak</string>
+    //   <key>scope</key>
+    //   <string>text.html.markdown meta.dummy.line-break</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e0eddd</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: heading</string>
+    //   <key>scope</key>
+    //   <string>markdown.heading, markup.heading | markup.heading entity.name, markup.heading.markdown punctuation.definition.heading.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#fd971f</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: italic</string>
+    //   <key>scope</key>
+    //   <string>markup.italic</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>italic</string>
+    //     <key>foreground</key>
+    //     <string>#e42e70</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: bold</string>
+    //   <key>scope</key>
+    //   <string>markup.bold</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>bold</string>
+    //     <key>foreground</key>
+    //     <string>#f92672</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: underline</string>
+    //   <key>scope</key>
+    //   <string>markup.underline</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>underline</string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: strike</string>
+    //   <key>scope</key>
+    //   <string>markup.strike</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#cc4273</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Blockquote</string>
+    //   <key>scope</key>
+    //   <string>markup.quote, punctuation.definition.blockquote.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>italic</string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: Quote</string>
+    //   <key>scope</key>
+    //   <string>markup.quote</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string> italic</string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Link</string>
+    //   <key>scope</key>
+    //   <string>string.other.link.title.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>underline</string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: Raw block</string>
+    //   <key>scope</key>
+    //   <string>markup.raw.block</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#ae81ff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: List Items Punctuation</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.list_item.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#777777</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Raw Block fenced</string>
+    //   <key>scope</key>
+    //   <string>markup.raw.block.fenced.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#222</string>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Fenced Bode Block</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.fenced.markdown, variable.language.fenced.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#222222</string>
+    //     <key>foreground</key>
+    //     <string>#636050</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Fenced Language</string>
+    //   <key>scope</key>
+    //   <string>variable.language.fenced.markdown</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#7c7865</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markdown: Separator</string>
+    //   <key>scope</key>
+    //   <string>meta.separator</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#ffffff0f</string>
+    //     <key>fontStyle</key>
+    //     <string>bold</string>
+    //     <key>foreground</key>
+    //     <string>#ffffff33</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Markup: table</string>
+    //   <key>scope</key>
+    //   <string>markup.table</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>background</key>
+    //     <string>#ff3a281a</string>
+    //     <key>foreground</key>
+    //     <string>#b42a1d</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>LaTeX: Math Variables</string>
+    //   <key>scope</key>
+    //   <string>variable.other.math.tex</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#e6db74</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Other: Removal</string>
+    //   <key>scope</key>
+    //   <string>other.package.exclude, other.remove</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#d3201f</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: builtin</string>
+    //   <key>scope</key>
+    //   <string>support.function.builtin.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: variable</string>
+    //   <key>scope</key>
+    //   <string>variable.other.normal.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: DOTFILES</string>
+    //   <key>scope</key>
+    //   <string>source.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: meta scope in loop</string>
+    //   <key>scope</key>
+    //   <string>meta.scope.for-in-loop.shell, variable.other.loop.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#fd971f</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: Function name</string>
+    //   <key>scope</key>
+    //   <string>entity.name.function.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: Quotation Marks</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.string.end.shell, punctuation.definition.string.begin.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: Meta Block</string>
+    //   <key>scope</key>
+    //   <string>meta.scope.case-block.shell, meta.scope.case-body.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#fd971f</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: []</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.logical-expression.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#ffffff</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Shell: Comment</string>
+    //   <key>scope</key>
+    //   <string>comment.line.number-sign.shell</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string>italic</string>
+    //     <key>foreground</key>
+    //     <string>#7c7865</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Makefile: Comment</string>
+    //   <key>scope</key>
+    //   <string>comment.line.number-sign.makefile</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#7c7865</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Makefile: Comment punctuation</string>
+    //   <key>scope</key>
+    //   <string>punctuation.definition.comment.makefile</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#7c7865</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Makefile: Variables</string>
+    //   <key>scope</key>
+    //   <string>variable.other.makefile</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#f92672</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Makefile: Function name</string>
+    //   <key>scope</key>
+    //   <string>entity.name.function.makefile</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#a6e22e</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Makefile: Function</string>
+    //   <key>scope</key>
+    //   <string>meta.function.makefile</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>fontStyle</key>
+    //     <string></string>
+    //     <key>foreground</key>
+    //     <string>#66d9ef</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>GitGutter deleted</string>
+    //   <key>scope</key>
+    //   <string>markup.deleted.git_gutter</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#F92672</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>GitGutter inserted</string>
+    //   <key>scope</key>
+    //   <string>markup.inserted.git_gutter</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#A6E22E</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>GitGutter changed</string>
+    //   <key>scope</key>
+    //   <string>markup.changed.git_gutter</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#FC951E</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>GitGutter ignored</string>
+    //   <key>scope</key>
+    //   <string>markup.ignored.git_gutter</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#565656</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>GitGutter untracked</string>
+    //   <key>scope</key>
+    //   <string>markup.untracked.git_gutter</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#565656</string>
+    //   </dict>
+    // </dict>
+    // <dict>
+    //   <key>name</key>
+    //   <string>Nginx path</string>
+    //   <key>scope</key>
+    //   <string>string.other.path.nginx</string>
+    //   <key>settings</key>
+    //   <dict>
+    //     <key>foreground</key>
+    //     <string>#fc951e</string>
+    //   </dict>
+    // </dict>
+
+	]
+}
+

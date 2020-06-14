@@ -1,0 +1,37 @@
+* Navigation
+  Jumping around in a file
+
+** Ctrl Arrow
+   - OrgUp - Jumps to the heading above your cursor
+   - OrgDown - Jumps to the heading below your cursor
+
+** Quick Search
+   - OrgJumpInFile - Quick search list of the headings in your file.
+
+** Targetting
+   TODO
+
+** Jump to Clock
+   TODO
+
+** Jump to CUSTOM_ID
+   One of the properties that is standard in orgmode nomenclature
+   is that of CUSTOM_ID. This property appears in your property
+   drawer. It should be unique across your entire set of org files.
+   The OrgDb has access to all your custom ids across all the parsed
+   files. This provides a really quick way for you to jump back to
+   what is effectively a bookmark.
+
+   OrgJumpToCustomId will pop up a quick selection window
+   and you can jump to the customID you have set.
+
+   #+BEGIN_EXAMPLE
+   * My Heading
+     :PROPERTIES:
+     CUSTOM_ID: @johnsmith
+     :END:
+   #+END_EXAMPLE
+
+   In this example you can jump to My Heading really quickly by fuzzy finding
+   the name @johnsmith.
+   You can also use orgs internal link system to jump to this ID within the file.

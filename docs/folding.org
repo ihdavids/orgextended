@@ -1,0 +1,54 @@
+* Folding
+	OrgExtended supports standard visibility cycling within a node.
+    
+    #+ATTR_HTML: :width 100px
+    [[file:orgfolding.gif]]
+
+
+** Tab Cycling
+
+    One of the most important keybindings is org_tab_cycling
+    This is a context aware tab mode that will handle tab insertion
+    vs header collapsing.
+
+    [[file:headings.gif][Heading Cycling]]
+
+    #+begin_src js
+
+	{ 
+	  "keys": ["tab"],               
+	  "command": "org_tab_cycling",         
+	  "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]
+	}
+
+    #+end_src
+
+    This single key binding enables the "magic" of org tab cycling.
+    After you have enabled this some great things will be possible:
+
+    - Pressing tab on a heading will cycle it through unfolded, folded, first level headings only
+    - Pressing tab on a source block will fold it away so you don't have to look at it.
+    - Pressing tab on [[file:properties.org][Properties]] and property drawers will automatically be folded for you.
+    - Pressing tab on [[file:links.org][Links]] will fold the links away for you so you don't have to see the full link.
+    - Pressing tab outside of any headings will cycle the entire document through Overview, Table Of "Contents" view and Show All modes.
+      This is a very powerful way to quick get a view of your document from a birds eye view. 
+
+** Commands
+   Sublime Org Mode supports quite a few commands:
+
+   - OrgFoldAll        - Fold everything in the file.
+   - OrgUnfoldAll      - Unfold everything in the file. 
+   - OrgFoldContents   - Fold all the contents of all the headings (Table Of Contents view)
+   - OrgRemoveAllFolds - Remove all the folds in the file (show everything)
+   - OrgFoldThing      - Fold an item within a heading (drawer, block etc)
+   - OrgFoldAllLinks   - Fold all links within the document
+
+   These commands can be bound to keybindings of your choice to help you naviate the file.
+
+** Caveats
+    Occasionally you can get yourself into a bad folding state.
+    I am working to ensure these cannot happen, however, since we use custom folds
+    sometimes your folds can be made or shift to wonky places. 
+    IF this happens, re-save your file and run the *OrgRemoveAllFolds* command. 
+
+    This will update the backing representation of the file and clear all folds from the file.

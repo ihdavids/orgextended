@@ -1,0 +1,38 @@
+* TODO Links
+
+  Links in org mode are a nested set of square brackets
+
+  #+BEGIN_EXAMPLE
+  [[ Reference ][ Description ]]
+  #+END_EXAMPLE
+
+  Pressing enter on a link will try to follow the link.
+  If the link is a web reference org will try to open a web browser.
+
+** TODO Internal Links
+** TODO External Links
+
+* TODO Images
+  Org supports the ability to show images inline in the document
+  These are done with Sublimes phantom support under an image link and do not count as lines of text.
+  Org can download links off the web that reference images into a cache and display them locally.
+
+  - OrgShowAllImages - Shows all image links in the document
+  - OrgHideAllImages - Hides all image links in the document
+  - OrgShowImage - Shows a single image link in the document
+  - OrgHideImage - Hides a single image link in the document
+
+* File and Line Number
+
+  You can link by file and line number like so:
+
+  [[file:./links.org::3][File and Line Number Example]]
+  
+* Custom Ids
+  :PROPERTIES:
+  :CUSTOM_ID: a-custom-id
+  :END:
+
+  You can link to a heading using the CUSTOM_ID property like so:
+
+  [[file:./links.org::#a-custom-id][Custom Id Example]]

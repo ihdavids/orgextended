@@ -1,0 +1,92 @@
+[
+
+    // Give the user access to our settings in the preferences menu
+    {
+        "caption": "Preferences: OrgExtended Settings – Default",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/OrgExtended/orgextended.sublime-settings"
+        }
+    },
+    {
+        "caption": "Preferences: OrgExtended Settings – User",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/User/orgextended.sublime-settings"
+        }
+    },
+    {"caption": "TableNext", "command":"table_editor_next_field"},
+
+    {"caption": "OrgNewFile",             "command": "org_new_file"                },
+    {"caption": "OrgJumpInFile",          "command": "org_jump_in_file"            },
+    {"caption": "OrgTabCycling",          "command": "org_tab_cycling"             },
+    {"caption": "OrgFoldAll",             "command": "org_fold_all"                },
+    {"caption": "OrgUnfoldAll",           "command": "org_unfold_all"              },
+    {"caption": "OrgFoldContents",        "command": "org_fold_contents"           },
+    {"caption": "OrgCopy",                "command": "org_copy"                    },
+    {"caption": "OrgRefile",              "command": "org_refile"                  },
+    {"caption": "OrgArchiveSubtree",      "command": "org_archive_subtree"         },
+    {"caption": "OrgOpenRefile",          "command": "org_open_refile"             },
+    {"caption": "OrgCapture",  	          "command": "org_capture"                 },
+    {"caption": "OrgRebuildDb",	          "command": "org_rebuild_db"              },
+    {"caption": "OrgUp",    	          "command": "org_up"                      },
+    {"caption": "OrgDown",    	          "command": "org_down"                    },
+    {"caption": "OrgRemoveAllFolds",      "command": "org_remove_all_folds"        },
+    {"caption": "OrgChangeTodo",          "command": "org_todo_change"             },
+    {"caption": "OrgChangePriority",      "command": "org_priority_change"         },
+    {"caption": "OrgChangeIndent",        "command": "org_change_indent"           },
+    {"caption": "OrgChangeDeIndent",      "command": "org_change_de_indent"        },
+    {"caption": "OrgReloadFile",          "command": "org_reload_file"             },
+    {"caption": "OrgFoldThing",           "command": "org_fold_thing"              },
+    {"caption": "OrgMoveHeadingUp",       "command": "org_move_heading_up"         },
+    {"caption": "OrgMoveHeadingDown",     "command": "org_move_heading_down"       },
+    {"caption": "OrgOpenLink",            "command": "org_open_link"               },
+    {"caption": "OrgFoldAllLinks",        "command": "org_fold_all_links"          },
+    {"caption": "OrgShowImages",          "command": "org_show_images"             },
+    {"caption": "OrgHideImages",          "command": "org_hide_images"             },
+    {"caption": "OrgShowImage",           "command": "org_show_image"              },
+    {"caption": "OrgHideImage",           "command": "org_hide_image"              },
+    {"caption": "OrgInsertHeadingSibling","command": "org_insert_heading_sibling"  },
+    {"caption": "OrgInsertHeadingChild",  "command": "org_insert_heading_child"    },
+    {"caption": "OrgInsertTodayInactive", "command": "org_insert_today_inactive"   },
+    {"caption": "OrgInsertTodayActive",   "command": "org_insert_today_active"     },
+    {"caption": "OrgInsertDrawer",        "command": "org_insert_drawer"           },
+    {"caption": "OrgClockIn",             "command": "org_clock_in"                },
+    {"caption": "OrgClockOut",            "command": "org_clock_out"               },
+    {"caption": "OrgClearClock",          "command": "org_clear_clock"             },
+    {"caption": "OrgRecalculateClock",    "command": "org_recalculate_clock"       },
+    {"caption": "OrgTodoView",            "command": "org_todo_view"               },
+    {"caption": "OrgFilteredTodoView",    "command": "org_tag_filtered_todo_view"  },
+    {"caption": "OrgExecDynamicBlock",    "command": "org_execute_dynamic_block"   },
+    {"caption": "OrgExecSrouceBlock",     "command": "org_execute_source_block"    },
+    {"caption": "OrgCheckboxToggle",      "command": "org_toggle_checkbox"         },
+    {"caption": "OrgRecalcCheckbox",      "command": "org_recalc_checkbox_summary" },
+    {"caption": "OrgRecalcAllCheckbox",   "command": "org_recalc_all_checkbox_summaries" },
+    {"caption": "OrgJumpToCustomId",      "command": "org_jump_to_custom_id"       },
+    {"caption": "OrgInsertTag",           "command": "org_insert_tag"              },
+    {"caption": "OrgSchedule",            "command": "org_schedule"                },
+    {"caption": "OrgInsertCustomId",      "command": "org_insert_custom_id"        },
+    {"caption": "OrgSchedule",            "command": "org_schedule"                },
+
+    // Agenda
+    {"caption": "OrgAgendaGoto",          "command": "org_agenda_go_to"            },
+    {"caption": "OrgAgendaGotoSplit",     "command": "org_agenda_go_to_split"      },
+    {"caption": "OrgAgendaChangeTodo",    "command": "org_agenda_change_todo"      },
+    {"caption": "OrgAgendaChangePriority","command": "org_agenda_change_priority"  },
+    {"caption": "OrgAgendaClockIn",       "command": "org_agenda_clock_in"         },
+    {"caption": "OrgAgendaClockOut",      "command": "org_agenda_clock_out"        },
+    {"caption": "OrgAgendaDayView",       "command": "org_agenda_day_view"         },
+    {"caption": "OrgAgendaCustomView",    "command": "org_agenda_custom_view"      },
+
+    // Date Picker
+    {"caption": "OrgDatePicker",          "command": "org_date_picker"             },
+    {"caption": "OrgDateNextDay",         "command": "org_date_picker_next_day"    },
+    {"caption": "OrgDatePrevDay",         "command": "org_date_picker_prev_day"    },
+
+    // Export
+    {"caption": "OrgExportFileAsRevealJs","command": "org_export_file_reveal_js"   },
+    {"caption": "OrgExportFileAsOHtml",   "command": "org_export_file_oHtml"       },
+    {"caption": "OrgExportSubtreeAsOHtml","command": "org_export_subtree_as_oHtml" },
+    {"caption": "OrgExportFileAsHtml",    "command": "org_export_file_as_html"     },
+    {"caption": "OrgExportSubtreeAsHtml", "command": "org_export_subtree_as_html"  },
+]

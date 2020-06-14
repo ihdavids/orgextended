@@ -1,0 +1,532 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - org
+  - org_archive
+# Generic parent scope of the file
+scope: text.orgmode
+
+variables:
+  datetime: "<\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?>"
+  unscheddatetime: "\\[\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?\\]"
+  tags: "(^|):[\\w\\d:]+:"
+  priority: '\s*\[((\#A)|(\#B)|(\#C)|(\#D)|(\#E)|(\#[a-zA-Z0-9]+))\]\s+'
+  state: (TODO)|(BLOCKED)|(WAITING)|(CANCELLED)|(DONE)|(MEETING)|(PHONE)|(NOTE)|(IN-PROGRESS)|(DOING)|(NEXT)|(REASSIGNED)
+  beginmrk: BEGIN_SRC|begin_src
+  endmrk:   END_SRC|end_src
+  beginsrc: '(\s*\#\+({{beginmrk}})\s+)'
+  endsrc: '(\s*\#\+({{endmrk}})\s*)'
+contexts:
+  # The prototype context is prepended to all contexts but those setting
+  # meta_include_prototype: false.
+  #prototype:
+  #- include: comments
+  main:
+    # The main context is the initial starting point of our syntax.
+    # Include other contexts from here (or specify them directly).
+    #- include: keywords
+    #- include: numbers
+    #- include: strings
+      # --- # Todo investigate what this actually is?
+    - match: ^\s*\-\-\- [^\n]*
+      scope: orgmode.page
+      # ~~~~~ # Todo investigate what this is?
+    - match: ^\s*[~]+ [^\n]*
+      scope: orgmode.break
+
+
+      # Generic headline, TODO: Make multiple of these so we can color them
+      # and sub captures so we can hide the extraneous stars
+    - match: ^\s*[*] ({{priority}})?({{state}} )?[^\[\]:\n]*({{tags}})?
+      scope: orgmode.headline
+      captures:
+        1: orgmode.priority
+        2: orgmode.priority.value
+        3: orgmode.priority.value.a
+        4: orgmode.priority.value.b
+        5: orgmode.priority.value.c
+        6: orgmode.priority.value.d
+        7: orgmode.priority.value.e
+        8: orgmode.priority.value.general
+        10: orgmode.state.todo
+        11: orgmode.state.blocked
+        12: orgmode.state.waiting
+        13: orgmode.state.cancelled
+        14: orgmode.state.done
+        15: orgmode.state.meeting
+        16: orgmode.state.phone
+        17: orgmode.state.note
+        18: orgmode.state.inprogress
+        19: orgmode.state.doing
+        20: orgmode.state.next
+        21: orgmode.state.reassigned
+        22: orgmode.tags.headline
+    - match: ^\s*([*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+      captures:
+        1: orgmode.preamble
+        2: orgmode.headline2
+        3: orgmode.priority
+        4: orgmode.priority.value
+        5: orgmode.priority.value.a
+        6: orgmode.priority.value.b
+        7: orgmode.priority.value.c
+        8: orgmode.priority.value.d
+        9: orgmode.priority.value.e
+        10: orgmode.priority.value.general
+        12: orgmode.state.todo
+        13: orgmode.state.blocked
+        14: orgmode.state.waiting
+        15: orgmode.state.cancelled
+        16: orgmode.state.done
+        17: orgmode.state.meeting
+        18: orgmode.state.phone
+        19: orgmode.state.note
+        20: orgmode.state.inprogress
+        21: orgmode.state.doing
+        22: orgmode.state.next
+        23: orgmode.state.reassigned
+        24: orgmode.tags.header
+      scope: orgmode.headline2
+    - match: ^\s*([*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+      captures:
+        1: orgmode.preamble
+        2: orgmode.headline3
+        3: orgmode.priority
+        4: orgmode.priority.value
+        5: orgmode.priority.value.a
+        6: orgmode.priority.value.b
+        7: orgmode.priority.value.c
+        8: orgmode.priority.value.d
+        9: orgmode.priority.value.e
+        10: orgmode.priority.value.general
+        12: orgmode.state.todo
+        13: orgmode.state.blocked
+        14: orgmode.state.waiting
+        15: orgmode.state.cancelled
+        16: orgmode.state.done
+        17: orgmode.state.meeting
+        18: orgmode.state.phone
+        19: orgmode.state.note
+        20: orgmode.state.inprogress
+        21: orgmode.state.doing
+        22: orgmode.state.next
+        23: orgmode.state.reassigned
+        24: orgmode.tags.header
+      scope: orgmode.headline3
+    - match: ^\s*([*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+      captures:
+        1: orgmode.preamble
+        2: orgmode.headline4
+        3: orgmode.priority
+        4: orgmode.priority.value
+        5: orgmode.priority.value.a
+        6: orgmode.priority.value.b
+        7: orgmode.priority.value.c
+        8: orgmode.priority.value.d
+        9: orgmode.priority.value.e
+        10: orgmode.priority.value.general
+        12: orgmode.state.todo
+        13: orgmode.state.blocked
+        14: orgmode.state.waiting
+        15: orgmode.state.cancelled
+        16: orgmode.state.done
+        17: orgmode.state.meeting
+        18: orgmode.state.phone
+        19: orgmode.state.note
+        20: orgmode.state.inprogress
+        21: orgmode.state.doing
+        22: orgmode.state.next
+        23: orgmode.state.reassigned
+        24: orgmode.tags.header
+      scope: orgmode.headline4
+    - match: ^\s*([*][*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+      captures:
+        1: orgmode.preamble
+        2: orgmode.headline5
+        3: orgmode.priority
+        4: orgmode.priority.value
+        5: orgmode.priority.value.a
+        6: orgmode.priority.value.b
+        7: orgmode.priority.value.c
+        8: orgmode.priority.value.d
+        9: orgmode.priority.value.e
+        10: orgmode.priority.value.general
+        12: orgmode.state.todo
+        13: orgmode.state.blocked
+        14: orgmode.state.waiting
+        15: orgmode.state.cancelled
+        16: orgmode.state.done
+        17: orgmode.state.meeting
+        18: orgmode.state.phone
+        19: orgmode.state.note
+        20: orgmode.state.inprogress
+        21: orgmode.state.doing
+        22: orgmode.state.next
+        23: orgmode.state.reassigned
+        24: orgmode.tags.header
+      scope: orgmode.headline5
+    - match: ^\s*([*][*][*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+      captures:
+        1: orgmode.preamble
+        2: orgmode.headline6
+        3: orgmode.priority
+        4: orgmode.priority.value
+        5: orgmode.priority.value.a
+        6: orgmode.priority.value.b
+        7: orgmode.priority.value.c
+        8: orgmode.priority.value.d
+        9: orgmode.priority.value.e
+        10: orgmode.priority.value.general
+        12: orgmode.state.todo
+        13: orgmode.state.blocked
+        14: orgmode.state.waiting
+        15: orgmode.state.cancelled
+        16: orgmode.state.done
+        17: orgmode.state.meeting
+        18: orgmode.state.phone
+        19: orgmode.state.note
+        20: orgmode.state.inprogress
+        21: orgmode.state.doing
+        22: orgmode.state.next
+        23: orgmode.state.reassigned
+        24: orgmode.tags.header
+      scope: orgmode.headline6
+
+    - match: ^\s*(\|.+\|)
+      captures:
+        1: orgmode.table.block
+      scope: orgmode.table
+      # DEADLINE: <DATETIME>
+    - match: "(DEADLINE:) ({{datetime}})"
+      captures:
+        1: orgmode.statekeyword
+        2: orgmode.datetime
+      scope: orgmode.deadline
+      # SCHEDULED: <DATETIME>
+    - match: "(SCHEDULED:) ({{datetime}})"
+      captures:
+        1: orgmode.statekeyword
+        2: orgmode.datetime
+      scope: orgmode.scheduled
+      # CLOSED: [DATETIME]
+    - match: "(CLOSED:) ({{unscheddatetime}})"
+      captures:
+        1: orgmode.statekeyword
+        2: orgmode.unscheddatetime
+      scope: orgmode.closed
+      # bullet list
+    - match: "^\\s*\\- "
+      scope: orgmode.tack.minus
+      # bullet list
+    - match: "^\\s*\\+ "
+      scope: orgmode.tack.plus
+      # To follow up: -> and =>
+    - match: "^\\s*(\\-\\>|\\=\\>) "
+      scope: orgmode.follow_up
+      # [-] Checkbox
+    - match: (\[[ ]\])\s?
+      scope: orgmode.checkbox
+    - match: (\[[xX]\])\s?
+      scope: orgmode.checkbox.checked
+    - match: (\[[\-]\])\s?
+      scope: orgmode.checkbox.blocked
+      # [#/#] Checkbox summary
+    - match: (\[\d*[/%]\d*\])
+      scope: orgmode.checkbox.summary
+      # [[link]]
+    - match: \[(\[([^\]]+)\])\]
+      captures:
+        1: orgmode.link.textblock
+        2: orgmode.link.text.href
+      scope: orgmode.link
+      # [[link][name]]
+    - match: \[(\[([^\]]+)\])(\[([^\]]+)\])\]
+      captures:
+        1: orgmode.link.hrefblock
+        2: orgmode.link.href
+        3: orgmode.link.textblock
+        4: orgmode.link.text
+      scope: orgmode.link
+    - match: http[s]?://[^ \t]+
+      scope: orgmode.link.href
+    - match: \b([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})\b
+      scope: orgmode.email
+      # {numerical_value}
+    - match: \{(\d+)\}
+      scope: orgmode.link.internal.number
+      # {{headline}}
+    - match: \{\{(.+?)\}\}
+      scope: orgmode.link.internal.headline
+      # :TAG:
+    - match: "(^|\\s):[\\w\\d:]+:"
+      scope: orgmode.tags
+      # [code] block, not sure what these are.
+    - match: \[code\]\s*
+      push:  code
+    - match: ^\s*Traceback \(most recent call last\):\s*$
+      push: pythonstack
+
+    - match: \*[^*]+\*
+      scope: orgmode.bold
+
+    - match: /[^/]+/
+      scope: orgmode.italics
+
+    - match: _[^_]+_
+      scope: orgmode.underline
+
+    - match: \+[^\+]+\+
+      scope: orgmode.strikethrough
+
+    - match: ~[^~]+~
+      scope: orgmode.code
+
+    - match: =[^=]+=
+      scope: orgmode.verbatim
+
+
+
+    - match: '(\s*\#\+(BEGIN_CENTER|begin_center)\s*)'
+      captures:
+        1: orgmode.fence
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: orgmode.raw.block
+        - match: '(\s*\#\+(END_CENTER|end_center)\s*)'
+          captures:
+            1: orgmode.fence
+          pop: true
+    - match: '(\s*\#\+(BEGIN_VERSE|begin_verse)\s*)'
+      captures:
+        1: orgmode.fence
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: orgmode.raw.block
+        - match: '(\s*\#\+(END_VERSE|end_verse)\s*)'
+          captures:
+            1: orgmode.fence
+          pop: true
+    - match: '(\s*\#\+(BEGIN_QUOTE|begin_quote)\s*)'
+      captures:
+        1: orgmode.fence
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: orgmode.raw.block
+        - match: '(\s*\#\+(END_QUOTE|end_quote)\s*)'
+          captures:
+            1: orgmode.fence
+          pop: true
+    - match: '(\s*\#\+(BEGIN_EXAMPLE|begin_example)\s*)'
+      captures:
+        1: orgmode.fence
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: orgmode.raw.block
+        - match: '(\s*\#\+(END_EXAMPLE|end_example)\s*)'
+          captures:
+            1: orgmode.fence
+          pop: true
+    - match: '{{beginsrc}}(python\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.python
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.python
+    - match: '{{beginsrc}}(cpp\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.c++
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.c++
+    - match: '{{beginsrc}}(C\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.c
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.c
+    - match: '{{beginsrc}}(perl\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.perl
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.perl
+    - match: '{{beginsrc}}(ini\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.ini
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.ini
+    - match: '{{beginsrc}}(js\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.js
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.js
+    - match: '{{beginsrc}}(javascript\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.js
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.js
+    - match: '{{beginsrc}}(php\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.php
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.php
+    - match: '{{beginsrc}}(xml\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: text.xml
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:text.xml
+    # This DOESNT WORK? WHY?
+    - match: '{{beginsrc}}(csharp\s*|cs\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.cs
+        - match: '{{endsrc}}'
+          captures:
+            2: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.cs
+    - match: '{{beginsrc}}(powershell\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.powershell
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.powershell
+    - match: '{{beginsrc}}(plantuml\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.powershell
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.powershell
+      # #+SOMETHING:
+      # But not a dynamic block
+      # Use negative look ahead to avoid matching begin and end dynamic blocks
+    - match: '^\s*(\#\+(?!(BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
+      scope: orgmode.controltag
+      captures:
+        1: orgmode.controltag.tag
+        4: orgmode.controltag.text
+
+    # #+BEGIN: NAME dynamic block support
+    - match: '((\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?)'
+      captures:
+        1: orgmode.fence.dynamicblock
+        2: orgmode.fence.dynamicblock.begin
+        3: orgmode.fence.dynamicblock.name
+        4: orgmode.fence.dynamicblock.params
+      push:
+        - meta_scope: orgmode.raw.block.dynamicblock
+        - meta_content_scope: source.js
+        - match: '(\#\+END:|\#\+end:)'
+          captures:
+            1: orgmode.fence.dynamicblock.end
+          pop: true
+        - include: scope:source.js
+  code:
+    - meta_scope: text
+    - match: \s*\[/code\]
+      pop: true
+
+  pythonstack:
+    - meta_scope: orgmode.python.traceback
+    - match: "^\\s*\\w+: .+$"
+      pop: true
+

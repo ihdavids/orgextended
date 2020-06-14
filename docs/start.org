@@ -1,0 +1,74 @@
+#+STARTUP: inlineimages
+
+* Introduction
+  #+ATTR_ORG: :width 100
+  [[https://orgmode.org/img/org-mode-unicorn-logo.png]]
+
+  OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
+  that has driven me back to Emacs over and over again. I finally decided that I might take a stab
+  at building a usable orgmode plugin for sublime.
+
+  Fundamentally org mode is 2 things and fairly hard to describe:
+
+  1. Org Files - A text based document markup language similar to markdown.
+  2. Org Mode  - A wide variety of tools for operating on and working with collections of 
+  3. Org Extensions - I know I said 2 but Org Mode has a wide variety of tools built around the mode and api's extending it in many creative ways.
+
+  Org Mode can and has been used for a large variety of things:
+
+  + A Personal Wiki
+  + Professional Notes
+  + Time Tracking and Billing
+  + Documentation
+  + Research Papers
+  + Literate Programming
+  + Personal Agenda
+  + Project Planning
+  + As a blogging tool
+  + Website content management 
+  + A means of planning and managing a budget with ledger mode
+  + Many many more things
+
+  What makes Org Mode so versatile is the simplicity of the format
+  and the the depth of the tools and API's provided around the format.
+
+  There is no reason markdown could not be extended to become exactly what Org Mode
+  has become, but markdown is not quite as flexible and has not had the same degree of cult
+  following so has yet to evolve into something like Org.
+
+  I hope to go beyond simply the file format and bring some of the actual Mode to Sublime.
+  I simply cannot build the entire thing, but I hope we can build something unique and amazing
+  in sublime, in its own right.
+
+* Thank You
+  I have shamelessly built this plugin on the backs of some excellent plugins.
+
+  - The original orgmode plugin - This work was exceptional, OrgExtended is a tribute to that work and consumes some of it.
+  - sublime_ZK - The inline image preview is entirely due to the Markdown ZK plugin. 
+    [[https://github.com/renerocksai/sublime_zk][ZK]] Thank you renerocksai for pointing out that phantoms can be used for image preview.
+  - Table Edit - For now this excellent plugin is a dependency and the basis by which we offer Org style table editing.
+  	In a fiture version we may look to consume the package and own table editing to facilitate expressions and some of the more
+  	advanced org table tools, but for now, thank you for making this excellent plugin!
+
+* This Plugin
+
+  - [[file:orgextended.org][Basic Structure]] - Basic file structure
+  - [[file:editing.org][Editing]] - Editing your org file
+  - [[./folding.org][Folding]] - Jumping from the full view to a folded representation.
+  - [[file:links.org][Links]] - Jumping within and without.
+  - [[file:navigation.org][Navigation]] - Powerful ways of navigating your org files.
+  - [[file:pandoc.org][Exporting]] - Converting from org to other things.
+  - [[file:properties.org][Properties and Drawers]] - Metadata within a heading
+  - [[file:clocking.org][Time Tracking]] - Clocking and clock reports
+  - [[file:dynamicblocks.org][Dynamic Blocks]] - Run arbitrary code
+
+* References
+  To help get you started on your Org journey
+  Here are some useful external links:
+
+- [[https://orgmode.org/manual/][The Org Manual]] - The official source of truth for all things orgmode
+- [[https://orgmode.org/worg/org-tutorials/org4beginners.html][Org Mode 4 Beginners]] - An introduction
+- [[https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html][David O'Tools Introduction]] - Yet another intro
+- [[https://thoughtbot.com/blog/the-many-uses-of-org-mode][The Many Uses of Org Mode]]
+- [[https://kitchingroup.cheme.cmu.edu/blog/2014/08/08/What-we-are-using-org-mode-for/][More Uses]]
+- [[http://doc.norang.ca/org-mode.html][Your Life In Plain Text]] - A wonderful reference on one mans journey to use orgmode to improve his life

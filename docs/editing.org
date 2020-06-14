@@ -1,0 +1,36 @@
+* Editing
+  Quick editing options
+
+** Formatting
+   Org supports a bunch of formatting options.
+   Where possible they have chosen formatting options
+   that have the flavour of the format you are choosing.
+
+   - *Bold*
+   - _Underline_
+   - /Italics/
+   - +Strikethrough+
+   - ~Code~
+   - =Verbatim=
+
+   These are most useful when writing org files for [[file:pandoc.org][Export]] 
+
+
+** Todo Cycling
+   Because changing the status of your task is something that you do
+   quite often when using org as a means of organizing a project,
+   org supports the means of quickly switching between task states.
+
+   - OrgChangeTodo - Will let you quickly change the state of
+     a task. I don't support cycling at the moment, only picking from
+     a quick list.
+
+** Priority Editing
+   Todo mention priorities and editing them
+
+
+** Quick Heading Insertion
+   TODO
+
+** Quick Indentation Change
+   TODO

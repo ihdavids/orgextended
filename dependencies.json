@@ -1,0 +1,10 @@
+{
+	"*": {
+		"*": [
+			"pathlib",
+			"dateutil",
+			"pyyaml",
+			"TableEditor"
+		]
+	}
+}

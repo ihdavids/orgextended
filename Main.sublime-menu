@@ -1,0 +1,45 @@
+[
+    {
+        "mnemonic": "n", 
+        "caption": "Preferences", 
+        "id": "preferences", 
+        "children": [
+            {
+                "mnemonic": "P", 
+                "caption": "Package Settings", 
+                "id": "package-settings", 
+                "children": [
+                    {
+                        "caption": "OrgExtended", 
+                        "children": [
+                            {
+                                "caption": "Docs", 
+                                "args": {
+                                    "file": "${packages}/OrgExtended/docs/start.org"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "Settings – Default", 
+                                "args": {
+                                    "file": "${packages}/OrgExtended/orgextended.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "Settings – User", 
+                                "args": {
+                                    "file": "${packages}/User/orgextended.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "-"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

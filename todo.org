@@ -1,0 +1,137 @@
+* TODO Things I want [9/37]
+	- [-] Capture [33%]
+		- [ ] External Capture (orgprotocol)
+		- [x] Basic capture buffer
+		- [x] Templates in config file.
+		- [ ] Capture targetting
+		- [ ] Capture using sublime snippets
+		- [ ] Capture box size controls?
+	- [-] Parsing [4/5]
+		- [x] Basic file parsing
+		- [x] Tags parsed.
+		- [x] Comments (#+) available
+		- [x] Positions available
+		- [ ] Stripping to keep in memory size down.
+	- [-] Refiling [2/3]
+		- [x] Basic Refile support
+		- [x] Basic Copy support
+		- [ ] More complex options for refiling.
+	- [-] Fold cycling [10/11]
+		- [x] Local fold cycling
+		- [x] Fold cycling in a modified file (currently gets confused)
+		- [x] Global fold cycling
+		- [x] Initial folding state control tag
+		- [x] Fold ALL, Unfold ALL commands
+		- [x] Folding property drawers
+		- [x] Folding src and quote blocks
+		- [x] Automatic property drawer folding. (I hate seeing those things!)
+		- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
+		- [x] Folding of all generic property drawers.
+		- [ ] Folding of checkbox trees
+	- [-] Archiving [4/7]
+		- [x] Copy to org_archive an entire subtree
+		- [ ] (Low Priority) Archive by old datetime stamps
+		- [x] (Low Priority) Archive by adding :ARCHIVE: tag
+		- [ ] (Low Priority) Archive projects without TODO tags.
+		- [ ] Configuration for what gets added to the archive entries
+		- [x] #+ARCHIVE tags
+		- [x] Global archive option
+	- [ ] Numbered Lists
+	- [-] Editing [4/12]
+		- [ ] Todo cycling
+		- [x] Todo menu
+		- [x] Priority menu
+		- [x] Insert heading (child and sibling)
+		- [ ] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
+		- [x] Caret looks okay
+		- [ ] Indent, De-Indent heading and subtree
+		- [ ] Heading movement, like you can do with lines
+		- [ ] Checkbox insert?
+		- [ ] Sublime snippets?
+		- [ ] Auto indenting of checkboxes (with tab)
+		- [ ] Property insertion
+	- [-] Links [7/16]
+		- [x] Orgmode style links
+		- [x] images displayed inline
+		- [ ] #+ATTR_ORG: :width 100 supported for images
+		- [x] Single entry links vs with description (don't auto fold)
+		- [x] Follow links on various platforms.
+		- [ ] Link copy and insertion
+		- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
+		- [ ] Links in templates.
+		- [x] Ensure file: works (currently doesn't work that well)
+		- [ ] <<TAG>> works for links
+		- [ ] Ensure line number
+		- [ ] search links
+		- [ ] regex links works for links
+		- [x] custom_id links work
+		- [ ] Write a page about personal wikis
+		- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
+	- [-] Formatting [3/8]
+		- [x] Basic syntax highlighting
+		- [x] Priority blocks
+		- [ ] Smarter heading blocks
+		- [ ] Fix priority highlighting.
+		- [x] Property drawers vs tags.
+		- [ ] Strings?
+		- [ ] Finish the babel work.
+		- [ ] Htmlify
+	- [-] Tables [1/5]
+		- [x] Basic table editing (Table Edit?)
+		- [ ] Syntax highlighting of tables
+		- [ ] Bold headers in tables
+		- [ ] Table formats
+		- [ ] Table parameters to execution blocks
+	- [x] Checkbox summary updating
+	- [x] Checkbox percentages
+	- [-] Dynamic Blocks [1/5]
+		- [x] Basic dynamic blocks
+		- [ ] Test user side blocks
+		- [ ] clocktable block
+		- [ ] Clock reports
+		- [ ] execute all dynamic blocks in file command
+	- [x] Basic Clocking
+	- [-] Agenda [4/8]
+		- [x] Todo list (dynamic)
+		- [x] Extensible agenda views
+		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
+		- [x] Todo summaries?
+		- [ ] More extensible views.
+		- [ ] Week View
+		- [ ] Calendar is selectable for day view?
+		- [ ] Formatting for today line in day view?
+	- [ ] Logging [0/2]
+		- [ ] Todo state controls
+		- [ ] Logging and notes on certain state transitions.
+	- [x] Priorities (From format block)
+	- [ ] TODO states are fully dynamic, even in coloring? Not sure I can make that possible.
+	- [ ] Format headings
+	- [ ] Babel execution of src blocks [0/5]
+		- [ ] plantuml and dot integration?
+		- [ ] latex?
+		- [ ] noweb
+		- [ ] naming src blocks
+		- [ ] parameters from tables
+	- [-] Snippets [2/4]
+		- [x] Src block snippet
+		- [ ] Quote block snippet
+		- [ ] Name snippet
+		- [x] Example block snippet
+	- [x] Quotes
+	- [x] Src blocks (more languages finish the color scheme)
+	- [ ] Symbol indexing for headers
+	- [x] Color highlighting for #+ symbols
+	- [x] Image display? Is that possible?
+	- [-] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
+	- [ ] Persistent folding between open and close
+	- [ ] Agenda? Integration with existing plugin?
+	- [ ] Jira integration?
+	- [ ] Google calendar integration?
+	- [ ] Searching by tag (like occur style?)
+	- [-] Export... probably refer and document using pandoc?
+		- [ ] Reveal.js support
+		- [ ] Export subtree
+	- [ ] Presentation mode from a file.
+	- [ ] Column view (Is this possible in sublime?)
+	- [ ] Effort Estimate
+	- [-] Vintageous bindings

@@ -1,0 +1,108 @@
+{
+	"name": "orgextended",
+	"variables": {
+		"bgcol": "#272822",
+		// Define variables here
+	},
+	"globals": {
+		"foreground": "#F8F8F2",
+		"background": "var(bgcol)",
+		"accent":     "#ffffff",
+		"selection":  "#9D550F",
+	    "selectionBackground": "#000000",
+	    "selectionForeground": "#FF0000",
+	    "caret":               "#FF55ff",
+	    "line_highlight":      "#373730"
+	},
+	"rules": 
+	[
+		{
+			"scope": "orgagenda.header",
+			"foreground": "#5b96f5",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.timeseparator",
+			"foreground": "#7c7c7d",
+		},
+		{
+			"scope": "orgagenda.now",
+			"foreground": "#a88cd4",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.filename",
+			"foreground": "#76b3ae",
+		},
+		{
+			"scope": "orgagenda.todo",
+			"foreground": "#a63229",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.doing",
+			"foreground": "#d2a2e0",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.blocked",
+			"foreground": "#FF0000",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.waiting",
+			"foreground": "#ffff00",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.cancelled",
+			"foreground": "#bab9b8",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgagenda.inprogress",
+			"foreground": "#d2a2e0",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.next",
+			"foreground": "#3fd9d7",
+			"font_style": "bold italic",
+		},
+		{   // Hide the habit markup in the buffer
+			"scope": "orgagenda.habit",
+			"foreground": "var(bgcol)",
+		},
+		{
+			"scope": "orgagenda.habit.didit",
+			"foreground": "#ffffff",
+			"background": "#007700",
+		},
+		{
+			"scope": "orgagenda.habit.scheduled",
+			"foreground": "#333300",
+			"background": "#550000",
+		},
+		{
+			"scope": "orgagenda.habit.nothing",
+			"foreground": "#000066",
+			"background": "#000066",
+		},
+		{
+			"scope": "orgagenda.projecttitle",
+			"foreground": "#a87932",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.blockseparator",
+			"foreground": "#4a4a37",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.monthheader",
+			"foreground": "#a87932",
+			"font_style": "bold italic",
+		},
+	]
+}
+

@@ -1,0 +1,4 @@
+{
+	// The color scheme to use for the agenda buffer
+	"color_scheme": "Packages/OrgExtended/orgagenda.sublime-color-scheme",
+}

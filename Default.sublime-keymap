@@ -1,0 +1,67 @@
+[
+
+	{ "keys": ["ctrl+shift+x"],      "command": "org_capture"                                                                                                          },
+	{ "keys": ["ctrl+up"],           "command": "org_up" ,                       "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+	{ "keys": ["ctrl+down"],         "command": "org_down" ,                     "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+	{ "keys": ["tab"],               "command": "org_tab_cycling",               "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+	{ "keys": ["ctrl+alt+x"],        "command": "org_open_refile"                                                                                                      },
+
+    // Core OrgMode Behaviour
+    //{ "keys": ["enter"],             "command": "orgmode_toggle_checkbox",         "context": [{ "key": "selector", "operator": "equal", "operand": "orgmode.checkbox" }]},
+    //{ "keys": ["enter"],             "command": "orgmode_recalc_checkbox_summary", "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.checkbox.summary" }]},
+    { "keys": ["enter"],             "command": "org_open_link",                   "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link" }]},
+    { "keys": ["enter"],             "command": "orgmode_cycle_internal_link",     "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link.internal" }]},
+
+	// NeoVintageous - Command / Normal Mode - Quick commands
+    // GLOBAL BINDINGS
+    { "keys": ["Z"],                 "command": "org_capture",                   "context": [{"key": "vi_command_mode_aware"}]                                                      },
+    { "keys": ["shift+space"],       "command": "org_agenda_day_view",           "context": [{"key": "vi_command_mode_aware"}]                                                      },
+    // Personal Doom/Spacemacs style keybindings. Really should be in their own package.
+    // I will move at some future point.
+    // Spacemacs style group switching. I prefer this, feel free to remove.
+    { "keys": [" ", "1"],            "command": "focus_group",                   "context": [{"key": "vi_command_mode_aware"}], "args": { "group": 0}  },
+    { "keys": [" ", "2"],            "command": "focus_group",                   "context": [{"key": "vi_command_mode_aware"}], "args": { "group": 1}  },
+    { "keys": [" ", "3"],            "command": "focus_group",                   "context": [{"key": "vi_command_mode_aware"}], "args": { "group": 2}  },
+    { "keys": [" ", "4"],            "command": "focus_group",                   "context": [{"key": "vi_command_mode_aware"}], "args": { "group": 3}  },
+    { "keys": [" ", "5"],            "command": "focus_group",                   "context": [{"key": "vi_command_mode_aware"}], "args": { "group": 4}  },
+    // Spacemacs style save file
+    { "keys": [" ", "f", "s"],       "command": "save",                          "context": [{"key": "vi_command_mode_aware"}]},
+    // ORGMODE BINDINGS
+    { "keys": ["t"],                 "command": "org_todo_change",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "left"],         "command": "org_change_de_indent",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "up"],           "command": "org_move_heading_up",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "down"],         "command": "org_move_heading_down",         "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "h"],       "command": "org_insert_heading_sibling",    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "c"],       "command": "org_insert_heading_child",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "d", "i"],  "command": "org_insert_date_inactive",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "d", "a"],  "command": "org_insert_date_active",        "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "t"],       "command": "org_insert_tag",                "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "i"],       "command": "org_insert_custom_id",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "s"],       "command": "org_schedule",                  "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "c", "i"],       "command": "org_clock_in",                  "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "c", "o"],       "command": "org_clock_out",                 "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    // ORG AGENDA
+    { "keys": [" ", "o", "a"],       "command": "org_agenda_custom_view",        "context": [{"key": "vi_command_mode_aware"}]  },
+    { "keys": ["enter"],             "command": "org_agenda_go_to",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [" "],                 "command": "org_agenda_go_to_split",        "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["g"],                 "command": "org_agenda_day_view",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [","],                 "command": "org_agenda_change_priority",    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["t"],                 "command": "org_agenda_change_todo",        "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["c","i"],             "command": "org_agenda_clock_in",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["c","o"],             "command": "org_agenda_clock_out",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+
+    // ORG DATE PICKER
+    { "keys": [">"],                 "command": "org_date_picker_next_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["<"],                 "command": "org_date_picker_prev_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+,"],            "command": "org_date_picker_prev_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+."],            "command": "org_date_picker_next_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+,"],             "command": "org_date_picker_prev_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+."],             "command": "org_date_picker_next_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    // ORG INPUT SELECTOR
+    { "keys": ["down"],             "command": "org_input_down",                "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
+    { "keys": ["up"],               "command": "org_input_up",                  "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
+]
+ 

@@ -1,0 +1,12 @@
+{
+    "extends": "Default.sublime-theme",
+    "variables": {
+        "fg": "black",
+        "bg": "white",
+    },
+    "rules": [
+        {
+            "class": "",
+        }
+    ]
+}

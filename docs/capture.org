@@ -1,0 +1,43 @@
+* TODO Capture
+  The ability to capture an idea really quickly is a very powerful feature of
+  org mode. Bind ~OrgCapture~ to a hotkey. (By default the neovintageous binding is shift+Z)
+  Once bound this allows you to make very quick captures of ideas as they come to you.
+
+  Right now, the capture mechanism ONLY supports capturing to a refile file.
+  That is because, that is my primary way of using the feature. Capture into
+  an inbox that I refile every day or so when I have a moment.
+
+  In the future I might support other mechanisms of capturing. Org
+  has the ability to capture to a datetree for things like regular meetings,
+  capturing to the active clocked item. Capturing to IDed or tagged items.
+  Capturing to specific entries in specific files and a host of other options.   
+  
+  [[file:orgcapture.gif]]
+
+
+* TODO Refile
+  I like to capture ideas, snippets and meeting notes to my refile file.
+  That makes input quick and dirty when I am in the middle of something else.
+
+  However, once captured it is a pain to move that stuff around. Org has a 
+  feature that lets you do that much easier. Refile. ~OrgRefile~ lets you
+  quickly move a heading from one location to another within your known
+  org files. 
+
+* TODO Archive
+  While projects are great, it is often useful to archive
+  a project once completed. Org has a powerful toolset for
+  archiving completed subtrees.
+
+  *OrgArchiveSubtree* will take the subtree and put it in another file
+  as an archived entry.
+
+  As usual the org manual is the best source of truth about archiving:
+  [[https://orgmode.org/manual/Archiving.html][Archiving]] 
+  That said a quick primer:
+
+  You can either add 
+  TODO FILL IN FROM HERE
+  #+BEGIN_EXAMPLE
+  #+ARCHIVE: %s_done::
+  #+END_EXAMPLE

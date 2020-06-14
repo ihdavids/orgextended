@@ -1,0 +1,40 @@
+
+* The Clock
+  Tasks are powerful by themselves but org takes project planning even deeper.
+  Org has a wonderful triad of features to help you with personal project planning and consulting.
+  These are:
+
+  - [x] Clocking
+  - [ ] Clock reports
+  - [x] Estimates
+  - [ ] Column Mode
+
+  I know I said triad, but I don't have column mode implemented yet and it will likely be a while
+  as I work to figure out how best to make that a reality. Clock reports are hopefully something I will
+  make time to implement relatively soon.
+
+  These features work together to allow you to estimate your expected time on a task, clock in and out
+  as you work on the tasks and build reports that delineate how your estimates stacked up against your
+  actual expenditures of time. For those of us that are always looking to grow in our project management
+  skills, disciplined use of the clock is powerful ally.
+
+  For those of us working as consultants or in other industries where a time sheet can be valuable 
+  the clock reports can be a huge benefit.
+
+** Clocking
+
+  Org has the ability to start and stop a clock and record the elapsed time in your property drawer.
+  While Org allows you to record your clock values anywhere in a heading, I have avoided that.
+  Not only is it easier searching for clocked values in a property drawer, but my bias is showing here
+  in that I prefer storing my clock values in the property drawer. Perhaps if someone else has the time to
+  lend a hand in the future we can support the other means of editing properties.
+
+
+** Clock Reports
+   TODO
+
+** Estimates
+   TODO
+
+** Column Mode
+   TODO

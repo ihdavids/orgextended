@@ -1,0 +1,6 @@
+* TODO Properties
+  Discuss properties in org mode
+
+** Property Drawers
+** Properties
+** Clock info

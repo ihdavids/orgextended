@@ -1,0 +1,6 @@
+{
+	// The color scheme to use for the datepicker buffer
+	"color_scheme": "Packages/OrgExtended/orgdatepicker.sublime-color-scheme",
+	//"font_face": "Courier New",
+	//"font_size": 15
+}

@@ -1,0 +1,246 @@
+#+FILETAGS: :Peter:Boss:Secret:
+#+STARTUP: content logdone
+
+Custom TODO cycling is understood.
+//#+TODO: A B C | D E
+
+// While this basic heading works
+// If you add your own extension you need
+// to add to validOrgExtensions in the sublime-settings
+// file. Otherwise the DB will not know about your file extension
+// and will reject the archive file.
+#+ARCHIVE: %s_archive::* Archive
+// While these are supported they are not highlighted like A B C D E are
+//#+PRORITIES: 1 2 3 4 5
+#+HTML_STYLE: refined
+
+* Introduction
+  This is a simple test file that tries to demonstrate some
+  of the syntax highlighting and allows me to play with things.
+* Basic Headings and tags  :TAG1:TAG2:
+  To start I am only supporting 7 levels of headers.
+  This seems sufficient for my needs. Tags are supported
+** Heading 2
+*** Heading 3 :TAG3:
+**** Heading 4
+***** Heading 5
+****** Heading 6 :TAG4:
+
+* NOTE Notes and phone messages :OTHERTAGS:
+  I have not found a good way to make the normal TODO states dynamic
+  as supported in org mode, so you get the states I like and care about.
+  Feel free to add and PR your additional states.
+** PHONE Phone messages
+   Some text in here
+*** MEETING Meetings
+
+* Property blocks are colored
+  :PROPERTIES:
+  :ORDERED:  t
+  :END:
+  :LOGBOOK:
+  - This is a line
+  :END:
+  For clocking we need a property drawer concept so here is a start.
+
+* NOTE orgmode (vs true orgmode compat) bits
+  These items are NOT true org mode things but come
+  from the previous ST2 orgmode package. I felt they were worth
+  supporting and have kept them. I do not think being purist is
+  super helpful when it comes to helping out the sublime community
+
+	~ This is a break
+	--- This is a page break ---
+
+	-> For Follow Up
+	=> For Follow Up
+
+* NOTE Checkboxes [1/3]
+  Colored but not updated yet! I need Ctrl-c Ctrl-c style updating.
+  That will come, just not yet.
+
+  - [ ] Checkbox
+  - [x] Blocked checkbox
+  - [-] Checked checkbox [1/3]
+      - [ ] sub
+      - [ ] sub2
+      - [x] sub3
+
+* NOTE Links
+
+	There is support for basic org links a la orgmode style.
+
+	[[https://reg.ca][Reg Ca]] Org link
+
+  NOTE: Folding is not perfect but I find folding the actual ref itself
+        is a reasonable compromise.
+
+  Pressing enter on the link will try to do the right thing.
+  [[file:./docs/links.org::#a-unique-id][Custom Id Link]]
+
+* NOTE Scheduling
+
+  These are colored and parsed by the system
+  but not yet integrated fully.
+
+  SCHEDULED: <2020-05-25 Thu 10:50 +1d>
+  CLOSED: [2020-05-25 Mon]
+  DEADLINE: <2020-05-25 Tue>
+
+* NOTE Navigation
+
+  Ctrl arrow key travels up and down the tree of headings
+  Jump in file.
+
+* NOTE Refile, Copy
+
+  I have commands for this but not bound well yet
+  I am currently missing archiving.
+
+* NOTE Control Tags
+   Most of these are not supported by the backend yet.
+   Where possible I WILL Support them and document them
+   
+   #+PRIORITIES: A B C
+   #+TITLE: Orgmode example file
+   
+* TODO Src Block
+	Working on supporting a variety of source code block styles.
+	Hopefully I can support some of the babel engine as well eventually
+
+	With the way org works the orgextended.sublime-color-scheme has to own your
+	ENTIRE color scheme. You can override any of it by providing your own sublime color scheme.
+
+	I have cheated here and pulled form the Monokai Extended tmTheme (I always found that language, theme confusing when it is a color scheme not theme)
+	I find monokai a bit jarring so I may provide several schemes eventually, we will see
+
+
+	#+BEGIN_SRC python
+    def function(a):
+	  print("hello world")
+	#+END_SRC
+
+
+	#+BEGIN_SRC cpp
+	class MyClass
+	{
+	public:
+		MyClass(int x, int y) {}
+	}
+	#+END_SRC
+
+	#+BEGIN_SRC C
+	void main(int x, int y)
+	{
+		printf("hello world\n");
+	}
+	#+END_SRC
+
+	#+begin_src js
+	function myfunc(x , y) {
+		console.log("Hello World")
+	}
+	#+end_src
+
+	#+begin_src xml
+	<mytag attribute="hello">
+		Some inner text
+	</mytag>
+	#+end_src
+
+* NOTE Bold Italics Underline
+    *bold*
+    /italic/
+    _underline_
+    +strikethrough+
+    ~code~
+    =verbatim=
+
+* NOTE Example, Verse, Quote, Center
+	I use these a bunch to delineate a block of text I care about
+	in my notes. I am going to keep these for now.
+
+    #+begin_example
+    This is an example of something
+    in a block
+    #+end_example
+
+    #+BEGIN_QUOTE
+    This is a quote from something.
+    #+END_QUOTE
+
+    #+BEGIN_VERSE
+    A verse of poetry
+    #+END_VERSE
+
+    #+BEGIN_CENTER
+    A verse of poetry
+    #+END_CENTER
+
+* NOTE Capture
+  One of the biggest features I can't do without is the quick capture keybindings and templates.
+  I have a system for this in place. It will probably change as I discover what I like here.
+  I have a little template engine that is expanding as I discover what I need. It is NOTE quite like org
+  as we are workingin sublime here.
+
+* [#TOP] NOTE Priorities
+   General priority tags work
+   but a, b, c, d, e have independent
+   coloring options in the grammar.
+** [#A] TODO Top priority
+   A body for this work item
+*** [#B] TODO Second priority
+**** [#C] TODO Third priorty item
+***** [#D] TODO Third priorty item
+****** [#E] TODO Third priorty item
+
+
+
+* Inline Images
+  Links can be used to show images or open
+  up an image viewer if followed.
+
+  Run: OrgShowImage on this link
+  [[file:./docs/sublime.png]]
+
+* Table Editor
+  Eventually we will probably have to own table editing
+  (At least if I want full support for expressions, which I do.)
+
+  However, for now, the Sublime Table Editor plugin
+  is pretty much full basic table editing support. It just needs
+  a little tweaking to get working, I have just made it a dependency
+  and embedded it into our generic tab cycling for now.
+
+  |   Heading 1    | Heading 2 | Heading 3 |
+  |----------------+-----------+-----------|
+  | Some data      |         1 |         3 |
+  | More data      |         2 |         4 |
+  |----------------+-----------+-----------|
+  | Something else |         5 |         6 |
+
+
+* Clocking
+  #+BEGIN: clocktable :scope subtree :level 2
+  |Heading|Time|
+  |-
+  |A|B|
+  #+END:
+** Clocking
+   :PROPERTIES:
+    CLOCK: [2020-03-31 Tue 16:28]--[2020-03-31 Tue 16:29] => 00:01
+    CLOCK: [2020-03-31 Tue 20:39]--[2020-03-31 Tue 20:55] => 00:16
+   :END:
+   We can clock in and out now.
+
+* Dynamic Blocks
+  We will have to handle these differently than regular dynamic blocks
+  #+BEGIN: insertdatetime
+  If you run this, this text will be replaced with the current datetime
+  #+END:
+
+  #+BEGIN: clocktable :scope subtree :level 2
+  This is a dynamic block
+  #+END:
+    
+      

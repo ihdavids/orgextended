@@ -1,0 +1,100 @@
+{
+	// The color scheme to use for the capture buffer
+	"color_scheme": "Packages/OrgExtended/orgextended.sublime-color-scheme",
+
+    // Turn on TableEditor for orgmode
+    "enable_table_editor": true,
+    "table_editor_syntax": "EmacsOrgMode",
+	
+	// The quick capture buffer gets this name
+	"captureBufferName": "*capture*",
+
+    // Captures go into this file for refiling later.
+    "refile": "D:\\Build\\notes\\refile.org",
+
+    // Org Capture templates $0 is where the cursor ends up.
+    "captureTemplates":
+    [
+    	{
+    		"name": "Todo",
+    		"template": 
+				"* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+    	},
+    	{
+    		"name": "Note",
+    		"template":
+				"* NOTE $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+    	},
+    	{
+    		"name": "Meeting",
+    		"template":
+				"* MEETING $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+    	}    	
+    ],
+    
+    // Where are your org files?
+    "orgDirs": [
+        "c:\\Users\\ian\\notes"
+    ],
+
+    // The Org DB will not load a file without one of these file extensions.
+    // It assumes we are somehow erroneously trying to load something wrong.
+    // If you create your own #+ARCHIVE: entries make sure the extensions are in here.
+    "validOrgExtensions": [ ".org", ".org_archive"],
+
+    // Startup is equivalent to #+STARTUP: showall in a file
+    // but has an effect on all org files. This controls what mode
+    // the org files show as globally. Valid values are:
+    // - showall - everything but drawers is shown
+    // - showeverything - even drawers are shown.
+    // - contents - like a table of contents, contents of headings is hidden but all headings shown
+    // - overview - only top level headings are shown. 
+    // - noinlineimages - do not show images inline
+    // - inlineimages - show inline images in file
+    //    #+STARTUP: inlineimages
+    //    #+STARTUP: noinlineimages
+    "startup": ["showall", "noinlineimages"],
+    
+    // Globally where should things be archived?
+    // So the following will expand to myfile.org_archive
+    // NOTE: org allows for datetree/ and a few other options
+    //       we probably only support a subset of those
+    //       properly
+    "archive": "%s_archive::* Archive",
+
+    // We follow the same sort of syntax as the normal orgmode for todos.
+    // Right now I don't support logging tags on these, but that will come.
+    // I don't have smart syntax highlighting on these. The grammar file gives
+    // me some basic highlighting.
+    "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"],
+
+    // When looking for images in org files, where might those images be located?
+    // The first path in this list is where generated images will be placed.
+    // If this list is empty a subdir of images under the first entry in orgDirs will be used.
+    "imageSearchPath": [],
+
+
+    "resolver.jira.url":"http://sandbox.onjira.com/browse/%s",
+    "resolver.jira.pattern":"^(jira|j):(?P<issue>.+)$",
+
+    //email
+    "resolver.email.url":"mailto:%s",
+    "resolver.email.pattern":"^(?P<type>email|mailto):(?P<email>[^/]+)(/(?P<subject>.+))?$",
+
+    //prompt
+    "resolver.prompt.pattern":"^(cmd:|prompt:)(?P<path>.+)$",
+
+    //file: Only these extensions will be opened in sublime when in a link others will be opened externally.
+    "resolver.local_file.force_into_sublime":"'*.txt', '*.org', '*.py', '*.rb', '*.html', '*.css', '*.js', '*.php', '*.c', '*.cpp', '*.h', '*.png', '*.jpg', '*.gif', '*.cs'",
+    //"resolver.local_file.pattern":"^(file:)?(?P<filepath>.+?)(?::(?P<row>\\d+)(?::(?P<col>\\d+))?)?$",
+
+    // For the plantuml source blocks, where is planuml found?
+    "plantuml": "D:\\Build\\.imacs\\plantuml.jar",
+
+    // What does the composite agenda view show?
+    // You can add your own views but that is done through code.
+    // Right now I ONLY have this one composite view.
+    "AgendaCustomView": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]
+
+
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Symbol List</string>
+	<key>scope</key>
+	<string>text.orgmode orgmode.page, text.orgmode orgmode.break, text.orgmode orgmode.headline orgmode.headline2 orgmode.headline3 orgmode.headline4 orgmode.headline5 orgmode.headline6</string>
+	<key>settings</key>
+	<dict>
+		<key>showInSymbolList</key>
+		<integer>1</integer>
+		<key>symbolTransformation</key>
+		<string>
+			 s/\s*\**\s*\z//g;       #Search for *
+			s/(?&lt;=\*)\*/  /g;     #replace * with two spaces, except first
+			s/^\*( *)\s+(.*)/$1$2/;  #replace first found with a space
+		</string>
+	</dict>
+	<key>uuid</key>
+	<string>a5b8a9bb-75fa-41bf-a15c-3832eb894331</string>
+</dict>
+</plist>

@@ -1,0 +1,71 @@
+%YAML1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: orgagenda
+file_extensions:
+  - orgagenda
+scope: source.orgagenda
+contexts:
+  main:
+    # filename and line location
+    - match: '(^[a-zA-Z0-9]+:)'
+      scope: orgagenda.filename
+
+    - match: '[0-9]+:[0-9]+(\.)+ (\-)+'
+      scope: orgagenda.timeseparator
+
+
+    - match: 'H\['
+      push:
+        - meta_scope: orgagenda.habit
+        - match: '[*]'
+          scope: orgagenda.habit.didit
+        - match: '[.]'
+          scope: orgagenda.habit.scheduled
+        - match: '[_]'
+          scope: orgagenda.habit.nothing
+        - match: '\]'
+          pop: true
+
+    - match: '^[a-zA-Z][^=>:]+$'
+      scope: orgagenda.header
+
+    # Datetime
+    - match: '(\d{4,4}-\d{2,2}-\d{2,2} \d{2,2}:\d{2,2}:\d{2,2})'
+      scope: orgagenda.datetime
+
+    - match: '^\s*now =>.*'
+      scope: orgagenda.now
+
+    - match: '(DONE)'
+      scope: orgagenda.done
+
+    - match: '(TODO)'
+      scope: orgagenda.todo
+
+    - match: '(DOING)'
+      scope: orgagenda.doing
+
+    - match: '(BLOCKED)'
+      scope: orgagenda.blocked
+
+    - match: '(WAITING)'
+      scope: orgagenda.waiting
+
+    - match: '(CANCELLED)'
+      scope: orgagenda.cancelled
+
+    - match: '(IN-PROGRESS)'
+      scope: orgagenda.inprogress
+
+    - match: '(NEXT)'
+      scope: orgagenda.next
+
+    - match: '\s+-------\s+.*'
+      scope: orgagenda.projecttitle
+
+    - match: '^=====+'
+      scope: orgagenda.blockseparator
+
+    - match: '(January|February|March|April|May|June|July|August|September|October|November|December)\s*([0-9]+)'
+      scope: orgagenda.monthheader

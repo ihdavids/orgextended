@@ -1,0 +1,40 @@
+{
+	"name": "orgdatepicker",
+	"variables": {
+		"bgcol": "#272822",
+		// Define variables here
+	},
+	"globals": {
+		"foreground": "#F8F8F2",
+		"background": "var(bgcol)",
+		"accent":     "#ffffff",
+		"selection":  "#9D550F",
+	    "selectionBackground": "#000000",
+	    "selectionForeground": "#FF0000",
+	    "caret":               "#FF55ff",
+	    "line_highlight":      "#373730"
+	},
+	"rules": 
+	[
+		{
+			"scope": "orgdatepicker.weekendheader",
+			"foreground": "#5b96f5",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgdatepicker.weekdayheader",
+			"foreground": "#0762a3",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgdatepicker.monthheader",
+			"foreground": "#7e4794",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgdatepicker.time",
+			"foreground": "#aaaaaa",
+			"font_style": "bold italic",
+		},
+    ]
+}

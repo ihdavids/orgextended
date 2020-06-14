@@ -1,0 +1,6 @@
+[
+	{ "keys": ["ctrl+alt+x"],        "command": "org_capture"                                                                                                    },
+	{ "keys": ["ctrl+up"],           "command": "org_up" ,                 "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+	{ "keys": ["ctrl+down"],         "command": "org_down" ,               "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+	{ "keys": ["tab"],               "command": "org_tab_cycling",         "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]}
+]
