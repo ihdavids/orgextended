@@ -3,7 +3,7 @@
 		"*": [
 			"pathlib",
 			"dateutil",
-			"pyyaml",
+			"pyyaml"
 		]
 	}
 }

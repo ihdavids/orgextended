@@ -38,30 +38,30 @@ contexts:
 
       # Generic headline, TODO: Make multiple of these so we can color them
       # and sub captures so we can hide the extraneous stars
-    - match: ^\s*[*] ({{priority}})?({{state}} )?[^\[\]:\n]*({{tags}})?
+    - match: ^\s*[*] ({{state}} )?({{priority}})?[^\[\]:\n]*({{tags}})?
       scope: orgmode.headline
       captures:
-        1: orgmode.priority
-        2: orgmode.priority.value
-        3: orgmode.priority.value.a
-        4: orgmode.priority.value.b
-        5: orgmode.priority.value.c
-        6: orgmode.priority.value.d
-        7: orgmode.priority.value.e
-        8: orgmode.priority.value.general
-        10: orgmode.state.todo
-        11: orgmode.state.blocked
-        12: orgmode.state.waiting
-        13: orgmode.state.cancelled
-        14: orgmode.state.done
-        15: orgmode.state.meeting
-        16: orgmode.state.phone
-        17: orgmode.state.note
-        18: orgmode.state.inprogress
-        19: orgmode.state.doing
-        20: orgmode.state.next
-        21: orgmode.state.reassigned
-        22: orgmode.tags.headline
+        1: orgmode.state.todo
+        2: orgmode.state.blocked
+        3: orgmode.state.waiting
+        4: orgmode.state.cancelled
+        5: orgmode.state.done
+        6: orgmode.state.meeting
+        7: orgmode.state.phone
+        8: orgmode.state.note
+        9: orgmode.state.inprogress
+        10: orgmode.state.doing
+        11: orgmode.state.next
+        12: orgmode.state.reassigned
+        13: orgmode.priority
+        14: orgmode.priority.value
+        15: orgmode.priority.value.a
+        16: orgmode.priority.value.b
+        17: orgmode.priority.value.c
+        18: orgmode.priority.value.d
+        19: orgmode.priority.value.e
+        20: orgmode.priority.value.general
+        21: orgmode.tags.headline
     - match: ^\s*([*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble

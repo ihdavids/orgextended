@@ -183,7 +183,7 @@ Custom TODO cycling is understood.
   I have a little template engine that is expanding as I discover what I need. It is NOTE quite like org
   as we are workingin sublime here.
 
-* [#TOP] NOTE Priorities
+* NOTE [#TOP] Priorities
    General priority tags work
    but a, b, c, d, e have independent
    coloring options in the grammar.
