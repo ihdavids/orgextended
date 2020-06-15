@@ -351,13 +351,18 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
-        level = curNode.level
-        reg = curNode.region(self.view)
-        if(level == 0):
+        if(not curNode):
             level = 1
-            here = sublime.Region(view.size(),view.size())
+            here = sublime.Region(self.view.size(),self.view.size())
+            reg  = here
         else:
-            here = sublime.Region(reg.end(),reg.end())
+            level = curNode.level
+            reg = curNode.region(self.view)
+            if(level == 0):
+                level = 1
+                here = sublime.Region(view.size(),view.size())
+            else:
+                here = sublime.Region(reg.end(),reg.end())
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
@@ -366,13 +371,23 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
-        level = curNode.level
-        reg = curNode.region(self.view)
-        if(level == 0):
+        if(not curNode):
+            file = db.Get().FindInfo(self.view)
+            if(len(file.org) > 0):
+                curNode = file.org[len(file.org) - 1]
+        if(not curNode):
             level = 1
-            here = sublime.Region(view.size(),view.size())
+            l = self.view.line(self.view.size())
+            reg = sublime.Region(l.start(),l.start())
+            reg  = here
         else:
-            here = sublime.Region(reg.end(),reg.end())
+            level = curNode.level
+            reg = curNode.region(self.view)
+            if(level == 0):
+                level = 1
+                here = sublime.Region(view.size(),view.size())
+            else:
+                here = sublime.Region(reg.end(),reg.end())
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
