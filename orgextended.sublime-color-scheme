@@ -16,6 +16,31 @@
 	},
 	"rules": [
 		{
+			"background": "#000000",
+			"scope": "col_gutter",
+			"foreground": "#ffffff"
+		},
+		{
+			"background": "#FFC0CBFF",
+			"scope": "col_FFC0CBFF",
+			"foreground": "#545454FF"
+		},
+		{
+			"background": "#800080FF",
+			"scope": "col_800080FF",
+			"foreground": "#B4B4B4FF"
+		},
+		{
+			"background": "#0000FFFF",
+			"scope": "col_0000FFFF",
+			"foreground": "#9D9D9DFF"
+		},
+		{
+			"background": "#FF0000FF",
+			"scope": "col_FF0000FF",
+			"foreground": "#CCCCCCFF"
+		},
+		{
 			"scope": "orgmode.break",
 			"foreground": "#ed188a",
 		},
