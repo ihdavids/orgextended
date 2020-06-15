@@ -27,7 +27,7 @@
     // Spacemacs style save file
     { "keys": [" ", "f", "s"],       "command": "save",                          "context": [{"key": "vi_command_mode_aware"}]},
     // ORGMODE BINDINGS
-    { "keys": ["t"],                 "command": "org_todo_change",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "t"],            "command": "org_todo_change",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
