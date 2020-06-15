@@ -132,8 +132,6 @@ class OrgDb:
             self.orgPaths = sets.Get("orgDirs",None)
         filename = self.FilenameFromFileOrView(fileOrView)
         if(util.isPotentialOrgFile(filename)):
-            print("WTF: " + str(traceback.format_stack()))
-            print("ADDING: " + filename)
             file = FileInfo(filename, load(filename), self.orgPaths)
             self.AddFileInfo(file)
             return file
@@ -148,19 +146,10 @@ class OrgDb:
             filename = fileOrView.lower()
         for i in range(len(self.Files)-1,-1,-1):
             if(self.Files[i].key == filename):
-                print("REMOVING KEY: " + self.Files[i].key)
                 del self.Files[i]
 
-        for i in range(len(self.Files)-1,-1,-1):
-            print("AAAA: " + self.Files[i].key)
-
-        print("REMOVING KEY: " + filename)
-        print(self.files)
         if(filename in self.files):
-            print("REMOVING FROM DICT: " + filename)
             del self.files[filename]
-        print("NEW DICT")
-        print(self.files)
         #self.files.pop(filename,None)
 
     def Reload(self, fileOrView):
@@ -223,7 +212,6 @@ class OrgDb:
         #self.orgFiles = sets.Get("orgFiles",None)
         self.orgExcludePaths = sets.Get("orgExcludeDirs",None)
         self.orgExcludeFiles = sets.Get("orgExcludeFiles",None)
-        print("EXCLUDED: " + str(self.orgExcludePaths))
         matches = []
         if(self.orgPaths):
             for orgPath in self.orgPaths:
