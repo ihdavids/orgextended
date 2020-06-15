@@ -23,6 +23,7 @@ import OrgExtended.orgclocking as clocking
 import OrgExtended.orgnotifications as notice
 import OrgExtended.orgdatepicker as datepicker
 import OrgExtended.pymitter as evt
+import OrgExtended.tableeditor as tableeditor
 
 log = None
 
@@ -32,6 +33,10 @@ def sync_up_on_loaded():
     window.run_command("org_on_load_sync_up", {})
     notice.Setup()
     datepicker.SetupMouse()
+    log.debug("Checking for TableEditor")
+    if(not tableeditor.IsInstalled()):
+        log.debug("Installing Table Editor")
+        tableeditor.Install()
 
 # This is where we can start to load our DB!
 def plugin_loaded():
