@@ -55,6 +55,15 @@ class FileInfo:
             f.write(str(item))
         f.close()
 
+    def ReloadIfChanged(self,view):
+        if(self.HasChanged(view)):
+            self.LoadS(view)
+
+    def FindInfoAndReloadIfChanged(self, view):
+        if(self.HasChanged(view)):
+            self.LoadS(view)
+        return self.FindInfo(view)
+
     def HasChanged(self,view):
         return self.change_count < view.change_count()
 
@@ -62,6 +71,7 @@ class FileInfo:
         return self.org.at(row)
 
     def AtPt(self, view, pt):
+        self.ReloadIfChanged(view)
         row,col = view.rowcol(pt)
         return self.org.at(row)
 
@@ -70,6 +80,7 @@ class FileInfo:
         return self.org.at(row)
 
     def AtInView(self, view):
+        self.ReloadIfChanged(view)
         (row,col) = view.curRowCol()
         return self.org.at(row)
 
@@ -233,12 +244,17 @@ class OrgDb:
     def FindInfo(self, fileOrView):
         try:
             if(type(fileOrView) is sublime.View):
-                return self.files[fileOrView.file_name().lower()]
+                f = self.files[fileOrView.file_name().lower()]
+                f.ReloadIfChanged(fileOrView)
+                return f
             return self.files[fileOrView.lower()]
         except:
             try:
                 log.debug("Trying to load file anew")
-                return orgDb.LoadNew(fileOrView)            
+                f = self.LoadNew(fileOrView)            
+                if(type(fileOrView) is sublime.View):
+                    f.ReloadIfChanged(fileOrView)
+                return f
             except:
                 log.warning("FAILED PARSING: \n  %s",traceback.format_exc())
                 return None

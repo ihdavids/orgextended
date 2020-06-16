@@ -156,6 +156,7 @@ Custom TODO cycling is understood.
     ~code~
     =verbatim=
 
+
 * NOTE Example, Verse, Quote, Center
 	I use these a bunch to delineate a block of text I care about
 	in my notes. I am going to keep these for now.
