@@ -53,143 +53,143 @@ contexts:
         10: orgmode.state.doing
         11: orgmode.state.next
         12: orgmode.state.reassigned
-        13: orgmode.priority
-        14: orgmode.priority.value
-        15: orgmode.priority.value.a
-        16: orgmode.priority.value.b
-        17: orgmode.priority.value.c
-        18: orgmode.priority.value.d
-        19: orgmode.priority.value.e
-        20: orgmode.priority.value.general
-        21: orgmode.tags.headline
-    - match: ^\s*([*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+        14: orgmode.priority
+        15: orgmode.priority.value
+        16: orgmode.priority.value.a
+        17: orgmode.priority.value.b
+        18: orgmode.priority.value.c
+        19: orgmode.priority.value.d
+        20: orgmode.priority.value.e
+        21: orgmode.priority.value.general
+        22: orgmode.tags.headline
+    - match: ^\s*([*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble
         2: orgmode.headline2
-        3: orgmode.priority
-        4: orgmode.priority.value
-        5: orgmode.priority.value.a
-        6: orgmode.priority.value.b
-        7: orgmode.priority.value.c
-        8: orgmode.priority.value.d
-        9: orgmode.priority.value.e
-        10: orgmode.priority.value.general
-        12: orgmode.state.todo
-        13: orgmode.state.blocked
-        14: orgmode.state.waiting
-        15: orgmode.state.cancelled
-        16: orgmode.state.done
-        17: orgmode.state.meeting
-        18: orgmode.state.phone
-        19: orgmode.state.note
-        20: orgmode.state.inprogress
-        21: orgmode.state.doing
-        22: orgmode.state.next
-        23: orgmode.state.reassigned
+        3: orgmode.state.todo
+        4: orgmode.state.blocked
+        5: orgmode.state.waiting
+        6: orgmode.state.cancelled
+        7: orgmode.state.done
+        8: orgmode.state.meeting
+        9: orgmode.state.phone
+        10: orgmode.state.note
+        11: orgmode.state.inprogress
+        12: orgmode.state.doing
+        13: orgmode.state.next
+        14: orgmode.state.reassigned
+        16: orgmode.priority
+        17: orgmode.priority.value
+        18: orgmode.priority.value.a
+        19: orgmode.priority.value.b
+        20: orgmode.priority.value.c
+        21: orgmode.priority.value.d
+        22: orgmode.priority.value.e
+        23: orgmode.priority.value.general
         24: orgmode.tags.header
       scope: orgmode.headline2
-    - match: ^\s*([*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+    - match: ^\s*([*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble
         2: orgmode.headline3
-        3: orgmode.priority
-        4: orgmode.priority.value
-        5: orgmode.priority.value.a
-        6: orgmode.priority.value.b
-        7: orgmode.priority.value.c
-        8: orgmode.priority.value.d
-        9: orgmode.priority.value.e
-        10: orgmode.priority.value.general
-        12: orgmode.state.todo
-        13: orgmode.state.blocked
-        14: orgmode.state.waiting
-        15: orgmode.state.cancelled
-        16: orgmode.state.done
-        17: orgmode.state.meeting
-        18: orgmode.state.phone
-        19: orgmode.state.note
-        20: orgmode.state.inprogress
-        21: orgmode.state.doing
-        22: orgmode.state.next
-        23: orgmode.state.reassigned
+        3: orgmode.state.todo
+        4: orgmode.state.blocked
+        5: orgmode.state.waiting
+        6: orgmode.state.cancelled
+        7: orgmode.state.done
+        8: orgmode.state.meeting
+        9: orgmode.state.phone
+        10: orgmode.state.note
+        11: orgmode.state.inprogress
+        12: orgmode.state.doing
+        13: orgmode.state.next
+        14: orgmode.state.reassigned
+        16: orgmode.priority
+        17: orgmode.priority.value
+        18: orgmode.priority.value.a
+        19: orgmode.priority.value.b
+        20: orgmode.priority.value.c
+        21: orgmode.priority.value.d
+        22: orgmode.priority.value.e
+        23: orgmode.priority.value.general
         24: orgmode.tags.header
       scope: orgmode.headline3
-    - match: ^\s*([*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+    - match: ^\s*([*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble
         2: orgmode.headline4
-        3: orgmode.priority
-        4: orgmode.priority.value
-        5: orgmode.priority.value.a
-        6: orgmode.priority.value.b
-        7: orgmode.priority.value.c
-        8: orgmode.priority.value.d
-        9: orgmode.priority.value.e
-        10: orgmode.priority.value.general
-        12: orgmode.state.todo
-        13: orgmode.state.blocked
-        14: orgmode.state.waiting
-        15: orgmode.state.cancelled
-        16: orgmode.state.done
-        17: orgmode.state.meeting
-        18: orgmode.state.phone
-        19: orgmode.state.note
-        20: orgmode.state.inprogress
-        21: orgmode.state.doing
-        22: orgmode.state.next
-        23: orgmode.state.reassigned
+        3: orgmode.state.todo
+        4: orgmode.state.blocked
+        5: orgmode.state.waiting
+        6: orgmode.state.cancelled
+        7: orgmode.state.done
+        8: orgmode.state.meeting
+        9: orgmode.state.phone
+        10: orgmode.state.note
+        11: orgmode.state.inprogress
+        12: orgmode.state.doing
+        13: orgmode.state.next
+        14: orgmode.state.reassigned
+        16: orgmode.priority
+        17: orgmode.priority.value
+        18: orgmode.priority.value.a
+        19: orgmode.priority.value.b
+        20: orgmode.priority.value.c
+        21: orgmode.priority.value.d
+        22: orgmode.priority.value.e
+        23: orgmode.priority.value.general
         24: orgmode.tags.header
       scope: orgmode.headline4
-    - match: ^\s*([*][*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+    - match: ^\s*([*][*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble
         2: orgmode.headline5
-        3: orgmode.priority
-        4: orgmode.priority.value
-        5: orgmode.priority.value.a
-        6: orgmode.priority.value.b
-        7: orgmode.priority.value.c
-        8: orgmode.priority.value.d
-        9: orgmode.priority.value.e
-        10: orgmode.priority.value.general
-        12: orgmode.state.todo
-        13: orgmode.state.blocked
-        14: orgmode.state.waiting
-        15: orgmode.state.cancelled
-        16: orgmode.state.done
-        17: orgmode.state.meeting
-        18: orgmode.state.phone
-        19: orgmode.state.note
-        20: orgmode.state.inprogress
-        21: orgmode.state.doing
-        22: orgmode.state.next
-        23: orgmode.state.reassigned
+        3: orgmode.state.todo
+        4: orgmode.state.blocked
+        5: orgmode.state.waiting
+        6: orgmode.state.cancelled
+        7: orgmode.state.done
+        8: orgmode.state.meeting
+        9: orgmode.state.phone
+        10: orgmode.state.note
+        11: orgmode.state.inprogress
+        12: orgmode.state.doing
+        13: orgmode.state.next
+        14: orgmode.state.reassigned
+        16: orgmode.priority
+        17: orgmode.priority.value
+        18: orgmode.priority.value.a
+        19: orgmode.priority.value.b
+        20: orgmode.priority.value.c
+        21: orgmode.priority.value.d
+        22: orgmode.priority.value.e
+        23: orgmode.priority.value.general
         24: orgmode.tags.header
       scope: orgmode.headline5
-    - match: ^\s*([*][*][*][*][*])([*] ({{priority}})?({{state}} )?[^\[\]:\n]*)({{tags}})?
+    - match: ^\s*([*][*][*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
       captures:
         1: orgmode.preamble
         2: orgmode.headline6
-        3: orgmode.priority
-        4: orgmode.priority.value
-        5: orgmode.priority.value.a
-        6: orgmode.priority.value.b
-        7: orgmode.priority.value.c
-        8: orgmode.priority.value.d
-        9: orgmode.priority.value.e
-        10: orgmode.priority.value.general
-        12: orgmode.state.todo
-        13: orgmode.state.blocked
-        14: orgmode.state.waiting
-        15: orgmode.state.cancelled
-        16: orgmode.state.done
-        17: orgmode.state.meeting
-        18: orgmode.state.phone
-        19: orgmode.state.note
-        20: orgmode.state.inprogress
-        21: orgmode.state.doing
-        22: orgmode.state.next
-        23: orgmode.state.reassigned
+        3: orgmode.state.todo
+        4: orgmode.state.blocked
+        5: orgmode.state.waiting
+        6: orgmode.state.cancelled
+        7: orgmode.state.done
+        8: orgmode.state.meeting
+        9: orgmode.state.phone
+        10: orgmode.state.note
+        11: orgmode.state.inprogress
+        12: orgmode.state.doing
+        13: orgmode.state.next
+        14: orgmode.state.reassigned
+        16: orgmode.priority
+        17: orgmode.priority.value
+        18: orgmode.priority.value.a
+        19: orgmode.priority.value.b
+        20: orgmode.priority.value.c
+        21: orgmode.priority.value.d
+        22: orgmode.priority.value.e
+        23: orgmode.priority.value.general
         24: orgmode.tags.header
       scope: orgmode.headline6
 

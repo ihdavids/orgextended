@@ -187,12 +187,12 @@ Custom TODO cycling is understood.
    General priority tags work
    but a, b, c, d, e have independent
    coloring options in the grammar.
-** [#A] TODO Top priority
+** TODO [#A] Top priority
    A body for this work item
-*** [#B] TODO Second priority
-**** [#C] TODO Third priorty item
-***** [#D] TODO Third priorty item
-****** [#E] TODO Third priorty item
+*** TODO [#B] Second priority
+**** TODO [#C] Third priorty item
+***** TODO [#D] Third priorty item
+****** TODO [#E] Third priorty item
 
 
 
