@@ -220,7 +220,9 @@ class OrgPriorityChangeCommand(sublime_plugin.TextCommand):
         # if we don't have a TODO state then we have to handle that as well.
         m = self.Re.search(self.bufferContents)
         if(m == None):
-            self.Re = re.compile(r"^([*]+ )( )*")
+            todos = self.node.env.all_todo_keys
+            todos = '|'.join(todos)
+            self.Re = re.compile(r"^([*]+\s+(" + todos + r")?\s*)( )*")
         if(newState != ""):
             newState = "[#" + newState + "] " 
         self.bufferContents = self.Re.sub(r"\g<1>" + newState, self.bufferContents)
@@ -235,7 +237,7 @@ class OrgPriorityChangeCommand(sublime_plugin.TextCommand):
         self.priorities = copy.copy(self.priorities)
         self.priorities.append("none")
         row = self.node.start_row
-        self.Re = r"^([*]+ )(\[\#[a-zA-Z0-9]+\]\s+)"
+        self.Re = r"^([*]+ [^\[\]]*\s*)(\[\#[a-zA-Z0-9]+\]\s+)"
         self.Re = re.compile(self.Re)
         sp  = self.view.text_point(row,0)
         self.row = self.view.line(sp)
