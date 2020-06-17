@@ -1,4 +1,4 @@
-* TODO Things I want [9/37]
+* TODO Things I want [8/38]
 	- [-] Capture [33%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
@@ -37,7 +37,7 @@
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
 	- [ ] Numbered Lists
-	- [-] Editing [4/12]
+	- [-] Editing [4/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
@@ -50,6 +50,8 @@
 		- [ ] Sublime snippets?
 		- [ ] Auto indenting of checkboxes (with tab)
 		- [ ] Property insertion
+		- [ ] Fix Tag Insertion (tooltip is broken for some reason)
+		- [ ] Fix Tab Insertion (snippets are now not expanding properly)
 	- [-] Links [7/16]
 		- [x] Orgmode style links
 		- [x] images displayed inline
@@ -67,11 +69,11 @@
 		- [x] custom_id links work
 		- [ ] Write a page about personal wikis
 		- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
-	- [-] Formatting [3/8]
+	- [-] Formatting [4/8]
 		- [x] Basic syntax highlighting
 		- [x] Priority blocks
 		- [ ] Smarter heading blocks
-		- [ ] Fix priority highlighting.
+		- [x] Fix priority highlighting.
 		- [x] Property drawers vs tags.
 		- [ ] Strings?
 		- [ ] Finish the babel work.
@@ -100,8 +102,13 @@
 		- [ ] Week View
 		- [ ] Calendar is selectable for day view?
 		- [ ] Formatting for today line in day view?
+	- [-] Agenda Notifications [1/4]
+	    - [x] Windows Support
+	    - [ ] Fully customizable
+	    - [ ] Mac Support
+	    - [ ] Linux Support
 	- [ ] Logging [0/2]
-		- [ ] Todo state controls
+		- [ ] Todo state controls (Markup @ symbol etc.)
 		- [ ] Logging and notes on certain state transitions.
 	- [x] Priorities (From format block)
 	- [ ] TODO states are fully dynamic, even in coloring? Not sure I can make that possible.
@@ -129,8 +136,8 @@
 	- [ ] Google calendar integration?
 	- [ ] Searching by tag (like occur style?)
 	- [-] Export... probably refer and document using pandoc?
-		- [ ] Reveal.js support
-		- [ ] Export subtree
+		- [x] Reveal.js support
+		- [-] Export subtree
 	- [ ] Presentation mode from a file.
 	- [ ] Column view (Is this possible in sublime?)
 	- [ ] Effort Estimate
