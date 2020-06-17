@@ -7,8 +7,15 @@
   OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
   at building a usable orgmode plugin for sublime.
-  
+
   [[file:orgstart.gif]]
+
+  When people show off org, they often just show off some folding
+  and the ability to tab cycle a headings tree. This often leads people
+  to compare org with Markdown. Org IS a markup and document interchange
+  format like markdown, but it is also much more.
+
+  [[file:orgstartfolding.gif]]
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
