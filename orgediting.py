@@ -287,9 +287,9 @@ class OrgChangeIndentCommand(sublime_plugin.TextCommand):
 # This does not handle indention of sub trees! Need to fix that!
 class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        node = db.Get().AtInView(self.view)
-        if(node and type(node) != node.OrgRootNode):
-            deindent_node(self.view, node, edit)
+        n = db.Get().AtInView(self.view)
+        if(n and type(n) != node.OrgRootNode):
+            deindent_node(self.view, n, edit)
             file = db.Get().FindInfo(self.view)
             file.LoadS(self.view)
 
