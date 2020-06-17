@@ -9,7 +9,7 @@ def setup_heading(output,level):
 	output.append("|-")
 
 def handle_heading(skip, node, clevel, level):
-	print("H: " + node.heading)
+	#print("H: " + node.heading)
 	skipstr = ""
 	if(skip > 0):
 		skipstr = ("|" * skip)
