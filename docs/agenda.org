@@ -14,3 +14,21 @@
   - The habit visualizer leaves something to be desired, it does not yet support the restart options that most habits
     do in org, BUT, it is still present and gives you a semblance of how well you are tracking with your habits.
 
+** Notifications
+   OrgExtended has the start of a notification system. It is not yet super stable.
+   However, the notification thread is a background system that starts up when OrgExtended starts.
+   It will do the following:
+
+   - Start when sublime starts.
+   - Scan all files in your agenda list and build a model of scheduled tasks for today.
+   - Periodically rebuild that task list.
+   - Periodically detect approaching tasks and attempt to notify you.
+
+   The system as it currently stands is not very configurable, but that will change.
+   The system currently is hard coded to do 2 things:
+
+   - Show a full screen view with your current notifications for today.
+   - On Windows: Run showballoontip.ps1 to pop up a windows notification about your impending event.
+
+   Eventually I hope that this system can be made much more flexible and work on various platforms. 
+   For now, this is what we have.
