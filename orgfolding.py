@@ -150,6 +150,20 @@ def fold_global_cycle(view):
     return False
 
 
+def ShouldFoldLocalCycle(view):
+    fnode = db.Get().AtInView(view)
+    if(fnode):
+        row, col = view.curRowCol()
+        if(fnode.start_row == row):
+            return True
+        else:
+            # This could be a property drawer. We want to fold that if so.
+            if(not type(fnode) is node.OrgRootNode and fnode.is_foldable_item(view, row)):
+                return True
+            else:
+                return False
+    return False
+
 # ,-> FOLDED -> CHILDREN -> SUBTREE --.
 # '-----------------------------------'
 def fold_local_cycle(view):

@@ -105,6 +105,41 @@ class OrgCore(sublime_plugin.EventListener):
     def on_deactivated(self, view):
         capture.onDeactivated(view)
 
+    def ShouldLocalFold(self, view):
+        file = db.Get().FindInfo(view.file_name())
+        if(file != None and file.HasChanged(view)):
+            file.LoadS(view)
+        return folding.ShouldFoldLocalCycle(view)
+
+    def ShouldGlobalFold(self, view):
+        file = db.Get().FindInfo(view.file_name())
+        return (not self.ShouldLocalFold(view)) and (file != None and type(file.AtInView(view)) is node.OrgRootNode)
+
+    def ShouldFoldLinks(self, view):
+        return (not self.ShouldGlobalFold(view)) and folding.am_in_link(view)
+
+    RE_TABLE_MATCH = re.compile(r"^\s*\|")
+    def ShouldTableTab(self,view):
+        cur = view.sel()[0]
+        l = view.line(cur.begin())
+        line = view.substr(l)
+        return RE_TABLE_MATCH.search(line)
+
+    def on_query_context(self, view, key, operator, operand, match_all):
+        # A key wants to be inserted, what context are we in for that?
+        if(operator == sublime.OP_EQUAL and util.isPotentialOrgFile(view.file_name())):
+            if(key == 'org_heading'):
+                 return operand == self.ShouldLocalFold(view)
+            elif(key == 'org_global'):
+                return operand == self.ShouldGlobalFold(view)
+            elif(key == 'org_link'):
+                return operand == self.ShouldFoldLinks(view)
+            elif(key == 'org_table'):
+                return operand == self.ShouldTableTab(view)
+        return False
+
+
+
 # Create a new file.
 class OrgNewFileCommand(sublime_plugin.WindowCommand):
     def run(self):

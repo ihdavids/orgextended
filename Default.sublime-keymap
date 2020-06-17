@@ -3,8 +3,40 @@
 	{ "keys": ["ctrl+shift+x"],      "command": "org_capture"                                                                                                          },
 	{ "keys": ["ctrl+up"],           "command": "org_up" ,                       "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
 	{ "keys": ["ctrl+down"],         "command": "org_down" ,                     "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
-	{ "keys": ["tab"],               "command": "org_tab_cycling",               "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
+    // TODO: ST4 REQUIRES the use of context vs wrapping.
+    //       Split these appart to make the easier to manage.
+	{ "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_heading",  "operator": "equal", "operand": true },
+
+        ]
+    },
+    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_link",  "operator": "equal", "operand": true },
+
+        ]
+    },
+    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_global",  "operator": "equal", "operand": true },
+
+        ]
+    },
+    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_table",  "operator": "equal", "operand": true },
+
+        ]
+    },
+
 	{ "keys": ["ctrl+alt+x"],        "command": "org_open_refile"                                                                                                      },
+
+
 
     // Core OrgMode Behaviour
     //{ "keys": ["enter"],             "command": "orgmode_toggle_checkbox",         "context": [{ "key": "selector", "operator": "equal", "operand": "orgmode.checkbox" }]},
