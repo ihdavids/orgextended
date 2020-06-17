@@ -27,3 +27,7 @@
 
   This will insert the text directly into the block once evaluated with the:
   OrgExecDynamicBlock run while the cursor is over the heading of the block.
+
+* TODO Source Blocks (BABEL)
+  - Comment on how regular source blocks are executable.
+  - Comment about how we don't have the chaining features (tables and other source blocks can act as input to others) YET.

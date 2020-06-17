@@ -1,10 +1,12 @@
 * Reveal JS / Presenations
   I have often used Reveal JS for presentations.
-  I find having a simple web based format that doesn't require a powerpoint player
-  to be quite convenient. 
+  I find having a simple web based format that doesn't require a powerpoint player to be quite convenient. 
+
+  [[https://revealjs.com/][Reveal JS Website]]
 
   My exporter is NOT as elaborate as the full emacs exporter
-  but it does a reasonable job.
+  but it does a reasonable job building a presentation.
+
 
   [[file:orgrevealjs.gif]] 
 
