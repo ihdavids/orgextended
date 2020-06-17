@@ -244,4 +244,3 @@ Custom TODO cycling is understood.
   This is a dynamic block
   #+END:
     
-      

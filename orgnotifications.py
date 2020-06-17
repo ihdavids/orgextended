@@ -43,7 +43,10 @@ class OrgShowNotifications(sublime_plugin.TextCommand):
 		notification.DoRenderView(edit)
 
 def ShowBalloon(todo, time):
-	commandLine = [r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"" + todo + "\"", "\"" + time + "\""]
+	commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"" + todo + "\"", "\"" + time + "\""])
+	# Expand all potential macros.
+	for i in range(len(commandLine)):
+		commandLine[i] = commandLine[i].format(todo=todo,time=time)
 	try:
 		startupinfo = subprocess.STARTUPINFO()
 		startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
