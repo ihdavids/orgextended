@@ -7,6 +7,8 @@
   OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
   at building a usable orgmode plugin for sublime.
+  
+  [[file:orgstart.gif]]
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
@@ -20,7 +22,7 @@
   + Professional Notes
   + Time Tracking and Billing
   + Documentation
-  + Research Papers
+  + Research Papers - Dynamic Documents
   + Literate Programming
   + Personal Agenda
   + Project Planning
@@ -31,11 +33,13 @@
   + As a self documenting configuration file for emacs itself (and other things).
   + Many many more things
 
-  What makes Org Mode so versatile is the deceptive simplicity of the format
-  and the the depth of the tools and API's provided around that format.
 
+  What makes Org Mode so versatile is the deceptive simplicity of the format
+  the flexibility of the simple markup and the the depth of the tools and API's provided around that format.
+
+  At times I have wondered why I shouldn't just use markdown? It is a much more widely popular markup system.
   There is no reason markdown could not be extended to become exactly what Org Mode
-  has become, but markdown is not quite as flexible and has not had the same degree of *cult*
+  has become, but markdown is not quite as flexible with its meta data and has not had the same degree of *cult*
   following so has yet to evolve into something like Org.
 
   I hope to go beyond simply the file format and bring some of the actual Mode to Sublime.
