@@ -6,6 +6,7 @@ import OrgExtended.orgparse.node as node
 from OrgExtended.orgparse.sublimenode import * 
 from OrgExtended.orgparse.startup import *
 import OrgExtended.asettings as sets
+import OrgExtended.orgcheckbox as checkbox
 
 log = logging.getLogger(__name__)
 
@@ -207,3 +208,28 @@ def fold_local_cycle(view):
             else:
                 return False
     return False
+
+def ShouldFoldCheckbox(view):
+    line = view.curLine()
+    cb = checkbox.get_checkbox(view, line)
+    if(cb != None):
+        childs = checkbox.find_children(view, line)
+        rv = childs != None and len(childs) > 0
+        return rv
+    return False
+
+def FoldCheckbox(view):
+    line = view.curLine()
+    cb = checkbox.get_checkbox(view, line)
+    if(cb != None):
+        if(view.isRegionFolded(cb)):
+            view.unfold(cb)
+            return
+        childs = checkbox.find_children(view, line)
+        if(childs != None and len(childs) > 0):
+            reg = sublime.Region(line.end(), childs[len(childs) - 1].end())
+            if(view.isRegionFolded(reg)):
+                view.unfold(reg)
+            else:
+                view.fold(reg)
+

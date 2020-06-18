@@ -14,7 +14,6 @@ import OrgExtended.orgutil.template as templateEngine
 import logging
 import sys
 import traceback 
-import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props

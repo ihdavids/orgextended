@@ -83,6 +83,7 @@ def onLoad(view):
         folding.onLoad(view)
         links.onLoad(view)
 
+RE_TABLE_MATCH = re.compile(r"^\s*\|")
 # Core events to dispatch to each of our subsystems.
 # This simple direct call is sufficient for our needs
 class OrgCore(sublime_plugin.EventListener):
@@ -118,12 +119,14 @@ class OrgCore(sublime_plugin.EventListener):
     def ShouldFoldLinks(self, view):
         return (not self.ShouldGlobalFold(view)) and folding.am_in_link(view)
 
-    RE_TABLE_MATCH = re.compile(r"^\s*\|")
     def ShouldTableTab(self,view):
         cur = view.sel()[0]
         l = view.line(cur.begin())
         line = view.substr(l)
         return RE_TABLE_MATCH.search(line)
+    
+    def ShouldFoldCheckbox(self, view):
+        return (not self.ShouldGlobalFold(view)) and folding.ShouldFoldCheckbox(view)
 
     def on_query_context(self, view, key, operator, operand, match_all):
         # A key wants to be inserted, what context are we in for that?
@@ -136,6 +139,8 @@ class OrgCore(sublime_plugin.EventListener):
                 return operand == self.ShouldFoldLinks(view)
             elif(key == 'org_table'):
                 return operand == self.ShouldTableTab(view)
+            elif(key == 'org_checkbox'):
+                return operand == self.ShouldFoldCheckbox(view)
         return False
 
 

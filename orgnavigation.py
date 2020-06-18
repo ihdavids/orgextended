@@ -85,6 +85,8 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
         # All the other commands (at the moment) are okay
         elif(table_tabbing(self.view)):
             self.view.run_command("table_editor_next_field")
+        elif(folding.ShouldFoldCheckbox(self.view)):
+            folding.FoldCheckbox(self.view)
         else:
             log.debug("tab expansion")
             self.view.run_command("insert_best_completion", {"default": "\t", "exact": False})

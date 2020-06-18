@@ -48,6 +48,12 @@ def curRow(self):
     return self.rowcol(self.sel()[0].begin())[0]
 
 @add_method(sublime.View)
+def curLine(self):
+    row = self.curRow()
+    pt = self.text_point(row, 0)
+    return self.line(pt)
+
+@add_method(sublime.View)
 def endRow(self):
     return self.rowcol(self.size())[0]
 
