@@ -70,6 +70,7 @@
 
   - [[file:orgextended.org][Basic Structure]] - Basic file structure
   - [[file:editing.org][Editing]] - Editing your org file
+  - [[file:lists.org][Lists]] - Supported lists in an org file
   - [[./folding.org][Folding]] - Jumping from the full view to a folded representation.
   - [[file:links.org][Links]] - Jumping within and without.
   - [[file:navigation.org][Navigation]] - Powerful ways of navigating your org files.

@@ -1,0 +1,37 @@
+* Lists
+  Org supports a number of different types of lists.
+
+    #+BEGIN_EXAMPLE
+    - Minus sign is an unordered list
+    - More stuff
+    #+END_EXAMPLE
+
+    Minus sign is your basic unordered list.
+
+    #+BEGIN_EXAMPLE
+    + Plus sign is another type of list
+    + More stuff 
+    #+END_EXAMPLE 
+
+    Plus sign mixes it up with another type of list.
+
+    #+BEGIN_EXAMPLE
+    1. Numbered lists are valid as well
+    2. More stuff 
+    #+END_EXAMPLE
+
+    Numbered lists are also supported, but minimally at the moment.
+
+    #+BEGIN_EXAMPLE
+    - Item :: Definition   
+    #+END_EXAMPLE
+
+    Definition lists are an orgmode thing. We highlight them but have no
+    other support for that at the moment.
+
+** Checkboxes
+
+	Checkboxes are also a sort of a mini todo item.
+	They are very handy!
+
+   [[file:orgcheckboxes.gif]]
