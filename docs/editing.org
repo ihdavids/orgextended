@@ -21,6 +21,12 @@
 
    [[file:inserttag.gif]]
 
+   Inserting a second tag will append the new tag. The system also has pseudo intellisense.
+   We are using the input panel instead of the quick select panel because you need to be able to insert
+   items not in the list.
+
+   [[file:taginsert.gif]]
+
 ** Todo Cycling
    Because changing the status of your task is something that you do
    quite often when using org as a means of organizing a project,
