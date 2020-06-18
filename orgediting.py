@@ -457,6 +457,8 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
 RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
+        if(not text):
+            return
         node = db.Get().AtInView(self.view)
         if(node):
             if not text in node.tags:
