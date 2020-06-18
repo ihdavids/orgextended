@@ -215,11 +215,23 @@ contexts:
         1: orgmode.statekeyword
         2: orgmode.unscheddatetime
       scope: orgmode.closed
+      # numbered list
+    - match: "^\\s*[0-9]+\\. (([^:]+\\s+)(::))?"
+      captures:
+        2: orgmode.definition
+        3: orgmode.definition.marker
+      scope: orgmode.numberedlist
       # bullet list
-    - match: "^\\s*\\- "
+    - match: "^\\s*\\- (([^:]+\\s+)(::))?"
+      captures:
+        2: orgmode.definition
+        3: orgmode.definition.marker
       scope: orgmode.tack.minus
       # bullet list
-    - match: "^\\s*\\+ "
+    - match: "^\\s*\\+ (([^:]+\\s+)(::))?"
+      captures:
+        2: orgmode.definition
+        3: orgmode.definition.marker
       scope: orgmode.tack.plus
       # To follow up: -> and =>
     - match: "^\\s*(\\-\\>|\\=\\>) "

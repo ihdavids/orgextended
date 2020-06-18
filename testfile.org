@@ -54,6 +54,19 @@ Custom TODO cycling is understood.
 
 	-> For Follow Up
 	=> For Follow Up
+* NOTE Lists
+
+  - Basic unordered list
+  - More stuff
+
+  + Plus unordered list
+  + More stuff
+
+  1. Numbered list
+  2. More stuff
+
+  - Definition1 :: This is what it means
+  - Definition2 :: This is what that means
 
 * NOTE Checkboxes [1/3]
   Colored but not updated yet! I need Ctrl-c Ctrl-c style updating.

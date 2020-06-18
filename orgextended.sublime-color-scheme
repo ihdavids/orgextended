@@ -246,6 +246,21 @@
 			"font_style": "bold",
 		},
 		{
+			"scope": "orgmode.numberedlist",
+			"foreground": "#c993c4",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.definition",
+			"foreground": "#A2E8E4",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgmode.definition.marker",
+			"foreground": "#E1A2E8",
+			"font_style": "bold",
+		},
+		{
 			"scope": "orgmode.follow_up",
 			"foreground": "#FF0000",
 			"font_style": "bold",
