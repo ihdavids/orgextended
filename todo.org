@@ -1,4 +1,4 @@
-* TODO Things I want [8/38]
+* TODO Things I want [9/38]
 	- [-] Capture [33%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
@@ -16,7 +16,7 @@
 		- [x] Basic Refile support
 		- [x] Basic Copy support
 		- [ ] More complex options for refiling.
-	- [-] Fold cycling [10/11]
+	- [x] Fold cycling [11/11]
 		- [x] Local fold cycling
 		- [x] Fold cycling in a modified file (currently gets confused)
 		- [x] Global fold cycling
@@ -27,7 +27,7 @@
 		- [x] Automatic property drawer folding. (I hate seeing those things!)
 		- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
 		- [x] Folding of all generic property drawers.
-		- [ ] Folding of checkbox trees
+		- [x] Folding of checkbox trees
 	- [-] Archiving [4/7]
 		- [x] Copy to org_archive an entire subtree
 		- [ ] (Low Priority) Archive by old datetime stamps
@@ -37,7 +37,7 @@
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
 	- [ ] Numbered Lists
-	- [-] Editing [4/14]
+	- [-] Editing [5/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
@@ -51,7 +51,7 @@
 		- [ ] Auto indenting of checkboxes (with tab)
 		- [ ] Property insertion
 		- [ ] Fix Tag Insertion (tooltip is broken for some reason)
-		- [ ] Fix Tab Insertion (snippets are now not expanding properly)
+		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
 	- [-] Links [7/16]
 		- [x] Orgmode style links
 		- [x] images displayed inline
