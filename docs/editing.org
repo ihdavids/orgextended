@@ -42,7 +42,7 @@
 ** Check Boxes [1/3]
 
    Our org implementation has some basic support for checked lists.
-   These are weaker version of a heading!
+   These are a weaker version of a heading.
 
    - [ ] Something that needs to be done.
    - [x] Something that is already done.
@@ -53,6 +53,10 @@
    - *OrgRecalcAllCheckbox* - recalculate all checkboxes in view
    - *OrgCheckboxToggle*    - Toggle the checkbox and recalc
    - *OrgRecalcCheckbox*    - Recalc [/] boxes below this.
+
+   In addition, *OrgToggle* is aware of checkboxes and will toggle the checkbox
+
+   [[file:orgcheckboxes.gif]]
 
 ** Priority Editing
    Todo mention priorities and editing them
