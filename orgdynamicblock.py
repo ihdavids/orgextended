@@ -26,9 +26,16 @@ import importlib
 
 log = logging.getLogger(__name__)
 
+
 RE_END = re.compile(r"^\s*\#\+(END|end)[:]")
 RE_DYN_BLOCK = re.compile(r"^\s*\#\+(BEGIN|begin)[:]\s+(?P<name>[^: ]+)\s*")
 RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)\s*")
+
+
+def IsDynamicBlock(view):
+	line = view.getLine(view.curRow())
+	return RE_DYN_BLOCK.search(line) or RE_END.search(line)
+
 class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 	def on_replaced(self):
 		if(hasattr(self.curmod,"PostExecute")):

@@ -18,6 +18,9 @@ import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgcapture as capture
+import OrgExtended.orgcheckbox as checkbox
+import OrgExtended.orgdynamicblock as dynamic
+import OrgExtended.orgsourceblock as src
 
 log = logging.getLogger(__name__)
 
@@ -93,3 +96,16 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
             # {"name" : "Packages/vhdl-mode/Snippets/vhdl-header.sublime_snippet"}
             #self.view.run_command("insert_snippet") 
             #self.view.insert(edit,self.view.sel()[0].begin(), "\t")
+
+# Another Do What I Mean style command.
+# Contextually looks at where you are and "does the right thing."
+# Toggles checkboxes, recalculates things etc.
+class OrgRecalcCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if(dynamic.IsDynamicBlock(self.view)):
+            self.view.run_command('org_execute_dynamic_block')
+            return
+        if(src.IsSourceBlock(self.view)):
+            self.view.run_command('org_execute_source_block')
+            return
+        checkbox.recalculate_all_checkbox_summaries(self.view, edit)

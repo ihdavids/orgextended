@@ -38,6 +38,10 @@ RE_BLOCK = re.compile(r"^\s*\#\+(BEGIN_|begin_)[a-zA-Z]+\s+")
 RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 
+def IsSourceBlock(view):
+	line = view.getLine(view.curRow())
+	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
+
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def on_replaced(self):
 		if(hasattr(self.curmod,"PostExecute")):
