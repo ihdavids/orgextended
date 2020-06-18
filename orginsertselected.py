@@ -34,6 +34,25 @@ class OrgInput:
         if(self.onDone):
             evt.Get().emit(self.onDone,text)
 
+    def popup(self,content, count = 0):
+        if(count > 2):
+            return
+        try:
+            if(not self.inputpanel.is_popup_visible()):
+                self.inputpanel.show_popup(content,0,-1) 
+                self.havePopup = True
+            else:
+                self.inputpanel.update_popup(content)
+        except Exception as inst:
+            print('Exception on popup? Trying to recreate popup')
+            print(str(inst))
+            self.havePopup = False
+            self.popup(content, count + 1)
+            # This can be brought up after the popup goes away
+            # just ignore it.
+            pass
+
+
     def redraw(self):
         ff = sets.Get("font_face","Arial")
         content = "<html><body id=\"orgselect\">"
@@ -59,16 +78,7 @@ class OrgInput:
         content += "</div></body></html>"
         #self.inputpanel.show_popup_menu(self.matched,None) 
         #self.inputpanel.show_popup(content,sublime.COOPERATE_WITH_AUTO_COMPLETE,-1) 
-        try:
-            if(not self.havePopup):
-                self.inputpanel.show_popup(content,0,-1) 
-                self.havePopup = True
-            else:
-                self.inputpanel.update_popup(content)
-        except:
-            # This can be brought up after the popup goes away
-            # just ignore it.
-            pass
+        self.popup(content)
 
     def recalculate(self,text):
         se = re.compile(text.replace(" ",".*"))

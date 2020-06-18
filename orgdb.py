@@ -139,6 +139,8 @@ class OrgDb:
                 self.customidmaps.append(file)    
 
     def LoadNew(self, fileOrView):
+        if(fileOrView == None):
+            return None
         if(not hasattr(self,'orgPaths') or self.orgPaths == None):
             self.orgPaths = sets.Get("orgDirs",None)
         filename = self.FilenameFromFileOrView(fileOrView)
@@ -147,7 +149,7 @@ class OrgDb:
             self.AddFileInfo(file)
             return file
         else:
-            log.debug("File is not an org file, not loading into the database")
+            log.debug("File is not an org file, not loading into the database: " + str(filename))
             return None
 
     def Remove(self, fileOrView):
