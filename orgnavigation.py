@@ -99,7 +99,7 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
 
 # Another Do What I Mean style command.
 # Contextually looks at where you are and "does the right thing."
-# Toggles checkboxes, recalculates things etc.
+# Recalculates checkboxes, recalculates blocks etc.
 class OrgRecalcCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         if(dynamic.IsDynamicBlock(self.view)):
@@ -109,3 +109,16 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
             self.view.run_command('org_execute_source_block')
             return
         checkbox.recalculate_all_checkbox_summaries(self.view, edit)
+
+# Another Do What I Mean style command.
+# Contextually looks at where you are and "does the right thing."
+# All about toggling things state.
+class OrgToggleCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        line = self.view.curLine()
+        cb = checkbox.get_checkbox(self.view, line)
+        if(cb):
+            self.view.run_command('org_toggle_checkbox')
+            return
+        else:
+            self.view.run_command('org_todo_change')
