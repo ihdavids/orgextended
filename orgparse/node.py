@@ -1444,7 +1444,7 @@ class OrgNode(OrgBaseNode):
             if(not self._property_drawer_location):
                 self._property_drawer_location = (self._start + 1, self._start + 2)
                 i = 1
-                while("SCHEDULED" in self._lines[i] or "DEADLINE" in self._lines[i]):
+                while(len(self._lines) > i and ("SCHEDULED" in self._lines[i] or "DEADLINE" in self._lines[i])):
                     i += 1
                 self._lines.insert(i,   "{0} :PROPERTIES:".format(" " * self._level))
                 self._lines.insert(i+1, "{0} :END:".format(" " * self._level))
