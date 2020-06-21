@@ -136,3 +136,14 @@ class OrgGenericInsertCommand(sublime_plugin.TextCommand):
         n = db.Get().AtInView(self.view)
         if(not n.is_root()):
             self.view.run_command('org_insert_heading_sibling')
+
+class OrgGenericInsertAuxCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        line = self.view.curLine()
+        cb = checkbox.get_checkbox(self.view, line)
+        if(cb):
+            self.view.run_command('org_insert_checkbox')
+            return
+        n = db.Get().AtInView(self.view)
+        if(not n.is_root()):
+            self.view.run_command('org_insert_heading_child')

@@ -51,6 +51,7 @@
     { "keys": ["enter"],             "command": "org_open_link",                   "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link" }]},
     { "keys": ["enter"],             "command": "orgmode_cycle_internal_link",     "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link.internal" }]},
     { "keys": ["ctrl+enter"],        "command": "org_generic_insert",              "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
+    { "keys": ["ctrl+shift+enter"],  "command": "org_generic_insert_aux",          "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
 
 	// NeoVintageous - Command / Normal Mode - Quick commands
     // GLOBAL BINDINGS
