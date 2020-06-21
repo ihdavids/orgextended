@@ -122,3 +122,17 @@ class OrgToggleCommand(sublime_plugin.TextCommand):
             return
         else:
             self.view.run_command('org_todo_change')
+
+# Another Do What I Mean style command.
+# Contextually looks at where you are and "does the right thing."
+# All about inserting things state.
+class OrgGenericInsertCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        line = self.view.curLine()
+        cb = checkbox.get_checkbox(self.view, line)
+        if(cb):
+            self.view.run_command('org_insert_checkbox')
+            return
+        n = db.Get().AtInView(self.view)
+        if(not n.is_root()):
+            self.view.run_command('org_insert_heading_sibling')

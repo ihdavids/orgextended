@@ -1,6 +1,5 @@
 <snippet>
     <content><![CDATA[
-
 ***** ${0:HEADING}]]></content>
     <tabTrigger>hhhhh</tabTrigger>
     <scope>text.orgmode</scope>

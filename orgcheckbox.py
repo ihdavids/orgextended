@@ -263,6 +263,26 @@ def recalculate_all_checkbox_summaries(view, edit):
     for sel in sums:
         recalculate_checkbox_summary(view, sel, edit)
 
+cline_info_regex = re.compile(r'^(\s*)([-+0-9](\.)?)?.*$')
+class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        row = self.view.curRow()
+        line = self.view.getLine(row)
+        match = cline_info_regex.match(line)
+        indent = match.group(1)
+        start  = match.group(2)
+        if(start):
+            indent = indent + start + " [ ] "
+        reg = self.view.curLine()
+        self.view.insert(edit,reg.end(),"\n" + indent)
+        # Move to end of line
+        row = row + 1
+        pt = self.view.text_point(row,0)
+        ln = self.view.line(pt)
+        self.view.sel().clear()
+        self.view.sel().add(ln.end())
+
+
 class OrgToggleCheckboxCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view

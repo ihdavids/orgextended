@@ -50,6 +50,7 @@
     //{ "keys": ["enter"],             "command": "orgmode_recalc_checkbox_summary", "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.checkbox.summary" }]},
     { "keys": ["enter"],             "command": "org_open_link",                   "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link" }]},
     { "keys": ["enter"],             "command": "orgmode_cycle_internal_link",     "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link.internal" }]},
+    { "keys": ["ctrl+enter"],        "command": "org_generic_insert",              "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
 
 	// NeoVintageous - Command / Normal Mode - Quick commands
     // GLOBAL BINDINGS

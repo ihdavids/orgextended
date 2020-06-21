@@ -86,11 +86,11 @@
 		- [ ] Table parameters to execution blocks
 	- [x] Checkbox summary updating
 	- [x] Checkbox percentages
-	- [-] Dynamic Blocks [1/5]
+	- [-] Dynamic Blocks [3/5]
 		- [x] Basic dynamic blocks
 		- [ ] Test user side blocks
-		- [ ] clocktable block
-		- [ ] Clock reports
+		- [x] clocktable block
+		- [x] Clock reports
 		- [ ] execute all dynamic blocks in file command
 	- [x] Basic Clocking
 	- [-] Agenda [4/8]
