@@ -99,7 +99,6 @@ class OrgOpenRefileCommand(sublime_plugin.TextCommand):
 class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
 
     def close_tempView(self):
-        print("TRYING TO CLOSE IT!")
         self.tempView.run_command("close")
 
     def finish_archive_on_loaded(self):
@@ -206,17 +205,8 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
 
 # Capture some text into our refile org file
 class OrgCaptureCommand(sublime_plugin.TextCommand):
-
-    def on_done(self, index):
-        if(index < 0):
-            return
-        global captureBufferName
-        captureBufferName = sets.Get("captureBufferName", captureBufferName)
-        templates         = sets.Get("captureTemplates",[])
-        template          = templates[index]['template']
-        window = self.view.window()
-        panel = window.create_output_panel("orgcapture")
-
+    def insert_template(self, template, panel):
+        #template          = templates[index]['template']
         startPos = -1
         template, startPos = templateEngine.ExpandTemplate(self.view, template)
 
@@ -225,11 +215,32 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
             startPos = sublime.Region(startPos)
         else:
             startPos = panel.sel()[0]
+        return startPos
 
-        window.run_command('show_panel', args={'panel': 'output.orgcapture'})
-        panel.sel().clear()
-        panel.sel().add(startPos)
-        window.focus_view(panel)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        global captureBufferName
+        captureBufferName = sets.Get("captureBufferName", captureBufferName)
+        templates         = sets.Get("captureTemplates",[])
+        window = self.view.window()
+        panel = window.create_output_panel("orgcapture")
+        startPos = -1
+        if('template' in templates[index]):
+            startPos = self.insert_template(templates[index]['template'], panel)
+            window.run_command('show_panel', args={'panel': 'output.orgcapture'})
+            panel.sel().clear()
+            panel.sel().add(startPos)
+            window.focus_view(panel)
+        elif('snippet' in templates[index]):
+            window.run_command('show_panel', args={'panel': 'output.orgcapture'})
+            ai = sublime.active_window().active_view().settings().get('auto_indent')
+            panel.settings().set('auto_indent',False)
+            snippet = templates[index]['snippet']
+            window.focus_view(panel)
+            panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
+            panel.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"})
+            sublime.active_window().active_view().settings().set('auto_indent',ai)
         panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
         panel.set_name(captureBufferName)
 

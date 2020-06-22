@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[
+* METTING ${1:HEADING}
+  :PROPERTIES:
+  :CREATED: [$DATE]
+  :END:
+  $0
+]]></content>
+    <tabTrigger>meeting_heading</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>Meeting Heading</description>
+</snippet>
