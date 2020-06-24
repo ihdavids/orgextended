@@ -11,6 +11,7 @@ from   OrgExtended.orgparse.sublimenode import *
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
+import OrgExtended.orgparse.date as orgdate
 import logging
 import sys
 import traceback 
@@ -238,8 +239,14 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
             panel.settings().set('auto_indent',False)
             snippet = templates[index]['snippet']
             window.focus_view(panel)
+            #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
             panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
-            panel.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"})
+            now = datetime.datetime.now()
+            inow = orgdate.OrgDate.format_date(now, False)
+            anow = orgdate.OrgDate.format_date(now, True)
+            panel.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
+                , "ORG_INACTIVE_DATE": inow
+                , "ORG_ACTIVE_DATE":   anow})
             sublime.active_window().active_view().settings().set('auto_indent',ai)
         panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
         panel.set_name(captureBufferName)

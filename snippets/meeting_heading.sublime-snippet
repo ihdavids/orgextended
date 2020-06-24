@@ -2,7 +2,7 @@
     <content><![CDATA[
 * METTING ${1:HEADING}
   :PROPERTIES:
-  :CREATED: [$DATE]
+  :CREATED: $ORG_INACTIVE_DATE
   :END:
   $0
 ]]></content>
