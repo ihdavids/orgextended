@@ -58,3 +58,17 @@ def find_extension_modules(folder):
 	return moduleTable
 
 
+def find_extension_file(folder,name,extension='.py'):
+	base = os.path.dirname(os.path.abspath(__file__))
+	# User generated extensions
+	path = base + '/../User/' + folder
+	fname = name + extension
+	for root, dirnames, filenames in os.walk(path):
+		for filename in fnmatch.filter(filenames, fname):
+			return "Packages/User/" + folder + "/" + filename
+	# Built in extensions
+	path = base + '/' + folder
+	for root, dirnames, filenames in os.walk(path):
+		for filename in fnmatch.filter(filenames, fname):
+			return "Packages/OrgExtended/" + folder + "/" + filename
+	return None
