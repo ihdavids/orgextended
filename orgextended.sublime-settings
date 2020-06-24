@@ -15,16 +15,21 @@
     // Org Capture templates $0 is where the cursor ends up.
     "captureTemplates":
     [
-    	{
-    		"name": "Todo",
-    		"template": 
-				"* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
-    	},
-    	{
-    		"name": "Note",
-    		"template":
-				"* NOTE $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
-    	},
+    	//{
+    	//	"name": "Todo",
+    	//	"template": 
+		//		"* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+    	//},
+        {
+            "name":    "Todo",
+            "type":    "entry",
+            "snippet": "todo_heading",
+        },
+        {
+            "name":    "Note",
+            "type":    "entry",
+            "snippet": "note_heading",
+        },
     	{
             // This is what I am heading towards.
             // TODO:

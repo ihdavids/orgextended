@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[
+* TODO ${1:HEADING}
+  :PROPERTIES:
+  :CREATED: $ORG_INACTIVE_DATE
+  :END:
+  $0
+]]></content>
+    <tabTrigger>todo_heading</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>Todo Heading</description>
+</snippet>

@@ -91,8 +91,13 @@ class NotificationSystem(threading.Thread):
 	def HaveNotifiedFor(self, item):
 		return item in self.notified
 
+	def GetUID(item):
+		n = item['node']
+		f = item['file']
+		return f.filename + "@" + n.get_locator()
+
 	def DoNotify(self,item):
-		self.notified.append(item)
+		self.notified.append(GetUID(item))
 		global notification
 		notification = Notification("Notifications")
 		notification.Show(self.notified, item)

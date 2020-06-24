@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[
+* NOTE ${1:HEADING}
+  :PROPERTIES:
+  :CREATED: $ORG_INACTIVE_DATE
+  :END:
+  $0
+]]></content>
+    <tabTrigger>note_heading</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>Note Heading</description>
+</snippet>
