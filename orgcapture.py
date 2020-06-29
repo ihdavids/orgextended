@@ -190,12 +190,13 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
             return 
         log.debug("Inserting child into: " + str(fileIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
 
+        fromFile = db.Get().FindInfo(view)
         file.org[fileIndex].insert_child(node)
+        node.remove_node()
+        # Have to save down here in case
+        # file and fromFile are the same!
         file.Save()
         file.Reload()
-
-        node.remove_node()
-        fromFile = db.Get().FindInfo(view)
         fromFile.Save()
         fromFile.Reload()
 

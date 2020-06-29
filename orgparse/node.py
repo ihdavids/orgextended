@@ -530,7 +530,12 @@ class OrgBaseNode(Sequence):
             ccn.env = self.env
             header = "*" * ccn._level
             indent = " " * (ccn._level+1)
-            ccn._lines[0] = RE_HEADER_REPLACE.sub(header + " ", ccn._lines[0])
+            newHeading = RE_HEADER_REPLACE.sub(header + " ", ccn._lines[0])
+            if(len(ccn._lines) > 1):
+                ccn._lines = ccn._lines[1:]
+                ccn._lines.insert(0, newHeading)
+            else:
+                ccn._lines = [newHeading]
             ccn._heading = ccn._lines[0]
             for i in range(1,len(ccn._lines)):
                 ccn._lines[i] = RE_INDENT_REPLACE.sub(indent, ccn._lines[i])
@@ -554,9 +559,11 @@ class OrgBaseNode(Sequence):
                 if(self.env._nodes[i].level <= level):
                     break
                 end = i
-        #print("removing "+str(pos)+" to "+str(end))
+        #print("removing "+str(pos)+" to "+str(end) + " in " + str(len(self.env._nodes)))
+        for i in range(end,pos-1,-1):
+            self.env._nodes.pop(i)
         # Remove the elements.
-        del self.env._nodes[pos:end+1]
+        #del self.env._nodes[pos:end+1]
         # Now update the indexes!
         size = len(self.env._nodes)
         for i in range(pos,size):

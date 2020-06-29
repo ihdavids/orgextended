@@ -26,9 +26,25 @@ class FileInfo:
         self.filename = file
         self.key      = file.lower()
         self.change_count = 0
+        displayFn = self.key
+        oldLen = len(displayFn)
         for prefix in orgPaths:
-            displayFn = self.key.replace(prefix,"") 
+            displayFn = displayFn.replace(prefix,"") 
             displayFn = displayFn.replace(prefix.lower(),"")
+        # Max Slashes!
+        # No prefixes. We should count the slashes and truncate
+        # if there are to many.
+        maxSlash = 3
+        if(oldLen == len(displayFn)):
+           scount = displayFn.count('/')
+           if(scount > maxSlash):
+               llist = displayFn.split('/')
+               displayFn = '/'.join(llist[-maxSlash:]) 
+           scount = displayFn.count('\\')
+           if(scount > maxSlash):
+               llist = displayFn.split('\\')
+               displayFn = '\\'.join(llist[-maxSlash:]) 
+
         if(len(displayFn) > 1 and (displayFn[0] == '\\' or displayFn[0] == '/')): 
             displayFn = displayFn[1:]
         self.displayName = displayFn
@@ -191,7 +207,11 @@ class OrgDb:
         return filename
 
     def AddFileInfo(self, fi):
+        if(self.files == None):
+            self.files = {}
         self.files[fi.key] = fi
+        if(self.Files == None):
+            self.Files = []
         self.Files.append(fi)
         self.SortFiles()
 
@@ -318,7 +338,8 @@ class OrgDb:
                 while(type(t.parent) != node.OrgRootNode and t.parent != None):
                     t = t.parent
                     parents = t.heading + ":" + parents 
-                formattedHeading = "{0:35}::{1}{2}".format(displayFn , parents, n.heading)
+                #formattedHeading = "{0:35}::{1}{2}".format(displayFn , parents, n.heading)
+                formattedHeading = ["{0}{1}".format(parents,n.heading),displayFn]
                 #print(formattedHeading)
                 headings.append(formattedHeading)
                 count += 1
