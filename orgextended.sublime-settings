@@ -24,11 +24,13 @@
             "name":    "Todo",
             "type":    "entry",
             "snippet": "todo_heading",
+            "target": ["file","{refile}"],
         },
         {
             "name":    "Note",
             "type":    "entry",
             "snippet": "note_heading",
+            "target": ["file","{refile}"],
         },
     	{
             // This is what I am heading towards.
