@@ -14,10 +14,8 @@ import OrgExtended.orgutil.template as templateEngine
 import logging
 import sys
 import traceback 
-import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
-import OrgExtended.orgcapture as capture
 import OrgExtended.orgproperties as props
 import yaml
 import OrgExtended.pymitter as evt
@@ -116,6 +114,20 @@ class ClockManager:
 		cpath = ClockManager.ClockPath()
 		if(os.path.isfile(cpath)):
 			os.remove(cpath)
+
+	@staticmethod
+	def GetActiveClockFile():
+		if(not ClockManager.ClockRunning()):
+			return None
+		return ClockManager.Clock["file"]
+
+	@staticmethod
+	def GetActiveClockAt():
+		if(not ClockManager.ClockRunning()):
+			return None
+		node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
+		if(node):
+			node.start_row()
 
 
 # Load the clock cache.

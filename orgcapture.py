@@ -13,6 +13,7 @@ import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
 import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgextension as ext
+import OrgExtended.orgclocking as clk
 import logging
 import sys
 import traceback 
@@ -37,15 +38,24 @@ def GetCapturePath(view, template):
     if 'target' in template:
         target    = template['target']
     filename = None
+    at = None
     if('file' in target[0]):
         temp = templateEngine.TemplateFormatter()
         tempDict = {
             'refile' : sets.Get('refile','')
         } 
         filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
-        print('FILE: ' + filename)
+    if('id' == target[0]):
+        file, at = db.Get().FindByCustomId(target[1])
+        filename = file.filename
+    if('clock' == target[0]):
+        if(not clk.ClockManager.ClockRunning()):
+            log.debug("ERROR: clock is not running!")
+            raise "ERROR: clock is not running"
+        filename = clk.ClockManager.GetActiveClockFile()
+        at       = clk.ClockManager.GetActiveClockAt()
     file = load(filename)
-    return (target, filename, file)
+    return (target, filename, file, at)
 
 
 # This is a bit hokey. We track the last header so
@@ -63,7 +73,7 @@ def onDeactivated(view):
         template  = templates[tempIndex]
         #outpath, outfile = GetCaptureOutput()
         #print('template index was: ' + str(tempIndex))
-        target, capturePath, captureFile = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
+        target, capturePath, captureFile, at = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
         #refilePath = sets.Get("refile","UNKNOWN")
         #refile = load(refilePath)
         bufferContents = view.substr(sublime.Region(0, view.size()))

@@ -392,18 +392,23 @@ class OrgDb:
         
     def JumpToCustomId(self, id):
         path = None
-        for i in range(0, len(self.customids)):
-            cid = self.customids[i]
-            if(cid == id):
-                file = orgDb.customidmaps[i]
-                at   = file.org.env.customids[id][1]
-                path = "{0}:{1}".format(file.filename,at + 1)
+        file, at = self.FindByCustomId(id)
+        if(file != None):
+            path = "{0}:{1}".format(file.filename,at + 1)
         if(path):
             #print("Found ID jumping to it: " + path)
             sublime.active_window().open_file(path, sublime.ENCODED_POSITION)
         else:
             log.debug("Could not locate ID failed to jump there")
 
+    def FindByCustomId(self, id):
+        for i in range(0, len(self.customids)):
+            cid = self.customids[i]
+            if(cid == id):
+                file = orgDb.customidmaps[i]
+                at   = file.org.env.customids[id][1]
+                return (file, at)
+        return (None, None)
 
 
 # EXPORTED ORGDB
