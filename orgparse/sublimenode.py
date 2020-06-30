@@ -121,6 +121,10 @@ def get_foldable_item_region(self, view, row):
         for i in self.blocks:
             if(i != None and row >= i[0] and row <= i[1]):
                 return self.create_region_from_item(view, i)
+    if(self.dynamicblocks):
+        for i in self.dynamicblocks:
+            if(i != None and row >= i[0] and row <= i[1]):
+                return self.create_region_from_item(view, i)
     if(self.drawers):
         for d in self.drawers:
             i = d['loc']

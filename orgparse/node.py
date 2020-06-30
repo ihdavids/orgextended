@@ -1090,6 +1090,7 @@ class OrgNode(OrgBaseNode):
         self._property_offsets = {}
         self._drawers = None
         self._blocks = None
+        self._dynamicblocks = None
         self._property_drawer_location = None
         self._scheduled = OrgDate(None)
         self._deadline = OrgDate(None)
@@ -1119,6 +1120,10 @@ class OrgNode(OrgBaseNode):
     @property
     def blocks(self):
         return self._blocks
+
+    @property
+    def dynamicblocks(self):
+        return self._dynamicblocks
 
     @property
     def drawers(self):
@@ -1270,7 +1275,9 @@ class OrgNode(OrgBaseNode):
 
     def _iparse_blocks(self, ilines, at):
         self._blocks = []
+        self._dynamicblocks = []
         in_block = False
+        in_dynamic_block = False
         start = 0
         end   = 0
         for line in ilines:
@@ -1280,9 +1287,18 @@ class OrgNode(OrgBaseNode):
                     blk = (start, end)
                     self._blocks.append(blk)
                     in_block = False
+            elif in_dynamic_block:
+                if line.find("#+END:") >= 0 or line.find("#+end:") >= 0:
+                    end = self._start + at.offset
+                    blk = (start, end)
+                    self._dynamicblocks.append(blk)
+                    in_dynamic_block = False
             elif line.find("#+BEGIN_") >= 0 or line.find("#+begin_") >= 0:
                 start = self._start + at.offset
                 in_block = True
+            elif line.find("#+BEGIN:") >= 0 or line.find("#+begin:") >= 0:
+                start = self._start + at.offset
+                in_dynamic_block = True
             else:
                 yield line
         for line in ilines:

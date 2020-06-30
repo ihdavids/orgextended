@@ -20,7 +20,7 @@ class TemplateFormatter(string.Formatter):
 
 
 
-def ExpandTemplate(view, template):
+def ExpandTemplate(view, template, format={}):
     # Supported expansions
     formatDict = {
     "date": str(datetime.date.today()),
@@ -30,6 +30,9 @@ def ExpandTemplate(view, template):
     "file": str(view.file_name()),
     "clipboard": sublime.get_clipboard()
     }
+
+    if(format != None):
+        formatDict.update(format) 
 
     formatter = TemplateFormatter()
     template  = formatter.format(template, **formatDict)

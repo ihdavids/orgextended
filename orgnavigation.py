@@ -69,7 +69,6 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
     Or do we want something else here?
     """
     def run(self, edit):
-        print("TAB CYCLING CALLED")
         # Keep track of if the buffer has changed. The in memory image
         # will be out of date if it has, so loads it.
         file = db.Get().FindInfo(self.view.file_name())

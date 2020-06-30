@@ -25,6 +25,29 @@ log = logging.getLogger(__name__)
 captureBufferName = "*capture*"
 lastHeader        = None
 
+def GetViewById(id):
+    win = sublime.active_window()
+    for v in win.views():
+        if(v.id() == id):
+            return v
+    return None
+
+def GetCapturePath(view, template):
+    target    = ['file', '{refile}']
+    if 'target' in template:
+        target    = template['target']
+    filename = None
+    if('file' in target[0]):
+        temp = templateEngine.TemplateFormatter()
+        tempDict = {
+            'refile' : sets.Get('refile','')
+        } 
+        filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
+        print('FILE: ' + filename)
+    file = load(filename)
+    return (target, filename, file)
+
+
 # This is a bit hokey. We track the last header so
 # if you change the header we can still find it
 # in your target file. Every time you swap your
@@ -35,8 +58,14 @@ def onDeactivated(view):
     global captureBufferName
     global lastHeader
     if(view.name() == captureBufferName):
-        refilePath = sets.Get("refile","UNKNOWN")
-        refile = load(refilePath)
+        tempIndex = view.settings().get('cap_index')
+        templates = sets.Get("captureTemplates",[])
+        template  = templates[tempIndex]
+        #outpath, outfile = GetCaptureOutput()
+        #print('template index was: ' + str(tempIndex))
+        target, capturePath, captureFile = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
+        #refilePath = sets.Get("refile","UNKNOWN")
+        #refile = load(refilePath)
         bufferContents = view.substr(sublime.Region(0, view.size()))
         if not bufferContents.endswith('\n'):
             bufferContents += "\n"
@@ -44,7 +73,7 @@ def onDeactivated(view):
         capture = loads(bufferContents)
         if(lastHeader == None):
             lastHeader = str(capture[1].heading)
-        for heading in refile:
+        for heading in captureFile:
             if(type(heading) is node.OrgRootNode):
                 continue
             if str(heading.heading) == lastHeader:
@@ -54,9 +83,9 @@ def onDeactivated(view):
                 continue
         if(not didInsert):
             var = capture[1]
-            refile.insert_child(var)
-        f = open(refilePath,"w+")
-        for item in refile:
+            captureFile.insert_child(var)
+        f = open(capturePath,"w+")
+        for item in captureFile:
             f.write(str(item))
         f.close()
         lastHeader = str(capture[1].heading)
@@ -229,6 +258,9 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
         window = self.view.window()
         panel = window.create_output_panel("orgcapture")
         startPos = -1
+        # Try to store the capture index
+        panel.settings().set('cap_index',index)
+        panel.settings().set('cap_view',self.view.id())
         if('template' in templates[index]):
             startPos = self.insert_template(templates[index]['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
@@ -251,7 +283,11 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
             panel.run_command("insert_snippet", 
                 { "name" : snipName
                 , "ORG_INACTIVE_DATE": inow
-                , "ORG_ACTIVE_DATE":   anow})
+                , "ORG_ACTIVE_DATE":   anow
+                , "ORG_DATE":          str(datetime.date.today())
+                , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
+                , "ORG_CLIPBOARD":     sublime.get_clipboard()
+                })
             sublime.active_window().active_view().settings().set('auto_indent',ai)
         panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
         panel.set_name(captureBufferName)

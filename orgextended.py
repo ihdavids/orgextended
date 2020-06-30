@@ -125,6 +125,11 @@ class OrgCore(sublime_plugin.EventListener):
         line = view.substr(l)
         return RE_TABLE_MATCH.search(line)
     
+    def ShouldFoldBlock(self,view):
+        cur = view.sel()[0]
+        names = view.scope_name(cur.begin())
+        return 'dynamicblock' in names
+
     def ShouldFoldCheckbox(self, view):
         return (not self.ShouldGlobalFold(view)) and folding.ShouldFoldCheckbox(view)
 
@@ -139,6 +144,8 @@ class OrgCore(sublime_plugin.EventListener):
                 return operand == self.ShouldFoldLinks(view)
             elif(key == 'org_table'):
                 return operand == self.ShouldTableTab(view)
+            elif(key == 'org_block'):
+                return operand == self.ShouldFoldBlock(view)
             elif(key == 'org_checkbox'):
                 return operand == self.ShouldFoldCheckbox(view)
         return False
