@@ -51,6 +51,7 @@
     {"caption": "OrgInsertTodayInactive", "command": "org_insert_today_inactive"   },
     {"caption": "OrgInsertTodayActive",   "command": "org_insert_today_active"     },
     {"caption": "OrgInsertDrawer",        "command": "org_insert_drawer"           },
+    {"caption": "OrgInsertPropertyDrawer","command": "org_insert_property_drawer"  },
     {"caption": "OrgClockIn",             "command": "org_clock_in"                },
     {"caption": "OrgClockOut",            "command": "org_clock_out"               },
     {"caption": "OrgClearClock",          "command": "org_clear_clock"             },
@@ -65,6 +66,7 @@
     {"caption": "OrgJumpToCustomId",      "command": "org_jump_to_custom_id"       },
     {"caption": "OrgInsertTag",           "command": "org_insert_tag"              },
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
+    {"caption": "OrgClosed",              "command": "org_insert_closed"           },
     {"caption": "OrgInsertCustomId",      "command": "org_insert_custom_id"        },
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
 
