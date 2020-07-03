@@ -409,6 +409,20 @@ contexts:
             1: orgmode.fence.sourceblock
           pop: true
         - include: scope:source.ini
+    - match: '{{beginsrc}}((bash|sh)\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.shell.bash
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.shell.bash
     - match: '{{beginsrc}}(js\s*)'
       captures:
         1: orgmode.fence.sourceblock
