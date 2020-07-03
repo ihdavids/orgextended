@@ -462,6 +462,25 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
             self.view.sel().add(l.end())
             datep.Pick(evt.Make(self.insert))
 
+
+class OrgInsertClosedCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        node = db.Get().AtInView(self.view)
+        if(not node.is_root()):
+            self.oldsel = self.view.sel()[0]
+            pt = self.view.text_point(node.start_row,0)
+            l = self.view.line(pt)
+            # Last row handling If we are the last row we can't jump over the newline
+            # we have to add one.
+            nl = ""
+            addnl = 1
+            if(self.view.isBeyondLastRow(node.start_row+1)):
+                nl = "\n"
+                addnl = 0
+            now = datetime.datetime.now()
+            toInsert = orgdate.OrgDate.format_clock(now, False)
+            self.view.insert(edit, l.end() + addnl, nl + node.indent() + "CLOSED: "+toInsert+"\n")
+
 RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
