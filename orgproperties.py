@@ -191,3 +191,9 @@ class OrgInsertDrawerCommand(sublime_plugin.TextCommand):
         node = db.Get().AtInView(self.view)
         if(node and node.level > 0):
             InsertDrawerIfNotPresent(self.view, node, ":" + drawer + ":")
+
+class OrgInsertPropertyDrawerCommand(sublime_plugin.TextCommand):
+    def run(self,edit):
+        node = db.Get().AtInView(self.view)
+        if(node and node.level > 0):
+            InsertDrawerIfNotPresent(self.view, node, ":PROPERTIES:")
