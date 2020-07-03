@@ -2,5 +2,9 @@
   Discuss properties in org mode
 
 ** Property Drawers
+   Our orgmode has a powerful insertion tool.
+   
+   [[file:insert_property.gif]]
+
 ** Properties
 ** Clock info
