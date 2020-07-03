@@ -197,3 +197,27 @@ class OrgInsertPropertyDrawerCommand(sublime_plugin.TextCommand):
         node = db.Get().AtInView(self.view)
         if(node and node.level > 0):
             InsertDrawerIfNotPresent(self.view, node, ":PROPERTIES:")
+
+class OrgInsertPropertyCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        self.onDone=onDone
+        self.view.window().show_input_panel(
+                    "Property Name:",
+                    "",
+                    self.createProperty, None, None)
+
+    def createProperty(self, prop):
+        if(not prop):
+            return
+        self.pname = prop
+        self.view.window().show_input_panel(
+                    "Property Value:",
+                    "",
+                    self.createPropertyV2, None, None)
+
+    def createPropertyV2(self, prop):
+        if(not prop):
+            return
+        node = db.Get().AtInView(self.view)
+        if(node and node.level > 0):
+            UpdateProperty(self.view, node, self.pname, prop, self.onDone)

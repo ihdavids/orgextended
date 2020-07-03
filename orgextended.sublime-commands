@@ -52,6 +52,7 @@
     {"caption": "OrgInsertTodayActive",   "command": "org_insert_today_active"     },
     {"caption": "OrgInsertDrawer",        "command": "org_insert_drawer"           },
     {"caption": "OrgInsertPropertyDrawer","command": "org_insert_property_drawer"  },
+    {"caption": "OrgInsertProperty",      "command": "org_insert_property"         },
     {"caption": "OrgClockIn",             "command": "org_clock_in"                },
     {"caption": "OrgClockOut",            "command": "org_clock_out"               },
     {"caption": "OrgClearClock",          "command": "org_clear_clock"             },
