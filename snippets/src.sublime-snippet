@@ -1,9 +1,9 @@
 <snippet>
     <content>
     <![CDATA[
-  #+BEGIN_SRC ${1:TYPE}
-  $2
-  #+END_SRC]]></content>
+#+BEGIN_SRC ${1:TYPE}
+  $0
+#+END_SRC]]></content>
     <tabTrigger>&lt;s</tabTrigger>
     <scope>text.orgmode</scope>
     <description>source block</description>
