@@ -3,6 +3,7 @@ import sublime_plugin
 import datetime
 import os
 import logging
+import shutil
 
 log = logging.getLogger(__name__)
 
