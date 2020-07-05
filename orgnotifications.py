@@ -43,7 +43,12 @@ class OrgShowNotifications(sublime_plugin.TextCommand):
 		notification.DoRenderView(edit)
 
 def ShowBalloon(todo, time):
-	commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"" + todo + "\"", "\"" + time + "\""])
+	if(sublime.platform() == 'windows'):
+		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"" + todo + "\"", "\"" + time + "\""])
+	elif(sublime.platform() == 'osx'):
+		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \""+time+"\" with title \""+todo+"\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"])
+	else:
+		print("ERROR: platform not yet supported for notifications")
 	# Expand all potential macros.
 	for i in range(len(commandLine)):
 		commandLine[i] = commandLine[i].format(todo=todo,time=time)
