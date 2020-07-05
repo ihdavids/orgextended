@@ -76,7 +76,8 @@ def plugin_loaded():
 # This is called when our plugin unloads!
 def plugin_unloaded():
     links.onShutdown()
-    notice.Get().stop()
+    if(notice):
+        notice.Get().stop()
 
 def onLoad(view):
     if(view and view.file_name() and util.isPotentialOrgFile(view.file_name())):
