@@ -10,19 +10,37 @@
 	You can build your own but I am currently extending the syntax on a regular basis so your color scheme may break.
 
   #+BEGIN_SRC js
-{
-	// The color scheme to use for the capture buffer
-	"color_scheme": "Packages/OrgExtended/orgextended.sublime-color-scheme",
+  {
+    // The color scheme to use for the capture buffer
+    "color_scheme": "Packages/OrgExtended/orgextended-light.sublime-color-scheme",
 
     // Where are your org files?
     "orgDirs": [
         "c:\\Users\\ian\\notes"
     ],
-
-
-
-}
+  }
   #+END_SRC
+
+  [file:light-color-scheme.gif]
+
+** Excluding Files
+   Often it is helpful to exclude some subdirectories in your orgDirs. This can be done as follows:
+
+  #+BEGIN_SRC js
+	"orgExcludeDirs": [
+		"c:\\Users\\ian\\notes\\old",
+		"c:\\Users\\ian\\notes\\caldav",
+	],
+
+  #+END_SRC
+
+** HTML Export
+   You can customize the HTML exporter as follows:
+   TODO: Extend this!
+
+   #+BEGIN_SRC js
+	"HtmlStyle": "funky"
+   #+END_SRC
 
 ** Capture Templates
 	Capture templates are a core element of Org Mode in general.
