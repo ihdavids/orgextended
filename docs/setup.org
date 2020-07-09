@@ -14,10 +14,6 @@
 	// The color scheme to use for the capture buffer
 	"color_scheme": "Packages/OrgExtended/orgextended.sublime-color-scheme",
 
-    // Captures go into this file for refiling later.
-    "refile": "D:\\Build\\notes\\refile.org",
-
-    
     // Where are your org files?
     "orgDirs": [
         "c:\\Users\\ian\\notes"
@@ -32,6 +28,9 @@
 	Capture templates are a core element of Org Mode in general.
 	This is still in its infancy but growing.
   #+BEGIN_SRC js
+    // I use this symbol for {refile} symbol expansion below.
+    "refile": "D:\\Build\\notes\\refile.org",
+    
     // Org Capture templates $0 is where the cursor ends up.
     "captureTemplates":
     [
