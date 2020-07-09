@@ -69,6 +69,7 @@
 * This Plugin
 
   - [[file:orgextended.org][Basic Structure]] - Basic file structure
+  - [[file:setup.org][Setup]] - Sublime Setup
   - [[file:editing.org][Editing]] - Editing your org file
   - [[file:lists.org][Lists]] - Supported lists in an org file
   - [[./folding.org][Folding]] - Jumping from the full view to a folded representation.
