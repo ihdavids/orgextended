@@ -91,14 +91,32 @@
     ],
    #+END_SRC 
 
-** Other Settings
-   #+BEGIN_SRC js
-     
+*** Archiving
+	Archiving is a very personal choice. By default OrgExtended will archive to a myfile.org_archive file under a Archive heading. You can customize this using the following option:
+
+	#+BEGIN_SRC js
+    // Globally where should things be archived?
+    // So the following will expand to myfile.org_archive
+    // NOTE: org allows for datetree/ and a few other options
+    //       we probably only support a subset of those
+    //       properly
+    "archive": "%s_archive::* Archive",
+	#+END_SRC
+
+** Org Extensions
+	While sublime controls when to enable the mode for a particular file the background org file scanning can be controlled with the following option:
+
+	#+BEGIN_SRC js
     // The Org DB will not load a file without one of these file extensions.
     // It assumes we are somehow erroneously trying to load something wrong.
     // If you create your own #+ARCHIVE: entries make sure the extensions are in here.
     "validOrgExtensions": [ ".org", ".org_archive"],
+	#+END_SRC
 
+** Controlling Default Startup Options
+	Org has a STARTUP tag that can be placed in a file. You can control the default startup state in your config file like so:
+
+	#+BEGIN_SRC js
     // Startup is equivalent to #+STARTUP: showall in a file
     // but has an effect on all org files. This controls what mode
     // the org files show as globally. Valid values are:
@@ -111,13 +129,21 @@
     //    #+STARTUP: inlineimages
     //    #+STARTUP: noinlineimages
     "startup": ["showall", "noinlineimages"],
-    
-    // Globally where should things be archived?
-    // So the following will expand to myfile.org_archive
-    // NOTE: org allows for datetree/ and a few other options
-    //       we probably only support a subset of those
-    //       properly
-    "archive": "%s_archive::* Archive",
+	#+END_SRC
+
+** Images
+	Inline image visualization will search for images using the following option:
+
+	#+BEGIN_SRC js
+    // When looking for images in org files, where might those images be located?
+    // The first path in this list is where generated images will be placed.
+    // If this list is empty a subdir of images under the first entry in orgDirs will be used.
+    "imageSearchPath": [],
+	#+END_SRC
+
+** Other Settings
+	TODO: Get around to documenting this stuff.
+   #+BEGIN_SRC js
 
     // We follow the same sort of syntax as the normal orgmode for todos.
     // Right now I don't support logging tags on these, but that will come.
@@ -125,10 +151,6 @@
     // me some basic highlighting.
     "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"],
 
-    // When looking for images in org files, where might those images be located?
-    // The first path in this list is where generated images will be placed.
-    // If this list is empty a subdir of images under the first entry in orgDirs will be used.
-    "imageSearchPath": [],
 
 
     "resolver.jira.url":"http://sandbox.onjira.com/browse/%s",
