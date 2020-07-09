@@ -1,7 +1,14 @@
 * Exporting
-  At the moment orgextended supports 3 ways of exporting you content.
+  Org is first and foremost a document interchange format, much like markdown.
+  There are many tools to work with markdown files and org files alike.
 
-  1. [[file:pandoc.org][Pandoc]]
-  2. [[file:htmlexporter.org][Html]]
-  3. [[file:revealjs.org][RevealJs]]
+  OrgExtended has a couple of mechanisms that can allow you to convert between
+  your org files and other formats.
+
+
+*** Current Exporters
+
+  1. [[file:pandoc.org][Pandoc]]   - This is a well known tool. You will need to install it.
+  2. [[file:htmlexporter.org][Html]]     - Simple built in HTML exporter. 
+  3. [[file:revealjs.org][RevealJs]] - An imitation of the emacs revealjs exporter.
    
