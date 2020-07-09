@@ -21,7 +21,7 @@
   }
   #+END_SRC
 
-  [file:light-color-scheme.gif]
+  [[file:light-color-scheme.gif]]
 
 ** Excluding Files
    Often it is helpful to exclude some subdirectories in your orgDirs. This can be done as follows:
