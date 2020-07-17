@@ -2,15 +2,19 @@
 
   Links in org mode are a nested set of square brackets
 
+  [[file:links.gif]]
+
   #+BEGIN_EXAMPLE
   [[ Reference ][ Description ]]
   #+END_EXAMPLE
 
-  Pressing enter on a link will try to follow the link.
+  Pressing enter on a link in sublime will try to follow the link.
   If the link is a web reference org will try to open a web browser.
 
   The link system I am using is based on the original orgmode for sublime text and
-  is extensible.
+  is fairly extensible. Custom handlers can be built to allow you to link easily to 
+  your own services.
+
 
 * Images
   Org supports the ability to show images inline in the document
@@ -33,7 +37,8 @@
 
 * File and Line Number
 
-  You can link by file and line number like so:
+  A link can be more than just the filename. 
+  You can link to a specific line number like so:
 
   #+BEGIN_EXAMPLE
   [[file:links.org::3][File and Line Number Example]]
@@ -46,10 +51,14 @@
   :CUSTOM_ID: a-custom-id
   :END:
 
-  You can link to a heading using the CUSTOM_ID property like so:
+  Org has the concept of custom IDs. These are defined as a CUSTOM_ID property
+  in a property drawer. To link to a heading with one of these IDs:
 
   #+BEGIN_EXAMPLE
   [[file:./links.org::#a-custom-id][Custom Id Example]]
   #+END_EXAMPLE 
   
-  [[file:./links.org::#a-custom-id][Custom Id Example]]
+  [[file:./links.org::#a-custom-id][Custom Id Example]] 
+
+* Extending Link Processing
+  TODO: Describe how to do this.
