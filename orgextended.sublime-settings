@@ -32,6 +32,12 @@
             "snippet": "note_heading",
             "target": ["file","{refile}"],
         },
+        {
+            "name":    "Capture",
+            "type":    "entry",
+            "snippet": "capture_heading",
+            "target": ["file","{refile}"],
+        },
     	{
             // This is what I am heading towards.
             // TODO:

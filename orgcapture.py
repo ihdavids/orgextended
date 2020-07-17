@@ -290,6 +290,12 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
             inow = orgdate.OrgDate.format_date(now, False)
             anow = orgdate.OrgDate.format_date(now, True)
             # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
+            # OTHER VARIABLES:
+            # TM_FULLNAME - Users full name
+            # TM_FILENAME - File name of the file being edited
+            # TM_CURRENT_WORD - Word under cursor when snippet was triggered
+            # TM_SELECTED_TEXT - Selected text when snippet was triggered
+            # TM_CURRENT_LINE - Line of snippet when snippet was triggered
             panel.run_command("insert_snippet", 
                 { "name" : snipName
                 , "ORG_INACTIVE_DATE": inow
@@ -297,6 +303,7 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
                 , "ORG_DATE":          str(datetime.date.today())
                 , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
                 , "ORG_CLIPBOARD":     sublime.get_clipboard()
+                , "ORG_SELECTION":     self.view.substr(self.view.sel()[0])
                 })
             sublime.active_window().active_view().settings().set('auto_indent',ai)
         panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')

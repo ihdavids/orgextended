@@ -4,7 +4,8 @@ import datetime
 import os
 import logging
 import shutil
-import orgutil.template as temp
+import OrgExtended.orgutil.template as temp
+
 
 log = logging.getLogger(__name__)
 
@@ -52,17 +53,18 @@ def Get(name, defaultValue, formatDictionary = None):
 		Load()
 	rv = _sets.Get(name, defaultValue)
 	formatDict = {
-    	"date":     str(datetime.date.today()),
-    	"time":     datetime.datetime.now().strftime("%H:%M:%S"),
-    	"datetime": str(datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M")),
-    }
-    if(formatDictionary != None):
-        formatDict.update(formatDictionary)
+		"date":     str(datetime.date.today()),
+		"time":     datetime.datetime.now().strftime("%H:%M:%S"),
+		"datetime": str(datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M")),
+	}
+
+	if(formatDictionary != None):
+		formatDict.update(formatDictionary)
 
 	if(str == type(rv)):
-    	formatter = TemplateFormatter()
-    	rv  = formatter.format(rv, **formatDict)
-    if(list == type(rv)):
-    	formatter = TemplateFormatter()
-    	rv = [ formatter.format(r, **formatDict) for r in rv ]
+		formatter = temp.TemplateFormatter()
+		rv  = formatter.format(rv, **formatDict)
+	if(list == type(rv)):
+		formatter = temp.TemplateFormatter()
+		rv = [ (formatter.format(r, **formatDict) if str == type(r) else r) for r in rv ]
 	return rv
