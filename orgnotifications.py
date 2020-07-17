@@ -43,10 +43,17 @@ class OrgShowNotifications(sublime_plugin.TextCommand):
 		notification.DoRenderView(edit)
 
 def ShowBalloon(todo, time):
+	print("SHOW BALLOON")
+	formatDict = {
+	"time": time,
+	"todo": todo
+	}
 	if(sublime.platform() == 'windows'):
-		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"" + todo + "\"", "\"" + time + "\""])
+		print("WINDOWS")
+		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"", "\"{time}\""])
 	elif(sublime.platform() == 'osx'):
-		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \""+time+"\" with title \""+todo+"\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"])
+		print("OSX")
+		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \"{time}\" with title \"{todo}\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"])
 	else:
 		print("ERROR: platform not yet supported for notifications")
 	# Expand all potential macros.
@@ -155,3 +162,7 @@ def Setup():
 def Get():
 	return notice   
 
+class OrgRebuildNotificationsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+    	global notice
+    	pass
