@@ -150,7 +150,7 @@
     "AgendaCustomView": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
 
     // This is the template used to notify outside of sublime on org notifications 
-    "ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
+    //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
 
 
 }
