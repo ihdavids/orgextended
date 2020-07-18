@@ -49,10 +49,8 @@ def ShowBalloon(todo, time):
 	"todo": todo
 	}
 	if(sublime.platform() == 'windows'):
-		print("WINDOWS")
 		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"", "\"{time}\""], formatDict)
 	elif(sublime.platform() == 'osx'):
-		print("OSX")
 		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \"{time}\" with title \"{todo}\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"], formatDict)
 	else:
 		print("ERROR: platform not yet supported for notifications")
