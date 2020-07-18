@@ -51,7 +51,7 @@
 
   Here we will insert some properties with a link to your current location in the current view.
   The currently selected text inside a src block and the date you made this capture.
-  
+
   #+BEGIN_SRC xml
         <snippet>
             <content><![CDATA[
@@ -63,9 +63,8 @@
           $0
           #+begin_src ${2:cpp}
           $ORG_SELECTION
-          #+end_src
-        
-        ]]></content>
+          #+end_sr_c]]>
+        </content>
             <tabTrigger>capture_heading</tabTrigger>
             <scope>text.orgmode</scope>
             <description>Capture Heading</description>
