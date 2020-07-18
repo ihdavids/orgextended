@@ -304,6 +304,8 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
                 , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
                 , "ORG_CLIPBOARD":     sublime.get_clipboard()
                 , "ORG_SELECTION":     self.view.substr(self.view.sel()[0])
+                , "ORG_LINENUM":       str(self.view.curRow())
+                , "ORG_FILENAME":      self.view.file_name()
                 })
             sublime.active_window().active_view().settings().set('auto_indent',ai)
         panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
