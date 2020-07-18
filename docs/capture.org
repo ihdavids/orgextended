@@ -52,6 +52,8 @@
   Here we will insert some properties with a link to your current location in the current view.
   The currently selected text inside a src block and the date you made this capture.
 
+  *NOTE*: /In the following block, the github org parser gets confused with nested src blocks so I have formatted them funny so they will show up/
+
   #+BEGIN_SRC xml
         <snippet>
             <content><![CDATA[
