@@ -14,6 +14,63 @@
   
   [[file:orgcapture.gif]]
 
+** Capture By Template
+  While I do have a very simplistic template mechanism, I decided after starting to
+  implement that, that I would rather use snippets.
+
+  A capture entry is specified something like so: 
+
+  #+BEGIN_SRC js
+    "captureTemplates":
+    [
+        {
+            "name":    "Capture",
+            "type":    "entry",
+            "snippet": "capture_heading",
+            "target": ["file","{refile}"],
+        },
+    ]
+  #+END_SRC
+
+  This states that when you run the Capture option, we will paste the
+  capture_heading.sublime-snippet file into the capture buffer for your to edit.
+
+  I have extended the snippet environment to include additional variables and will
+  continue to extend the list as there is need:
+
+  - ORG_INACTIVE_DATE :: An inactive date block at the current date
+  - ORG_ACTIVE_DATE :: An active date block at the current date
+  - ORG_DATE :: Just the current date
+  - ORG_TIME :: Just the current time.
+  - ORG_CLIPBOARD :: The current contents of the clipboard
+  - ORG_SELECTION :: The currently selected text in the current view.
+  - ORG_LINENUM :: The current line number in the current view
+  - ORG_FILENAME :: The filename of the current view
+
+  These can be used in your snippet to add a rich variety to your captures:
+
+  Here we will insert some properties with a link to your current location in the current view.
+  The currently selected text inside a src block and the date you made this capture.
+  
+  #+BEGIN_SRC xml
+        <snippet>
+            <content><![CDATA[
+        * NOTE ${1:HEADING}
+          :PROPERTIES:
+          :FROM:    [[file:${ORG_FILENAME}:${ORG_LINENUM}][Source]]
+          :CREATED: $ORG_INACTIVE_DATE
+          :END:
+          $0
+          #+begin_src ${2:cpp}
+          $ORG_SELECTION
+          #+end_src
+        
+        ]]></content>
+            <tabTrigger>capture_heading</tabTrigger>
+            <scope>text.orgmode</scope>
+            <description>Capture Heading</description>
+        </snippet>
+  #+END_SRC 
 
 * TODO Refile
   I like to capture ideas, snippets and meeting notes to my refile file.
