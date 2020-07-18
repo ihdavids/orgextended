@@ -61,9 +61,9 @@
           :CREATED: $ORG_INACTIVE_DATE
           :END:
           $0
-          #+begin_src ${2:cpp}
+          # +begin_sr_c ${2:cpp}
           $ORG_SELECTION
-          #+end_sr_c]]>
+          # +end_sr_c]]>
         </content>
             <tabTrigger>capture_heading</tabTrigger>
             <scope>text.orgmode</scope>
