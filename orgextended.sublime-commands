@@ -80,6 +80,7 @@
     {"caption": "OrgAgendaClockOut",      "command": "org_agenda_clock_out"        },
     {"caption": "OrgAgendaDayView",       "command": "org_agenda_day_view"         },
     {"caption": "OrgAgendaCustomView",    "command": "org_agenda_custom_view"      },
+    {"caption": "OrgAgendaRebuildNotices","command": "org_rebuild_notifications"   },
 
     // Date Picker
     {"caption": "OrgDatePicker",          "command": "org_date_picker"             },

@@ -50,10 +50,10 @@ def ShowBalloon(todo, time):
 	}
 	if(sublime.platform() == 'windows'):
 		print("WINDOWS")
-		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"", "\"{time}\""])
+		commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"", "\"{time}\""], formatDict)
 	elif(sublime.platform() == 'osx'):
 		print("OSX")
-		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \"{time}\" with title \"{todo}\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"])
+		commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"'display notification \"{time}\" with title \"{todo}\" subtitle \""+"Org Mode TODO"+"\" sound name Submarine'"], formatDict)
 	else:
 		print("ERROR: platform not yet supported for notifications")
 	# Expand all potential macros.
@@ -81,6 +81,11 @@ def IsWithinNotificationWindow(n, hours, minutes):
 	next = n.scheduled.start
 	return ((next.hour-hours) == hour and (next.minute - mins) <= minutes) 
 
+def GetUID(item):
+	n = item['node']
+	f = item['file']
+	return f.filename + "@" + n.get_locator()
+
 class NotificationSystem(threading.Thread):
 	def __init__(self, interval):
 		threading.Thread.__init__(self)
@@ -103,10 +108,6 @@ class NotificationSystem(threading.Thread):
 	def HaveNotifiedFor(self, item):
 		return item in self.notified
 
-	def GetUID(item):
-		n = item['node']
-		f = item['file']
-		return f.filename + "@" + n.get_locator()
 
 	def DoNotify(self,item):
 		self.notified.append(GetUID(item))
@@ -152,7 +153,7 @@ notice = None
 
 def Setup():
 	global notice
-	checkPeriod = sets.Get("noticePeriod",5)*60
+	checkPeriod = sets.Get("noticePeriod",1)*60
 	if(checkPeriod < 60):
 		checkPeriod = 60
 	notice = NotificationSystem(interval=timedelta(seconds=checkPeriod))
@@ -165,4 +166,6 @@ def Get():
 class OrgRebuildNotificationsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
     	global notice
-    	pass
+    	if(notice == None):
+    		Setup()
+    	notice.BuildToday()
