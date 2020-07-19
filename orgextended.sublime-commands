@@ -93,4 +93,5 @@
     {"caption": "OrgExportSubtreeAsOHtml","command": "org_export_subtree_as_oHtml" },
     {"caption": "OrgExportFileAsHtml",    "command": "org_export_file_as_html"     },
     {"caption": "OrgExportSubtreeAsHtml", "command": "org_export_subtree_as_html"  },
+    {"caption": "OrgTestThing", "command": "org_show_item"  },
 ]
