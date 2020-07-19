@@ -31,8 +31,9 @@ class Notification(agenda.TodoView):
 		# Show the in sublime version, clear out other
 		# todos and just show our notices.
 		self.entries = []
-		for key,item in notifications.items():
-			self.AddEntry(item['node'],item['file'])
+		if(notifications and type(notifications) is dict):
+			for key,item in notifications.items():
+				self.AddEntry(item['node'],item['file'])
 		window = sublime.active_window() 
 		window.active_view().run_command('org_show_notifications')
 		return
@@ -170,40 +171,4 @@ class OrgRebuildNotificationsCommand(sublime_plugin.TextCommand):
     	if(notice == None):
     		Setup()
     	notice.BuildToday()
-
-class OrgShowItemCommand(sublime_plugin.TextCommand):
-	def run(self, edit):
-		print("SHOW BALLOON")
-		todo = "this is a todo"
-		time = "some time"
-		formatDict = {
-		"time": time,
-		"todo": todo
-		}
-		if(sublime.platform() == 'windows'):
-			commandLine = sets.Get("ExternalNotificationCommand",[r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"", "\"{time}\""], formatDict)
-		elif(sublime.platform() == 'osx'):
-			commandLine = sets.Get("ExternalNotificationCommand",['osascript','-e',"display notification \"{time}\" with title \"{todo}\" subtitle \""+"Org Mode TODO"+"\""], formatDict)
-		else:
-			print("ERROR: platform not yet supported for notifications")
-		# Expand all potential macros.
-		for i in range(len(commandLine)):
-			commandLine[i] = commandLine[i].format(todo=todo,time=time)
-		try:
-			startupinfo = subprocess.STARTUPINFO()
-			startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-		except:
-			startupinfo = None
-		# cwd=working_dir, env=my_env,
-		cwd = os.path.join(sublime.packages_path(),"OrgExtended") 
-		print("Calling: " + str(commandLine))
-		if(sublime.platform() == 'windows'):
-			popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			popen.wait()
-		elif(sublime.platform() == 'osx'):
-			print("OSX")
-			rv = subprocess.check_call(commandLine,stderr=subprocess.STDOUT)
-			#print("RV: " + str(rv.decode('utf-8')))
-		else:
-			log.error("unsupported platform")
 
