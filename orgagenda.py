@@ -637,6 +637,18 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         log.info("Custom view refreshed")
 
 
+# TODO: This is a work in progress that only lists them right now.
+#       The goal is add parameters for filtered todos and support
+#       multiple calendar views in the end. I should probably
+#       rename the command above so we know it is intended to directly
+#       select a view rather than use a quick panel.
+#       I would like to add:
+#       1. Vertical Week View (Org Style)
+#       2. Horizontal Week View (Calendar Style)
+#       3. Month View (Vim Style)
+#       4. Month View Quick Highlight (My Style)
+#       5. Various Filtered Todo lists.
+#       6. Try an HTML version of a todo?
 class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
     def on_done(self, index):
         if(index < 0):
