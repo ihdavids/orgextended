@@ -147,7 +147,10 @@
     // What does the composite agenda view show?
     // You can add your own views but that is done through code.
     // Right now I ONLY have this one composite view.
-    "AgendaCustomView": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+    "AgendaCustomViews": 
+    {
+        "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+    },
 
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]

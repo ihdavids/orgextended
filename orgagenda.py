@@ -622,11 +622,12 @@ viewRegistry = CalendarViewRegistry()
 
 
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit, toShow="Default"):
         pos = None
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
-        views = sets.Get("CompositeView",["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"])
+        views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
+        views = views[toShow]
         agenda = viewRegistry.CreateCompositeView(views)
         #agenda = CompositeView("Agenda", views)
         #agenda = AgendaView(AGENDA_VIEW)

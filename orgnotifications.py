@@ -44,7 +44,7 @@ class OrgShowNotifications(sublime_plugin.TextCommand):
 		notification.DoRenderView(edit)
 
 def ShowBalloon(todo, time):
-	print("SHOW BALLOON")
+	log.debug("SHOW BALLOON POPUP")
 	formatDict = {
 	"time": time,
 	"todo": todo
@@ -86,7 +86,7 @@ def IsWithinNotificationWindow(n, hours, minutes):
 def GetUID(item):
 	n = item['node']
 	f = item['file']
-	return f.filename + "@" + n.get_locator()
+	return f.filename + "@" + n.get_locator() + "@" + str(n.scheduled)
 
 class NotificationSystem(threading.Thread):
 	def __init__(self, interval):

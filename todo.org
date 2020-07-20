@@ -37,7 +37,7 @@
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
 	- [ ] Numbered Lists
-	- [-] Editing [5/14]
+	- [-] Editing [8/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
@@ -46,11 +46,11 @@
 		- [x] Caret looks okay
 		- [ ] Indent, De-Indent heading and subtree
 		- [ ] Heading movement, like you can do with lines
-		- [ ] Checkbox insert?
+		- [x] Checkbox insert?
 		- [ ] Sublime snippets?
 		- [ ] Auto indenting of checkboxes (with tab)
-		- [ ] Property insertion
-		- [ ] Fix Tag Insertion (tooltip is broken for some reason)
+		- [x] Property insertion
+		- [x] Fix Tag Insertion (tooltip is broken for some reason)
 		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
 	- [-] Links [7/16]
 		- [x] Orgmode style links
@@ -102,10 +102,10 @@
 		- [ ] Week View
 		- [ ] Calendar is selectable for day view?
 		- [ ] Formatting for today line in day view?
-	- [-] Agenda Notifications [1/4]
+	- [-] Agenda Notifications [2/4]
 	    - [x] Windows Support
 	    - [ ] Fully customizable
-	    - [ ] Mac Support
+	    - [x] Mac Support
 	    - [ ] Linux Support
 	- [ ] Logging [0/2]
 		- [ ] Todo state controls (Markup @ symbol etc.)
