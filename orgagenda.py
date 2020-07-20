@@ -637,6 +637,18 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         log.info("Custom view refreshed")
 
 
+class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
+    def on_done(self, index):
+        if(index < 0):
+            return
+        evt.EmitIf(self.onDone)
+
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
+        self.keys = self.views.keys()
+        self.view.window().show_quick_panel(list(self.keys), self.on_done, -1, -1)
+
 # Change the TODO status of the node.
 class OrgAgendaChangeTodoCommand(sublime_plugin.TextCommand):
     def run(self, edit):
