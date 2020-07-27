@@ -610,11 +610,34 @@ class CalendarViewRegistry:
     def AddView(self,name,cls):
         self.KnownViews[name] = cls
 
+    def ParseArgs(self, n ):
+        tokens = n.split(':')
+        name = tokens[0].strip()
+        args = {}
+        i = 1
+        while(i < len(tokens)):
+            p = tokens[i].strip()
+            if(len(p) > 0):
+                idx = p.find(' ')
+                if(idx > 0):
+                    pname = p[:idx].strip()
+                    pval = p[idx:].strip()
+                    args[pname] = pval
+                    print(pname + " -> " + pval)
+            i += 1
+        return (name, args)
+
     def CreateCompositeView(self,views):
         vlist = []
         for v in views:
-            vv = self.KnownViews[v](v, False)
-            vlist.append(vv)
+            n, args = self.ParseArgs(v)
+            vv = None
+            if(args == None):
+                vv = self.KnownViews[n](n, False)
+            else:
+                vv = self.KnownViews[n](n, False, **args)
+            if(vv):
+                vlist.append(vv)
         cview = CompositeView("Agenda", vlist)
         return cview
 
@@ -653,13 +676,15 @@ class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
     def on_done(self, index):
         if(index < 0):
             return
+        key = self.keys[index]
+        self.view.run_command("org_agenda_custom_view", { "toShow": key })
         evt.EmitIf(self.onDone)
 
     def run(self, edit, onDone=None):
         self.onDone = onDone
         self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
-        self.keys = self.views.keys()
-        self.view.window().show_quick_panel(list(self.keys), self.on_done, -1, -1)
+        self.keys = list(self.views.keys())
+        self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
 
 # Change the TODO status of the node.
 class OrgAgendaChangeTodoCommand(sublime_plugin.TextCommand):
