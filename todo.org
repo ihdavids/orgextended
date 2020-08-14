@@ -142,3 +142,22 @@
 	- [ ] Column view (Is this possible in sublime?)
 	- [ ] Effort Estimate
 	- [-] Vintageous bindings
+
+* TODO Next
+** TODO Agenda
+	- [ ] Week View
+	- [ ] Week Quick Select
+
+** TODO Notifications
+    - [ ] Linux popup
+    - [ ] Windows powershell prompt (ascii art)
+
+** TODO Jira
+    - [ ] Query Jira for My Stuff
+
+** TODO Google Calendar
+    - [ ] Pull my calendar
+    - [ ] Update my calendar
+
+** TODO Colored Headers
+** TODO Underlined Headers
