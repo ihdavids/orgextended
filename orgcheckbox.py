@@ -295,6 +295,17 @@ class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
         self.view.sel().add(ln.end())
 
 
+cbsline_info_regex = re.compile(r'^(\s*)(.*)\[\s*[0-9]*/[0-9]\s*\]\s*$')
+class OrgInsertCheckboxSummaryCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        row = self.view.curRow()
+        line = self.view.getLine(row)
+        match = cbsline_info_regex.match(line)
+        if(not match):
+            reg = self.view.curLine()
+            self.view.insert(edit,reg.end()," [/] ")
+            recalculate_all_checkbox_summaries(self.view, edit)
+
 class OrgToggleCheckboxCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view

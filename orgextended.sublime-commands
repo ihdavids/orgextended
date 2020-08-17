@@ -64,6 +64,7 @@
     {"caption": "OrgCheckboxToggle",      "command": "org_toggle_checkbox"         },
     {"caption": "OrgRecalcCheckbox",      "command": "org_recalc_checkbox_summary" },
     {"caption": "OrgRecalcAllCheckbox",   "command": "org_recalc_all_checkbox_summaries" },
+    {"caption": "OrgAddCheckboxSummary",  "command": "org_insert_checkbox_summary" },
     {"caption": "OrgJumpToCustomId",      "command": "org_jump_to_custom_id"       },
     {"caption": "OrgInsertTag",           "command": "org_insert_tag"              },
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
