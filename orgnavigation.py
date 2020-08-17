@@ -116,7 +116,8 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
 class OrgToggleCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         line = self.view.curLine()
-        cb = checkbox.get_checkbox(self.view, line)
+        cb = checkbox.is_checkbox_line(self.view)
+        #cb = checkbox.get_checkbox(self.view, line)
         if(cb):
             self.view.run_command('org_toggle_checkbox')
             return

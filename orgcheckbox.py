@@ -32,6 +32,7 @@ class CheckState:
 indent_regex     = re.compile(r'^(\s*).*$')
 summary_regex    = re.compile(r'(\[\d*[/%]\d*\])')
 checkbox_regex   = re.compile(r'(\[[xX\- ]\])')
+checkbox_line_regex   = re.compile(r'\s*[-+]?\s*(\[[xX\- ]\])\s+')
 
 # Extract the indent of this checkbox.
 # RETURNS: a string with the indent of this line.
@@ -251,6 +252,17 @@ def is_checkbox(view, sel):
     names = view.scope_name(sel.end())
     return 'orgmode.checkbox' in names or 'orgmode.checkbox.checked' in names or 'orgmode.checkbox.blocked' in names
 
+def is_checkbox_line(view,sel=None):
+    point = None
+    if(sel == None):
+        row = view.curRow()
+        point = view.text_point(row, 0)
+    else:
+        point = sel.end()
+    line = view.line(point)
+    content = view.substr(line)
+    return checkbox_line_regex.search(content)
+
 def find_all_summaries(view):
     return view.find_by_selector("orgmode.checkbox.summary")
 
@@ -287,7 +299,7 @@ class OrgToggleCheckboxCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view
         for sel in view.sel():
-            if(not is_checkbox(view, sel)):
+            if(not is_checkbox_line(view, sel)):
                 continue
             line     = view.line(sel.end())
             toggle_checkbox(view, edit, line, recurse_up=True, recurse_down=True)
