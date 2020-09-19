@@ -150,6 +150,7 @@
     "AgendaCustomViews": 
     {
         "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+        "Todos":   ["Todos"],
     },
 
     // This is the template used to notify outside of sublime on org notifications 
