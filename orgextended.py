@@ -23,9 +23,15 @@ import OrgExtended.orgclocking as clocking
 import OrgExtended.orgnotifications as notice
 import OrgExtended.orgdatepicker as datepicker
 import OrgExtended.pymitter as evt
-import OrgExtended.tableeditor as tableeditor
+import OrgExtended.packagecon as pkgcon
 
 log = None
+
+def InstallIfNeeded(pkg, name):
+    log.debug("Checking for " + name)
+    if(not pkgcon.IsInstalled(pkg)):
+        log.debug("Installing " + name)
+        pkgcon.Install(pkg)
 
 # Lets get our windows in sync now that we are loaded.
 def sync_up_on_loaded():
@@ -33,10 +39,9 @@ def sync_up_on_loaded():
     window.run_command("org_on_load_sync_up", {})
     notice.Setup()
     datepicker.SetupMouse()
-    log.debug("Checking for TableEditor")
-    if(not tableeditor.IsInstalled()):
-        log.debug("Installing Table Editor")
-        tableeditor.Install()
+    # Install required packages to operate org extended
+    InstallIfNeeded(pkgcon.TABLE_PACKAGE, "Table Editor")
+    InstallIfNeeded(pkgcon.PS_PACKAGE, "Powershell")
 
 # This is where we can start to load our DB!
 def plugin_loaded():
