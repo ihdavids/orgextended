@@ -5,7 +5,7 @@
     // Turn on TableEditor for orgmode
     "enable_table_editor": true,
     "table_editor_syntax": "EmacsOrgMode",
-	
+
 	// The quick capture buffer gets this name
 	"captureBufferName": "*capture*",
 
@@ -90,6 +90,16 @@
         "c:\\Users\\ian\\notes"
     ],
 
+    // Specific files to add vs whole directories
+    //"orgFiles": [
+    //],
+
+    // Directories to exclude from parsing org files
+    //"orgExcludeDirs": [],
+
+    // Files to be excluded from org parsing
+    //"orgExcludeFiles": [],
+
     // The Org DB will not load a file without one of these file extensions.
     // It assumes we are somehow erroneously trying to load something wrong.
     // If you create your own #+ARCHIVE: entries make sure the extensions are in here.
@@ -107,6 +117,14 @@
     //    #+STARTUP: inlineimages
     //    #+STARTUP: noinlineimages
     "startup": ["showall", "noinlineimages"],
+
+    // Used in the tag selector for the font to use in the popup
+    //"input_font_face": "Arial",
+
+    // List of priorities we can insert / change to
+    // NOTE: only the letters (below) can be highlighted at the moment
+    //       I haven't found a good way to modify the grammer dynamically.
+    //"priorities": ["A","B","C","D","E"]
     
     // Globally where should things be archived?
     // So the following will expand to myfile.org_archive
@@ -153,8 +171,27 @@
         "Todos":   ["Todos"],
     },
 
+
+    // Configure the agenda header format
+    //"agendaHeaderFormat": "%A \t%d %B %Y",
+
+    // Day view starts at 6am and ends at 7pm
+    //"agendaDayStart": 6,
+    //"agendaDayEnd": 19,  
+
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
+
+    // When notice thread is polling, how far off does event need to be?
+    //"notifyHoursBefore": 0,
+    //"notifyMinsBefore": 15,
+
+    // How often to check if an event is up? (in minutes)
+    //"noticePeriod": 1,
+
+    // Pandoc export uses these to determine the style and the location of pandoc executable
+    // "PandocPath": "C:\Program Files\Pandoc\pandoc.exe",
+    // "PandocStyle": "blocky",
 
 
 }

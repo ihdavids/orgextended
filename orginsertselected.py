@@ -54,7 +54,7 @@ class OrgInput:
 
 
     def redraw(self):
-        ff = sets.Get("font_face","Arial")
+        ff = sets.Get("input_font_face","Arial")
         content = "<html><body id=\"orgselect\">"
         content += """<style>
         div.orgselect {
