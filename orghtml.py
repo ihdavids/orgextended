@@ -190,7 +190,9 @@ def GetStyleRelatedPropertyData(file, key, setting):
 
 
 def GetHighlightJsCss(style):
-	data = os.path.join(sublime.packages_path(),"OrgExtended", "highlightjs", "styles", style + ".css")
+	import OrgExtended.orgutil.webpull as wp
+	wp.download_highlightjs()
+	data = os.path.join(sublime.packages_path(),"User", "highlightjs", "styles", style + ".css")
 	if(os.path.isfile(data)):
 		with open(data) as f:
 			contents = f.read()
@@ -198,7 +200,9 @@ def GetHighlightJsCss(style):
 
 
 def GetHighlightJs():
-	data = os.path.join(sublime.packages_path(),"OrgExtended", "highlightjs", "highlight.pack.js")
+	import OrgExtended.orgutil.webpull as wp
+	wp.download_highlightjs()
+	data = os.path.join(sublime.packages_path(),"User", "highlightjs", "highlight.pack.js")
 	if(os.path.isfile(data)):
 		with open(data) as f:
 			contents = f.read()

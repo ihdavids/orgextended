@@ -33,16 +33,12 @@ def download_highlightjs():
 	r = requests.get('https://highlightjs.org/download')
 	matcher = re.compile('^[ 	]*<input[ ]+type=\"hidden\"[ ]+name=\"csrfmiddlewaretoken\"[ ]+value=\"([^\"]+)\"')
 	cookie = r.headers['Set-Cookie']
-	#csrftoken=mm0TFIj3kVfXGORUqThNU1XTocsCPeEPYDnHF2WKl5YR0XM6vw5b1Va8sZ5IapH0
 	cookie = cookie[0:cookie.find(';')]
-	#print("COOKIE: " + cookie[0:cookie.find(';')])
-	#print(r.headers)
 	csrftoken = ""
 	for l in r.text.split('\n'):
 		m = matcher.match(l)
 		if(m):
 			csrftoken = str(m.groups(1)[0])
-	#print("Token: " + csrftoken)
 	payload = {
 	'csrfmiddlewaretoken': csrftoken,
 	'properties.js': 'on',
