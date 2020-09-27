@@ -35,6 +35,11 @@ def load_module(basemodule, folder, filename):
 		module = importlib.import_module(module_path)
 	return module
 
+def GetUserFolder():
+	base = os.path.dirname(os.path.abspath(__file__))
+	return os.path.join(base,'..','User')
+
+
 def find_extension_modules(folder):
 	importlib.invalidate_caches()
 	base = os.path.dirname(os.path.abspath(__file__))

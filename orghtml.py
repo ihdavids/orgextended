@@ -22,6 +22,7 @@ import OrgExtended.orgproperties as props
 import OrgExtended.orgutil.temp as tf
 import OrgExtended.pymitter as evt
 import OrgExtended.orgnotifications as notice
+import OrgExtended.orgextension as ext
 import yaml
 import sys
 import subprocess
@@ -540,6 +541,13 @@ class OrgExportFileOHtmlCommand(sublime_plugin.TextCommand):
 
 def sync_up_on_closed():
 	notice.Get().BuildToday()
+
+
+class OrgDownloadHighlighJs(sublime_plugin.TextCommand):
+	def run(self,edit):
+		log.info("Trying to download highlightjs")
+		import OrgExtended.orgutil.webpull as wp
+		wp.download_highlightjs()
 
 class OrgExportSubtreeAsOHtmlCommand(sublime_plugin.TextCommand):
 	def onDone(self):
