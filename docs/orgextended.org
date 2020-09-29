@@ -35,3 +35,21 @@
 
   Built into orgmode is the concept of todo lists.
   Org headings can have a state identifier that can flow through various states.
+
+  #+BEGIN_EXAMPLE
+   ,-> (unmarked) -> TODO -> DONE --.
+   '--------------------------------' 
+  #+END_EXAMPLE
+
+  [[https://orgmode.org/manual/TODO-Basics.html#TODO-Basics][Org Mode Todo]]
+
+  These todos can be used to create projects with sub tasks. In turn these todos can be
+  listed and filtered or scheduled to appear in the org agenda.
+
+  This in turn makes org mode a flexible and full features personal information manager.
+  Tools like:
+
+  - OrgTodoChange :: Lets you dynamically change the todo state of a heading.
+  
+
+  

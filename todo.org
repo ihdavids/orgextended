@@ -1,4 +1,4 @@
-* TODO Things I want [9/38]
+* TODO Things I want [9/40]
 	- [-] Capture [33%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
@@ -149,7 +149,7 @@
 	- [ ] Week Quick Select
 
 ** TODO Notifications
-    - [ ] Linux popup
+    - [x] Linux popup
     - [ ] Windows powershell prompt (ascii art)
 
 ** TODO Jira
@@ -159,5 +159,19 @@
     - [ ] Pull my calendar
     - [ ] Update my calendar
 
-** TODO Colored Headers
-** TODO Underlined Headers
+** DONE Colored Headers
+** DONE Underlined Headers
+** TODO TRAMP
+	- I would love to hook this in to babel as well.
+	- I would love to see this embeded into sublime as a whole
+	  this IS one of the powerful tools of emacs.
+
+** TODO GUD - Grand Unified Debugger
+	- I would love to see something like GUD ported
+
+** TODO Mu4E
+	- I love using Mu once I have org.
+
+** TODO EDiff
+	- There are diff tools for sublime but ediff is simple and awesome
+	  the other tools cost to much money IMHO and I find them a bit buggy.
