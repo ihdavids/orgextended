@@ -454,3 +454,8 @@ class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
         self.view.window().show_quick_panel(orgDb.customids, self.on_done, -1, -1)
 
 
+class OrgJumpToTodayCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        file, at = Get().FindByCustomId("TODAY")
+        path = "{0}:{1}".format(file.filename,at + 1)
+        self.view.window().open_file(path, sublime.ENCODED_POSITION)
