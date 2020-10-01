@@ -54,6 +54,16 @@ def GetCapturePath(view, template):
             raise "ERROR: clock is not running"
         filename = clk.ClockManager.GetActiveClockFile()
         at       = clk.ClockManager.GetActiveClockAt()
+    # Try to create my capture file if I can
+    try:
+        if(not os.file.exists(filename)):
+            with open(filename,"w") as fp:
+                fp.write("#+TAGS: refile\n")
+    except:
+        log.error("Failed to create capture file: " + str(filename))
+        pass
+    # Now make sure that file is loaded in the DB
+    # it might not be in my org path
     file = load(filename)
     return (target, filename, file, at)
 

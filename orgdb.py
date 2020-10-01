@@ -288,7 +288,10 @@ class OrgDb:
         return None
 
     def At(self, fileOrView, line):
-        return self.Find(fileOrView).at(line)
+        x = self.Find(fileOrView)
+        if(x != None):
+            return x.at(line)
+        return None
 
     def AtInView(self, view):
         (row,col) = view.curRowCol()

@@ -519,3 +519,20 @@ class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
         self.input = insSel.OrgInput()
         print(str(db.Get().customids))
         self.input.run("Custom Id:",db.Get().customids, evt.Make(self.on_done))
+
+class OrgSetTodayCommand(sublime_plugin.TextCommand):
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        idValue = "TODAY"
+        node = db.Get().AtInView(self.view)
+        if(not node or node.is_root()):
+            log.debug("Cannot update root node or non existent node as today")
+            return
+        file, at = db.Get().FindByCustomId(idValue)
+        if(file != None and at != None):
+            node = file.At(at)
+            if(node):
+                props.RemoveProperty(self.view, node, "CUSTOM_ID")
+        node = db.Get().AtInView(self.view)
+        if(node and not node.is_root()):
+            props.UpdateProperty(self.view,node,"CUSTOM_ID",idValue,self.onDone)
