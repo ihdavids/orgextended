@@ -1069,6 +1069,12 @@ class OrgRootNode(OrgBaseNode):
             return self.env._nodes[index]
         return None
 
+    def getFile(self):
+        return self.file
+
+    def setFile(self, file):
+        self.file = file
+
 
 class OrgNode(OrgBaseNode):
 

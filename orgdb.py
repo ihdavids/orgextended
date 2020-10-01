@@ -26,6 +26,7 @@ class FileInfo:
         self.filename = file
         self.key      = file.lower()
         self.change_count = 0
+        self.org.setFile(self)
         displayFn = self.key
         oldLen = len(displayFn)
         for prefix in orgPaths:
@@ -53,11 +54,13 @@ class FileInfo:
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
         self.org = loads(bufferContents)
+        self.org.setFile(self)
         # Keep track of last change count.
         self.change_count = view.change_count()
 
     def Reload(self):
         self.org = load(self.filename)
+        self.org.setFile(self)
 
     def ResetChangeCount(self):
         self.change_count = 0

@@ -38,6 +38,7 @@ def GetCapturePath(view, template):
     if 'target' in template:
         target    = template['target']
     filename = None
+    file = None
     at = None
     if('file' in target[0]):
         temp = templateEngine.TemplateFormatter()
@@ -47,6 +48,9 @@ def GetCapturePath(view, template):
         filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
     if('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
+        if(file == None):
+            log.error("Could not find id: " + target[1])
+            return
         filename = file.filename
     if('clock' == target[0]):
         if(not clk.ClockManager.ClockRunning()):
@@ -56,15 +60,17 @@ def GetCapturePath(view, template):
         at       = clk.ClockManager.GetActiveClockAt()
     # Try to create my capture file if I can
     try:
-        if(not os.file.exists(filename)):
+        if(not os.path.isfile(str(filename))):
             with open(filename,"w") as fp:
                 fp.write("#+TAGS: refile\n")
     except:
-        log.error("Failed to create capture file: " + str(filename))
-        pass
+        log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename))
     # Now make sure that file is loaded in the DB
     # it might not be in my org path
-    file = load(filename)
+    if(file != None):
+        file.Reload()
+    else:
+        file = db.Get().LoadNew(filename)
     return (target, filename, file, at)
 
 
@@ -86,29 +92,44 @@ def onDeactivated(view):
         target, capturePath, captureFile, at = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
         #refilePath = sets.Get("refile","UNKNOWN")
         #refile = load(refilePath)
-        bufferContents = view.substr(sublime.Region(0, view.size()))
-        if not bufferContents.endswith('\n'):
-            bufferContents += "\n"
+        captureFileRoot = None
+        if(captureFile != None):
+            captureFileRoot = captureFile.org
+
+        bufferContentsToInsert = view.substr(sublime.Region(0, view.size()))
+        if not bufferContentsToInsert.endswith('\n'):
+            bufferContentsToInsert += "\n"
         didInsert = False
-        capture = loads(bufferContents)
+        # Get a capture node
+        captureNode = loads(bufferContentsToInsert)
+        # if we moused out of the window we might be replacing
+        # ourselves again.
         if(lastHeader == None):
-            lastHeader = str(capture[1].heading)
-        for heading in captureFile:
+            lastHeader = str(captureNode[1].heading)
+        # We may haved moved around in the capture file
+        # so find the old heading.
+        for heading in captureFileRoot:
             if(type(heading) is node.OrgRootNode):
                 continue
             if str(heading.heading) == lastHeader:
                 #log.debug("REPLACING: " + str(heading.heading))
-                heading.replace_node(capture[1])
+                heading.replace_node(captureNode[1])
                 didInsert = True
                 continue
         if(not didInsert):
-            var = capture[1]
-            captureFile.insert_child(var)
+            insertAt = captureFileRoot
+            inserted = captureNode[1]
+            if(at != None and at > 0):
+                # This does not work? its a node not a file
+                insertAt = captureFile.At(at)
+            insertAt.insert_child(inserted)
         f = open(capturePath,"w+")
-        for item in captureFile:
+        # reauthor the ENTIRE file.
+        # This can get expensive!
+        for item in captureFileRoot:
             f.write(str(item))
         f.close()
-        lastHeader = str(capture[1].heading)
+        lastHeader = str(captureNode[1].heading)
         log.debug("***************>>>>> [" + view.name() + "] is no more")
 
 # Respond to panel events. If the panel is hidden we stop
