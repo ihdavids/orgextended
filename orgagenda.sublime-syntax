@@ -27,6 +27,17 @@ contexts:
         - match: '\]'
           pop: true
 
+    - match: '((Su)|(Mo)|(Tu)|(We)|(Th)|(Fr)|(Sa)) '
+      scope: orgagenda.header
+      captures:
+        2: orgagenda.weekendheader 
+        3: orgagenda.dateheader 
+        4: orgagenda.dateheader 
+        5: orgagenda.dateheader 
+        6: orgagenda.dateheader 
+        7: orgagenda.dateheader 
+        8: orgagenda.weekendheader 
+
     - match: '^[a-zA-Z][^=>:]+$'
       scope: orgagenda.header
 

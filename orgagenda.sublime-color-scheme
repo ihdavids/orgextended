@@ -22,6 +22,16 @@
 			"font_style": "bold italic",
 		},
 		{
+			"scope": "orgagenda.dateheader",
+			"foreground": "#5b96f5",
+			"font_style": "bold italic underline",
+		},
+		{
+			"scope": "orgagenda.weekendheader",
+			"foreground": "#ab96f5",
+			"font_style": "bold italic underline",
+		},
+		{
 			"scope": "orgagenda.timeseparator",
 			"foreground": "#7c7c7d",
 		},
