@@ -98,6 +98,41 @@
 			"foreground": "#000066",
 			"background": "#000066",
 		},
+		{   // Hide the week markup in the buffer
+			"scope": "orgagenda.week",
+			"foreground": "var(bgcol)",
+		},
+		{
+			"scope": "orgagenda.week.something",
+			"foreground": "#ffffff",
+			"background": "#007700",
+		},
+		{
+			"scope": "orgagenda.week.today",
+			"foreground": "#f89cf4",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgagenda.week.active",
+			"foreground": "#f8fc00",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgagenda.week.activetoday",
+			"foreground": "#f89cf4",
+			"background": "#485c00",
+			"font_style": "bold",
+		},
+		{
+			"scope": "orgagenda.week.empty",
+			"foreground": "#333300",
+			"background": "#333333",
+		},
+		{
+			"scope": "orgagenda.week.nothing",
+			"foreground": "var(bgcol)",
+			"background": "var(bgcol)",
+		},
 		{
 			"scope": "orgagenda.projecttitle",
 			"foreground": "#a87932",

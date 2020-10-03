@@ -207,9 +207,12 @@ class DateView:
 
 
 class DatePicker:
+	def __init__(self):
+		self.dateView = DateView()
+		self.months = []
+
 	def on_done(self, text):
 		self.dateView.output.close()
-		print("INPUT DONE")
 		if(self.onDone):
 			evt.Get().emit(self.onDone, self.dateView.cdate)
 
@@ -224,10 +227,6 @@ class DatePicker:
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)
 		self.dateView.ReShow()
-
-	def __init__(self):
-		self.dateView = DateView()
-		self.months = []
 
 	def MapRowColToNewDate(self,row,col):
 		time     = self.dateView.cdate.start.time()

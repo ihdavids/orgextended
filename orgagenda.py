@@ -166,6 +166,9 @@ def IsInHour(n, hour):
     if(not n.scheduled):
         return False
 
+    if(not n.scheduled.has_time()):
+        return False
+
     if(n.scheduled.repeating):
         next = n.scheduled.next_repeat_from_today
         return next.hour == hour
@@ -215,7 +218,6 @@ class AgendaBaseView:
         self.StartEditing()
         self.RenderView(edit)
         self.DoneEditing()
-
 
 
     def InsertAgendaHeading(self, edit):
@@ -313,6 +315,77 @@ class CalendarView(AgendaBaseView):
                 next = n.scheduled.next_repeat_from_today
                 if(next.month >= (self.now.month-1) and next.month <= (self.now.month+1)):
                     self.AddRepeating(next)
+
+    def FilterEntry(self, n, filename):
+        return IsTodo(n) and not IsProject(n) and n.scheduled
+
+
+class WeekView(AgendaBaseView):
+    def __init__(self, name, setup=True,tagfilter=None):
+        super(WeekView, self).__init__(name, setup)
+
+
+    def HighlightTime(self, date):
+        reg = self.DateToRegion(date)
+        style = self.dayhighlight
+        if(style == None):
+            style = "orgdatepicker.monthheader"
+        self.output.add_regions("cur",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
+
+    def InsertTimeHeading(self, edit, hour):
+
+        pt = self.view.size()
+        row, c = self.view.rowcol(pt)
+        header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
+        self.view.insert(edit, self.view.size(), header)
+        #row = self.view.curRow()
+        col = 9 + hour*5
+        s = self.view.text_point(row-1,col)
+        e = self.view.text_point(row-1,col+2)
+        reg = sublime.Region(s, e)
+        style = "orgagenda.now"
+        self.view.add_regions("curw",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
+
+    def InsertDay(self, name, date, edit):
+        if(date.day == datetime.datetime.now().day):
+            if(date.day == self.now.day):
+                self.view.insert(edit, self.view.size(),"@" + name + " " + "{0:2}".format(date.day) + "W[")
+            else:
+                self.view.insert(edit, self.view.size(),"#" + name + " " + "{0:2}".format(date.day) + "W[")
+        elif(date.day == self.now.day):
+            self.view.insert(edit, self.view.size(),"&" + name + " " + "{0:2}".format(date.day) + "W[")
+        else:
+            self.view.insert(edit, self.view.size()," " + name + " " + "{0:2}".format(date.day) + "W[")
+
+        for hour in range(0,24):
+            haveSlot = False
+            for entry in self.entries:
+                n = entry['node']
+                if(n.scheduled.start.day == date.day and IsInHour(n, hour)):
+                    haveSlot = True
+                    self.view.insert(edit, self.view.size(), "{0:4}_".format(n.heading[0:4])) 
+            if(not haveSlot):
+                self.view.insert(edit, self.view.size(), "...._") 
+        self.view.insert(edit, self.view.size(),"]\n")
+
+    def RenderView(self, edit):
+        self.InsertAgendaHeading(edit)
+        self.InsertTimeHeading(edit,self.now.hour)
+        toHighlight = []
+        print(str(self.now))
+        wday   = self.now.weekday()
+        # Adjust for Sunday being day 6 and we start with dunday
+        if(wday >= 6):
+            wday = -1
+        wstart = self.now + datetime.timedelta(days=-(wday+1))
+        print(str(wstart.hour))
+        self.InsertDay("Sun", wstart, edit)
+        self.InsertDay("Mon", wstart + datetime.timedelta(days=1), edit)
+        self.InsertDay("Tue", wstart + datetime.timedelta(days=2), edit)
+        self.InsertDay("Wed", wstart + datetime.timedelta(days=3), edit)
+        self.InsertDay("Thr", wstart + datetime.timedelta(days=4), edit)
+        self.InsertDay("Fri", wstart + datetime.timedelta(days=5), edit)
+        self.InsertDay("Sat", wstart + datetime.timedelta(days=6), edit)
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and n.scheduled
@@ -557,7 +630,7 @@ class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
         # Save and restore the cursor
-        views = [CalendarView("Calendar",False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
+        views = [CalendarView("Calendar",False), WeekView("Week", False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
         #views = [AgendaView("Agenda", False), TodoView("Global Todo List", False)]
         agenda = CompositeView("Agenda", views)
         #agenda = AgendaView(AGENDA_VIEW)
@@ -628,6 +701,7 @@ class CalendarViewRegistry:
         self.AddView("Next Tasks", NextTasksProjectsView)
         self.AddView("Loose Tasks", LooseTasksView)
         self.AddView("Todos", TodoView)
+        self.AddView("Week", WeekView)
 
     def AddView(self,name,cls):
         self.KnownViews[name] = cls
@@ -671,7 +745,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         pos = None
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
-        views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
+        views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         views = views[toShow]
         nameOfShow = toShow
         if(toShow == "Default"):
