@@ -21,7 +21,7 @@ def CreateUniqueViewNamed(name, mapped=None):
 	return view
 
 class DateView:
-	def __init__(self):
+	def __init__(self, dayhighlight=None):
 		self.months = []
 		self.columnsPerMonth = 30                     # 7 * 3 = 21 + 9
 		self.columnsInDay    = 2  
@@ -33,6 +33,7 @@ class DateView:
 		self.cdate           = OrgDateFreeFloating(datetime.datetime.now())
 		self.startrow        = 0
 		self.endrow          = 7
+		self.dayhighlight    = dayhighlight
 
 
 	def SetView(self, view):
@@ -41,6 +42,7 @@ class DateView:
 
 	def SetStartRow(self, row):
 		self.startrow = row
+
 
 	def DateToRegion(self, date):
 		# Convert 
@@ -68,7 +70,10 @@ class DateView:
 
 	def HighlightDay(self, date):
 		reg = self.DateToRegion(date)
-		self.output.add_regions("cur",[reg],"orgdatepicker.monthheader","",sublime.DRAW_NO_OUTLINE)	
+		style = self.dayhighlight
+		if(style == None):
+			style = "orgdatepicker.monthheader"
+		self.output.add_regions("cur",[reg],style,"",sublime.DRAW_NO_OUTLINE)	
 
 	def AddToDayHighlights(self, date, key, highlight, drawtype = sublime.DRAW_NO_OUTLINE):
 		reg = self.DateToRegion(date)
@@ -94,6 +99,10 @@ class DateView:
 			result = datetime.datetime(year, month, day)
 		return result
 
+	def MoveCDateToDate(self, now):
+		self.cdate           = OrgDateFreeFloating(now)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
 
 	def MoveCDateToNextDay(self):
 		self.cdate.add_days(1)

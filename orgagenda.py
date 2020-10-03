@@ -221,8 +221,11 @@ class AgendaBaseView:
     def InsertAgendaHeading(self, edit):
         self.view.insert(edit, self.view.size(), self.name + "\n")
 
-    def UpdateNow(self):
-        self.now = datetime.datetime.now()
+    def UpdateNow(self, now=None):
+        if(now == None):
+            self.now = datetime.datetime.now()
+        else:
+            self.now = now
 
     # You have to bookend your editing session with these
     def StartEditing(self):
@@ -249,6 +252,10 @@ class AgendaBaseView:
                     return (e['node'], e['file'])
         return (None, None)
 
+    def Clear(self, edit):
+        self.StartEditing()
+        self.view.erase(edit, sublime.Region(0,self.view.size()))
+        self.DoneEditing()
 
     # ----------------------------------------------
     # These are user extended views!
@@ -276,8 +283,14 @@ def IsAfterNow(n, now):
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
         super(CalendarView, self).__init__(name, setup)
-        self.dv = DateView()
+        self.dv = DateView("orgagenda.now")
 
+    def UpdateNow(self, now=None):
+        if(now == None):
+            self.now = datetime.datetime.now()
+        else:
+            self.now = now
+            self.dv.MoveCDateToDate(self.now)
 
     def AddRepeating(self, date):
         self.dv.AddToDayHighlights(date, "repeat", "orgagenda.blocked", sublime.DRAW_NO_FILL)
@@ -286,18 +299,17 @@ class CalendarView(AgendaBaseView):
         self.dv.AddToDayHighlights(date, "todo", "orgagenda.todo")
     #def AddToDayHighlights(self, date, key, hightlight, drawtype = sublime.DRAW_NO_OUTLINE):
     def RenderView(self, edit):
-        now = datetime.datetime.now()
         self.InsertAgendaHeading(edit)
         self.dv.SetView(self.view)
-        self.dv.Render(now)
+        self.dv.Render(self.now)
         toHighlight = []
         for entry in self.entries:
             n = entry['node']
-            if(n.scheduled.start.month >= (now.month-1) and n.scheduled.start.month <= (now.month+1)):
+            if(n.scheduled.start.month >= (self.now.month-1) and n.scheduled.start.month <= (self.now.month+1)):
                 self.AddTodo(n.scheduled.start)
             if(n.scheduled.repeating):
                 next = n.scheduled.next_repeat_from_today
-                if(next.month >= (now.month-1) and next.month <= (now.month+1)):
+                if(next.month >= (self.now.month-1) and next.month <= (self.now.month+1)):
                     self.AddRepeating(next)
 
     def FilterEntry(self, n, filename):
@@ -513,6 +525,14 @@ class CompositeView(AgendaBaseView):
         self.entries = []
         for v in self.agendaViews:
             self.entries += v.entries
+
+    def UpdateNow(self, now=None):
+        if(now == None):
+            self.now = datetime.datetime.now()
+        else:
+            self.now = now
+        for v in self.agendaViews:
+            v.UpdateNow(now)
 
     def FilterEntries(self):
         self.entries = []
@@ -744,3 +764,21 @@ class OrgTagFilteredTodoViewCommand(sublime_plugin.TextCommand):
         if(not tags):
             return
         self.view.run_command('org_tag_filtered_todo_view_internal', {"tags": tags})
+
+class OrgAgendaGotoNextDayCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        agenda = FindMappedView(self.view)
+        now = agenda.now
+        now = now + datetime.timedelta(days=1)
+        agenda.UpdateNow(now)
+        agenda.Clear(edit)
+        agenda.DoRenderView(edit)
+
+class OrgAgendaGotoPrevDayCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        agenda = FindMappedView(self.view)
+        now = agenda.now
+        now = now + datetime.timedelta(days=-1)
+        agenda.UpdateNow(now)
+        agenda.Clear(edit)
+        agenda.DoRenderView(edit)
