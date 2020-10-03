@@ -16,6 +16,26 @@
 	},
 	"rules": [
 		{
+			"scope": "col_008000FF",
+			"background": "#008000FF",
+			"foreground": "#CBCBCBFF"
+		},
+		{
+			"scope": "col_D2B48CFF",
+			"background": "#D2B48CFF",
+			"foreground": "#383838FF"
+		},
+		{
+			"scope": "col_000000FF",
+			"background": "#000000FF",
+			"foreground": "#808080FF"
+		},
+		{
+			"scope": "col_339966FF",
+			"background": "#339966FF",
+			"foreground": "#F4F4F4FF"
+		},
+		{
 			"background": "#000000",
 			"scope": "col_gutter",
 			"foreground": "#ffffff"
@@ -51,12 +71,14 @@
 		{
 			"scope": "orgmode.headline",
 			"foreground": "#14adfa",
+			"background": "#172822",
 			"font_style": "bold italic",
 		},
 		{
 			"scope": "orgmode.headline2",
 			"foreground": "#bb86fc",
-			"font_style": "bold",
+			"background": "#171812",
+			"font_style": "bold underline",
 		},
 		{
 			"scope": "orgmode.headline3",

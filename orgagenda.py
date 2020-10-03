@@ -226,6 +226,8 @@ class AgendaBaseView:
             self.now = datetime.datetime.now()
         else:
             self.now = now
+            self.entries = []
+            self.FilterEntries()
 
     # You have to bookend your editing session with these
     def StartEditing(self):
