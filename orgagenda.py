@@ -338,10 +338,9 @@ class WeekView(AgendaBaseView):
         row, c = self.view.rowcol(pt)
         header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
         self.view.insert(edit, self.view.size(), header)
-        #row = self.view.curRow()
         col = 9 + hour*5
-        s = self.view.text_point(row-1,col)
-        e = self.view.text_point(row-1,col+2)
+        s = self.view.text_point(row,col)
+        e = self.view.text_point(row,col+2)
         reg = sublime.Region(s, e)
         style = "orgagenda.now"
         self.view.add_regions("curw",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
