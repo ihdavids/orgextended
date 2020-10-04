@@ -180,6 +180,26 @@ def IsInHour(n, hour):
         return True
     return False
 
+
+def Overlaps(s,e,rs,re):
+    # s | e |
+    # +---+
+    if(s <= rs and e >= rs and e <= re):
+        return True
+    # | s | e
+    #   +---+
+    if(s >= rs and s <= re and e >= re):
+        return True
+    # | s  e |
+    #   +-+
+    if(s >= rs and e <= re):
+        return True
+    # s |    | e
+    # +-------+
+    if(s <= rs and e >= re):
+        return True
+    return False
+
 def IsInHourAndMinute(n, hour, mstart, mend):
     if(not n.scheduled):
         return False
@@ -190,15 +210,16 @@ def IsInHourAndMinute(n, hour, mstart, mend):
     if(n.scheduled.repeating):
         next = n.scheduled.next_repeat_from_today
         return next.hour == hour
+    s = n.scheduled.start
+    e = n.scheduled.end
+    if(not e):
+        # TODO Make this configurable
+        e = s + datetime.timedelta(minutes=30)
+
     # Either this task is a ranged task OR it is a single point task
     # Ranged tasks have to fit within the hour, point tasks have to 
-    if((not n.scheduled.end and n.scheduled.start.hour == hour) 
-        or 
-        (n.scheduled.end and n.scheduled.start.hour >= hour and n.scheduled.end.hour <= hour)):
-        if(n.scheduled.start.minute >= mstart and n.scheduled.start.minute < mend):
-            if(not n.scheduled.end or n.scheduled.end.minute >= mstart and n.scheduled.end.minute < mend):
-                return True
-        return False
+    if( Overlaps(s.hour, e.hour, hour, hour) and Overlaps(s.minute, e.minute, mstart, mend)):
+        return True
     return False
 
 def distanceFromStart(n, hour, minSlot):
