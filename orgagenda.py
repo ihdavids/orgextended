@@ -180,6 +180,29 @@ def IsInHour(n, hour):
         return True
     return False
 
+def IsInHourAndMinute(n, hour, mstart, mend):
+    if(not n.scheduled):
+        return False
+
+    if(not n.scheduled.has_time()):
+        return False
+
+    if(n.scheduled.repeating):
+        next = n.scheduled.next_repeat_from_today
+        return next.hour == hour
+    # Either this task is a ranged task OR it is a single point task
+    # Ranged tasks have to fit within the hour, point tasks have to 
+    if((not n.scheduled.end and n.scheduled.start.hour == hour) 
+        or 
+        (n.scheduled.end and n.scheduled.start.hour >= hour and n.scheduled.end.hour <= hour)):
+        if(n.scheduled.start.minute >= mstart and n.scheduled.start.minute < mend):
+            if(not n.scheduled.end or n.scheduled.end.minute >= mstart and n.scheduled.end.minute < mend):
+                return True
+        return False
+    return False
+
+def distanceFromStart(n, hour, minSlot):
+    return 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
 
 # IDEA Make a base class that has all the functionality needed to
 #      render an agenda view. Then create an agenda folder with
@@ -319,6 +342,15 @@ class CalendarView(AgendaBaseView):
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and n.scheduled
 
+def bystartdate(a, b):
+    if a.scheduled.start > b.scheduled.start:
+        return 1
+    if a.scheduled.start < b.scheduled.start:
+        return -1
+    return 0
+
+def bystartdatekey(a):
+    return a.scheduled.start
 
 class WeekView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
@@ -356,15 +388,31 @@ class WeekView(AgendaBaseView):
         else:
             self.view.insert(edit, self.view.size()," " + name + " " + "{0:2}".format(date.day) + "W[")
 
+        daydata = []
+        for entry in self.entries:
+            n = entry['node']
+            if(n.scheduled.start.day == date.day):
+                daydata.append(n)
+        daydata.sort(key=bystartdatekey)
+
         for hour in range(0,24):
             haveSlot = False
-            for entry in self.entries:
-                n = entry['node']
-                if(n.scheduled.start.day == date.day and IsInHour(n, hour)):
-                    haveSlot = True
-                    self.view.insert(edit, self.view.size(), "{0:4}_".format(n.heading[0:4])) 
-            if(not haveSlot):
-                self.view.insert(edit, self.view.size(), "...._") 
+            for minSlot in range(0,5):
+                match = None
+                for n in daydata:
+                    if(IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)):
+                        match = n
+                        #haveSlot = True
+                        #self.view.insert(edit, self.view.size(), "{0:4}_".format(n.heading[0:4])) 
+                if(match != None):
+                    d = distanceFromStart(match, hour, minSlot)
+                    print("DIST: " + str(d))
+                    self.view.insert(edit, self.view.size(), n.heading[d:d+1])
+                else:
+                    if(minSlot < 4):
+                        self.view.insert(edit, self.view.size(), ".")
+                    else:
+                        self.view.insert(edit, self.view.size(), "_")
         self.view.insert(edit, self.view.size(),"]\n")
 
     def RenderView(self, edit):
