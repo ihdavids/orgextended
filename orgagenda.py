@@ -175,12 +175,19 @@ def IsInHour(n, hour):
     if(n.scheduled.repeating):
         next = n.scheduled.next_repeat_from_today
         return next.hour == hour
+    s = n.scheduled.start
+    e = n.scheduled.end
+    if(not e):
+        # TODO Make this configurable
+        e = s + datetime.timedelta(minutes=30)
     # Either this task is a ranged task OR it is a single point task
     # Ranged tasks have to fit within the hour, point tasks have to 
-    if((not n.scheduled.end and n.scheduled.start.hour == hour) 
-        or 
-        (n.scheduled.end and n.scheduled.start.hour >= hour and n.scheduled.end.hour <= hour)):
+    if( Overlaps(s.hour*60 + s.minute, e.hour*60 + e.minute, hour*60, hour*60 + 59)):
         return True
+    #if((not n.scheduled.end and n.scheduled.start.hour == hour) 
+    #    or 
+    #    (n.scheduled.end and n.scheduled.start.hour >= hour and n.scheduled.end.hour <= hour)):
+    #    return True
     return False
 
 
@@ -559,6 +566,8 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     filename = entry['file'].AgendaFilenameTag()
+                    if("NCG" in n.heading):
+                        print("Trying entry: " + n.heading + " IAN: " + str(IsAfterNow(n, self.now)) + " IIH: " + str(IsInHour(n,h)))
                     if(IsAfterNow(n, self.now) and IsInHour(n, h)):
                         self.MarkEntryAt(entry)
                         self.RenderAgendaEntry(edit,filename,n,h)
