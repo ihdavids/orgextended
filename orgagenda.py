@@ -100,6 +100,9 @@ def CreateUniqueViewNamed(name, mapped=None):
 def IsTodo(n):
     return n.todo and n.todo in n.env.todo_keys
 
+def IsDone(n):
+    return n.todo and n.todo in n.env.done_keys
+
 def IsProjectTask(n):
     return (IsTodo(n) and n.parent and (n.parent.is_root() or IsTodo(n.parent)))
 
@@ -218,7 +221,7 @@ def IsInHourAndMinute(n, hour, mstart, mend):
 
     # Either this task is a ranged task OR it is a single point task
     # Ranged tasks have to fit within the hour, point tasks have to 
-    if( Overlaps(s.hour, e.hour, hour, hour) and Overlaps(s.minute, e.minute, mstart, mend)):
+    if( Overlaps(s.hour*60 + s.minute, e.hour*60 + e.minute, hour*60 + mstart, hour*60 + mend)):
         return True
     return False
 
@@ -314,7 +317,7 @@ class AgendaBaseView:
         for file in db.Get().Files:
             #if(not "habits" in file.filename):
             #    continue
-            print("AGENDA: " + file.filename + " " + file.key)
+            #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
                 if(self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
@@ -328,6 +331,7 @@ def IsBeforeNow(n, now):
 def IsAfterNow(n, now):
     return n.scheduled and n.scheduled.has_time() and n.scheduled.start.time() >= now.time()
 
+# ============================================================ 
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
         super(CalendarView, self).__init__(name, setup)
@@ -373,6 +377,7 @@ def bystartdate(a, b):
 def bystartdatekey(a):
     return a.scheduled.start
 
+# ============================================================ 
 class WeekView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
         super(WeekView, self).__init__(name, setup)
@@ -383,7 +388,7 @@ class WeekView(AgendaBaseView):
         style = self.dayhighlight
         if(style == None):
             style = "orgdatepicker.monthheader"
-        self.output.add_regions("cur",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
+        self.output.add_regions("curweek",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
 
     def InsertTimeHeading(self, edit, hour):
         self.startOffset = 9
@@ -422,6 +427,7 @@ class WeekView(AgendaBaseView):
         lastMatchStart = 0
         lastMatch      = None
         matchCount     = 0
+        doneMatchCount = 0
         for hour in range(0,24):
             haveSlot = False
             for minSlot in range(0,self.cellSize):
@@ -435,9 +441,14 @@ class WeekView(AgendaBaseView):
                     s = self.view.text_point(row,lastMatchStart)
                     e = self.view.text_point(row,self.startOffset + hour*self.cellSize + minSlot)
                     reg = sublime.Region(s, e)
-                    style = "orgagenda.week." + str(matchCount)
-                    matchCount = (matchCount + 1) % 10
-                    self.view.add_regions("week_" + str(date.day) + "_" + str(hour),[reg],style,"",sublime.DRAW_NO_FILL)   
+                    if(IsDone(lastMatch)):
+                        style = "orgagenda.week.done." + str(doneMatchCount)
+                        doneMatchCount = (doneMatchCount + 1) % 2
+                        self.view.add_regions("week_done_" + str(date.day) + "_" + str(hour) + "_" + str(minSlot),[reg],style,"", sublime.DRAW_SQUIGGLY_UNDERLINE)   
+                    else:
+                        style = "orgagenda.week." + str(matchCount)
+                        matchCount = (matchCount + 1) % 10
+                        self.view.add_regions("week_" + str(date.day) + "_" + str(hour) + "_" + str(minSlot),[reg],style,"",sublime.DRAW_NO_FILL)   
                 if(match != None):
                     if(lastMatch != match):
                         lastMatch      = match
@@ -458,13 +469,13 @@ class WeekView(AgendaBaseView):
         self.InsertAgendaHeading(edit)
         self.InsertTimeHeading(edit,self.now.hour)
         toHighlight = []
-        print(str(self.now))
+        #print(str(self.now))
         wday   = self.now.weekday()
         # Adjust for Sunday being day 6 and we start with dunday
         if(wday >= 6):
             wday = -1
         wstart = self.now + datetime.timedelta(days=-(wday+1))
-        print(str(wstart.hour))
+        #print(str(wstart.hour))
         self.InsertDay("Sun", wstart, edit)
         self.InsertDay("Mon", wstart + datetime.timedelta(days=1), edit)
         self.InsertDay("Tue", wstart + datetime.timedelta(days=2), edit)
@@ -474,9 +485,10 @@ class WeekView(AgendaBaseView):
         self.InsertDay("Sat", wstart + datetime.timedelta(days=6), edit)
 
     def FilterEntry(self, n, filename):
-        return IsTodo(n) and not IsProject(n) and n.scheduled
+        return (IsTodo(n) or IsDone(n)) and not IsProject(n) and n.scheduled
 
 
+# ============================================================ 
 class AgendaView(AgendaBaseView):
     def __init__(self, name, setup=True):
         super(AgendaView, self).__init__(name, setup)
@@ -805,7 +817,7 @@ class CalendarViewRegistry:
                     pname = p[:idx].strip()
                     pval = p[idx:].strip()
                     args[pname] = pval
-                    print(pname + " -> " + pval)
+                    #print(pname + " -> " + pval)
             i += 1
         return (name, args)
 

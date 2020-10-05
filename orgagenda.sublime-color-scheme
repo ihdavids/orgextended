@@ -152,16 +152,24 @@
 		// Week View Cycling Item Colors
 
 		{
+			"scope": "orgagenda.week.done.0",
+			"foreground": "#555555",
+		},
+		{
+			"scope": "orgagenda.week.done.1",
+			"foreground": "#666666",
+		},
+		{
 			"scope": "orgagenda.week.0",
-			"foreground": "#ff0000",
+			"foreground": "#550000",
 		},
 		{
 			"scope": "orgagenda.week.1",
-			"foreground": "#00ff00",
+			"foreground": "#007700",
 		},
 		{
 			"scope": "orgagenda.week.2",
-			"foreground": "#ff00ff",
+			"foreground": "#770077",
 		},
 		{
 			"scope": "orgagenda.week.3",
@@ -169,11 +177,11 @@
 		},
 		{
 			"scope": "orgagenda.week.4",
-			"foreground": "#ffff00",
+			"foreground": "#999900",
 		},
 		{
 			"scope": "orgagenda.week.5",
-			"foreground": "#00ffff",
+			"foreground": "#007777",
 		},
 		{
 			"scope": "orgagenda.week.6",
@@ -189,9 +197,10 @@
 		},
 		{
 			"scope": "orgagenda.week.9",
-			"foreground": "#ff0000",
+			"foreground": "#623456",
 		},
 		{
+
 			"scope": "orgagenda.week.normal",
 			"foreground": "#ffffff",
 		},
