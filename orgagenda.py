@@ -429,14 +429,11 @@ class WeekView(AgendaBaseView):
         matchCount     = 0
         doneMatchCount = 0
         for hour in range(0,24):
-            haveSlot = False
             for minSlot in range(0,self.cellSize):
                 match = None
                 for n in daydata:
                     if(IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)):
                         match = n
-                        #haveSlot = True
-                        #self.view.insert(edit, self.view.size(), "{0:4}_".format(n.heading[0:4])) 
                 if(lastMatch != match and lastMatch != None):
                     s = self.view.text_point(row,lastMatchStart)
                     e = self.view.text_point(row,self.startOffset + hour*self.cellSize + minSlot)
