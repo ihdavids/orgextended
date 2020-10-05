@@ -51,7 +51,7 @@ contexts:
       push:
         - meta_scope: orgagenda.week
         - match: '[a-zA-Z0-9 ]'
-          scope: orgagenda.week.something
+          scope: orgagenda.week.normal
         - match: '[.]'
           scope: orgagenda.week.empty
         - match: '[_]'

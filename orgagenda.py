@@ -386,12 +386,13 @@ class WeekView(AgendaBaseView):
         self.output.add_regions("cur",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
 
     def InsertTimeHeading(self, edit, hour):
-
+        self.startOffset = 9
+        self.cellSize    = 5
         pt = self.view.size()
         row, c = self.view.rowcol(pt)
         header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
         self.view.insert(edit, self.view.size(), header)
-        col = 9 + hour*5
+        col = self.startOffset + hour*self.cellSize
         s = self.view.text_point(row,col)
         e = self.view.text_point(row,col+2)
         reg = sublime.Region(s, e)
@@ -399,6 +400,8 @@ class WeekView(AgendaBaseView):
         self.view.add_regions("curw",[reg],style,"",sublime.DRAW_NO_OUTLINE)   
 
     def InsertDay(self, name, date, edit):
+        pt = self.view.size()
+        row, c = self.view.rowcol(pt)
         if(date.day == datetime.datetime.now().day):
             if(date.day == self.now.day):
                 self.view.insert(edit, self.view.size(),"@" + name + " " + "{0:2}".format(date.day) + "W[")
@@ -416,20 +419,35 @@ class WeekView(AgendaBaseView):
                 daydata.append(n)
         daydata.sort(key=bystartdatekey)
 
+        lastMatchStart = 0
+        lastMatch      = None
+        matchCount     = 0
         for hour in range(0,24):
             haveSlot = False
-            for minSlot in range(0,5):
+            for minSlot in range(0,self.cellSize):
                 match = None
                 for n in daydata:
                     if(IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)):
                         match = n
                         #haveSlot = True
                         #self.view.insert(edit, self.view.size(), "{0:4}_".format(n.heading[0:4])) 
+                if(lastMatch != match and lastMatch != None):
+                    s = self.view.text_point(row,lastMatchStart)
+                    e = self.view.text_point(row,self.startOffset + hour*self.cellSize + minSlot)
+                    reg = sublime.Region(s, e)
+                    style = "orgagenda.week." + str(matchCount)
+                    matchCount = (matchCount + 1) % 10
+                    self.view.add_regions("week_" + str(date.day) + "_" + str(hour),[reg],style,"",sublime.DRAW_NO_FILL)   
                 if(match != None):
+                    if(lastMatch != match):
+                        lastMatch      = match
+                        lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
                     d = distanceFromStart(match, hour, minSlot)
-                    print("DIST: " + str(d))
-                    self.view.insert(edit, self.view.size(), n.heading[d:d+1])
+                    self.view.insert(edit, self.view.size(), match.heading[d:d+1])
                 else:
+                    if(lastMatch != match):
+                        lastMatch      = match
+                        lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
                     if(minSlot < 4):
                         self.view.insert(edit, self.view.size(), ".")
                     else:
