@@ -454,7 +454,11 @@ class WeekView(AgendaBaseView):
                         lastMatch      = match
                         lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
                     d = distanceFromStart(match, hour, minSlot)
-                    self.view.insert(edit, self.view.size(), match.heading[d:d+1])
+                    # If the time slot is larger than the name we space pad it
+                    c = " "
+                    if(d < len(match.heading)):
+                        c = match.heading[d:d+1]
+                    self.view.insert(edit, self.view.size(), c)
                 else:
                     if(lastMatch != match):
                         lastMatch      = match

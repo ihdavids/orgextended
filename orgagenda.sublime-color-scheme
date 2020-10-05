@@ -153,7 +153,7 @@
 
 		{
 			"scope": "orgagenda.week.done.0",
-			"foreground": "#555555",
+			"foreground": "#4f4f4f",
 		},
 		{
 			"scope": "orgagenda.week.done.1",
