@@ -107,6 +107,8 @@
     { "keys": ["t"],                 "command": "org_agenda_change_todo",        "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["c","i"],             "command": "org_agenda_clock_in",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["c","o"],             "command": "org_agenda_clock_out",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [">"],                 "command": "org_agenda_goto_next_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["<"],                 "command": "org_agenda_goto_prev_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
 
     // ORG DATE PICKER
     { "keys": [">"],                 "command": "org_date_picker_next_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },

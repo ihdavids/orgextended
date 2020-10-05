@@ -26,6 +26,38 @@ contexts:
           scope: orgagenda.habit.nothing
         - match: '\]'
           pop: true
+    # Today in week view
+    - match: '^(#)([A-Za-z]+ *[0-9]+)'
+      scope: orgagenda.week.today
+      captures:
+        1: orgagenda.week.nothing
+        2: orgagenda.week.today
+
+    # Active day in week view
+    - match: '^(&)([A-Za-z]+ *[0-9]+)'
+      scope: orgagenda.week.active
+      captures:
+        1: orgagenda.week.nothing
+        2: orgagenda.week.active
+
+    # Both day in week view
+    - match: '^(@)([A-Za-z]+ *[0-9]+)'
+      scope: orgagenda.week.activetoday
+      captures:
+        1: orgagenda.week.nothing
+        2: orgagenda.week.activetoday
+
+    - match: 'W\['
+      push:
+        - meta_scope: orgagenda.week
+        - match: '[a-zA-Z0-9 ]'
+          scope: orgagenda.week.normal
+        - match: '[.]'
+          scope: orgagenda.week.empty
+        - match: '[_]'
+          scope: orgagenda.week.nothing
+        - match: '\]'
+          pop: true
 
     - match: '((Su)|(Mo)|(Tu)|(We)|(Th)|(Fr)|(Sa)) '
       scope: orgagenda.header

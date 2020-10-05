@@ -1196,12 +1196,25 @@ class OrgNode(OrgBaseNode):
             line = next(ilines)
         except StopIteration:
             return
-        (self._scheduled, self._deadline, self._closed) = parse_sdc(line)
 
-        if not (self._scheduled or
-                self._deadline or
-                self._closed):
-            yield line  # when none of them were found
+        for i in range(0,3):
+            (scheduled, deadline, closed) = parse_sdc(line)
+
+            if not (scheduled or
+                    deadline or
+                    closed):
+                yield line  # when none of them were found
+            else:
+                if(scheduled):
+                    self._scheduled = scheduled
+                if(deadline):
+                    self._deadline = deadline
+                if(closed):
+                    self._closed = closed 
+                try:
+                    line = next(ilines)
+                except StopIteration:
+                    return
 
         for line in ilines:
             yield line

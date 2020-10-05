@@ -85,6 +85,8 @@
     {"caption": "OrgAgendaCustomView",    "command": "org_agenda_custom_view"      },
     {"caption": "OrgAgendaRebuildNotices","command": "org_rebuild_notifications"   },
     {"caption": "OrgAgendaChooseView",    "command": "org_agenda_choose_custom_view"},
+    {"caption": "OrgAgendaGotoNextDay",   "command": "org_agenda_goto_next_day"    },
+    {"caption": "OrgAgendaGotoPrevDay",   "command": "org_agenda_goto_prev_day"    },
 
     // Date Picker
     {"caption": "OrgDatePicker",          "command": "org_date_picker"             },

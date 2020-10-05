@@ -16,14 +16,24 @@
 	},
 	"rules": [
 		{
-			"foreground": "#CBCBCBFF",
 			"scope": "col_008000FF",
-			"background": "#008000FF"
+			"background": "#008000FF",
+			"foreground": "#CBCBCBFF"
 		},
 		{
-			"foreground": "#808080FF",
+			"scope": "col_D2B48CFF",
+			"background": "#D2B48CFF",
+			"foreground": "#383838FF"
+		},
+		{
 			"scope": "col_000000FF",
-			"background": "#000000FF"
+			"background": "#000000FF",
+			"foreground": "#808080FF"
+		},
+		{
+			"scope": "col_339966FF",
+			"background": "#339966FF",
+			"foreground": "#F4F4F4FF"
 		},
 		{
 			"background": "#000000",
@@ -60,14 +70,15 @@
 		},
 		{
 			"scope": "orgmode.headline",
-			"background": "#172822",			
 			"foreground": "#14adfa",
+			"background": "#172822",
 			"font_style": "bold italic",
 		},
 		{
 			"scope": "orgmode.headline2",
 			"background": "#172822",			
 			"foreground": "#bb86fc",
+			"background": "#171812",
 			"font_style": "bold underline",
 		},
 		{

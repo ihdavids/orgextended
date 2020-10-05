@@ -8,7 +8,7 @@ file_extensions:
 scope: text.orgmode
 
 variables:
-  datetime: "<\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?>"
+  datetime: "<\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2}(-\\d{2}\\:\\d{2})?)?\\s*([+]*\\d[wdmy])?>"
   unscheddatetime: "\\[\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?\\]"
   tags: "(^|):[\\w\\d:]+:"
   priority: '\s*\[((\#A)|(\#B)|(\#C)|(\#D)|(\#E)|(\#[a-zA-Z0-9]+))\]\s+'
