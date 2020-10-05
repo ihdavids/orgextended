@@ -345,10 +345,10 @@ class CalendarView(AgendaBaseView):
             self.dv.MoveCDateToDate(self.now)
 
     def AddRepeating(self, date):
-        self.dv.AddToDayHighlights(date, "repeat", "orgagenda.blocked", sublime.DRAW_NO_FILL)
+        self.dv.AddToDayHighlights(date, "repeat", "orgagenda.blocked")
 
     def AddTodo(self, date):
-        self.dv.AddToDayHighlights(date, "todo", "orgagenda.todo")
+        self.dv.AddToDayHighlights(date, "todo", "orgagenda.todo", sublime.DRAW_NO_FILL)
     #def AddToDayHighlights(self, date, key, hightlight, drawtype = sublime.DRAW_NO_OUTLINE):
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
