@@ -16,6 +16,16 @@
 	},
 	"rules": [
 		{
+			"foreground": "#CBCBCBFF",
+			"scope": "col_008000FF",
+			"background": "#008000FF"
+		},
+		{
+			"foreground": "#808080FF",
+			"scope": "col_000000FF",
+			"background": "#000000FF"
+		},
+		{
 			"background": "#000000",
 			"scope": "col_gutter",
 			"foreground": "#ffffff"
@@ -50,13 +60,15 @@
 		},
 		{
 			"scope": "orgmode.headline",
+			"background": "#172822",			
 			"foreground": "#14adfa",
 			"font_style": "bold italic",
 		},
 		{
 			"scope": "orgmode.headline2",
+			"background": "#172822",			
 			"foreground": "#bb86fc",
-			"font_style": "bold",
+			"font_style": "bold underline",
 		},
 		{
 			"scope": "orgmode.headline3",
