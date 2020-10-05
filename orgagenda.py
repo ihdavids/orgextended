@@ -191,7 +191,7 @@ def Overlaps(s,e,rs,re):
         return True
     # | s | e
     #   +---+
-    if(s >= rs and s <= re and e >= re):
+    if(s >= rs and s < re and e >= re):
         return True
     # | s  e |
     #   +-+
@@ -226,7 +226,13 @@ def IsInHourAndMinute(n, hour, mstart, mend):
     return False
 
 def distanceFromStart(n, hour, minSlot):
-    return 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
+    rv = 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
+    if(rv < 0):
+        print("HOUR: " + str(hour))
+        print("SHR:  " + str(n.scheduled.start.hour))
+        print("MSLT: " + str(minSlot))
+        print("SMIN: " + str(n.scheduled.start.minute/12))
+    return rv
 
 # IDEA Make a base class that has all the functionality needed to
 #      render an agenda view. Then create an agenda folder with
@@ -453,7 +459,7 @@ class WeekView(AgendaBaseView):
                     d = distanceFromStart(match, hour, minSlot)
                     # If the time slot is larger than the name we space pad it
                     c = " "
-                    if(d < len(match.heading)):
+                    if(d < len(match.heading) and d >= 0):
                         c = match.heading[d:d+1]
                     self.view.insert(edit, self.view.size(), c)
                 else:
