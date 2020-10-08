@@ -567,7 +567,6 @@ class AgendaView(AgendaBaseView):
     def FindSymbol(self, blk):
         for i in range(0,len(self.symUsed)):
             if(self.symUsed[i] == blk):
-                print("RETURNING: " + str(blk))
                 return i
         return 0
 
@@ -677,7 +676,11 @@ class AgendaView(AgendaBaseView):
                         didNotInsert = False
             if(didNotInsert):
                 empty = " " * 12
-                view.insert(edit, view.size(), "{0:12} {1:02d}:00.{2} ---------------------\n".format(empty, h, self.GetAgendaBlocks(None,h)))
+                blocks = self.GetAgendaBlocks(None,h)
+                sep = " "
+                if('.' in blocks):
+                    sep = "."
+                view.insert(edit, view.size(), "{0:12} {1:02d}:00{3}{2} ---------------------\n".format(empty, h, blocks, sep))
         view.insert(edit,view.size(),"\n")
         for entry in self.entries:
             n = entry['node']
