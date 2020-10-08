@@ -200,11 +200,45 @@
 			"foreground": "#623456",
 		},
 		{
-
 			"scope": "orgagenda.week.normal",
 			"foreground": "#ffffff",
 		},
 
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.1",
+			"background": "#623456",
+			"foreground": "#623456",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.2",
+			"background": "#007777",
+			"foreground": "#007777",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.3",
+			"background": "#999900",
+			"foreground": "#999900",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.4",
+			"background": "#007700",
+			"foreground": "#007700",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.5",
+			"background": "#aa5522",
+			"foreground": "#aa5522",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.6",
+			"background": "#f89cf4",
+			"foreground": "#f89cf4",
+		},
+		{   // Hide the block markup in the buffer
+			"scope": "orgagenda.block.7",
+			"background": "#0000ee",
+			"foreground": "#0000ee",
+		},
 
 	]
 }

@@ -112,3 +112,15 @@ contexts:
 
     - match: '(January|February|March|April|May|June|July|August|September|October|November|December)\s*([0-9]+)'
       scope: orgagenda.monthheader
+    
+    - match: ' ((!)|(@)|(#)|($)|(%)|(^)|(&))+ '
+      scope: orgagenda.block
+      captures:
+        2: orgagenda.block.1
+        3: orgagenda.block.2
+        4: orgagenda.block.3
+        5: orgagenda.block.4
+        6: orgagenda.block.5
+        7: orgagenda.block.6
+        8: orgagenda.block.7
+

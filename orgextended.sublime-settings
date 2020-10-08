@@ -176,18 +176,18 @@
     //"agendaHeaderFormat": "%A \t%d %B %Y",
 
     // Day view starts at 6am and ends at 7pm
-    //"agendaDayStart": 6,
-    //"agendaDayEnd": 19,  
+    "agendaDayStart": 6,
+    "agendaDayEnd": 19,  
 
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
 
     // When notice thread is polling, how far off does event need to be?
-    //"notifyHoursBefore": 0,
-    //"notifyMinsBefore": 15,
+    "notifyHoursBefore": 0,
+    "notifyMinsBefore": 15,
 
     // How often to check if an event is up? (in minutes)
-    //"noticePeriod": 1,
+    "noticePeriod": 1,
 
     // Pandoc export uses these to determine the style and the location of pandoc executable
     // "PandocPath": "C:\Program Files\Pandoc\pandoc.exe",

@@ -166,7 +166,7 @@ def IsAllDay(n):
 
 
 def IsInHour(n, hour):
-    if(not n.scheduled):
+    if(not n or not n.scheduled):
         return False
 
     if(not n.scheduled.has_time()):
@@ -513,6 +513,9 @@ class WeekView(AgendaBaseView):
 class AgendaView(AgendaBaseView):
     def __init__(self, name, setup=True):
         super(AgendaView, self).__init__(name, setup)
+        self.blocks = [None,None,None,None,None,None,None]
+        self.sym     = ("!","@","#","$","%","^","&")
+        self.symUsed = [-1,-1,-1,-1,-1,-1,-1]
 
     def RenderDateHeading(self, edit, now):
         headerFormat = sets.Get("agendaHeaderFormat","%A \t%d %B %Y")
@@ -548,9 +551,72 @@ class AgendaView(AgendaBaseView):
             return "H" + ''.join(hb)
         return ""
 
+    def GetUnusedSymbol(self, blk):
+        for i in range(0,len(self.symUsed)):
+            if(self.symUsed[i] < 0):
+                self.symUsed[i] = blk
+                return i
+        return 0
+
+    def ReleaseSymbol(self, blk):
+        for i in range(0,len(self.symUsed)):
+            if(self.symUsed[i] == blk):
+                self.symUsed[i] = -1
+                break
+
+    def FindSymbol(self, blk):
+        for i in range(0,len(self.symUsed)):
+            if(self.symUsed[i] == blk):
+                print("RETURNING: " + str(blk))
+                return i
+        return 0
+
+
+    def ClearAgendaBlocks(self,h):
+        for i in range(0, len(self.blocks)):
+            n = self.blocks[i]
+            if(not IsInHour(n, h)):
+                self.ReleaseSymbol(i)
+                self.blocks[i] = None
+
+    def UpdateWithThisBlock(self, n, h):
+        idx = -1
+        for i in range(0, len(self.blocks)):
+            if(idx == -1 and self.blocks[i] == None):
+                idx = i
+            if(self.blocks[i] == n):
+                idx = -1
+                return i
+        if(idx != -1):
+            self.blocks[idx] = n
+            return idx
+        return 0
+
+    def GetAgendaBlocks(self,n,h):
+        out = ""
+        if(n != None):
+            symIdx = self.GetUnusedSymbol(0)
+            self.ClearAgendaBlocks(h)
+            myIdx = self.UpdateWithThisBlock(n, h)
+            self.symUsed[symIdx] = myIdx
+        else:
+            self.ClearAgendaBlocks(h)
+        spaceSym = "."
+        for i in range(0, len(self.blocks)):
+            if(self.blocks[i]):
+                spaceSym = " "
+        for i in range(0, len(self.blocks)):
+            if(not self.blocks[i]):
+                out = out + spaceSym
+            else:
+                symIdx = self.FindSymbol(i)
+                out = out + self.sym[symIdx]
+        return out
+
     def RenderAgendaEntry(self,edit,filename,n,h):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}         {3} {4:55} {5}\n".format(filename, h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n)))
+        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d} {6}  {3} {4:55} {5}\n".format(filename, h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+
 
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
@@ -559,6 +625,7 @@ class AgendaView(AgendaBaseView):
         dayStart = sets.Get("agendaDayStart",6)
         dayEnd   = sets.Get("agendaDayEnd",19)  
         allDat = []
+        before = True
         for h in range(dayStart, dayEnd):
             didNotInsert = True
             if(self.now.hour == h):
@@ -567,7 +634,9 @@ class AgendaView(AgendaBaseView):
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
                     if(IsBeforeNow(n, self.now) and IsInHour(n, h)):
-                        foundItems.append(entry)
+                        if(not 'found' in entry):
+                            foundItems.append(entry)
+                            entry['found'] = 'b'
                 if(len(foundItems) > 0):
                     foundItems.sort(key=bystartnodedatekey)
                     for it in foundItems:
@@ -582,7 +651,9 @@ class AgendaView(AgendaBaseView):
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
                     if(IsAfterNow(n, self.now) and IsInHour(n, h)):
-                        foundItems.append(entry)
+                        if(not 'found' in entry or entry['found'] == 'b'):
+                            foundItems.append(entry)
+                            entry['found'] = 'a'
                 if(len(foundItems) > 0):
                     foundItems.sort(key=bystartnodedatekey)
                     for it in foundItems:
@@ -591,17 +662,22 @@ class AgendaView(AgendaBaseView):
                         self.MarkEntryAt(it)
                         self.RenderAgendaEntry(edit,filename,n,h)
                         didNotInsert = False
+                before = False
             else:
                 for entry in self.entries:
                     n = entry['node']
                     filename = entry['file'].AgendaFilenameTag()
-                    if(IsInHour(n, h)):
+                    if(IsInHour(n, h) and (not 'found' in entry or (not before and entry['found'] == 'b'))):
+                        if(before):
+                            entry['found'] = 'b'
+                        else:
+                            entry['found'] = 'a'
                         self.MarkEntryAt(entry)
                         self.RenderAgendaEntry(edit,filename,n,h)
                         didNotInsert = False
             if(didNotInsert):
                 empty = " " * 12
-                view.insert(edit, view.size(), "{0:12} {1:02d}:00........ ---------------------\n".format(empty, h))
+                view.insert(edit, view.size(), "{0:12} {1:02d}:00.{2} ---------------------\n".format(empty, h, self.GetAgendaBlocks(None,h)))
         view.insert(edit,view.size(),"\n")
         for entry in self.entries:
             n = entry['node']
