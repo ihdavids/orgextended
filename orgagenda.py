@@ -307,13 +307,16 @@ class AgendaBaseView:
         self.entries.append({"node": node, "file": file})
 
     def MarkEntryAt(self, entry):
-        entry['at'] = self.view.rowcol(self.view.size())[0]
+        if(not 'at' in entry):
+            entry['at'] = []
+        entry['at'].append(self.view.rowcol(self.view.size())[0])
 
     def At(self, row):
         for e in self.entries:
             if 'at' in e:
-                if(e['at'] == row):
-                    return (e['node'], e['file'])
+                for  ea in e['at']:
+                    if(ea == row):
+                        return (e['node'], e['file'])
         return (None, None)
 
     def Clear(self, edit):
@@ -389,6 +392,10 @@ def bystartdate(a, b):
 
 def bystartdatekey(a):
     return a.scheduled.start
+
+def bystartnodedatekey(a):
+    n = a['node']
+    return n.scheduled.start
 
 # ============================================================ 
 class WeekView(AgendaBaseView):
@@ -555,21 +562,33 @@ class AgendaView(AgendaBaseView):
         for h in range(dayStart, dayEnd):
             didNotInsert = True
             if(self.now.hour == h):
+                foundItems = []
                 for entry in self.entries:
                     n = entry['node']
-                    filename = entry['file'].AgendaFilenameTag()
+                    #filename = entry['file'].AgendaFilenameTag()
                     if(IsBeforeNow(n, self.now) and IsInHour(n, h)):
-                        self.MarkEntryAt(entry)
+                        foundItems.append(entry)
+                if(len(foundItems) > 0):
+                    foundItems.sort(key=bystartnodedatekey)
+                    for it in foundItems:
+                        n = it['node']
+                        filename = it['file'].AgendaFilenameTag()
+                        self.MarkEntryAt(it)
                         self.RenderAgendaEntry(edit,filename,n,h)
                         didNotInsert = False
                 view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d} - - - - - - - - - - - - - - - - - - - - - \n".format("now =>", self.now.hour, self.now.minute) )
+                foundItems = []
                 for entry in self.entries:
                     n = entry['node']
-                    filename = entry['file'].AgendaFilenameTag()
-                    if("NCG" in n.heading):
-                        print("Trying entry: " + n.heading + " IAN: " + str(IsAfterNow(n, self.now)) + " IIH: " + str(IsInHour(n,h)))
+                    #filename = entry['file'].AgendaFilenameTag()
                     if(IsAfterNow(n, self.now) and IsInHour(n, h)):
-                        self.MarkEntryAt(entry)
+                        foundItems.append(entry)
+                if(len(foundItems) > 0):
+                    foundItems.sort(key=bystartnodedatekey)
+                    for it in foundItems:
+                        n = it['node']
+                        filename = it['file'].AgendaFilenameTag()
+                        self.MarkEntryAt(it)
                         self.RenderAgendaEntry(edit,filename,n,h)
                         didNotInsert = False
             else:
