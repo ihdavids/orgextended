@@ -514,7 +514,7 @@ class AgendaView(AgendaBaseView):
     def __init__(self, name, setup=True):
         super(AgendaView, self).__init__(name, setup)
         self.blocks = [None,None,None,None,None,None,None]
-        self.sym     = ("!","@","#","$","%","^","&")
+        self.sym     = ("$","@","!","#","%","^","&")
         self.symUsed = [-1,-1,-1,-1,-1,-1,-1]
 
     def RenderDateHeading(self, edit, now):
@@ -552,11 +552,16 @@ class AgendaView(AgendaBaseView):
         return ""
 
     def GetUnusedSymbol(self, blk):
+        start = 0
         for i in range(0,len(self.symUsed)):
+            if(self.symUsed[i] >= 0):
+                start = i
+                break
+        for i in range(start,len(self.symUsed)):
             if(self.symUsed[i] < 0):
                 self.symUsed[i] = blk
                 return i
-        return 0
+        return -1
 
     def ReleaseSymbol(self, blk):
         for i in range(0,len(self.symUsed)):
@@ -604,6 +609,8 @@ class AgendaView(AgendaBaseView):
         for i in range(0, len(self.blocks)):
             if(self.blocks[i]):
                 spaceSym = " "
+        if(spaceSym == "."):
+            out = ".."
         for i in range(0, len(self.blocks)):
             if(not self.blocks[i]):
                 out = out + spaceSym
@@ -614,7 +621,7 @@ class AgendaView(AgendaBaseView):
 
     def RenderAgendaEntry(self,edit,filename,n,h):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d} {6}  {3} {4:55} {5}\n".format(filename, h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename, h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
 
 
     def RenderView(self, edit):
@@ -677,10 +684,12 @@ class AgendaView(AgendaBaseView):
             if(didNotInsert):
                 empty = " " * 12
                 blocks = self.GetAgendaBlocks(None,h)
-                sep = " "
-                if('.' in blocks):
-                    sep = "."
-                view.insert(edit, view.size(), "{0:12} {1:02d}:00{3}{2} ---------------------\n".format(empty, h, blocks, sep))
+                sep = ""
+                esep = " "
+                if(not '.' in blocks):
+                    sep = "B["
+                    esep = "]"
+                view.insert(edit, view.size(), "{0:12} {1:02d}:00{3}{2}{4}---------------------\n".format(empty, h, blocks, sep, esep))
         view.insert(edit,view.size(),"\n")
         for entry in self.entries:
             n = entry['node']
