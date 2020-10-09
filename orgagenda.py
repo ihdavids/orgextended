@@ -818,6 +818,27 @@ class NextTasksProjectsView(TodoView):
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
 
+class CompositeViewListener(sublime_plugin.ViewEventListener):
+
+    @classmethod
+    def is_applicable(cls, settings):
+        return "orgagenda" in settings.get("color_scheme","not here")
+
+    def __init__(self, view):
+        super(CompositeViewListener, self).__init__(view)
+        self.agenda = FindMappedView(self.view)
+    
+    def on_hover(self, point, hover_zone):
+        if(hover_zone == sublime.HOVER_TEXT):
+            row,col = self.view.rowcol(point)
+            n, f = self.agenda.At(row, col)
+            if(n and f):
+                #reg = sublime.Region(point, point)
+                #self.view.erase_phantoms(n.heading)
+                #self.view.add_phantom(n.heading, reg, "<html><body>" + n.heading + "</body></html>", sublime.LAYOUT_BELOW)
+                #sublime.Phantom(sublime.Region(point, point), "<html><body>" + n.heading + "</body></html>",sublime.LAYOUT_INLINE, None) 
+                print(n.heading)
+
 # ORG has this custom composite view feature.
 # I want that. Make a view up of a couple of views.
 class CompositeView(AgendaBaseView):
@@ -853,6 +874,15 @@ class CompositeView(AgendaBaseView):
             v.entries = []
             v.FilterEntries()
             self.entries += v.entries
+
+    def At(self, row, col):
+        for av in self.agendaViews:
+            n, f  = av.At(row,col)
+            if(n and f):
+                return (n,f)
+        return (None, None)
+
+
 
 
 class OrgTodoViewCommand(sublime_plugin.TextCommand):
