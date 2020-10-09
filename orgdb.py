@@ -275,7 +275,7 @@ class OrgDb:
             return self.files[fileOrView.lower()]
         except:
             try:
-                log.debug("Trying to load file anew")
+                #log.debug("Trying to load file anew")
                 f = self.LoadNew(fileOrView)            
                 if(type(fileOrView) is sublime.View):
                     f.ReloadIfChanged(fileOrView)

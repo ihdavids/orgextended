@@ -310,13 +310,22 @@ class AgendaBaseView:
         if(not 'at' in entry):
             entry['at'] = []
         entry['at'].append(self.view.rowcol(self.view.size())[0])
+    
+    def MarkEntryAtRegion(self, entry, reg):
+        if(not 'at' in entry):
+            entry['at'] = []
+        entry['at'].append(reg)
 
-    def At(self, row):
+    def At(self, row, col):
         for e in self.entries:
             if 'at' in e:
                 for  ea in e['at']:
-                    if(ea == row):
-                        return (e['node'], e['file'])
+                    if(type(ea) == int):
+                        if(ea == row):
+                            return (e['node'], e['file'])
+                    elif(type(ea) == sublime.Region):
+                        if(ea.contains(self.view.text_point(row,col))):
+                            return (e['node'], e['file'])
         return (None, None)
 
     def Clear(self, edit):
@@ -441,19 +450,23 @@ class WeekView(AgendaBaseView):
         for entry in self.entries:
             n = entry['node']
             if(n.scheduled.start.day == date.day):
-                daydata.append(n)
-        daydata.sort(key=bystartdatekey)
+                daydata.append(entry)
+        daydata.sort(key=bystartnodedatekey)
 
         lastMatchStart = 0
         lastMatch      = None
+        lastMatchEntry = None
         matchCount     = 0
         doneMatchCount = 0
         for hour in range(0,24):
             for minSlot in range(0,self.cellSize):
                 match = None
-                for n in daydata:
+                matche = None
+                for entry in daydata:
+                    n = entry['node']
                     if(IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)):
                         match = n
+                        matche = entry
                 if(lastMatch != match and lastMatch != None):
                     s = self.view.text_point(row,lastMatchStart)
                     e = self.view.text_point(row,self.startOffset + hour*self.cellSize + minSlot)
@@ -461,14 +474,17 @@ class WeekView(AgendaBaseView):
                     if(IsDone(lastMatch)):
                         style = "orgagenda.week.done." + str(doneMatchCount)
                         doneMatchCount = (doneMatchCount + 1) % 2
+                        self.MarkEntryAtRegion(lastMatchEntry,reg)
                         self.view.add_regions("week_done_" + str(date.day) + "_" + str(hour) + "_" + str(minSlot),[reg],style,"", sublime.DRAW_SQUIGGLY_UNDERLINE)   
                     else:
                         style = "orgagenda.week." + str(matchCount)
                         matchCount = (matchCount + 1) % 10
+                        self.MarkEntryAtRegion(lastMatchEntry,reg)
                         self.view.add_regions("week_" + str(date.day) + "_" + str(hour) + "_" + str(minSlot),[reg],style,"",sublime.DRAW_NO_FILL)   
                 if(match != None):
                     if(lastMatch != match):
                         lastMatch      = match
+                        lastMatchEntry = matche
                         lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
                     d = distanceFromStart(match, hour, minSlot)
                     # If the time slot is larger than the name we space pad it
@@ -480,6 +496,7 @@ class WeekView(AgendaBaseView):
                     if(lastMatch != match):
                         lastMatch      = match
                         lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
+                        lastMatchEntry = matche
                     if(minSlot < 4):
                         self.view.insert(edit, self.view.size(), ".")
                     else:
@@ -865,8 +882,8 @@ class OrgAgendaGoToCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         agenda = FindMappedView(self.view)
         if(agenda):
-            row    = self.view.curRow()
-            n, f = agenda.At(row)
+            row, col    = self.view.curRowCol()
+            n, f = agenda.At(row, col)
             if(f):
                 if(n):
                     path = "{0}:{1}".format(f.filename,n.start_row + 1)
@@ -900,8 +917,8 @@ class RunEditingCommandOnNode:
     def Run(self):
         agenda = FindMappedView(self.view)
         if(agenda):
-            row  = self.view.curRow()
-            n, f = agenda.At(row)
+            row, col  = self.view.curRowCol()
+            n, f = agenda.At(row,col)
             if(f):
                 if(n):
                     self.n         = n
@@ -1033,8 +1050,8 @@ class OrgAgendaGoToSplitCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         agenda = FindMappedView(self.view)
         if(agenda):
-            row    = self.view.curRow()
-            n, f = agenda.At(row)
+            row, col    = self.view.curRowCol()
+            n, f = agenda.At(row,col)
             if(f):
                 if(n):
                     path = "{0}:{1}".format(f.filename,n.start_row + 1)
