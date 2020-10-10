@@ -167,7 +167,7 @@
     // Right now I ONLY have this one composite view.
     "AgendaCustomViews": 
     {
-        "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+        "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
         "Todos":   ["Todos"],
     },
 

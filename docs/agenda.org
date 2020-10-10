@@ -13,6 +13,7 @@
   - Ctrl+w will close the agenda view.
   - The habit visualizer leaves something to be desired, it does not yet support the restart options that most habits
     do in org, BUT, it is still present and gives you a semblance of how well you are tracking with your habits.
+  - The main agenda view is a custom list of visualizers you would like to see.
 
 ** Notifications
    OrgExtended has the start of a notification system. It is not yet super stable.
