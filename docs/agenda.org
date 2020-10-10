@@ -15,6 +15,69 @@
     do in org, BUT, it is still present and gives you a semblance of how well you are tracking with your habits.
   - The main agenda view is a custom list of visualizers you would like to see.
 
+  Custom Agenda views can be defined in the AgendaCustomViews dictionary in your orgextended.sublime-settings file.
+  The Default view is the view that will show when you call *OrgAgendaCustomView*.
+  To choose one of the other views use *OrgAgendaChooseView* this will pop up a quick select panel
+  allowing you to select a view.
+
+ #+BEGIN_SRC js
+    "AgendaCustomViews": 
+    {
+        "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+        "Todos":   ["Todos"],
+        "Notes":   ["Notes"],
+        "Flags":   ["Todos : tagfilter |TAG1 |OTHERTAGS", "Todos : tagfilter OTHERTAGS"],
+    },
+  #+END_SRC 
+
+  There are quite a few defined views:
+
+  - Calendar :: This is a 3 month view that will highlight the currently selected day and days with scheduled TODOs
+  - Day :: The day view is a single days schedule that will show tasks scheduled for that day
+  - Blocked Projects :: This is a list of projects without a NEXT tag. This is to help with a GTD style flow.
+  - Next Tasks :: This is a list of tasks marked as NEXT to help decide what needs to be done next.
+  - Todos :: This is a generic list of Todos that can be filtered by tags, priorities etc.
+  - Notes :: This is a list of your notes, again this can be filtered by tags etc.
+  - Meetings :: This is a list of meetings
+  - Phone :: This is a list of meetings marked as PHONE calls.
+  - Week :: This is a week view helping with a quick open slot / week at a glance view.
+
+** Tags
+
+  You can filter one of these views to a set of tags as follows
+
+  #+BEGIN_SRC js
+    "NAMEOFVIEW : tagfilter [MODIFIER]TAGNAME [MODIFIER]TAGNAME"
+  #+END_SRC
+
+  The modifiers determine how those tags are matched:
+
+  - - a minus sign ensures that tag IS NOT assigned to this heading.
+  - + a plus sign ensures that ALL tags with a plus are assigned to this heading.
+  - | an or or vertical bar ensures that ONE OF the tags listed this way are assigned to this heading.
+
+** Priorities
+
+  You can use the same kind of filter with priorities:
+
+  #+BEGIN_SRC js
+    "NAMEOFVIEW : priorityfilter [MODIFIER]Priority [MODIFIER]Priority"
+  #+END_SRC
+
+** Has Modifiers
+  - hasschedule :: Requries the task be scheduled
+  - hasdeadline :: Requires the task have a deadline
+  - hasclock :: Requires the task have clocking values
+  - hasclose :: Requires the task be a closed task (only for views that allow closed tasks)
+  - noschedule :: Requires the task is not scheduled
+  - nodeadline :: Requires the task not have a deadline
+  - noclock :: Requires the task not have any clocking values
+  - noclose :: Requires the task not have a close entry
+
+  #+BEGIN_SRC js
+    "NAMEOFVIEW : hasclock : noschedule"
+  #+END_SRC
+
 ** Notifications
    OrgExtended has the start of a notification system. It is not yet super stable.
    However, the notification thread is a background system that starts up when OrgExtended starts.

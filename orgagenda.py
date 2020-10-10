@@ -268,6 +268,11 @@ class AgendaBaseView:
         self.hasclock = "hasclock" in kwargs
         self.hasclose = "hasclose" in kwargs
         self.hasdeadline = "hasdeadline" in kwargs
+        self.hasschedule = "hasschedule" in kwargs
+        self.noclock = "noclock" in kwargs
+        self.noclose = "noclose" in kwargs
+        self.nodeadline = "nodeadline" in kwargs
+        self.noschedule = "noschedule" in kwargs
 
         if(setup):
             self.SetupView()
@@ -334,6 +339,16 @@ class AgendaBaseView:
         if(self.hasdeadline and not n.deadline):
             return False
         if(self.hasclose and not n.closed):
+            return False
+        if(self.hasschedule and not n.scheduled):
+            return False
+        if(self.noclock and n.clock):
+            return False
+        if(self.nodeadline and n.deadline):
+            return False
+        if(self.noclose and n.closed):
+            return False
+        if(self.noschedule and n.scheduled):
             return False
         return True
 
@@ -1132,6 +1147,8 @@ class CalendarViewRegistry:
                     pval = p[idx:].strip()
                     args[pname] = pval
                     #print(pname + " -> " + pval)
+                else:
+                    args[p] = True
             i += 1
         return (name, args)
 
