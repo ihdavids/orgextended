@@ -827,17 +827,54 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
     def __init__(self, view):
         super(CompositeViewListener, self).__init__(view)
         self.agenda = FindMappedView(self.view)
+        self.phantoms = []
+
+    def clear_phantoms(self):
+        for f in self.phantoms:
+            self.view.erase_phantoms(f)
+        self.phantoms = []
+
+    def on_hover_done(self):
+        self.clear_phantoms()
     
     def on_hover(self, point, hover_zone):
         if(hover_zone == sublime.HOVER_TEXT):
             row,col = self.view.rowcol(point)
             n, f = self.agenda.At(row, col)
             if(n and f):
-                #reg = sublime.Region(point, point)
-                #self.view.erase_phantoms(n.heading)
-                #self.view.add_phantom(n.heading, reg, "<html><body>" + n.heading + "</body></html>", sublime.LAYOUT_BELOW)
+                self.clear_phantoms()
+                line = self.view.line(point)
+                reg = sublime.Region(point, line.end())
+                body = """
+                <body id="agenda-week-popup">
+                <style>
+                    div.block {{
+                        background-color: #333333;
+                        border: 1pt;
+                    }}
+                    div.heading {{
+                        color: #880077;
+                        padding: 5px;
+                        font-size: 20px;
+                        }}
+                    div.file {{
+                        color: grey;
+                        padding: 5px;
+                        font-size: 15px;
+                        }}
+                </style>
+                <div class="block"/>
+                <div class="heading">{0}</div>
+                <div class="file">{1}</div>
+                </div>
+                </body>
+                """.format(n.heading,f.filename)
+
+                self.view.add_phantom(n.heading, reg, body, sublime.LAYOUT_INLINE)
                 #sublime.Phantom(sublime.Region(point, point), "<html><body>" + n.heading + "</body></html>",sublime.LAYOUT_INLINE, None) 
+                self.phantoms.append(n.heading)
                 print(n.heading)
+                sublime.set_timeout(self.on_hover_done, 1000*2) 
 
 # ORG has this custom composite view feature.
 # I want that. Make a view up of a couple of views.
