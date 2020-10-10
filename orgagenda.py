@@ -523,7 +523,7 @@ def bystartnodedatekey(a):
 # ============================================================ 
 class WeekView(AgendaBaseView):
     def __init__(self, name, setup=True,**kwargs):
-        super(WeekView, self).__init__(name, setup, kwargs)
+        super(WeekView, self).__init__(name, setup, **kwargs)
 
 
     def HighlightTime(self, date):
@@ -643,7 +643,7 @@ class WeekView(AgendaBaseView):
 # ============================================================ 
 class AgendaView(AgendaBaseView):
     def __init__(self, name, setup=True, **kwargs):
-        super(AgendaView, self).__init__(name, setup, kwargs)
+        super(AgendaView, self).__init__(name, setup, **kwargs)
         self.blocks = [None,None,None,None,None,None,None]
         self.sym     = ("$","@","!","#","%","^","&")
         self.symUsed = [-1,-1,-1,-1,-1,-1,-1]
@@ -854,24 +854,24 @@ class TodoView(AgendaBaseView):
 
 # ================================================================================
 class ProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
-        super(ProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(ProjectsView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
 
 # ================================================================================
 class BlockedProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
-        super(BlockedProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(BlockedProjectsView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsBlockedProject(n)
 
 # ================================================================================
 class LooseTasksView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
-        super(LooseTasksView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(LooseTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
@@ -879,8 +879,8 @@ class LooseTasksView(TodoView):
 
 # ================================================================================
 class NextTasksProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
-        super(NextTasksProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(NextTasksProjectsView, self).__init__(name, setup, **kwargs)
 
     # TODO Print project and then the next task
     def RenderView(self, edit):
@@ -908,24 +908,24 @@ class NextTasksProjectsView(TodoView):
 
 # ================================================================================
 class NoteView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
-        super(NoteView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True,**kwargs):
+        super(NoteView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsNote(n) and not IsProject(n) and not IsProjectTask(n)
 
 # ================================================================================
 class PhoneView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
-        super(PhoneView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True,**kwargs):
+        super(PhoneView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsPhone(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
 
 # ================================================================================
 class MeetingView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
-        super(MeetingView, self).__init__(name, setup, tagfilter, priorityfilter)
+    def __init__(self, name, setup=True,**kwargs):
+        super(MeetingView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         return IsMeeting(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)

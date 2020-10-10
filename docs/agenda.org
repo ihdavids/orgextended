@@ -42,6 +42,8 @@
   - Phone :: This is a list of meetings marked as PHONE calls.
   - Week :: This is a week view helping with a quick open slot / week at a glance view.
 
+  [[file:agenda_day.gif]] 
+  
 ** Tags
 
   You can filter one of these views to a set of tags as follows
