@@ -81,7 +81,7 @@
   #+END_SRC
 
 ** Movement
-  You can change the active day in your agenda using the right and left arrows.
+  You can change the active day in your agenda using the right and left angle brackets (usually shift command and shift period).
 
 
   [[file:agenda_movement.gif]] 
