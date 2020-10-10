@@ -169,6 +169,7 @@
     {
         "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"],
         "Todos":   ["Todos"],
+        "Flags":   ["Todos : tagfilter |TAG1 |OTHERTAGS", "Todos : tagfilter OTHERTAGS"],
     },
 
 

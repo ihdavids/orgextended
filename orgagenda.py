@@ -33,7 +33,10 @@ TODO_VIEW   = "Org Todos"
 ViewMappings = {}
 
 def FindMappedView(view):
-    return ViewMappings[view.name()]
+    if(view.name() in ViewMappings):
+        return ViewMappings[view.name()]
+    log.debug("Could not find view named: " + view.name())
+    return None
 
 def move_file_other_group(myview, view):
     window = sublime.active_window()
@@ -234,11 +237,6 @@ def IsInHourAndMinute(n, hour, mstart, mend):
 
 def distanceFromStart(n, hour, minSlot):
     rv = 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
-    if(rv < 0):
-        print("HOUR: " + str(hour))
-        print("SHR:  " + str(n.scheduled.start.hour))
-        print("MSLT: " + str(minSlot))
-        print("SMIN: " + str(n.scheduled.start.minute/12))
     return rv
 
 # IDEA Make a base class that has all the functionality needed to
@@ -281,7 +279,10 @@ class AgendaBaseView:
 
 
     def InsertAgendaHeading(self, edit):
-        self.view.insert(edit, self.view.size(), self.name + "\n")
+        if(hasattr(self,'_tagfilter')):
+            self.view.insert(edit, self.view.size(), self.name + "\t\t TAGS( " + self._tagfilter + " )\n")
+        else:
+            self.view.insert(edit, self.view.size(), self.name + "\n")
 
     def UpdateNow(self, now=None):
         if(now == None):
@@ -718,7 +719,8 @@ class AgendaView(AgendaBaseView):
     def FilterEntry(self, node, file):
         return (IsTodo(node) and IsToday(node, self.now))
 
-RE_IN_OUT_TAG = re.compile('(?P<inout>[+-])?(?P<tag>[^ ]+)')
+RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
+# ================================================================================
 class TodoView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
         self.SetTagFilter(tagfilter)
@@ -728,8 +730,9 @@ class TodoView(AgendaBaseView):
         self._tagfilter = filter
         if(not filter):
             return
-        self._intags  = []
-        self._outtags = []
+        self._intags     = []
+        self._oneoftags  = []
+        self._outtags    = []
         tags = self._tagfilter.split(' ')
         for tag in tags:
             tag = tag.strip()
@@ -740,15 +743,18 @@ class TodoView(AgendaBaseView):
                 inout = m.group('inout')
                 tagdata = m.group('tag')
                 if(not inout or inout == '+'):
-                    self._intags.append(tagdata)
+                    self._intags.append(tagdata.strip())
+                elif(inout == '|'):
+                    self._oneoftags.append(tagdata.strip())
                 else:
-                    self._outtags.append(tagdata)
-
+                    self._outtags.append(tagdata.strip())
 
     def MatchTags(self, node):
         if(self._intags and len(self._intags) > 0 and not all(elem in node.tags  for elem in self._intags)):
             return False
         if(self._outtags and any(elem in node.tags for elem in self._outtags)):
+            return False
+        if(self._oneoftags and len(self._oneoftags) > 0 and not any(elem in node.tags for elem in self._oneoftags)):
             return False
         return True
 
@@ -818,6 +824,7 @@ class NextTasksProjectsView(TodoView):
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
 
+# ================================================================================
 class CompositeViewListener(sublime_plugin.ViewEventListener):
 
     @classmethod
@@ -958,6 +965,7 @@ class OrgAgendaGoToCommand(sublime_plugin.TextCommand):
             else:
                 log.warning("COULD NOT LOCATE AGENDA ROW")
 
+# ================================================================================
 class RunEditingCommandOnNode:
     def __init__(self, view, command):
         self.view = view
@@ -996,7 +1004,7 @@ class RunEditingCommandOnNode:
             else:
                 log.warning("COULD NOT LOCATE AGENDA ROW")
 
-
+# ================================================================================
 class CalendarViewRegistry:
     def __init__(self):
         self.KnownViews = {}
