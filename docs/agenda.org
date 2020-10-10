@@ -43,7 +43,7 @@
   - Week :: This is a week view helping with a quick open slot / week at a glance view.
 
   [[file:agenda_day.gif]] 
-  
+
 ** Tags
 
   You can filter one of these views to a set of tags as follows
@@ -79,6 +79,12 @@
   #+BEGIN_SRC js
     "NAMEOFVIEW : hasclock : noschedule"
   #+END_SRC
+
+** Movement
+  You can change the active day in your agenda using the right and left arrows.
+
+
+  [[file:agenda_movement.gif]] 
 
 ** Notifications
    OrgExtended has the start of a notification system. It is not yet super stable.
