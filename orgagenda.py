@@ -261,9 +261,14 @@ def distanceFromStart(n, hour, minSlot):
 #      Also create a BUNCH of filters that filter by tag, properties
 #      and other things so there are example versions of each.
 class AgendaBaseView:
-    def __init__(self, name, setup=True, tagfilter=None):
+    def __init__(self, name, setup=True, **kwargs):
         self.name = name
-        self.SetTagFilter(tagfilter)
+        self.SetTagFilter(kwargs)
+        self.SetPriorityFilter(kwargs)
+        self.hasclock = "hasclock" in kwargs
+        self.hasclose = "hasclose" in kwargs
+        self.hasdeadline = "hasdeadline" in kwargs
+
         if(setup):
             self.SetupView()
         else:
@@ -273,10 +278,36 @@ class AgendaBaseView:
         self.UpdateNow()
         self.entries = []
 
+    def SetPriorityFilter(self,kwargs):
+        if("priorityfilter" in kwargs):
+            self._priorityFilter = kwargs["priorityfilter"]
+        else:
+            self._priorityFilter = None
+            return
+        self._inPriorityTags     = []
+        self._oneofPriorityTags  = []
+        self._outPriorityTagsags    = []
+        tags = self._priorityFilter.split(' ')
+        for tag in tags:
+            tag = tag.strip()
+            if not tag or len(tag) <= 0:
+                continue
+            m = RE_IN_OUT_TAG.search(tag)
+            if(m):
+                inout = m.group('inout')
+                tagdata = m.group('tag')
+                if(not inout or inout == '+'):
+                    self._inPriorityTags.append(tagdata.strip())
+                elif(inout == '|'):
+                    self._oneofPriorityTags.append(tagdata.strip())
+                else:
+                    self._outPriorityTags.append(tagdata.strip())
 
-    def SetTagFilter(self,filter):
-        self._tagfilter = filter
-        if(not filter):
+    def SetTagFilter(self,kwargs):
+        if("tagfilter" in kwargs):
+            self._tagfilter = kwargs["tagfilter"]
+        else:
+            self._tagfilter = None
             return
         self._intags     = []
         self._oneoftags  = []
@@ -297,6 +328,15 @@ class AgendaBaseView:
                 else:
                     self._outtags.append(tagdata.strip())
 
+    def MatchHas(self, node):
+        if(self.hasclock and not n.clock):
+            return False
+        if(self.hasdeadline and not n.deadline):
+            return False
+        if(self.hasclose and not n.closed):
+            return False
+        return True
+
     def MatchTags(self, node):
         if(not self._tagfilter):
             return True
@@ -305,6 +345,17 @@ class AgendaBaseView:
         if(self._outtags and any(elem in node.tags for elem in self._outtags)):
             return False
         if(self._oneoftags and len(self._oneoftags) > 0 and not any(elem in node.tags for elem in self._oneoftags)):
+            return False
+        return True
+
+    def MatchPriorities(self, node):
+        if(not self._priorityFilter):
+            return True
+        if(self._inPriorityTags and len(self._inPriorityTags) > 0 and not all(elem in node.priority  for elem in self._inPriorityTags)):
+            return False
+        if(self._outPriorityTags and any(elem in node.priority for elem in self._outPriorityTags)):
+            return False
+        if(self._oneofPriorityTags and len(self._oneofPriorityTags) > 0 and not any(elem in node.priority for elem in self._oneofPriorityTags)):
             return False
         return True
 
@@ -392,7 +443,7 @@ class AgendaBaseView:
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
-                if(self.MatchTags(n) and self.FilterEntry(n, file)):
+                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
     def FilterEntry(self, node, file):
@@ -406,8 +457,8 @@ def IsAfterNow(n, now):
 
 # ============================================================ 
 class CalendarView(AgendaBaseView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(CalendarView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True,**kwargs):
+        super(CalendarView, self).__init__(name, setup, **kwargs)
         self.dv = DateView("orgagenda.now")
 
     def UpdateNow(self, now=None):
@@ -456,8 +507,8 @@ def bystartnodedatekey(a):
 
 # ============================================================ 
 class WeekView(AgendaBaseView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(WeekView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True,**kwargs):
+        super(WeekView, self).__init__(name, setup, kwargs)
 
 
     def HighlightTime(self, date):
@@ -576,8 +627,8 @@ class WeekView(AgendaBaseView):
 
 # ============================================================ 
 class AgendaView(AgendaBaseView):
-    def __init__(self, name, setup=True, tagfilter=None):
-        super(AgendaView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(AgendaView, self).__init__(name, setup, kwargs)
         self.blocks = [None,None,None,None,None,None,None]
         self.sym     = ("$","@","!","#","%","^","&")
         self.symUsed = [-1,-1,-1,-1,-1,-1,-1]
@@ -769,8 +820,8 @@ class AgendaView(AgendaBaseView):
 RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
 # ================================================================================
 class TodoView(AgendaBaseView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(TodoView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, **kwargs):
+        super(TodoView, self).__init__(name, setup, **kwargs)
 
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
@@ -788,24 +839,24 @@ class TodoView(AgendaBaseView):
 
 # ================================================================================
 class ProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None):
-        super(ProjectsView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
+        super(ProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
 
 # ================================================================================
 class BlockedProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None):
-        super(BlockedProjectsView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
+        super(BlockedProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsBlockedProject(n)
 
 # ================================================================================
 class LooseTasksView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None):
-        super(LooseTasksView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
+        super(LooseTasksView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
@@ -813,8 +864,8 @@ class LooseTasksView(TodoView):
 
 # ================================================================================
 class NextTasksProjectsView(TodoView):
-    def __init__(self, name, setup=True, tagfilter=None):
-        super(NextTasksProjectsView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True, tagfilter=None,priorityfilter=None):
+        super(NextTasksProjectsView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     # TODO Print project and then the next task
     def RenderView(self, edit):
@@ -842,24 +893,24 @@ class NextTasksProjectsView(TodoView):
 
 # ================================================================================
 class NoteView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(NoteView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
+        super(NoteView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsNote(n) and not IsProject(n) and not IsProjectTask(n)
 
 # ================================================================================
 class PhoneView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(PhoneView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
+        super(PhoneView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsPhone(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
 
 # ================================================================================
 class MeetingView(TodoView):
-    def __init__(self, name, setup=True,tagfilter=None):
-        super(MeetingView, self).__init__(name, setup, tagfilter)
+    def __init__(self, name, setup=True,tagfilter=None,priorityfilter=None):
+        super(MeetingView, self).__init__(name, setup, tagfilter, priorityfilter)
 
     def FilterEntry(self, n, filename):
         return IsMeeting(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
