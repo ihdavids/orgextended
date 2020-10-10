@@ -100,6 +100,16 @@ def CreateUniqueViewNamed(name, mapped=None):
     ViewMappings[view.name()] = mapped
     return view
 
+
+def IsPhone(n):
+    return n and n.todo and "PHONE" in n.todo
+
+def IsMeeting(n):
+    return n and n.todo and "MEETING" in n.todo
+
+def IsNote(n):
+    return n and n.todo and "NOTE" in n.todo
+
 def IsTodo(n):
     return n.todo and n.todo in n.env.todo_keys
 
@@ -239,6 +249,7 @@ def distanceFromStart(n, hour, minSlot):
     rv = 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
     return rv
 
+# ================================================================================
 # IDEA Make a base class that has all the functionality needed to
 #      render an agenda view. Then create an agenda folder with
 #      all my views, like dynamic blocks.
@@ -250,8 +261,9 @@ def distanceFromStart(n, hour, minSlot):
 #      Also create a BUNCH of filters that filter by tag, properties
 #      and other things so there are example versions of each.
 class AgendaBaseView:
-    def __init__(self, name, setup=True):
+    def __init__(self, name, setup=True, tagfilter=None):
         self.name = name
+        self.SetTagFilter(tagfilter)
         if(setup):
             self.SetupView()
         else:
@@ -260,6 +272,41 @@ class AgendaBaseView:
     def BasicSetup(self):
         self.UpdateNow()
         self.entries = []
+
+
+    def SetTagFilter(self,filter):
+        self._tagfilter = filter
+        if(not filter):
+            return
+        self._intags     = []
+        self._oneoftags  = []
+        self._outtags    = []
+        tags = self._tagfilter.split(' ')
+        for tag in tags:
+            tag = tag.strip()
+            if not tag or len(tag) <= 0:
+                continue
+            m = RE_IN_OUT_TAG.search(tag)
+            if(m):
+                inout = m.group('inout')
+                tagdata = m.group('tag')
+                if(not inout or inout == '+'):
+                    self._intags.append(tagdata.strip())
+                elif(inout == '|'):
+                    self._oneoftags.append(tagdata.strip())
+                else:
+                    self._outtags.append(tagdata.strip())
+
+    def MatchTags(self, node):
+        if(not self._tagfilter):
+            return True
+        if(self._intags and len(self._intags) > 0 and not all(elem in node.tags  for elem in self._intags)):
+            return False
+        if(self._outtags and any(elem in node.tags for elem in self._outtags)):
+            return False
+        if(self._oneoftags and len(self._oneoftags) > 0 and not any(elem in node.tags for elem in self._oneoftags)):
+            return False
+        return True
 
     def SetupView(self):
         self.view = CreateUniqueViewNamed(self.name, self)
@@ -279,7 +326,7 @@ class AgendaBaseView:
 
 
     def InsertAgendaHeading(self, edit):
-        if(hasattr(self,'_tagfilter')):
+        if(hasattr(self,'_tagfilter') and self._tagfilter):
             self.view.insert(edit, self.view.size(), self.name + "\t\t TAGS( " + self._tagfilter + " )\n")
         else:
             self.view.insert(edit, self.view.size(), self.name + "\n")
@@ -345,7 +392,7 @@ class AgendaBaseView:
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
-                if(self.FilterEntry(n, file)):
+                if(self.MatchTags(n) and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
     def FilterEntry(self, node, file):
@@ -360,7 +407,7 @@ def IsAfterNow(n, now):
 # ============================================================ 
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
-        super(CalendarView, self).__init__(name, setup)
+        super(CalendarView, self).__init__(name, setup, tagfilter)
         self.dv = DateView("orgagenda.now")
 
     def UpdateNow(self, now=None):
@@ -410,7 +457,7 @@ def bystartnodedatekey(a):
 # ============================================================ 
 class WeekView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
-        super(WeekView, self).__init__(name, setup)
+        super(WeekView, self).__init__(name, setup, tagfilter)
 
 
     def HighlightTime(self, date):
@@ -529,8 +576,8 @@ class WeekView(AgendaBaseView):
 
 # ============================================================ 
 class AgendaView(AgendaBaseView):
-    def __init__(self, name, setup=True):
-        super(AgendaView, self).__init__(name, setup)
+    def __init__(self, name, setup=True, tagfilter=None):
+        super(AgendaView, self).__init__(name, setup, tagfilter)
         self.blocks = [None,None,None,None,None,None,None]
         self.sym     = ("$","@","!","#","%","^","&")
         self.symUsed = [-1,-1,-1,-1,-1,-1,-1]
@@ -723,40 +770,7 @@ RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
 # ================================================================================
 class TodoView(AgendaBaseView):
     def __init__(self, name, setup=True,tagfilter=None):
-        self.SetTagFilter(tagfilter)
-        super(TodoView, self).__init__(name, setup)
-
-    def SetTagFilter(self,filter):
-        self._tagfilter = filter
-        if(not filter):
-            return
-        self._intags     = []
-        self._oneoftags  = []
-        self._outtags    = []
-        tags = self._tagfilter.split(' ')
-        for tag in tags:
-            tag = tag.strip()
-            if not tag or len(tag) <= 0:
-                continue
-            m = RE_IN_OUT_TAG.search(tag)
-            if(m):
-                inout = m.group('inout')
-                tagdata = m.group('tag')
-                if(not inout or inout == '+'):
-                    self._intags.append(tagdata.strip())
-                elif(inout == '|'):
-                    self._oneoftags.append(tagdata.strip())
-                else:
-                    self._outtags.append(tagdata.strip())
-
-    def MatchTags(self, node):
-        if(self._intags and len(self._intags) > 0 and not all(elem in node.tags  for elem in self._intags)):
-            return False
-        if(self._outtags and any(elem in node.tags for elem in self._outtags)):
-            return False
-        if(self._oneoftags and len(self._oneoftags) > 0 and not any(elem in node.tags for elem in self._oneoftags)):
-            return False
-        return True
+        super(TodoView, self).__init__(name, setup, tagfilter)
 
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
@@ -770,36 +784,37 @@ class TodoView(AgendaBaseView):
         self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, n.todo, n.heading))
 
     def FilterEntry(self, n, filename):
-        if(self._tagfilter):
-            return IsTodo(n) and not IsProject(n) and self.MatchTags(n) 
-        else:
-            return IsTodo(n) and not IsProject(n)
+        return IsTodo(n) and not IsProject(n)
 
+# ================================================================================
 class ProjectsView(TodoView):
-    def __init__(self, name, setup=True):
-        super(ProjectsView, self).__init__(name, setup)
+    def __init__(self, name, setup=True, tagfilter=None):
+        super(ProjectsView, self).__init__(name, setup, tagfilter)
 
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
 
+# ================================================================================
 class BlockedProjectsView(TodoView):
-    def __init__(self, name, setup=True):
-        super(BlockedProjectsView, self).__init__(name, setup)
+    def __init__(self, name, setup=True, tagfilter=None):
+        super(BlockedProjectsView, self).__init__(name, setup, tagfilter)
 
     def FilterEntry(self, n, filename):
         return IsBlockedProject(n)
 
+# ================================================================================
 class LooseTasksView(TodoView):
-    def __init__(self, name, setup=True):
-        super(LooseTasksView, self).__init__(name, setup)
+    def __init__(self, name, setup=True, tagfilter=None):
+        super(LooseTasksView, self).__init__(name, setup, tagfilter)
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
 
 
+# ================================================================================
 class NextTasksProjectsView(TodoView):
-    def __init__(self, name, setup=True):
-        super(NextTasksProjectsView, self).__init__(name, setup)
+    def __init__(self, name, setup=True, tagfilter=None):
+        super(NextTasksProjectsView, self).__init__(name, setup, tagfilter)
 
     # TODO Print project and then the next task
     def RenderView(self, edit):
@@ -823,6 +838,31 @@ class NextTasksProjectsView(TodoView):
                     
     def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n)
+
+
+# ================================================================================
+class NoteView(TodoView):
+    def __init__(self, name, setup=True,tagfilter=None):
+        super(NoteView, self).__init__(name, setup, tagfilter)
+
+    def FilterEntry(self, n, filename):
+        return IsNote(n) and not IsProject(n) and not IsProjectTask(n)
+
+# ================================================================================
+class PhoneView(TodoView):
+    def __init__(self, name, setup=True,tagfilter=None):
+        super(PhoneView, self).__init__(name, setup, tagfilter)
+
+    def FilterEntry(self, n, filename):
+        return IsPhone(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
+
+# ================================================================================
+class MeetingView(TodoView):
+    def __init__(self, name, setup=True,tagfilter=None):
+        super(MeetingView, self).__init__(name, setup, tagfilter)
+
+    def FilterEntry(self, n, filename):
+        return IsMeeting(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
 
 # ================================================================================
 class CompositeViewListener(sublime_plugin.ViewEventListener):
@@ -856,17 +896,21 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
                 <body id="agenda-week-popup">
                 <style>
                     div.block {{
+                        display: block;
                         background-color: #333333;
-                        border: 1pt;
+                        border-style: solid;
+                        border: 1px;
+                        border-color: #666666;
                     }}
                     div.heading {{
                         color: #880077;
                         padding: 5px;
                         font-size: 20px;
+                        font-weight: bold;
                         }}
                     div.file {{
                         color: grey;
-                        padding: 5px;
+                        padding-left: 5px;
                         font-size: 15px;
                         }}
                 </style>
@@ -883,6 +927,7 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
                 print(n.heading)
                 sublime.set_timeout(self.on_hover_done, 1000*2) 
 
+# ================================================================================
 # ORG has this custom composite view feature.
 # I want that. Make a view up of a couple of views.
 class CompositeView(AgendaBaseView):
@@ -926,14 +971,13 @@ class CompositeView(AgendaBaseView):
                 return (n,f)
         return (None, None)
 
-
-
-
+# ================================================================================
 class OrgTodoViewCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         todo = TodoView(TODO_VIEW)
         todo.DoRenderView(edit)
 
+# ================================================================================
 # Right now this is a composite view... Need to allow the user to define
 # Their own versions of this.
 class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
@@ -951,6 +995,7 @@ class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
             agenda.RestoreCursor(pos)
         log.info("Day view refreshed")
 
+# ================================================================================
 # Goto the file in the current window (ENTER)
 class OrgAgendaGoToCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -1014,6 +1059,9 @@ class CalendarViewRegistry:
         self.AddView("Next Tasks", NextTasksProjectsView)
         self.AddView("Loose Tasks", LooseTasksView)
         self.AddView("Todos", TodoView)
+        self.AddView("Notes", NoteView)
+        self.AddView("Meetings", MeetingView)
+        self.AddView("Phone", PhoneView)
         self.AddView("Week", WeekView)
 
     def AddView(self,name,cls):
@@ -1053,6 +1101,7 @@ class CalendarViewRegistry:
 viewRegistry = CalendarViewRegistry()
 
 
+# ================================================================================
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
     def run(self, edit, toShow="Default"):
         pos = None
@@ -1072,6 +1121,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         log.info("Custom view refreshed")
 
 
+# ================================================================================
 # TODO: This is a work in progress that only lists them right now.
 #       The goal is add parameters for filtered todos and support
 #       multiple calendar views in the end. I should probably
@@ -1098,6 +1148,7 @@ class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
         self.keys = list(self.views.keys())
         self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
 
+# ================================================================================
 # Change the TODO status of the node.
 class OrgAgendaChangeTodoCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -1105,21 +1156,25 @@ class OrgAgendaChangeTodoCommand(sublime_plugin.TextCommand):
         self.ed.Run()
 
 
+# ================================================================================
 class OrgAgendaChangePriorityCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.ed = RunEditingCommandOnNode(self.view, "org_priority_change")
         self.ed.Run()
 
+# ================================================================================
 class OrgAgendaClockInCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.ed = RunEditingCommandOnNode(self.view,"org_clock_in")
         self.ed.Run()
 
+# ================================================================================
 class OrgAgendaClockOutCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.ed = RunEditingCommandOnNode(self.view,"org_clock_out")
         self.ed.Run()
 
+# ================================================================================
 # Goto the file but in a split (SPACE)
 class OrgAgendaGoToSplitCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -1136,12 +1191,14 @@ class OrgAgendaGoToSplitCommand(sublime_plugin.TextCommand):
             else:
                 log.warning("COULD NOT LOCATE AGENDA ROW")
 
+# ================================================================================
 class OrgTagFilteredTodoViewInternalCommand(sublime_plugin.TextCommand):
     def run(self,edit,tags):
         # TODO: add filtering to this and name it nicely
         todo = TodoView(TODO_VIEW + " Filtered By: " + tags,tagfilter=tags)
         todo.DoRenderView(edit)
 
+# ================================================================================
 class OrgTagFilteredTodoViewCommand(sublime_plugin.TextCommand):
     def run(self,edit):
         self.view.window().show_input_panel(
@@ -1154,6 +1211,7 @@ class OrgTagFilteredTodoViewCommand(sublime_plugin.TextCommand):
             return
         self.view.run_command('org_tag_filtered_todo_view_internal', {"tags": tags})
 
+# ================================================================================
 class OrgAgendaGotoNextDayCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         agenda = FindMappedView(self.view)
@@ -1163,6 +1221,7 @@ class OrgAgendaGotoNextDayCommand(sublime_plugin.TextCommand):
         agenda.Clear(edit)
         agenda.DoRenderView(edit)
 
+# ================================================================================
 class OrgAgendaGotoPrevDayCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         agenda = FindMappedView(self.view)
