@@ -65,6 +65,41 @@
     { "keys": ["ctrl+enter"],        "command": "org_generic_insert",              "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
     { "keys": ["ctrl+shift+enter"],  "command": "org_generic_insert_aux",          "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
 
+    // Normal non vim style bindings
+    { "keys": ["alt+o","c"],         "command": "org_capture",                  },
+    { "keys": ["alt+o","a", "d"],    "command": "org_agenda_day_view",          },
+
+    { "keys": ["alt+o", "t"],        "command": "org_toggle",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "R"],        "command": "org_refile",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "p"],            "command": "org_priority_change",           "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "right"],        "command": "org_change_indent",             "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "left"],         "command": "org_change_de_indent",          "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "up"],           "command": "org_move_heading_up",           "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "down"],         "command": "org_move_heading_down",         "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "h"],       "command": "org_insert_heading_sibling",    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "c"],       "command": "org_insert_heading_child",      "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "d", "i"],  "command": "org_insert_date_inactive",      "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "d", "a"],  "command": "org_insert_date_active",        "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "t"],       "command": "org_insert_tag",                "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "i"],       "command": "org_insert_custom_id",          "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "i", "s"],       "command": "org_schedule",                  "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "c", "i"],       "command": "org_clock_in",                  "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "c", "o"],       "command": "org_clock_out",                 "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "c", "c"],       "command": "org_recalc",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "c", "s"],       "command": "org_insert_checkbox_summary",   "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    // ORG AGENDA
+    { "keys": ["alt+o", "o", "a"],       "command": "org_agenda_custom_view",        "context": []  },
+    { "keys": ["enter"],             "command": "org_agenda_go_to",                  "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [" "],                 "command": "org_agenda_go_to_split",            "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["g"],                 "command": "org_agenda_day_view",               "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [","],                 "command": "org_agenda_change_priority",        "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["t"],                 "command": "org_agenda_change_todo",            "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["c","i"],             "command": "org_agenda_clock_in",               "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["c","o"],             "command": "org_agenda_clock_out",              "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": [">"],                 "command": "org_agenda_goto_next_day",          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["<"],                 "command": "org_agenda_goto_prev_day",          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+
+
 	// NeoVintageous - Command / Normal Mode - Quick commands
     // GLOBAL BINDINGS
     { "keys": ["Z"],                 "command": "org_capture",                   "context": [{"key": "vi_command_mode_aware"}]                                                      },
