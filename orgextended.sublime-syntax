@@ -465,6 +465,20 @@ contexts:
             1: orgmode.fence.sourceblock
           pop: true
         - include: scope:source.js
+    - match: '{{beginsrc}}(java\s*)'
+      captures:
+        1: orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      push:
+        - meta_scope: orgmode.raw.block
+        - meta_content_scope: source.java
+        - match: '{{endsrc}}'
+          captures:
+            1: orgmode.fence.sourceblock
+          pop: true
+        - include: scope:source.java
     - match: '{{beginsrc}}(php\s*)'
       captures:
         1: orgmode.fence.sourceblock
