@@ -64,6 +64,7 @@ def extract_link(view):
 
 
 DEFAULT_LINK_RESOLVERS = [
+    'internal',
     'http',
     'https',
     'prompt',

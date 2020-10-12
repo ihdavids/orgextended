@@ -5,9 +5,10 @@ from fnmatch import fnmatch
 import sublime
 from .abstract import AbstractLinkResolver
 import OrgExtended.orgdb as db
+from OrgExtended.orgutil.util import *
 
 PATTERN_SETTING = 'resolver.local_file.pattern'
-PATTERN_DEFAULT = r'^(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+)))?\s*$'
+PATTERN_DEFAULT = r'^(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+))|(::\*(?P<heading>[a-zA-Z0-9!$@%&_-]+)))?\s*$'
 
 FORCE_LOAD_SETTING = 'resolver.local_file.force_into_sublime'
 FORCE_LOAD_DEFAULT = ['*.txt', '*.org', '*.py', '*.rb',
@@ -22,6 +23,7 @@ class Resolver(AbstractLinkResolver):
 
     def __init__(self, view):
         super(Resolver, self).__init__(view)
+        self.view = view
         get = self.settings.get
         pattern = get(PATTERN_SETTING, PATTERN_DEFAULT)
         self.regex = re.compile(pattern)
@@ -57,11 +59,12 @@ class Resolver(AbstractLinkResolver):
 
         match = self.regex.match(filepath)
         if match:
-            filepath, row, col, cid = match.group('filepath'), match.group('row'), match.group('col'), match.group('cid')
+            filepath, row, col, cid, heading = match.group('filepath'), match.group('row'), match.group('col'), match.group('cid'), match.group('heading')
         else:
             row = None
             col = None
             cid = None
+            heading = None
 
         # The presence of a custom ID means we jump
         # using a different means
@@ -69,6 +72,16 @@ class Resolver(AbstractLinkResolver):
             print("Found ID trying to jump to: " + cid)
             db.Get().JumpToCustomId(cid)
             return True
+        if(heading):
+            print("Found Heading trying to jump to: " + heading)
+            fpath = self.view.RelativeTo(filepath).lower()
+            fi = db.Get().FindInfo(fpath)
+            if(fi):
+                for n in fi.org:
+                    if not n.is_root() and n.heading == heading:
+                        row = n.start_row + 1
+                        col = 0
+                        break
         drive, filepath = os.path.splitdrive(filepath)
         if not filepath.startswith('/'):  # If filepath is relative...
             cwd = os.path.dirname(self.view.file_name())
@@ -77,7 +90,6 @@ class Resolver(AbstractLinkResolver):
                 filepath = testfile
 
         filepath = ''.join([drive, filepath]) if drive else filepath
-        print('filepath: ' + filepath)
         if not self.file_is_excluded(filepath):
             if row:
                 filepath += ':%s' % row

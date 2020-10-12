@@ -1,4 +1,7 @@
-* TODO Things I want [9/40]
+* TODO Things I want [9/41]
+	- [ ] Named Objects [0%]
+		- [ ] Works with babel
+		- [ ] Identifies tables and other things
 	- [-] Capture [33%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
@@ -52,7 +55,7 @@
 		- [x] Property insertion
 		- [x] Fix Tag Insertion (tooltip is broken for some reason)
 		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
-	- [-] Links [7/16]
+	- [-] Links [7/17]
 		- [x] Orgmode style links
 		- [x] images displayed inline
 		- [ ] #+ATTR_ORG: :width 100 supported for images
@@ -63,6 +66,7 @@
 		- [ ] Links in templates.
 		- [x] Ensure file: works (currently doesn't work that well)
 		- [ ] <<TAG>> works for links
+		- [ ] Named objects work
 		- [ ] Ensure line number
 		- [ ] search links
 		- [ ] regex links works for links

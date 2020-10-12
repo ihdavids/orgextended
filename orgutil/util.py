@@ -110,6 +110,16 @@ def Erase(view, reg, onDone=None):
 def InsertEnd(view, text, onDone=None): 
     view.run_command("org_internal_insert", {"location": view.size(), "text": text, "onDone": onDone})
 
+@add_method(sublime.View)
+def RelativeTo(view, filepath):
+    fp = filepath.strip()
+    # We can't handle absolute paths at the moment
+    if(len(fp) > 2 and fp[0] == '/' or fp[1] == ':'):
+        return fp
+    return os.path.normpath(os.path.join(os.path.dirname(view.file_name()), fp))
+
 @add_method(sublime.Region)
 def IncEnd(reg): 
     return sublime.Region(reg.begin(), reg.end() + 1)
+
+

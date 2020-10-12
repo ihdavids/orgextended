@@ -15,6 +15,8 @@ import OrgExtended.pymitter as evt
 import datetime
 
 
+RE_TARGETS = re.compile(r'<<(?P<target>[^>]+)>>')
+
 class OffsetIter:
     def __init__(self, lines):
         self._lines = lines
@@ -934,6 +936,7 @@ class OrgBaseNode(Sequence):
         self._lines = lines
         self._start = start
         self._end   = end
+        self._names = {}
         self._parse_comments()
         return self
 
@@ -942,10 +945,20 @@ class OrgBaseNode(Sequence):
 
     def _parse_comments(self):
         special_comments = {}
+        idx = -1
         for line in self._lines:
+            idx += 1
             parsed = parse_comment(line)
             if parsed:
                 (key, val) = parsed
+                if(key == 'NAME' or key == 'name'):
+                    # IAN TODO: Latch position, identify duplicates
+                    #           and somehow mark the next object as being named this.
+                    # Named objects are very important
+                    self._names[val] = { 
+                    'row': idx + self._start, 
+                    'offset': idx 
+                    } 
                 special_comments.setdefault(key, []).append(val)
         self._special_comments = special_comments
         # parse TODO keys and store in OrgEnv
@@ -1163,6 +1176,7 @@ class OrgNode(OrgBaseNode):
         gen = self._iparse_clock(gen, ilines)
         gen = self._iparse_properties(gen, ilines)
         gen = self._iparse_drawers(gen, ilines)
+        gen = self._iparse_targets(gen, ilines)
         gen = self._iparse_blocks(gen, ilines)
         gen = self._iparse_repeated_tasks(gen, ilines)
         gen = self._iparse_timestamps(gen, ilines)
@@ -1321,6 +1335,19 @@ class OrgNode(OrgBaseNode):
             else:
                 yield line
         for line in ilines:
+            yield line
+
+    def _iparse_targets(self, ilines, at):
+        global RE_TARGETS
+        if(not hasattr(self.env,'_targets')):
+            self.env._targets = {}
+        for line in ilines:
+            m = RE_TARGETS.search(line)
+            if(m):
+                name = m.group('target')
+                row  = self._start + at.offset
+                col  = m.span('target')
+                self.env._targets[name] = {'row': row, 'col': col}
             yield line
 
     def _iparse_repeated_tasks(self, ilines, at):
