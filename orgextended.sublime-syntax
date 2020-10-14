@@ -298,6 +298,13 @@ contexts:
       scope: orgmode.verbatim
 
 
+    - match: '<<'
+      scope: orgmode.target.bracket
+      push:
+        - meta_scope: orgmode.target
+        - match: '>>'
+          scope: orgmode.target.bracket
+          pop: true
 
     - match: '(\s*\#\+(BEGIN_CENTER|begin_center)\s*)'
       captures:

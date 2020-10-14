@@ -16,6 +16,7 @@ import datetime
 
 
 RE_TARGETS = re.compile(r'<<(?P<target>[^>]+)>>')
+RE_COMMENT = re.compile(r'^\s*[#][+](?P<name>[A-Za-z][A-Za-z0-9_]+)[:]\s+(?P<val>.*)$')
 
 class OffsetIter:
     def __init__(self, lines):
@@ -182,7 +183,6 @@ def parse_property(line):
 
 RE_PROP = re.compile(r'^\s*:(.*?):\s*(.*?)\s*$')
 
-
 def parse_comment(line):
     """
     Parse special comment such as ``#+SEQ_TODO``
@@ -192,10 +192,15 @@ def parse_comment(line):
     >>> parse_comment('# not a special comment')  # None
 
     """
-    if line.startswith('#+'):
-        comment = line.lstrip('#+').split(':', 1)
-        if len(comment) == 2:
-            return (comment[0], comment[1].strip())
+    m = RE_COMMENT.match(line)
+    if(m):
+        name = m.group('name')
+        val  = m.group('val').strip()
+        return (name,val)
+    #if line.startswith('#+'):
+    #    comment = line.lstrip('#+').split(':', 1)
+    #    if len(comment) == 2:
+    #        return (comment[0], comment[1].strip())
 
 
 def parse_seq_todo(line):
@@ -240,9 +245,19 @@ class OrgEnv(object):
         self._todo_not_specified_in_comment = True
         self._filename = filename
         self._nodes = []
+        self._targets = {}
+        self._names = {}
         self.properties = []
         self.customids = {}
 
+    @property
+    def targets(self):
+        return self._targets
+
+    @property
+    def names(self):
+        return self._names
+    
     @property
     def nodes(self):
         """
@@ -404,6 +419,14 @@ class OrgBaseNode(Sequence):
         comment = " ".join(defaultVal)
         val = self.get_comment("STARTUP",[comment])[0].split(" ")
         return val
+
+    @property
+    def targets(self):
+        return self.env._targets
+
+    @property
+    def names(self):
+        return self.env._names
 
     def archive(self, defaultVal):
         dval = defaultVal
@@ -936,7 +959,6 @@ class OrgBaseNode(Sequence):
         self._lines = lines
         self._start = start
         self._end   = end
-        self._names = {}
         self._parse_comments()
         return self
 
@@ -952,10 +974,7 @@ class OrgBaseNode(Sequence):
             if parsed:
                 (key, val) = parsed
                 if(key == 'NAME' or key == 'name'):
-                    # IAN TODO: Latch position, identify duplicates
-                    #           and somehow mark the next object as being named this.
-                    # Named objects are very important
-                    self._names[val] = { 
+                    self.env._names[val] = { 
                     'row': idx + self._start, 
                     'offset': idx 
                     } 
@@ -1347,7 +1366,7 @@ class OrgNode(OrgBaseNode):
                 name = m.group('target')
                 row  = self._start + at.offset
                 col  = m.span('target')
-                self.env._targets[name] = {'row': row, 'col': col}
+                self.env._targets[name] = {'row': row, 'col': col[0] + 1}
             yield line
 
     def _iparse_repeated_tasks(self, ilines, at):

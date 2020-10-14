@@ -108,6 +108,18 @@
 			"foreground": "var(bgcol)",
 			"font_style": "italic",
 		},
+		// Links can target these
+		{
+			"scope": "orgmode.target",
+			"foreground": "#7c004a",
+			"font_style": "italic",
+		},
+		// Links can target these
+		{
+			"scope": "orgmode.target.bracket",
+			"foreground": "#7c004a",
+			"font_style": "bold",
+		},
 		// Maybe I can use regions to collapse these?
 		// Right now they look uber ugly
 		{

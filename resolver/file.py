@@ -8,7 +8,7 @@ import OrgExtended.orgdb as db
 from OrgExtended.orgutil.util import *
 
 PATTERN_SETTING = 'resolver.local_file.pattern'
-PATTERN_DEFAULT = r'^(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+))|(::\*(?P<heading>[a-zA-Z0-9!$@%&_-]+)))?\s*$'
+PATTERN_DEFAULT = r'^(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+))|(::\*(?P<heading>[a-zA-Z0-9!$@%&_-]+))|(::(?P<textmatch>[a-zA-Z0-9!$@%&_-]+)))?\s*$'
 
 FORCE_LOAD_SETTING = 'resolver.local_file.force_into_sublime'
 FORCE_LOAD_DEFAULT = ['*.txt', '*.org', '*.py', '*.rb',
@@ -16,10 +16,61 @@ FORCE_LOAD_DEFAULT = ['*.txt', '*.org', '*.py', '*.rb',
 
 
 class Resolver(AbstractLinkResolver):
-
     '''
     @todo: If the link is a local org-file open it directly via sublime, otherwise use OPEN_LINK_COMMAND.
     '''
+    def tryMatchHeading(self, filepath, heading):
+        fpath = self.view.RelativeTo(filepath).lower()
+        fi = db.Get().FindInfo(fpath)
+        row = None
+        col = None
+        if(fi):
+            for n in fi.org:
+                if not n.is_root() and n.heading == heading:
+                    row = n.start_row + 1
+                    col = 0
+                    break
+                    if row:
+                        filepath += ':%s' % row
+                    if col:
+                        filepath += ':%s' % col
+                    self.view.window().open_file(filepath, sublime.ENCODED_POSITION)
+                    return True
+        return None
+
+    def tryMatchDirectTarget(self, filepath, val):
+        fpath = self.view.RelativeTo(filepath).lower()
+        fi = db.Get().FindInfo(fpath)
+        if(fi):
+            if(fi.org.targets):
+                if(val in fi.org.targets):
+                    tgt = fi.org.targets[val]
+                    row = tgt['row'] + 1
+                    col = tgt['col']
+                    if row:
+                        filepath += ':{0}'.format(row)
+                    if col:
+                        filepath += ':{0}'.format(col)
+                    self.view.window().open_file(filepath, sublime.ENCODED_POSITION)
+                    return True
+        return None
+
+    def tryMatchNamedObject(self, filepath, val):
+        fpath = self.view.RelativeTo(filepath).lower()
+        fi = db.Get().FindInfo(fpath)
+        if(fi):
+            if(fi.org.names):
+                if(val in fi.org.names):
+                    tgt = fi.org.names[val]
+                    row = tgt['row'] + 1
+                    col = 0
+                    if row:
+                        filepath += ':{0}'.format(row)
+                    if col:
+                        filepath += ':{0}'.format(col)
+                    self.view.window().open_file(filepath, sublime.ENCODED_POSITION)
+                    return True
+        return None
 
     def __init__(self, view):
         super(Resolver, self).__init__(view)
@@ -59,12 +110,13 @@ class Resolver(AbstractLinkResolver):
 
         match = self.regex.match(filepath)
         if match:
-            filepath, row, col, cid, heading = match.group('filepath'), match.group('row'), match.group('col'), match.group('cid'), match.group('heading')
+            filepath, row, col, cid, heading, textmatch = match.group('filepath'), match.group('row'), match.group('col'), match.group('cid'), match.group('heading'), match.group('textmatch')
         else:
             row = None
             col = None
             cid = None
             heading = None
+            textmatch = None
 
         # The presence of a custom ID means we jump
         # using a different means
@@ -82,6 +134,17 @@ class Resolver(AbstractLinkResolver):
                         row = n.start_row + 1
                         col = 0
                         break
+        if(textmatch):
+            print("Found Textmatch trying to jump to: " + textmatch)
+            fpath = self.view.RelativeTo(filepath).lower()
+            if(self.tryMatchDirectTarget(fpath, textmatch)):
+                return True
+            if(self.tryMatchNamedObject(fpath, textmatch)):
+                return True
+            if(self.tryMatchHeading(fpath, textmatch)):
+                return True
+
+        print("NO TEXT MATCH")
         drive, filepath = os.path.splitdrive(filepath)
         if not filepath.startswith('/'):  # If filepath is relative...
             cwd = os.path.dirname(self.view.file_name())
@@ -100,7 +163,7 @@ class Resolver(AbstractLinkResolver):
         else:
             print('file_is_excluded: ' + filepath)
 
-        return filepath
+        return None
 
     def replace(self, content):
         content = self.expand_path(content)
