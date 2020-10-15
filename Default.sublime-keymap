@@ -87,6 +87,7 @@
     { "keys": ["alt+o", "c", "o"],       "command": "org_clock_out",                 "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["alt+o", "c", "c"],       "command": "org_recalc",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["alt+o", "c", "s"],       "command": "org_insert_checkbox_summary",   "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": ["alt+o", "y", "l"],       "command": "org_create_link",               "context": []},
     // ORG AGENDA
     { "keys": ["alt+o", "o", "a"],       "command": "org_agenda_custom_view",        "context": []  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",                  "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
@@ -104,6 +105,7 @@
     // GLOBAL BINDINGS
     { "keys": ["Z"],                 "command": "org_capture",                   "context": [{"key": "vi_command_mode_aware"}]                                                      },
     { "keys": ["shift+space"],       "command": "org_agenda_day_view",           "context": [{"key": "vi_command_mode_aware"}]                                                      },
+    { "keys": [" ", "y", "l"],       "command": "org_create_link",               "context": [{"key": "vi_command_mode_aware"}]},
     // Personal Doom/Spacemacs style keybindings. Really should be in their own package.
     // I will move at some future point.
     // Spacemacs style group switching. I prefer this, feel free to remove.

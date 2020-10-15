@@ -73,6 +73,7 @@
     {"caption": "OrgClosed",              "command": "org_insert_closed"           },
     {"caption": "OrgInsertCustomId",      "command": "org_insert_custom_id"        },
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
+    {"caption": "OrgCreateLink",          "command": "org_create_link"             },
 
     // Agenda
     {"caption": "OrgAgendaGoto",          "command": "org_agenda_go_to"            },

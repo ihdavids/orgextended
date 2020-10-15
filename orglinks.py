@@ -9,6 +9,7 @@ from .orgparse.__init__ import *
 import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
+from OrgExtended.orgutil.util import *
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
 import logging
@@ -146,6 +147,51 @@ class OrgOpenLinkCommand(sublime_plugin.TextCommand):
                 sublime.error_message('Could not resolve link:\n%s' % content)
                 continue
             resolver.execute(content)
+
+RE_TARGET = re.compile(r'<<(?P<target>[^>]+)>>')
+RE_NAMED = re.compile(r'[#][+]NAME[:]\s*(?P<target>.+)')
+class OrgCreateLinkCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        fn = self.view.file_name()
+        # Org Files have a LOT more potential for making links!
+        if(util.isPotentialOrgFile(fn)):
+            print("org file")
+            r = self.view.curRow()
+            line = self.view.getLine(r)
+            linet = RE_TARGET.match(line)
+            namet = RE_NAMED.match(line)
+            link = None
+            # have target on this line?
+            if(linet):
+                link = "[[file:{0}::{1}][{1}]]".format(self.view.file_name(),linet.group('target'))
+            # have named object on this line?
+            if(link == None and namet):
+                link = "[[file:{0}::{1}][{1}]]".format(self.view.file_name(),namet.group('target'))
+            n = db.Get().AtInView(self.view)
+            if(link == None and n and not n.is_root()):
+                # Have custom id?
+                p = n.get_property("CUSTOM_ID")
+                if(p):
+                    link = "[[file:{0}::#{1}][{2}]]".format(self.view.file_name(),p,n.heading)
+                # Am near a heading?
+                else:
+                    link = "[[file:{0}::*{1}][{1}]]".format(self.view.file_name(),n.heading)
+            if(link == None):
+                r,c = self.view.curRowCol()
+                link = "[[file:{0}::{1},{2}][{3}]]".format(self.view.file_name(),r,c,os.path.basename(self.view.file_name()))
+            # okay then just use row,col
+            if(link != None):
+                print("set clipboard to: " + link)
+                sublime.set_clipboard(link)
+            else:
+                print("Failed to get link")
+        else:
+            # Other file types only have line and column
+            r,c = self.view.curRowCol()
+            sublime.set_clipboard("[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn)))
+
+
+
 
 # global magic
 VIEWS_WITH_IMAGES = set()
