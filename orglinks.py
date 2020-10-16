@@ -35,6 +35,7 @@ from operator import itemgetter
 import base64
 import urllib.request
 import yaml
+import OrgExtended.orgneovi as nvi
 
 try:
     import importlib
@@ -183,12 +184,16 @@ class OrgCreateLinkCommand(sublime_plugin.TextCommand):
             if(link != None):
                 print("set clipboard to: " + link)
                 sublime.set_clipboard(link)
+                nvi.TestAndSetClip(self.view, link)
+                print(sublime.get_clipboard())
             else:
                 print("Failed to get link")
         else:
             # Other file types only have line and column
             r,c = self.view.curRowCol()
-            sublime.set_clipboard("[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn)))
+            link = "[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn))
+            sublime.set_clipboard(link)
+            nvi.TestAndSetClip(self.view, link)
 
 
 
