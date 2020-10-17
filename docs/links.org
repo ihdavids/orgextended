@@ -1,5 +1,7 @@
 * Links
 
+  <<ThisIsATarget>>
+
   Links in org mode are a nested set of square brackets
 
   [[file:links.gif]]
@@ -15,6 +17,32 @@
   is fairly extensible. Custom handlers can be built to allow you to link easily to 
   your own services.
 
+  There are several special ways of locating within a file within a reference.
+
+  #+BEGIN_EXAMPLE
+  [[<PROTOCOL>:<FILENAME>::<LOCATOR>][<NAME>]]
+  #+END_EXAMPLE
+
+  To manually specify locators using special symbols: 
+  - Custom Id :: #<IDNAME>
+  - Header :: *<HEADING TEXT>
+  - Row Col :: Row::Col
+
+  If your locator is only text and non numerical there is an order to how the text is matched:
+
+  - Target
+  - Custom Id
+  - Header
+
+* Targets
+  Targets are like anchors in an html file.
+  A target is specified using double angle brackets.
+
+  #+BEGIN_EXAMPLE
+    <<TEXT>>
+  #+END_EXAMPLE
+
+  [[file:./links.org::ThisIsATarget][Linking to a Target]]
 
 * Images
   Org supports the ability to show images inline in the document
@@ -45,7 +73,12 @@
   #+END_EXAMPLE
 
   [[file:./links.org::3][File and Line Number Example]]
+ 
+* Linking to Headings
   
+  You can link to a heading using a star.
+  [[file:./links.org::*Images][Images Example]]
+
 * Custom Ids
   :PROPERTIES:
   :CUSTOM_ID: a-custom-id
