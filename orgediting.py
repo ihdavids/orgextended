@@ -22,6 +22,7 @@ import OrgExtended.pymitter as evt
 import OrgExtended.orgproperties as props
 import OrgExtended.orgdatepicker as datep
 import OrgExtended.orginsertselected as insSel
+import OrgExtended.orglinks as orglink
 
 defaultPriorities = ["A","B","C","D","E"]
 
@@ -441,7 +442,9 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(self.oldsel)
 
-    def run(self, edit):
+    def run(self, edit, dateval=None):
+        if(type(dateval) == str):
+            dateval = orgdate.OrgDateFreeFloating.from_str(dateval)
         # TODO: Find scheduled and replace it as well.
         node = db.Get().AtInView(self.view)
         if(not node.is_root()):
@@ -460,7 +463,10 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
             l = self.view.line(pt)
             self.view.sel().clear()
             self.view.sel().add(l.end())
-            datep.Pick(evt.Make(self.insert))
+            if(dateval == None):
+                datep.Pick(evt.Make(self.insert))
+            else:
+                self.insert(dateval)
 
 
 class OrgInsertClosedCommand(sublime_plugin.TextCommand):
@@ -536,3 +542,105 @@ class OrgSetTodayCommand(sublime_plugin.TextCommand):
         node = db.Get().AtInView(self.view)
         if(node and not node.is_root()):
             props.UpdateProperty(self.view,node,"CUSTOM_ID",idValue,self.onDone)
+
+
+def get_view_for_silent_edit_file(file):
+    # First check all sheets for this file.
+    window = sublime.active_window()
+    view = window.find_open_file(file.filename)
+    if(view):
+        return view
+    # Okay the file is not opened, we have to open it
+    # but we don't want it having focus
+    # So keep the old view so we can refocus just to
+    # be sure.
+    currentView = window.active_view()
+    view = window.open_file(file.filename, sublime.ENCODED_POSITION)
+    window.focus_view(currentView)
+    return view
+
+# ================================================================================
+class RunEditingCommandOnToday:
+    def __init__(self, view, command, cmds = {}):
+        self.view    = view
+        self.command = command
+        self.cmds    = cmds
+
+    def onSaved(self):
+        #self.view.run_command("org_agenda_day_view")
+        pass
+
+    def onEdited(self):
+        # NOTE the save here doesn't seem to be working
+        # Not sure why. BUT...
+        view = self.savedView
+        view.run_command("save")
+        sublime.set_timeout_async(lambda: self.onSaved(), 100)
+
+    def onLoaded(self):
+        view = self.savedView
+        self.n.move_cursor_to(view)
+        eventName = util.RandomString()
+        evt.Get().once(eventName, self.onEdited)
+        log.debug("Trying to run: " + self.command)
+        cmds = self.cmds
+        cmds["onDone"] = eventName
+        view.run_command(self.command, cmds)
+
+    def Run(self):
+        idValue = "TODAY"
+        file, at = db.Get().FindByCustomId(idValue)
+        if(file != None and at != None):
+            node = file.At(at)
+            if(node):
+                self.n         = node
+                self.f         = file
+                self.savedView = get_view_for_silent_edit_file(file)
+                # Give time for the document to be opened.
+                sublime.set_timeout_async(lambda: self.onLoaded(), 200)
+                return
+            else:
+                log.warning("COULD NOT LOCATE TODAY")
+        else:
+            log.warning("Could not locate today")
+
+# Append text to a node
+class OrgAppendTextCommand(sublime_plugin.TextCommand):
+    def run(self, edit, text="", onDone=None):
+        curNode = db.Get().AtInView(self.view)
+        if(not curNode):
+            file = db.Get().FindInfo(self.view)
+            if(len(file.org) > 0):
+                curNode = file.org[len(file.org) - 1]
+        if(not curNode):
+            level = 1
+            l = self.view.line(self.view.size())
+            reg = sublime.Region(l.start(),l.start())
+            reg  = here
+        else:
+            level = curNode.level
+            reg = curNode.region(self.view)
+            if(level == 0):
+                level = 1
+                here = sublime.Region(view.size(),view.size())
+            else:
+                here = sublime.Region(reg.end(),reg.end())
+        self.view.sel().clear()
+        self.view.sel().add(reg.end())
+        #self.view.show(here)
+        self.view.insert(edit,self.view.sel()[0].begin(),'\n' + text)
+        evt.EmitIf(onDone)
+
+class OrgLinkToTodayCommand(sublime_plugin.TextCommand):
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        # Schedule this item so it is in the agenda
+        self.view.run_command("org_schedule", {"dateval": str(datetime.datetime.now())})
+        # Create a link to the current location so we can insert it in our today item
+        link = orglink.CreateLink(self.view)
+        # Should we add a heading to this?
+        self.ed = RunEditingCommandOnToday(self.view, "org_append_text", {'text': link})
+        self.ed.Run()
+        evt.EmitIf(onDone)
+
+

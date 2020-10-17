@@ -69,11 +69,11 @@
     {"caption": "OrgJumpToCustomId",      "command": "org_jump_to_custom_id"       },
     {"caption": "OrgJumpToToday",         "command": "org_jump_to_today"           },
     {"caption": "OrgInsertTag",           "command": "org_insert_tag"              },
-    {"caption": "OrgSchedule",            "command": "org_schedule"                },
     {"caption": "OrgClosed",              "command": "org_insert_closed"           },
     {"caption": "OrgInsertCustomId",      "command": "org_insert_custom_id"        },
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
     {"caption": "OrgCreateLink",          "command": "org_create_link"             },
+    {"caption": "OrgLinkToToday",         "command": "org_link_to_today"           },
 
     // Agenda
     {"caption": "OrgAgendaGoto",          "command": "org_agenda_go_to"            },

@@ -117,6 +117,43 @@ def find_image_file(view, url):
         if(os.path.isfile(filename)):
             return filename
 
+RE_TARGET = re.compile(r'<<(?P<target>[^>]+)>>')
+RE_NAMED = re.compile(r'[#][+]NAME[:]\s*(?P<target>.+)')
+def CreateLink(view):
+    fn = view.file_name()
+    # Org Files have a LOT more potential for making links!
+    if(util.isPotentialOrgFile(fn)):
+        r = view.curRow()
+        line = view.getLine(r)
+        linet = RE_TARGET.match(line)
+        namet = RE_NAMED.match(line)
+        link = None
+        # have target on this line?
+        if(linet):
+           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(),linet.group('target'))
+        # have named object on this line?
+        if(link == None and namet):
+           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(),namet.group('target'))
+        n = db.Get().AtInView(view)
+        if(link == None and n and not n.is_root()):
+            # Have custom id?
+            p = n.get_property("CUSTOM_ID")
+            if(p):
+               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(),p,n.heading)
+            # Am near a heading?
+            else:
+               link = "[[file:{0}::*{1}][{1}]]".format(view.file_name(),n.heading)
+        # okay then just use row,col
+        if(link == None):
+            r,c = view.curRowCol()
+            link = "[[file:{0}::{1},{2}][{3}]]".format(view.file_name(),r,c,os.path.basename(view.file_name()))
+        return link
+    else:
+        # Other file types only have line and column
+        r,c = view.curRowCol()
+        link = "[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn))
+        return link
+
 class OrgOpenLinkCommand(sublime_plugin.TextCommand):
     def resolve(self, content):
         for resolver in self.resolvers:
@@ -149,52 +186,11 @@ class OrgOpenLinkCommand(sublime_plugin.TextCommand):
                 continue
             resolver.execute(content)
 
-RE_TARGET = re.compile(r'<<(?P<target>[^>]+)>>')
-RE_NAMED = re.compile(r'[#][+]NAME[:]\s*(?P<target>.+)')
 class OrgCreateLinkCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        fn = self.view.file_name()
-        # Org Files have a LOT more potential for making links!
-        if(util.isPotentialOrgFile(fn)):
-            print("org file")
-            r = self.view.curRow()
-            line = self.view.getLine(r)
-            linet = RE_TARGET.match(line)
-            namet = RE_NAMED.match(line)
-            link = None
-            # have target on this line?
-            if(linet):
-                link = "[[file:{0}::{1}][{1}]]".format(self.view.file_name(),linet.group('target'))
-            # have named object on this line?
-            if(link == None and namet):
-                link = "[[file:{0}::{1}][{1}]]".format(self.view.file_name(),namet.group('target'))
-            n = db.Get().AtInView(self.view)
-            if(link == None and n and not n.is_root()):
-                # Have custom id?
-                p = n.get_property("CUSTOM_ID")
-                if(p):
-                    link = "[[file:{0}::#{1}][{2}]]".format(self.view.file_name(),p,n.heading)
-                # Am near a heading?
-                else:
-                    link = "[[file:{0}::*{1}][{1}]]".format(self.view.file_name(),n.heading)
-            if(link == None):
-                r,c = self.view.curRowCol()
-                link = "[[file:{0}::{1},{2}][{3}]]".format(self.view.file_name(),r,c,os.path.basename(self.view.file_name()))
-            # okay then just use row,col
-            if(link != None):
-                print("set clipboard to: " + link)
-                sublime.set_clipboard(link)
-                nvi.TestAndSetClip(self.view, link)
-                print(sublime.get_clipboard())
-            else:
-                print("Failed to get link")
-        else:
-            # Other file types only have line and column
-            r,c = self.view.curRowCol()
-            link = "[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn))
-            sublime.set_clipboard(link)
-            nvi.TestAndSetClip(self.view, link)
-
+        link = CreateLink(self.view)
+        sublime.set_clipboard(link)
+        nvi.TestAndSetClip(self.view, link)
 
 
 

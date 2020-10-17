@@ -222,7 +222,7 @@ class DatePicker:
 			evt.Get().emit(self.onDone, None)
 
 	def on_changed(self, text):
-		print("CHANGED: " + text)
+		#print("CHANGED: " + text)
 		self.dateView.cdate = OrgDateFreeFloating.from_str(text)
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)
