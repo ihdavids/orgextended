@@ -198,19 +198,19 @@ contexts:
         1: orgmode.table.block
       scope: orgmode.table
       # DEADLINE: <DATETIME>
-    - match: "(DEADLINE:) ({{datetime}})"
+    - match: "(DEADLINE:)\\s+({{datetime}})"
       captures:
         1: orgmode.statekeyword
         2: orgmode.datetime
       scope: orgmode.deadline
       # SCHEDULED: <DATETIME>
-    - match: "(SCHEDULED:) ({{datetime}})"
+    - match: "(SCHEDULED:)\\s+({{datetime}})"
       captures:
         1: orgmode.statekeyword
         2: orgmode.datetime
       scope: orgmode.scheduled
       # CLOSED: [DATETIME]
-    - match: "(CLOSED:) ({{unscheddatetime}})"
+    - match: "(CLOSED:)\\s+({{unscheddatetime}})"
       captures:
         1: orgmode.statekeyword
         2: orgmode.unscheddatetime

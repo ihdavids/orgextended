@@ -1,3 +1,4 @@
+
 * Links
 
   <<ThisIsATarget>>
@@ -14,7 +15,7 @@
   If the link is a web reference org will try to open a web browser.
 
   The link system I am using is based on the original orgmode for sublime text and
-  is fairly extensible. Custom handlers can be built to allow you to link easily to 
+  is fairly extensible. Custom handlers can be built to allow you to link easily to
   your own services.
 
   There are several special ways of locating within a file within a reference.
@@ -23,7 +24,7 @@
   [[<PROTOCOL>:<FILENAME>::<LOCATOR>][<NAME>]]
   #+END_EXAMPLE
 
-  To manually specify locators using special symbols: 
+  To manually specify locators using special symbols:
   - Custom Id :: #<IDNAME>
   - Header :: *<HEADING TEXT>
   - Row Col :: Row::Col
@@ -65,7 +66,7 @@
 
 * File and Line Number
 
-  A link can be more than just the filename. 
+  A link can be more than just the filename.
   You can link to a specific line number like so:
 
   #+BEGIN_EXAMPLE
@@ -73,14 +74,14 @@
   #+END_EXAMPLE
 
   [[file:./links.org::3][File and Line Number Example]]
- 
+
 * Linking to Headings
-  
+
   You can link to a heading using a star.
   #+BEGIN_EXAMPLE
-  [[file:./links.org::*Images][Images Example]] 
+  [[file:./links.org::*Images][Images Example]]
   #+END_EXAMPLE
-  [[file:./links.org::*Images][Images Example]] 
+  [[file:./links.org::*Images][Images Example]]
 
   You can link without the star but it can match other things.
   #+BEGIN_EXAMPLE
@@ -98,9 +99,9 @@
 
   #+BEGIN_EXAMPLE
   [[file:./links.org::#a-custom-id][Custom Id Example]]
-  #+END_EXAMPLE 
-  
-  [[file:./links.org::#a-custom-id][Custom Id Example]] 
+  #+END_EXAMPLE
+
+  [[file:./links.org::#a-custom-id][Custom Id Example]]
 
 * Extending Link Processing
   TODO: Describe how to do this.

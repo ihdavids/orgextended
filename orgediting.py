@@ -376,7 +376,7 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
         sublime.active_window().active_view().settings().set('auto_indent',ai)
         
 class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit, onDone=None):
         curNode = db.Get().AtInView(self.view)
         if(not curNode):
             file = db.Get().FindInfo(self.view)
@@ -403,6 +403,34 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
         self.view.settings().set('auto_indent',False)
         self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str((level+1))+".sublime-snippet"})
         sublime.active_window().active_view().settings().set('auto_indent',ai)
+        evt.EmitIf(onDone)
+
+# This will insert whatever text you provide as a child heading of the current node
+class OrgInsertTextAsChildHeadingCommand(sublime_plugin.TextCommand):
+    def run(self, edit, heading=None, onDone=None):
+        curNode = db.Get().AtInView(self.view)
+        if(not curNode):
+            file = db.Get().FindInfo(self.view)
+            if(len(file.org) > 0):
+                curNode = file.org[len(file.org) - 1]
+        if(not curNode):
+            level = 1
+            l = self.view.line(self.view.size())
+            reg = sublime.Region(l.start(),l.start())
+            reg  = here
+        else:
+            level = curNode.level
+            reg = curNode.region(self.view)
+            if(level == 0):
+                level = 1
+                here = sublime.Region(view.size(),view.size())
+            else:
+                here = sublime.Region(reg.end(),reg.end())
+        self.view.sel().clear()
+        self.view.sel().add(reg.end()+1)
+        #self.view.show(here)
+        self.view.insert(edit,self.view.sel()[0].begin(),'\n' + ('*'*(level+1)) + ' ' + heading)
+        evt.EmitIf(onDone)
         
 class OrgInsertTodayInactiveCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -567,8 +595,8 @@ class RunEditingCommandOnToday:
         self.cmds    = cmds
 
     def onSaved(self):
-        #self.view.run_command("org_agenda_day_view")
-        pass
+        db.Get().Reload(self.savedView)
+        evt.EmitIf(self.onDone)
 
     def onEdited(self):
         # NOTE the save here doesn't seem to be working
@@ -587,7 +615,8 @@ class RunEditingCommandOnToday:
         cmds["onDone"] = eventName
         view.run_command(self.command, cmds)
 
-    def Run(self):
+    def Run(self,onDone = None):
+        self.onDone = onDone
         idValue = "TODAY"
         file, at = db.Get().FindByCustomId(idValue)
         if(file != None and at != None):
@@ -626,21 +655,31 @@ class OrgAppendTextCommand(sublime_plugin.TextCommand):
             else:
                 here = sublime.Region(reg.end(),reg.end())
         self.view.sel().clear()
-        self.view.sel().add(reg.end())
+        self.view.sel().add(reg.end() + 1)
         #self.view.show(here)
-        self.view.insert(edit,self.view.sel()[0].begin(),'\n' + text)
+        self.view.insert(edit,self.view.sel()[0].begin(),'\n' + (' '*(level*2)) + text)
         evt.EmitIf(onDone)
 
 class OrgLinkToTodayCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+
+    def InsertLink(self):
+        self.ed = RunEditingCommandOnToday(self.view, "org_append_text", {'text': self.link})
+        self.ed.Run(evt.Make(self.OnDone))
+
     def run(self, edit, onDone=None):
         self.onDone = onDone
         # Schedule this item so it is in the agenda
         self.view.run_command("org_schedule", {"dateval": str(datetime.datetime.now())})
         # Create a link to the current location so we can insert it in our today item
-        link = orglink.CreateLink(self.view)
+        self.link = orglink.CreateLink(self.view)
+        curNode = db.Get().AtInView(self.view)
         # Should we add a heading to this?
-        self.ed = RunEditingCommandOnToday(self.view, "org_append_text", {'text': link})
-        self.ed.Run()
-        evt.EmitIf(onDone)
+        if(curNode and not curNode.is_root()):
+            self.ed = RunEditingCommandOnToday(self.view, "org_insert_text_as_child_heading", {'heading': curNode.heading})
+            self.ed.Run(evt.Make(self.InsertLink))
+        else:
+            self.InsertLink()
 
 
