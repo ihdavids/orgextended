@@ -36,6 +36,44 @@
    Clock reports are nothing more that a dynamic block that builds a text table showing how you have
    spent your time.
 
+** Cheater Clock - TODAY
+   Sometimes it is handier NOT to use the clock.
+   Captures can be setup to capture to the active clock, but sometimes clocking your work can be tedious.
+   Clocking is not for everyone. For that reason I have a special custom ID that I find fairly handy.
+   TODAY is an ID that has some helper methods around it.
+
+   You can:
+   - Mark a heading as "TODAY"
+   - Capture to TODAY
+   - Link another heading from Today
+
+   Following part of the GTD philosophy I find it is quite useful to 
+   build projects with lists of actions to be taken.
+
+   When keeping a worklog, the natural tendency is to write task lists in your entry for that day.
+   I have found this is less than ideal. Projets often bleed over between days, so have a project
+   in your log for that day is very inefficient as you end up juggling the task every day.
+
+   Instead I tend to do the following:
+
+   - Start a new entry in my work log each morning.
+   - I mark that entry as the TODAY entry.
+   - I then do triage. This is a process to clear my inbox.
+      - I enter any new tasks from my email.
+      - I clear out any refile captures I may have.
+      - I then go over all my projects, ensure stuck projects have a NEXT item
+      - I also *OrgLinkToToday* on tasks that I think I will accomplish that day
+        This will add a subheading in my worklog with a link to the project task.
+        It also schedules the task for today. As part of this I either remove the time or adjust it
+        to when during the day I may need to handle that task.
+      - I add any meetings I may have that day.
+
+   From then on out I can use the agenda to manage and track my day. I have a clear understanding of what it is
+   I am trying to achieve and I can quickly jump to my worklog entry for today using *OrgJumpToToday*
+
+   This is not as good as clocking in many ways, but it does help me work efficiently when I do not care about
+   clocking my efforts.
+
 ** Estimates
    TODO
 
