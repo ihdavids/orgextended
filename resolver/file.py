@@ -12,13 +12,11 @@ PATTERN_DEFAULT = r'^(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))
 
 FORCE_LOAD_SETTING = 'resolver.local_file.force_into_sublime'
 FORCE_LOAD_DEFAULT = ['*.txt', '*.org', '*.py', '*.rb',
-                      '*.html', '*.css', '*.js', '*.php', '*.c', '*.cpp', '*.h', '*.png', '*.jpg', '*.gif', '*.cs']
+                      '*.html', '*.css', '*.js', '*.php', '*.c', 
+                      '*.cpp', '*.h', '*.png', '*.jpg', '*.gif', '*.cs']
 
 
 class Resolver(AbstractLinkResolver):
-    '''
-    @todo: If the link is a local org-file open it directly via sublime, otherwise use OPEN_LINK_COMMAND.
-    '''
     def tryMatchHeading(self, filepath, heading):
         fpath = self.view.RelativeTo(filepath).lower()
         fi = db.Get().FindInfo(fpath)
@@ -99,11 +97,8 @@ class Resolver(AbstractLinkResolver):
         return False
 
     def expand_path(self, filepath):
-        #print("FP: " + filepath)
         if(filepath.startswith("file:")):
-            #print("REPLACE")
             filepath = filepath.replace("file:","", 1)
-        #print("FP2: " + filepath)
         filepath = os.path.expandvars(filepath)
         filepath = os.path.expanduser(filepath)
 
@@ -142,8 +137,7 @@ class Resolver(AbstractLinkResolver):
                 return True
             if(self.tryMatchHeading(fpath, textmatch)):
                 return True
-
-        print("NO TEXT MATCH")
+        #print("NO TEXT MATCH")
         drive, filepath = os.path.splitdrive(filepath)
         if not filepath.startswith('/'):  # If filepath is relative...
             cwd = os.path.dirname(self.view.file_name())
