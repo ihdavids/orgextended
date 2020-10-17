@@ -77,7 +77,16 @@
 * Linking to Headings
   
   You can link to a heading using a star.
-  [[file:./links.org::*Images][Images Example]]
+  #+BEGIN_EXAMPLE
+  [[file:./links.org::*Images][Images Example]] 
+  #+END_EXAMPLE
+  [[file:./links.org::*Images][Images Example]] 
+
+  You can link without the star but it can match other things.
+  #+BEGIN_EXAMPLE
+  [[file:./links.org::Images][Images Example]]
+  #+END_EXAMPLE
+  [[file:./links.org::Images][Images Example]]
 
 * Custom Ids
   :PROPERTIES:

@@ -29,7 +29,6 @@ class Resolver(AbstractLinkResolver):
                 if not n.is_root() and n.heading == heading:
                     row = n.start_row + 1
                     col = 0
-                    break
                     if row:
                         filepath += ':%s' % row
                     if col:
