@@ -96,6 +96,69 @@ def UpdateLine(view, edit):
                 cur += 1
 
 
+def AppendLine(view, edit):
+    crow = view.curRow()
+    parent = view.findParentByIndent(view.curLine())
+    prow, _ = view.rowcol(parent.begin())
+    children, erow = findChildrenByIndent(view, view.curLine())
+    cur = 1
+    curIndent = view.getIndent(view.getLine(prow+1))
+    curLen    = len(curIndent)
+    indentStack = []
+    sep = '.'
+    for r in range(prow + 1, erow+1):
+        line = view.getLine(r)
+        thisIndent = view.getIndent(line)
+        thisLen    = len(thisIndent)
+        if(thisLen > curLen):
+            indentStack.append((curIndent,curLen, cur))
+            curIndent = thisIndent
+            curLen    = thisLen
+            cur       = 1
+
+        while(thisLen < curLen and len(indentStack) > 0):
+            curIndent, curLen, cur = indentStack.pop()
+
+        if(thisLen == curLen):
+            print(line)
+            m = RE_NUMLINE.search(line)
+            if(m):
+                num = int(m.group('num'))
+                sep = m.group('sep')
+                if(num != cur):
+                    region = view.lineAt(r)
+                    view.replace(edit, region, '{0}{1}{2}{3}'.format(curIndent, cur, m.group('sep'), m.group('data')))
+                cur += 1
+            else:
+                point  = view.text_point(r, 0)
+                view.insert(edit,point,'{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' '))
+                view.sel().clear()
+                view.sel().add(point + len(curIndent) + 3)
+                UpdateLine(view,edit)
+                return
+        else:
+            point  = view.text_point(r, 0)
+            view.insert(edit,point,'{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' '))
+            view.sel().clear()
+            view.sel().add(point + len(curIndent) + 3)
+            UpdateLine(view,edit)
+            return
+    # Okay we didn't insert, have to now
+    last_row, _ = view.rowcol(view.size())
+    if(erow > last_row):
+        point  = view.text_point(last_row, 0)
+        view.insert(edit,point,'\n')
+    point  = view.text_point(erow, 0)
+    line = view.getLine(erow)
+    newLine = ''
+    if(len(line) > 0):
+        newLine = '\n'
+    view.insert(edit,point,'{0}{1}{2}{3}{4}'.format(curIndent, cur, sep, ' ', newLine))
+    view.sel().clear()
+    view.sel().add(point + len(curIndent) + 3)
+    UpdateLine(view,edit)
+
+
 # def findSiblingsByIndent(view, child, parent):
 #     row, col      = view.rowcol(parent.begin())
 #     parent_indent = view.getIndent(parent)
@@ -135,3 +198,9 @@ class OrgUpdateNumberedListCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view
         UpdateLine(view, edit)
+
+
+class OrgAppendNumberedListCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = self.view
+        AppendLine(view, edit)
