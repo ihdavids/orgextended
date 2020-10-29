@@ -19,6 +19,7 @@ import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgcapture as capture
 import OrgExtended.orgcheckbox as checkbox
+import OrgExtended.orgnumberedlist as numberedlist
 import OrgExtended.orgdynamicblock as dynamic
 import OrgExtended.orgsourceblock as src
 
@@ -109,6 +110,7 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
             self.view.run_command('org_execute_source_block')
             return
         checkbox.recalculate_all_checkbox_summaries(self.view, edit)
+        numberedlist.UpdateLine(self.view, edit)
 
 # Another Do What I Mean style command.
 # Contextually looks at where you are and "does the right thing."
@@ -133,6 +135,9 @@ class OrgGenericInsertCommand(sublime_plugin.TextCommand):
         cb = checkbox.get_checkbox(self.view, line)
         if(cb):
             self.view.run_command('org_insert_checkbox')
+            return
+        if(numberedlist.isNumberedLine(self.view)):
+            numberedlist.AppendLine(self.view, edit)
             return
         n = db.Get().AtInView(self.view)
         if(not n.is_root()):

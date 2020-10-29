@@ -35,3 +35,11 @@
 	They are very handy!
 
    [[file:orgcheckboxes.gif]]
+
+** Numbered Lists
+  Numbered lists are always a pain to author. The list tools can use the standard recal command
+  to reorder a list for you automatically.
+
+  In addition adding to a numbered list is supported by the OrgAppendNumberedList command.
+
+  [[file:numberedlist.gif]]
