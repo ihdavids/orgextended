@@ -74,6 +74,7 @@
     {"caption": "OrgSchedule",            "command": "org_schedule"                },
     {"caption": "OrgCreateLink",          "command": "org_create_link"             },
     {"caption": "OrgLinkToToday",         "command": "org_link_to_today"           },
+    {"caption": "OrgUpdateNumberedList",  "command": "org_update_numbered_list"    },
 
     // Agenda
     {"caption": "OrgAgendaGoto",          "command": "org_agenda_go_to"            },

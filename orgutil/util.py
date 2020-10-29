@@ -5,6 +5,7 @@ import base64
 import urllib.request
 import OrgExtended.asettings as sets 
 import uuid
+import re
 
 from OrgExtended.orgutil.addmethod import *
 
@@ -54,6 +55,11 @@ def curLine(self):
     return self.line(pt)
 
 @add_method(sublime.View)
+def lineAt(self,row):
+    pt = self.text_point(row, 0)
+    return self.line(pt)
+
+@add_method(sublime.View)
 def endRow(self):
     return self.rowcol(self.size())[0]
 
@@ -75,6 +81,20 @@ def getSourceScope(view):
             return scope
     return None
 
+RE_INDENT  = re.compile(r'^(\s*).*$')
+# RETURNS: a string with the indent of this line.
+@add_method(sublime.View)
+def getIndent(view, regionOrLine):
+    content = regionOrLine
+    if isinstance(regionOrLine, sublime.Region):
+        content = view.substr(regionOrLine)
+    match = RE_INDENT.match(content)
+    if(match):
+        return match.group(1)
+    else:
+        log.debug("Could not match indent: " + content)
+        return ""
+
 # Extract a line of text at row
 # from the buffer
 @add_method(sublime.View)
@@ -82,6 +102,37 @@ def getLine(view, row):
     pt = view.text_point(row, 0)
     reg = view.line(pt)
     return view.substr(reg)
+
+RE_HEADING = re.compile('^[*]+ ')
+# Try to find the parent of a region (by indent)
+# parent
+#   of
+#   a
+#   region
+#   search up
+@add_method(sublime.View)
+def findParentByIndent(view, region):
+    row, col = view.rowcol(region.begin())
+    content  = view.substr(view.line(region))
+    indent   = len(view.getIndent(content))
+    row     -= 1
+    found    = False
+    # Look upward 
+    while row >= 0:
+        content = view.getLine(row)
+        if len(content.strip()):
+            if(RE_HEADING.search(content)):
+                found = True
+                break
+            cur_indent = len(view.getIndent(content))
+            if cur_indent < indent:
+                found = True
+                break
+        row -= 1
+    if found:
+        # return the parent we found.
+        return view.line(view.text_point(row,0))
+
 
 @add_method(sublime.View)
 def getLineAndRegion(view, row):

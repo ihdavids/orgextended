@@ -216,7 +216,7 @@ contexts:
         2: orgmode.unscheddatetime
       scope: orgmode.closed
       # numbered list
-    - match: "^\\s*[0-9]+\\. (([^:]+\\s+)(::))?"
+    - match: "^\\s*[0-9]+[.)]\\s+(([^:]+\\s+)(::))?"
       captures:
         2: orgmode.definition
         3: orgmode.definition.marker
