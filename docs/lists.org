@@ -42,4 +42,4 @@
 
   In addition adding to a numbered list is supported by the OrgAppendNumberedList command.
 
-  [[file:numberedlist.gif]]
+  [[file:numberedlists.gif]]
