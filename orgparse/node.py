@@ -17,6 +17,7 @@ import datetime
 
 RE_TARGETS = re.compile(r'<<(?P<target>[^>]+)>>')
 RE_COMMENT = re.compile(r'^\s*[#][+](?P<name>[A-Za-z][A-Za-z0-9_]+)[:]\s+(?P<val>.*)$')
+RE_TABLE_MATCH = re.compile(r"^\s*\|")
 
 class OffsetIter:
     def __init__(self, lines):
@@ -626,6 +627,7 @@ class OrgBaseNode(Sequence):
         self._lines = []
         # Num children, gets cached.
         self._count = -1
+        self.lastName = None
 
         # FIXME: use `index` argument to set index.  (Currently it is
         # done externally in `parse_lines`.)
@@ -1192,7 +1194,9 @@ class OrgNode(OrgBaseNode):
         # each line. The problem is that we can't
         # tell the offset from the heading
         gen = self._iparse_sdc(ilines)
+        gen = self._iparse_names(gen, ilines)
         gen = self._iparse_clock(gen, ilines)
+        gen = self._iparse_tables(gen, ilines)
         gen = self._iparse_properties(gen, ilines)
         gen = self._iparse_drawers(gen, ilines)
         gen = self._iparse_targets(gen, ilines)
@@ -1271,6 +1275,36 @@ class OrgNode(OrgBaseNode):
             timestamps.extend(OrgDate.list_from_str(l))
             yield l
 
+    def _iparse_names(self, ilines, at):
+        for l in ilines:
+            parsed = parse_comment(l)
+            if parsed:
+                (key, val) = parsed
+                if(key == 'NAME' or key == 'name'):
+                    self.lastName = val
+            yield l
+
+    def _iparse_tables(self, ilines, at):
+        in_table = False
+        start = None
+        for l in ilines:
+            m = RE_TABLE_MATCH.match(l)
+            if(m):
+                if(not start):
+                    start = self._start + at.offset
+                in_table = True
+            else:
+                if(in_table):
+                    in_table = False
+                    end = self._start + at.offset
+                    if(self.lastName):
+                        self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end)}
+                        self.lastName = None
+            yield l
+                     
+
+
+
     def _iparse_properties(self, ilines, at):
         self._properties = properties = {}
         self._property_offsets = poff = {}
@@ -1337,12 +1371,18 @@ class OrgNode(OrgBaseNode):
                 if line.find("#+END_") >= 0 or line.find("#+end_") >= 0:
                     end = self._start + at.offset
                     blk = (start, end)
+                    if(self.lastName):
+                        self.env.NamedObjects[self.lastName] = {"type": "b", "loc": blk}
+                        self.lastName = None
                     self._blocks.append(blk)
                     in_block = False
             elif in_dynamic_block:
                 if line.find("#+END:") >= 0 or line.find("#+end:") >= 0:
                     end = self._start + at.offset
                     blk = (start, end)
+                    if(self.lastName):
+                        self.env.NamedObjects[self.lastName] = {"type": "db", "loc": blk}
+                        self.lastName = None
                     self._dynamicblocks.append(blk)
                     in_dynamic_block = False
             elif line.find("#+BEGIN_") >= 0 or line.find("#+begin_") >= 0:
