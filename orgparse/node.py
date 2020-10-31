@@ -250,6 +250,7 @@ class OrgEnv(object):
         self._names = {}
         self.properties = []
         self.customids = {}
+        self.NamedObjects = {}
 
     @property
     def targets(self):
