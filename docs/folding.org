@@ -41,6 +41,8 @@
       In emacs I would narrow the buffer to just the current subtree. We cannot do that in sublime
       so, second best is to fold everything other than the heading you want to work on.
 
+    [[file:global_tab_cycling.gif][Global Heading Cycling]] 
+    
 ** Commands
    Sublime Org Mode supports quite a few commands:
 
