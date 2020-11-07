@@ -326,7 +326,6 @@ class OrgDatePickerPrevWeekCommand(sublime_plugin.TextCommand):
 
 class OrgDatePickerNextWeekCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
-		print("NEXT WEEK 1")
 		global datePicker
 		datePicker.MoveNextWeek()
 
