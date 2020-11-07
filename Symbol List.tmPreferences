@@ -5,7 +5,7 @@
 	<key>name</key>
 	<string>Symbol List</string>
 	<key>scope</key>
-	<string>text.orgmode orgmode.page, text.orgmode orgmode.break, text.orgmode orgmode.headline orgmode.headline2 orgmode.headline3 orgmode.headline4 orgmode.headline5 orgmode.headline6</string>
+	<string>text.orgmode orgmode.page, text.orgmode orgmode.break, text.orgmode orgmode.headline, text.orgmode orgmode.headline2, text.orgmode orgmode.headline3, text.orgmode orgmode.headline4, text.orgmode orgmode.headline5, text.orgmode orgmode.headline6</string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>
