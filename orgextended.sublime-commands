@@ -20,6 +20,7 @@
     {"caption": "OrgNewFile",             "command": "org_new_file"                },
     {"caption": "OrgJumpInFile",          "command": "org_jump_in_file"            },
     {"caption": "OrgTabCycling",          "command": "org_tab_cycling"             },
+    {"caption": "OrgGlobalTabCycling",    "command": "org_global_tab_cycling"      },
     {"caption": "OrgFoldAll",             "command": "org_fold_all"                },
     {"caption": "OrgUnfoldAll",           "command": "org_unfold_all"              },
     {"caption": "OrgFoldContents",        "command": "org_fold_contents"           },

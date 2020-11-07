@@ -98,6 +98,11 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
             #self.view.run_command("insert_snippet") 
             #self.view.insert(edit,self.view.sel()[0].begin(), "\t")
 
+# Global cycling
+class OrgGlobalTabCyclingCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        folding.fold_global_cycle(self.view)
+
 # Another Do What I Mean style command.
 # Contextually looks at where you are and "does the right thing."
 # Recalculates checkboxes, recalculates blocks etc.

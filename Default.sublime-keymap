@@ -11,6 +11,12 @@
             { "key": "org_heading",  "operator": "equal", "operand": true },
         ]
     },
+    { "keys": ["shift+tab"],         "command": "org_global_tab_cycling",        "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_heading",  "operator": "equal", "operand": true },
+        ]
+    },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
