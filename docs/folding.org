@@ -34,6 +34,13 @@
     - Pressing tab outside of any headings will cycle the entire document through Overview, Table Of "Contents" view and Show All modes.
       This is a very powerful way to quick get a view of your document from a birds eye view. 
 
+** Global Tab Cycling
+    - Global tab cycling can be done at the top of the document, but it can also be done on any heading
+      by pressing *shift+tab*
+    - This can often be useful as a quick way of narrowing your focus to just a single heading.
+      In emacs I would narrow the buffer to just the current subtree. We cannot do that in sublime
+      so, second best is to fold everything other than the heading you want to work on.
+
 ** Commands
    Sublime Org Mode supports quite a few commands:
 
