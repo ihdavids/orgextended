@@ -5,14 +5,14 @@
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
   at building a usable orgmode plugin for sublime.
 
-  ![Start](orgstart.gif)
+  ![Start](./docs/orgstart.gif)
 
   When people show off org, they often just show off some folding
   and the ability to tab cycle a headings tree. This often leads people
   to compare org with Markdown. Org IS a markup and document interchange
   format like markdown, but it is also much more.
 
-  ![Folding](./orgstartfolding.gif)
+  ![Folding](./docs/orgstartfolding.gif)
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
@@ -55,7 +55,7 @@
 
   - The original orgmode plugin - This work was exceptional, OrgExtended is a tribute to that work and consumes some of it.
   - sublime_ZK - The inline image preview is entirely due to the Markdown ZK plugin. 
-    [[https://github.com/renerocksai/sublime_zk][ZK]] Thank you renerocksai for pointing out that phantoms can be used for image preview.
+    [ZK](https://github.com/renerocksai/sublime_zk) Thank you renerocksai for pointing out that phantoms can be used for image preview.
   - Table Edit - For now this excellent plugin is a dependency and the basis by which we offer Org style table editing.
   	In a fiture version we may look to consume the package and own table editing to facilitate expressions and some of the more
   	advanced org table tools, but for now, thank you for making this excellent plugin!
@@ -65,28 +65,28 @@
 
 # This Plugin
 
-  - [Basic Structure](orgextended.org) - Basic file structure
-  - [[file:setup.org][Setup]] - Sublime Setup
-  - [[file:editing.org][Editing]] - Editing your org file
-  - [[file:lists.org][Lists]] - Supported lists in an org file
-  - [[./folding.org][Folding]] - Jumping from the full view to a folded representation.
-  - [[file:links.org][Links]] - Jumping within and without.
-  - [[file:navigation.org][Navigation]] - Powerful ways of navigating your org files.
-  - [[file:capture.org][Capture, Refile, Archive]] - Save ideas fast.
-  - [[file:exporting.org][Exporting]] - Converting from org to other things.
-  - [[file:properties.org][Properties and Drawers]] - Metadata within a heading
-  - [[file:dates.org][Scheduling]] - Dates and times
-  - [[file:clocking.org][Time Tracking]] - Clocking and clock reports
-  - [[file:dynamicblocks.org][Dynamic Blocks]] - Run arbitrary code
-  - [[file:agenda.org][Agenda]] - Keeping track of your day.
+  - [Basic Structure](./docs/orgextended.org) - Basic file structure
+  - [Setup](./docs/setup.org) - Sublime Setup
+  - [Editing](./docs/editing.org) - Editing your org file
+  - [Lists](./docs/lists.org) - Supported lists in an org file
+  - [Folding](./docs/folding.org) - Jumping from the full view to a folded representation.
+  - [Links](./docs/links.org) - Jumping within and without.
+  - [Navigation](./docs/navigation.org) - Powerful ways of navigating your org files.
+  - [Capture, Refile, Archive](./docs/capture.org) - Save ideas fast.
+  - [Exporting](./docs/exporting.org) - Converting from org to other things.
+  - [Properties and Drawers](./docs/properties.org) - Metadata within a heading
+  - [Scheduling](./docs/dates.org) - Dates and times
+  - [Time Tracking](./docs/clocking.org) - Clocking and clock reports
+  - [Dynamic Blocks](./docs/dynamicblocks.org) - Run arbitrary code
+  - [Agenda](./docs/agenda.org) - Keeping track of your day.
 
 # References
   To help get you started on your Org journey
   Here are some useful external links:
 
-- [[https://orgmode.org/manual/][The Org Manual]] - The official source of truth for all things orgmode
-- [[https://orgmode.org/worg/org-tutorials/org4beginners.html][Org Mode 4 Beginners]] - An introduction
-- [[https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html][David O'Tools Introduction]] - Yet another intro
-- [[https://thoughtbot.com/blog/the-many-uses-of-org-mode][The Many Uses of Org Mode]]
-- [[https://kitchingroup.cheme.cmu.edu/blog/2014/08/08/What-we-are-using-org-mode-for/][More Uses]]
-- [[http://doc.norang.ca/org-mode.html][Your Life In Plain Text]] - A wonderful reference on one mans journey to use orgmode to improve his life
+- [The Org Manual](https://orgmode.org/manual/) - The official source of truth for all things orgmode
+- [Org Mode 4 Beginners](https://orgmode.org/worg/org-tutorials/org4beginners.html) - An introduction
+- [David O'Tools Introduction](https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html) - Yet another intro
+- [The Many Uses of Org Mode](https://thoughtbot.com/blog/the-many-uses-of-org-mode)
+- [More Uses](https://kitchingroup.cheme.cmu.edu/blog/2014/08/08/What-we-are-using-org-mode-for/)
+- [Your Life In Plain Text](http://doc.norang.ca/org-mode.html) - A wonderful reference on one mans journey to use orgmode to improve his life
