@@ -1,5 +1,5 @@
 # Org Extended
-  ![Org](https://orgmode.org/img/org-mode-unicorn-logo.png)
+  ![Org](https://orgmode.org/resources/img/org-mode-unicorn.svg)
 
   OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
@@ -12,7 +12,7 @@
   to compare org with Markdown. Org IS a markup and document interchange
   format like markdown, but it is also much more.
 
-  ![Folding](orgstartfolding.gif)
+  ![Folding](./orgstartfolding.gif)
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
