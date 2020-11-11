@@ -1,13 +1,13 @@
-* TODO Things I want [9/41]
+* TODO Things I want [10/41]
 	- [ ] Named Objects [0%]
 		- [ ] Works with babel
 		- [ ] Identifies tables and other things
-	- [-] Capture [33%]
+	- [-] Capture [66%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
 		- [x] Templates in config file.
-		- [ ] Capture targetting
-		- [ ] Capture using sublime snippets
+		- [x] Capture targetting
+		- [x] Capture using sublime snippets
 		- [ ] Capture box size controls?
 	- [-] Parsing [4/5]
 		- [x] Basic file parsing
@@ -39,23 +39,23 @@
 		- [ ] Configuration for what gets added to the archive entries
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
-	- [ ] Numbered Lists
-	- [-] Editing [8/14]
+	- [x] Numbered Lists
+	- [-] Editing [11/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
 		- [x] Insert heading (child and sibling)
-		- [ ] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
+		- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
 		- [x] Caret looks okay
-		- [ ] Indent, De-Indent heading and subtree
+		- [x] Indent, De-Indent heading and subtree
 		- [ ] Heading movement, like you can do with lines
 		- [x] Checkbox insert?
-		- [ ] Sublime snippets?
+		- [x] Sublime snippets?
 		- [ ] Auto indenting of checkboxes (with tab)
 		- [x] Property insertion
 		- [x] Fix Tag Insertion (tooltip is broken for some reason)
 		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
-	- [-] Links [7/17]
+	- [-] Links [9/17]
 		- [x] Orgmode style links
 		- [x] images displayed inline
 		- [ ] #+ATTR_ORG: :width 100 supported for images
@@ -65,11 +65,11 @@
 		- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
 		- [ ] Links in templates.
 		- [x] Ensure file: works (currently doesn't work that well)
-		- [ ] <<TAG>> works for links
+		- [x] <<TAG>> works for links
 		- [ ] Named objects work
 		- [ ] Ensure line number
 		- [ ] search links
-		- [ ] regex links works for links
+		- [x] regex links works for links
 		- [x] custom_id links work
 		- [ ] Write a page about personal wikis
 		- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
@@ -97,14 +97,14 @@
 		- [x] Clock reports
 		- [ ] execute all dynamic blocks in file command
 	- [x] Basic Clocking
-	- [-] Agenda [4/8]
+	- [-] Agenda [7/8]
 		- [x] Todo list (dynamic)
 		- [x] Extensible agenda views
 		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
 		- [x] Todo summaries?
-		- [ ] More extensible views.
-		- [ ] Week View
-		- [ ] Calendar is selectable for day view?
+		- [x] More extensible views.
+		- [x] Week View
+		- [x] Calendar is selectable for day view?
 		- [ ] Formatting for today line in day view?
 	- [-] Agenda Notifications [2/4]
 	    - [x] Windows Support
