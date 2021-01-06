@@ -203,13 +203,26 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             file.Save()
             print(str(node))
             return
+        # Set the root to empty if not provided
+        if('::' not in archive):
+            archive = archive + "::"
         (fileTemplate, headingTarget) = archive.split('::')
-        filename      = fileTemplate % (self.view.file_name()) 
+        if('%' in fileTemplate):
+            filename      = fileTemplate % (self.view.file_name()) 
+        else:
+            filename = fileTemplate
         log.debug("ARCHIVE FILE:    " + filename)
         log.debug("ARCHIVE HEADING: " + headingTarget)
 
         # Ensure the file actually exists.
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        if(not os.path.dirname(filename).strip() == ''):
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+        # Okay the file is probably a local path
+        # Get the full path from our file.
+        else:
+            localDirname = os.path.dirname(self.view.file_name())
+            if('/' not in filename and '\\' not in filename):
+                filename = os.path.join(localDirname, filename)
         with open(filename, "a") as f:
             log.debug("  Archive file created...")
         # Okay now open the file.
@@ -218,14 +231,22 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
         if(sourceNode != None):
             log.debug("Find or create: " + headingTarget)
             targetNode = file.FindOrCreateNode(headingTarget)
-            log.debug("Inserting heading at: " + targetNode.heading)
-            log.debug("Inserting: " + sourceNode.heading)
-            self.result = targetNode.insert_child(sourceNode)
+            if(targetNode == None):
+                targetNode = file.Root()
+                self.result = targetNode.insert_child(sourceNode)
+                self.result.update_property("ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
+                self.result.update_property("ARCHIVE_FILE", self.view.file_name())
+                for n in file.org[1:]:
+                    print(n.full_heading)
+            else:
+                log.debug("Inserting heading at: " + targetNode.heading)
+                log.debug("Inserting: " + sourceNode.heading)
+                self.result = targetNode.insert_child(sourceNode)
 
-            self.result.update_property("ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
-            self.result.update_property("ARCHIVE_FILE", self.view.file_name())
-            for n in file.org[1:]:
-                print(n.full_heading)
+                self.result.update_property("ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
+                self.result.update_property("ARCHIVE_FILE", self.view.file_name())
+                for n in file.org[1:]:
+                    print(n.full_heading)
             log.debug("Saving the source file")
             file.Save()
             file.Reload()

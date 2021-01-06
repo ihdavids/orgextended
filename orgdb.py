@@ -50,7 +50,9 @@ class FileInfo:
             displayFn = displayFn[1:]
         self.displayName = displayFn
 
-
+    def Root(self):
+        return self.org[0]
+        
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
         self.org = loads(bufferContents)
