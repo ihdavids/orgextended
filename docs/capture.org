@@ -32,6 +32,7 @@
     ]
   #+END_SRC
 
+
   This states that when you run the Capture option, we will paste the
   capture_heading.sublime-snippet file into the capture buffer for your to edit.
 
@@ -73,6 +74,17 @@
         </snippet>
   #+END_SRC 
 
+*** Direct vs Panel
+  By default org capture will open up a panel. When you close the panel
+  by pressing escape the system will save your the capture automatically.
+
+  Sometimes it is easier to work directly in the file. Adding openas: direct
+  to your capture config will flip open the file rather than using a capture panel.
+
+  #+BEGIN_SRC js
+    "openas": "direct",
+  #+END_SRC
+  
 ** Targetting
   Ultimately I would like to support the full gamut of OrgMode capture settings.
   At the moment I have a very limited set. The following is a rough idea of where I would like to take this:
