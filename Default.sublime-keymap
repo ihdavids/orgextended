@@ -7,20 +7,23 @@
     //       Split these appart to make the easier to manage.
 	{ "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
-            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
-            { "key": "org_heading",  "operator": "equal", "operand": true },
+            { "key": "eol_selector",   "operator": "equal",     "operand": "text.orgmode" },
+            { "key": "org_heading",    "operator": "equal",     "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
         ]
     },
     { "keys": ["shift+tab"],         "command": "org_global_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_heading",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_link",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
 
         ]
     },
@@ -28,6 +31,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_global",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
 
         ]
     },
@@ -35,6 +39,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_table",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
 
         ]
     },
@@ -42,6 +47,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_checkbox",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
 
         ]
     },
@@ -49,6 +55,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_block",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
 
         ]
     },

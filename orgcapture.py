@@ -71,6 +71,8 @@ def GetCapturePath(view, template):
         file.Reload()
     else:
         file = db.Get().LoadNew(filename)
+    if(not at and file):
+        at = file.org.end_row
     return (target, filename, file, at)
 
 
@@ -274,10 +276,29 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
         self.headings = db.Get().AllHeadingsWContext(self.view)
         self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
 
+class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
+    def on_done(self, index):
+        pass
+    def on_done_base(self, index):
+        if(index < 0):
+            return
+        self.templates         = sets.Get("captureTemplates",[])
+        self.on_done(index)
+    def run(self, edit):
+        templates = sets.Get("captureTemplates",[])
+        temps = []
+        for temp in templates:
+            log.debug("TEMPLATE: ", temp)
+            temps.append(temp['name'])
+        self.view.window().show_quick_panel(temps, self.on_done_base, -1, -1)
 
+
+class OrgCaptureDirectCommand(OrgCaptureBaseCommand):
+    def on_done():
+        pass
 
 # Capture some text into our refile org file
-class OrgCaptureCommand(sublime_plugin.TextCommand):
+class OrgCaptureCommand(OrgCaptureBaseCommand):
     def insert_template(self, template, panel):
         #template          = templates[index]['template']
         startPos = -1
@@ -290,29 +311,36 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
             startPos = panel.sel()[0]
         return startPos
 
-    def on_done(self, index):
-        if(index < 0):
-            return
+    def on_panel_ready(self, index, openas, panel):
         global captureBufferName
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
-        templates         = sets.Get("captureTemplates",[])
         window = self.view.window()
-        panel = window.create_output_panel("orgcapture")
+        template = self.templates[index]
+        target, capturePath, captureFile, at = GetCapturePath(self.view, template)
+        if(panel.is_loading()):
+            sublime.set_timeout_async(lambda: self.on_panel_ready(index, openas, panel), 100)
+            return
         startPos = -1
         # Try to store the capture index
         panel.settings().set('cap_index',index)
         panel.settings().set('cap_view',self.view.id())
-        if('template' in templates[index]):
-            startPos = self.insert_template(templates[index]['template'], panel)
+        if('template' in template):
+            startPos = self.insert_template(template['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
             panel.sel().clear()
             panel.sel().add(startPos)
             window.focus_view(panel)
-        elif('snippet' in templates[index]):
-            window.run_command('show_panel', args={'panel': 'output.orgcapture'})
+        elif('snippet' in template):
+            if(openas):
+                insertAt = captureFile.At(at)
+                pt = panel.text_point(insertAt.end_row,0)
+                panel.sel().clear()
+                panel.sel().add(pt)
+            else:
+                window.run_command('show_panel', args={'panel': 'output.orgcapture'})
             ai = sublime.active_window().active_view().settings().get('auto_indent')
             panel.settings().set('auto_indent',False)
-            snippet = templates[index]['snippet']
+            snippet = template['snippet']
             snipName = ext.find_extension_file('snippets',snippet,'.sublime-snippet')
             window.focus_view(panel)
             #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
@@ -339,15 +367,23 @@ class OrgCaptureCommand(sublime_plugin.TextCommand):
                 , "ORG_FILENAME":      self.view.file_name()
                 })
             sublime.active_window().active_view().settings().set('auto_indent',ai)
-        panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
-        panel.set_name(captureBufferName)
+        if(not openas):
+            panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
+            panel.set_name(captureBufferName)
 
-    def run(self, edit):
-        templates = sets.Get("captureTemplates",[])
-        temps = []
-        for temp in templates:
-            log.debug("TEMPLATE: ", temp)
-            temps.append(temp['name'])
-
-        self.view.window().show_quick_panel(temps, self.on_done, -1, -1)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        global captureBufferName
+        captureBufferName = sets.Get("captureBufferName", captureBufferName)
+        window = self.view.window()
+        template = self.templates[index]
+        target, capturePath, captureFile, at = GetCapturePath(self.view, template)
+        openas = False
+        if('openas' in template and 'direct' == template['openas']):
+            panel = window.open_file(capturePath)
+            openas = True
+        else:
+            panel = window.create_output_panel("orgcapture")
+        self.on_panel_ready(index, openas, panel)
 
