@@ -7,8 +7,9 @@
 		- [x] Basic capture buffer
 		- [x] Templates in config file.
 		- [x] Capture targetting
+			- [ ] *Capture manages level properly (BROKEN)*
 		- [x] Capture using sublime snippets
-		- [ ] Capture box size controls?
+		- [ ] Capture panel size controls?
 	- [-] Parsing [4/5]
 		- [x] Basic file parsing
 		- [x] Tags parsed.
@@ -40,7 +41,7 @@
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
 	- [x] Numbered Lists
-	- [-] Editing [11/14]
+	- [-] Editing [12/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
@@ -51,7 +52,7 @@
 		- [ ] Heading movement, like you can do with lines
 		- [x] Checkbox insert?
 		- [x] Sublime snippets?
-		- [ ] Auto indenting of checkboxes (with tab)
+		- [x] Auto indenting of checkboxes (with tab)
 		- [x] Property insertion
 		- [x] Fix Tag Insertion (tooltip is broken for some reason)
 		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
