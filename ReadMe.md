@@ -1,4 +1,5 @@
 # Org Extended
+
   ![Org](https://orgmode.org/resources/img/org-mode-unicorn.svg)
 
   OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
@@ -7,6 +8,8 @@
 
   ![Start](./docs/orgstart.gif)
 
+  NOTE: To get setup, please jump down the Setup link below.
+  
   When people show off org, they often just show off some folding
   and the ability to tab cycle a headings tree. This often leads people
   to compare org with Markdown. Org IS a markup and document interchange
