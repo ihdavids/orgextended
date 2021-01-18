@@ -247,6 +247,13 @@ class ImageHandler:
             size = ImageHandler.get_image_size(local_filename)
             if size:
                 w, h, ttype = size
+                if ttype and ttype == 'svg':
+                    view.erase_phantoms(str(region))
+                    html_img = util.get_as_string(img)
+                    print(html_img)
+                    view.add_phantom(str(region), region, html_img, sublime.LAYOUT_BLOCK)
+                    ImageHandler.Phantoms[view.id()].add(str(region))
+                    return
                 FMT = u'''
                     {}<img src="data:image/{}" class="centerImage" {}>
                 '''
@@ -353,7 +360,10 @@ class ImageHandler:
             head = f.read(24)
             ttype = None
 
-            # print('head:\n', repr(head))
+            if b'<svg' in head:
+                ttype = 'svg'
+                width, height = (100,100)
+                return width, height, ttype
             if len(head) != 24:
                 return
             if imghdr.what(img) == 'png':

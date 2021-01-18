@@ -16,6 +16,7 @@ def isPotentialOrgFile(filename):
     exts = sets.Get("validOrgExtensions",[".org", ".org_archive"])
     return (len(fn) > 1 and (fn[1] in exts))
 
+# Sublime doesn't seem to have svg support in minihtml?
 image_extensions = [".jpg", ".png", ".gif"]
 
 def is_image(url):
@@ -28,6 +29,9 @@ def get_as_base64(url):
     image = urllib.request.urlopen(url)
     return base64.encodestring(image.read()).decode('ascii').replace('\n', '')
 
+def get_as_string(url):
+    image = urllib.request.urlopen(url)
+    return image.read().decode('ascii').replace('\n', '')
 
 def RandomString():
     randomString = uuid.uuid4().hex

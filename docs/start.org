@@ -2,7 +2,7 @@
 
 * Introduction
   #+ATTR_ORG: :width 100
-  [[https://orgmode.org/img/org-mode-unicorn-logo.png]]
+  [[https://orgmode.org/resources/img/org-mode-unicorn.svg]]
 
   OrgMode is a lifestyle. While I like sublime, living without Org Mode has been something 
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab

@@ -27,9 +27,9 @@ def load_module(basemodule, folder, filename):
 		module = reload(module)
 	else:
 		module_path = basemodule + '.'+ folder +'.' + filename.split('.')[0]
-		for m in sys.modules:
-			if(module_path in m):
-				print("KEY: " + str(m))
+		#for m in sys.modules:
+		#	if(module_path in m):
+		#		print("KEY: " + str(m))
 		if module_path in sys.modules:
 			del sys.modules[module_path]
 		module = importlib.import_module(module_path)
