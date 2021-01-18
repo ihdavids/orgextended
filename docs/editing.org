@@ -43,7 +43,25 @@
    I have started working on a date picker that can help /somewhat/ with
    scheduling efforts.
 
-   [[file:scheduling.gif]]
+   [[file:scheduling.gif]] 
+
+   The date picker is not perfect but I hope to improve it over time.
+   The date picker CAN use the mouse to select a date.
+
+   The keybindings are a little odd. The greater than and less than
+   signs will move you by date. Holding down alt and ctrl allows you to
+   move faster with the same keys. 
+
+   To get mouse support you have to use a somewhat controversial feature of sublime. The sublime mousemap does not have the same context support 
+   as keybindings.
+   I have not included the mousemap in the package, but there is a means
+   of generating one automatically.
+
+   #+BEGIN_EXAMPLE
+     Preferences > Package Settings > Org Extended > Setup MouseMap
+   #+END_EXAMPLE
+
+   This generates the mousemap in your User folder. Alt + Click should select the date for you.
 
 ** Check Boxes [1/3]
 

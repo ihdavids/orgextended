@@ -237,7 +237,7 @@ class DatePicker:
 		if(duration):
 			self.dateView.cdate._end = self.dateView.cdate.start + duration
 		self.inputpane.ReplaceRegion(self.inputpane.line(self.inputpane.text_point(0,0)), OrgDate.format_datetime(self.dateView.cdate.start))
-		self.HighlightDay(self.dateView.cdate.start)
+		self.dateView.HighlightDay(self.dateView.cdate.start)
 
 	def RefreshInputPanelFromDateView(self):
 		self.inputpane.ReplaceRegion(self.inputpane.line(self.inputpane.text_point(0,0)), OrgDate.format_datetime(self.dateView.cdate.start))
