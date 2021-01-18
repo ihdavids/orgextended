@@ -83,11 +83,47 @@
    [[file:orgcheckboxes.gif]]
 
 ** Priority Editing
-   Todo mention priorities and editing them
+   Org has extensive priority support, we do not!
+   While you can mark up your file with any priority tags you would like.
 
+   [[file:priorities.jpg][Priorities]] 
+
+   1. Color coding of priorities is limited to the A B C priorities.
+   2. The PRIORITIES comment does not impact the quick insertion.
+   3. You can cycle priorities using a command but it is currently restricted to the built in priorities.
+
+   [[file:priorities_cycling.gif][Priority Cycling]]
 
 ** Quick Heading Insertion
    TODO
 
 ** Quick Indentation Change
    TODO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
