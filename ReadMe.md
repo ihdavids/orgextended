@@ -68,20 +68,20 @@
 
 # This Plugin
 
-  - [Basic Structure](./docs/orgextended.org) - Basic file structure
-  - [Setup](./docs/setup.org) - Sublime Setup
-  - [Editing](./docs/editing.org) - Editing your org file
-  - [Lists](./docs/lists.org) - Supported lists in an org file
-  - [Folding](./docs/folding.org) - Jumping from the full view to a folded representation.
-  - [Links](./docs/links.org) - Jumping within and without.
-  - [Navigation](./docs/navigation.org) - Powerful ways of navigating your org files.
-  - [Capture, Refile, Archive](./docs/capture.org) - Save ideas fast.
-  - [Exporting](./docs/exporting.org) - Converting from org to other things.
-  - [Properties and Drawers](./docs/properties.org) - Metadata within a heading
-  - [Scheduling](./docs/dates.org) - Dates and times
-  - [Time Tracking](./docs/clocking.org) - Clocking and clock reports
-  - [Dynamic Blocks](./docs/dynamicblocks.org) - Run arbitrary code
-  - [Agenda](./docs/agenda.org) - Keeping track of your day.
+  - [Basic Structure](https://github.com/ihdavids/orgextended_docs/blob/master/orgextended.org) - Basic file structure
+  - [Setup](https://github.com/ihdavids/orgextended_docs/blob/master/setup.org) - Sublime Setup
+  - [Editing](https://github.com/ihdavids/orgextended_docs/blob/master/editing.org) - Editing your org file
+  - [Lists](https://github.com/ihdavids/orgextended_docs/blob/master/lists.org) - Supported lists in an org file
+  - [Folding](https://github.com/ihdavids/orgextended_docs/blob/master/folding.org) - Jumping from the full view to a folded representation.
+  - [Links](https://github.com/ihdavids/orgextended_docs/blob/master/links.org) - Jumping within and without.
+  - [Navigation](https://github.com/ihdavids/orgextended_docs/blob/master/navigation.org) - Powerful ways of navigating your org files.
+  - [Capture, Refile, Archive](https://github.com/ihdavids/orgextended_docs/blob/master/capture.org) - Save ideas fast.
+  - [Exporting](https://github.com/ihdavids/orgextended_docs/blob/master/exporting.org) - Converting from org to other things.
+  - [Properties and Drawers](https://github.com/ihdavids/orgextended_docs/blob/master/properties.org) - Metadata within a heading
+  - [Scheduling](https://github.com/ihdavids/orgextended_docs/blob/master/dates.org) - Dates and times
+  - [Time Tracking](https://github.com/ihdavids/orgextended_docs/blob/master/clocking.org) - Clocking and clock reports
+  - [Dynamic Blocks](https://github.com/ihdavids/orgextended_docs/blob/master/dynamicblocks.org) - Run arbitrary code
+  - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
 
 # References
   To help get you started on your Org journey
