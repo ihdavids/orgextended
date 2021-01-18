@@ -159,29 +159,6 @@ def AppendLine(view, edit):
     UpdateLine(view,edit)
 
 
-# def findSiblingsByIndent(view, child, parent):
-#     row, col      = view.rowcol(parent.begin())
-#     parent_indent = view.getIndent(parent)
-#     child_indent  = view.getIndent(child)
-#     siblings = []
-#     row += 1
-#     last_row, _ = view.rowcol(view.size())
-#     while row <= last_row:  # Don't go past end of document.
-#         line = view.text_point(row, 0)
-#         line = view.line(line)
-#         content = view.substr(line)
-#         # print content
-#         if len(content.strip()):
-#             cur_indent = view.getIndent(content)
-#             if len(cur_indent) <= len(parent_indent):
-#                 break  # Indent same as parent found!
-#             if len(cur_indent) == len(child_indent):
-#                 siblings.append((line, content))
-#         row += 1
-#     return siblings
-
-
-
 def isNumberedLine(view,sel=None):
     point = None
     if(sel == None):

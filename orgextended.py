@@ -57,8 +57,8 @@ def plugin_loaded():
     # To enable debug logging, set the env var to a non-blank value.
     # This is the same pattern that neovintageous uses and I think
     # it is a reasonably decent mechanism
-    #_DEBUG = bool(os.getenv('SUBLIME_ORGEXTENDED_DEBUG'))
-    _DEBUG = True
+    _DEBUG = bool(os.getenv('SUBLIME_ORGEXTENDED_DEBUG'))
+    #_DEBUG = True
     if _DEBUG:
         logger = logging.getLogger('OrgExtended')
         logger.propagate = 0
