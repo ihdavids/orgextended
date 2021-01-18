@@ -10,22 +10,13 @@
 
     One of the most important keybindings is org_tab_cycling
     This is a context aware tab mode that will handle tab insertion
-    vs header collapsing.
+    vs header collapsing. This binding is setup by default for a
+    variety of cases. If it is causing you grief you can dig into
+    how it is setup in the Default.sublime-keymap in this package.
 
-    [[file:headings.gif][Heading Cycling]]
-
-    #+begin_src js
-
-	{ 
-	  "keys": ["tab"],               
-	  "command": "org_tab_cycling",         
-	  "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]
-	}
-
-    #+end_src
+    [[file:headings.gif]]
 
     This single key binding enables the "magic" of org tab cycling.
-    After you have enabled this some great things will be possible:
 
     - Pressing tab on a heading will cycle it through unfolded, folded, first level headings only
     - Pressing tab on a source block will fold it away so you don't have to look at it.
@@ -48,12 +39,12 @@
 ** Commands
    Sublime Org Mode supports quite a few commands:
 
-   - OrgFoldAll        - Fold everything in the file.
-   - OrgUnfoldAll      - Unfold everything in the file. 
-   - OrgFoldContents   - Fold all the contents of all the headings (Table Of Contents view)
-   - OrgRemoveAllFolds - Remove all the folds in the file (show everything)
-   - OrgFoldThing      - Fold an item within a heading (drawer, block etc)
-   - OrgFoldAllLinks   - Fold all links within the document
+   - Org Fold All         - Fold everything in the file.
+   - Org Unfold All       - Unfold everything in the file. 
+   - Org Fold Contents    - Fold all the contents of all the headings (Table Of Contents view)
+   - Org Remove All Folds - Remove all the folds in the file (show everything)
+   - Org Fold Thing       - Fold an item within a heading (drawer, block etc)
+   - Org Fold All Links   - Fold all links within the document
 
    These commands can be bound to keybindings of your choice to help you naviate the file.
 
