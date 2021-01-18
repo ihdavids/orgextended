@@ -20,6 +20,23 @@
                                 "command": "open_file"
                             }, 
                             {
+                                "caption": "-"
+                            },
+                            {
+                                "caption": "Setup MouseMap", 
+                                "command": "org_setup_mouse_map"
+                            }, 
+                            {
+                                "caption": "Open MouseMap", 
+                                "args": {
+                                    "file": "${packages}/User/Default.sublime-mousemap"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "-"
+                            },
+                            {
                                 "caption": "Settings – Default", 
                                 "args": {
                                     "file": "${packages}/OrgExtended/orgextended.sublime-settings"

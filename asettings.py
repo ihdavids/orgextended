@@ -38,6 +38,34 @@ def setup_user_settings():
 			filename)
 		shutil.copyfile(default_settings_path, user_settings_path)
 
+def setup_mousemap():
+	filename = "Default.sublime-mousemap"
+	user_settings_path = os.path.join(
+		sublime.packages_path(),
+		"User",
+		filename)
+	mousemap = """
+[
+    {
+        "button": "button1", 
+        "count": 1, 
+        "modifiers": ["alt"],
+        "press_command": "drag_select",
+        // In the future we may vector this to a more generic handler
+        "command": "org_mouse_handler",
+    }
+]
+	"""	
+	if not os.path.exists(user_settings_path):
+		with open(user_settings_path,"w") as o:
+			o.write(mousemap)
+			o.write("\n")
+
+class OrgSetupMouseMapCommand(sublime_plugin.TextCommand):
+    def run(self, edit, event=None):
+    	setup_mousemap()
+
+
 # Singleton access
 _sets = None
 
