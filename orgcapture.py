@@ -20,6 +20,7 @@ import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props
+import OrgExtended.pymitter as evt
 import time
 
 log = logging.getLogger(__name__)
@@ -72,7 +73,7 @@ def GetCapturePath(view, template):
     else:
         file = db.Get().LoadNew(filename)
     if(not at and file):
-        at = file.org.end_row
+        at = file.org.start_row
     return (target, filename, file, at)
 
 
@@ -332,7 +333,23 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             startPos = panel.sel()[0]
         return startPos
 
+    def cleanup_capture_panel(self):
+        global captureBufferName
+        if(not self.openas):
+            self.panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
+            self.panel.set_name(captureBufferName)
+
+    # In OpenAs mode we insert some pre-heading stars
+    # Before inserting the snippet. This SHOULD get our
+    # heading where it needs to be?
+    def on_added_stars(self):
+        linev = self.panel.line(self.pt)
+        self.panel.sel().clear()
+        self.panel.sel().add(linev.end())
+        self.insert_snippet(self.index)
+
     def on_panel_ready(self, index, openas, panel):
+        self.panel = panel
         global captureBufferName
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
         window = self.view.window()
@@ -345,52 +362,75 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         # Try to store the capture index
         panel.settings().set('cap_index',index)
         panel.settings().set('cap_view',self.view.id())
+        self.openas = openas
         if('template' in template):
             startPos = self.insert_template(template['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
             panel.sel().clear()
             panel.sel().add(startPos)
             window.focus_view(panel)
+            self.cleanup_capture_panel()
         elif('snippet' in template):
-            if(openas):
+            level = 0
+            pt = None
+            prefix = ""
+            if(self.openas):
                 insertAt = captureFile.At(at)
-                pt = panel.text_point(insertAt.end_row,0)
+                pt = panel.text_point(insertAt.end_row+1,0)
+                linev = panel.line(pt)
+                linetxt = panel.substr(linev)
+                if(linetxt and not linetxt.strip() == ""):
+                    prefix = "\n"
+                    pt = linev.end()
+                else:
+                    pt = linev.end()
                 panel.sel().clear()
                 panel.sel().add(pt)
+                level = insertAt.level
             else:
                 window.run_command('show_panel', args={'panel': 'output.orgcapture'})
-            ai = sublime.active_window().active_view().settings().get('auto_indent')
-            panel.settings().set('auto_indent',False)
-            snippet = template['snippet']
-            snipName = ext.find_extension_file('snippets',snippet,'.sublime-snippet')
-            window.focus_view(panel)
-            #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
-            panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
-            now = datetime.datetime.now()
-            inow = orgdate.OrgDate.format_date(now, False)
-            anow = orgdate.OrgDate.format_date(now, True)
-            # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
-            # OTHER VARIABLES:
-            # TM_FULLNAME - Users full name
-            # TM_FILENAME - File name of the file being edited
-            # TM_CURRENT_WORD - Word under cursor when snippet was triggered
-            # TM_SELECTED_TEXT - Selected text when snippet was triggered
-            # TM_CURRENT_LINE - Line of snippet when snippet was triggered
-            panel.run_command("insert_snippet", 
-                { "name" : snipName
-                , "ORG_INACTIVE_DATE": inow
-                , "ORG_ACTIVE_DATE":   anow
-                , "ORG_DATE":          str(datetime.date.today())
-                , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
-                , "ORG_CLIPBOARD":     sublime.get_clipboard()
-                , "ORG_SELECTION":     self.view.substr(self.view.sel()[0])
-                , "ORG_LINENUM":       str(self.view.curRow())
-                , "ORG_FILENAME":      self.view.file_name()
-                })
-            sublime.active_window().active_view().settings().set('auto_indent',ai)
-        if(not openas):
-            panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
-            panel.set_name(captureBufferName)
+            if(self.openas and level > 0):
+                self.pt = pt
+                self.index = index
+                self.panel = panel
+                self.panel.Insert(pt, "*" * level, evt.Make(self.on_added_stars))
+            else:
+                self.insert_snippet(index)
+
+    def insert_snippet(self, index):
+        window = self.view.window()
+        template = self.templates[index]
+        ai = sublime.active_window().active_view().settings().get('auto_indent')
+        self.panel.settings().set('auto_indent',False)
+        snippet = template['snippet']
+        snipName = ext.find_extension_file('snippets',snippet,'.sublime-snippet')
+        window.focus_view(self.panel)
+        #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
+        self.panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
+        now = datetime.datetime.now()
+        inow = orgdate.OrgDate.format_date(now, False)
+        anow = orgdate.OrgDate.format_date(now, True)
+        # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
+        # OTHER VARIABLES:
+        # TM_FULLNAME - Users full name
+        # TM_FILENAME - File name of the file being edited
+        # TM_CURRENT_WORD - Word under cursor when snippet was triggered
+        # TM_SELECTED_TEXT - Selected text when snippet was triggered
+        # TM_CURRENT_LINE - Line of snippet when snippet was triggered
+        self.panel.run_command("insert_snippet", 
+            { "name" : snipName
+            , "ORG_INACTIVE_DATE": inow
+            , "ORG_ACTIVE_DATE":   anow
+            , "ORG_DATE":          str(datetime.date.today())
+            , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
+            , "ORG_CLIPBOARD":     sublime.get_clipboard()
+            , "ORG_SELECTION":     self.view.substr(self.view.sel()[0])
+            , "ORG_LINENUM":       str(self.view.curRow())
+            , "ORG_FILENAME":      self.view.file_name()
+            })
+        sublime.active_window().active_view().settings().set('auto_indent',ai)
+        self.cleanup_capture_panel()
+
 
     def on_done(self, index):
         if(index < 0):
