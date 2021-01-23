@@ -627,14 +627,15 @@ class WeekView(AgendaBaseView):
         if(wday >= 6):
             wday = -1
         wstart = self.now + datetime.timedelta(days=-(wday+1))
-        #print(str(wstart.hour))
-        self.InsertDay("Sun", wstart, edit)
-        self.InsertDay("Mon", wstart + datetime.timedelta(days=1), edit)
-        self.InsertDay("Tue", wstart + datetime.timedelta(days=2), edit)
-        self.InsertDay("Wed", wstart + datetime.timedelta(days=3), edit)
-        self.InsertDay("Thr", wstart + datetime.timedelta(days=4), edit)
-        self.InsertDay("Fri", wstart + datetime.timedelta(days=5), edit)
-        self.InsertDay("Sat", wstart + datetime.timedelta(days=6), edit)
+        dayNames  = ["Sun","Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
+        dayOffset = sets.Get("agendaFirstDay",0)
+        numDays   = sets.Get("agendaWeekViewNumDays",7)
+        for i in range(0,numDays):
+            index = dayOffset + i
+            if(index == 0):
+                self.InsertDay(dayNames[index % len(dayNames)], wstart, edit)
+            else:
+                self.InsertDay(dayNames[index % len(dayNames)], wstart + datetime.timedelta(days=index) , edit)
 
     def FilterEntry(self, n, filename):
         return (IsTodo(n) or IsDone(n)) and not IsProject(n) and n.scheduled
