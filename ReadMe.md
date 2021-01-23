@@ -53,19 +53,6 @@
   I simply cannot build the entire thing, but I hope we can build something unique and amazing
   in sublime, in its own right.
 
-# Thank You
-  I have shamelessly built this plugin on the backs of some excellent plugins and libraries.
-
-  - The original orgmode plugin - This work was exceptional, OrgExtended is a tribute to that work and consumes some of it.
-  - sublime_ZK - The inline image preview is entirely due to the Markdown ZK plugin. 
-    [ZK](https://github.com/renerocksai/sublime_zk) Thank you renerocksai for pointing out that phantoms can be used for image preview.
-  - Table Edit - For now this excellent plugin is a dependency and the basis by which we offer Org style table editing.
-  	In a fiture version we may look to consume the package and own table editing to facilitate expressions and some of the more
-  	advanced org table tools, but for now, thank you for making this excellent plugin!
-  - pymitter - a great little event library for python.
-  - highlightjs - a wonderful highlighting library for html.
-  - pandoc - a great command line tool for converting formats.
-
 # This Plugin
 
   - [Basic Structure](https://github.com/ihdavids/orgextended_docs/blob/master/orgextended.org) - Basic file structure
@@ -84,6 +71,20 @@
   - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
 
   The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
+
+# Thank You
+  I have shamelessly built this plugin on the backs of some excellent plugins and libraries.
+
+  - The original orgmode plugin - This work was exceptional, OrgExtended is a tribute to that work and consumes some of it.
+  - sublime_ZK - The inline image preview is entirely due to the Markdown ZK plugin. 
+    [ZK](https://github.com/renerocksai/sublime_zk) Thank you renerocksai for pointing out that phantoms can be used for image preview.
+  - Table Edit - For now this excellent plugin is a dependency and the basis by which we offer Org style table editing.
+  	In a fiture version we may look to consume the package and own table editing to facilitate expressions and some of the more
+  	advanced org table tools, but for now, thank you for making this excellent plugin!
+  - pymitter - a great little event library for python.
+  - highlightjs - a wonderful highlighting library for html.
+  - pandoc - a great command line tool for converting formats.
+
 
 # References
   To help get you started on your Org journey
