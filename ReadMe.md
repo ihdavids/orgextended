@@ -6,7 +6,7 @@
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
   at building a usable orgmode plugin for sublime.
 
-  ![Start](./docs/orgstart.gif)
+  ![Start](./images/orgstart.gif)
 
   NOTE: To get setup, please jump down the Setup link below.
   
@@ -15,7 +15,7 @@
   to compare org with Markdown. Org IS a markup and document interchange
   format like markdown, but it is also much more.
 
-  ![Folding](./docs/orgstartfolding.gif)
+  ![Folding](./images/orgstartfolding.gif)
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
@@ -82,6 +82,8 @@
   - [Time Tracking](https://github.com/ihdavids/orgextended_docs/blob/master/clocking.org) - Clocking and clock reports
   - [Dynamic Blocks](https://github.com/ihdavids/orgextended_docs/blob/master/dynamicblocks.org) - Run arbitrary code
   - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
+
+  The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
 
 # References
   To help get you started on your Org journey
