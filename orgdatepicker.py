@@ -21,7 +21,7 @@ def CreateUniqueViewNamed(name, mapped=None):
 	return view
 
 class DateView:
-	def __init__(self, dayhighlight=None):
+	def __init__(self, dayhighlight=None,firstDayOffset=0):
 		self.months = []
 		self.columnsPerMonth = 30                     # 7 * 3 = 21 + 9
 		self.columnsInDay    = 2  
@@ -34,6 +34,7 @@ class DateView:
 		self.startrow        = 0
 		self.endrow          = 7
 		self.dayhighlight    = dayhighlight
+		self.firstdayoffset  = firstDayOffset
 
 
 	def SetView(self, view):
@@ -160,9 +161,12 @@ class DateView:
 		return (month, year)
 
 	def Render(self,now):
-		c = calendar.TextCalendar(calendar.SUNDAY)
+		days = [calendar.SUNDAY, calendar.MONDAY, calendar.TUESDAY, calendar.WEDNESDAY, calendar.THURSDAY, calendar.FRIDAY, calendar.SATURDAY]
+		offset = self.firstdayoffset % 7
+		firstDay = days[offset]
+		c = calendar.TextCalendar(firstDay)
 		str = c.formatmonth(now.year, now.month)
-		calendar.setfirstweekday(calendar.SUNDAY)
+		calendar.setfirstweekday(firstDay)
 		self.midmonth  = now.month
 		pmonth, pyear = DateView.PrevMonth(now)
 		nmonth, nyear = DateView.NextMonth(now)
