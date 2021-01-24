@@ -38,11 +38,11 @@ def Execute(cmd):
 	sys.stdout = oldOut
 	sys.stderr = oldErr
 
-	print("DONE EXECUTING")
+	#print("DONE EXECUTING")
 	e = codeErr.getvalue()
-	print("error:\n%s\n" % e)
+	#print("error:\n%s\n" % e)
 	o = codeOut.getvalue()
-	print("output:\n%s" % o)
+	#print("output:\n%s" % o)
 	codeOut.close()
 	codeErr.close()
 	return o.split('\n') + e.split('\n')

@@ -1,0 +1,10 @@
+<snippet>
+    <content>
+    <![CDATA[
+#+BEGIN_QUOTE
+  $0
+#+END_QUOTE]]></content>
+    <tabTrigger>&lt;q</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>quote block</description>
+</snippet>

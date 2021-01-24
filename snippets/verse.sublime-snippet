@@ -1,0 +1,10 @@
+<snippet>
+    <content>
+    <![CDATA[
+#+BEGIN_VERSE
+  $0
+#+END_VERSE]]></content>
+    <tabTrigger>&lt;v</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>verse block</description>
+</snippet>

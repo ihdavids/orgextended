@@ -1,0 +1,27 @@
+* Initial release of Org Extended
+
+  Setup instructions can be found here:
+  https://github.com/ihdavids/orgextended_docs/blob/master/start.org
+
+  Org Mode in Emacs is an extensive lifestyle plugin.
+  This plugin couldn't hope to duplicate the full expanse of
+  Emacs org mode. That said, this plugin attempts to provide
+  some of the amazing functionality found in Emacs org mode
+  right here in sublime text!
+
+  Org Mode IS: https://orgmode.org 
+
+  - A document interchange format
+  - A personal wiki
+  - A task and project management toolset
+  - An agenda
+  - A means of building living documents known as literate programming
+  - The backend for blogs, webpages, and an outliner for authors.
+  - A tool for authoring presentations.
+  - A time tracking tool
+  - A spreadsheet and data management tool
+  - And much much more. 
+
+  This plugin is written selfishly as a means of helping
+  me stay organized. It comes with no warranty whatsoever.
+  It is my hope that you still find it useful.

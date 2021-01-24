@@ -1,0 +1,13 @@
+* 1.2.0
+	- Documentation moved out of the repository to its own repository
+	  this was done to shrink the size of the package.
+	- Turned off logger that was accidentally left on.
+	- Added "openas": "direct" to capture definitions. This will
+	  open the capture directly in the file at the target location.
+	- Added  "agendaFirstDay" and "agendaWeekViewNumDays" to settings to allow
+	  users to start the week view from monday rather than sunday and limit the
+	  week view to just a 5 day view rather than 7 days if desired.
+	- Cleaned up a bunch of old debugging output.
+	- Working on named targets for blocks in the parser, this is to facilitate
+	  eventual chainging of inputs in the bable execution. 
+    - Fixed archive notation to work without the colon separator.

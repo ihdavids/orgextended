@@ -1,0 +1,3 @@
+* 1.0.1 
+  - Improving link handling for local files.
+  - Fixes some bugs around generating local file links.
