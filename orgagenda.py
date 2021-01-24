@@ -3,12 +3,9 @@ import os
 import time
 import sublime, sublime_plugin
 import datetime
-from pathlib import Path
 import fnmatch
-from .orgparse.__init__ import *
 import OrgExtended.orgparse.node as node
 import OrgExtended.orgparse.date as orgdate
-from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
@@ -17,7 +14,7 @@ import sys
 import traceback 
 import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
-from   OrgExtended.orgdatepicker import *
+import OrgExtended.orgdatepicker as dpick
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 import calendar
@@ -474,7 +471,7 @@ def IsAfterNow(n, now):
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,**kwargs):
         super(CalendarView, self).__init__(name, setup, **kwargs)
-        self.dv = DateView("orgagenda.now")
+        self.dv = dpick.DateView("orgagenda.now")
 
     def UpdateNow(self, now=None):
         if(now == None):
