@@ -17,3 +17,5 @@
   - Changed docs link in settings to open the docs repo rather than
     opening the docs in sublime.
   - Fixed global tab cycling on first line of file.
+  - agendaFirstDay can now be the english name of a day of the week OR an integer.
+  - Month view in the agenda now respects agendaFirstDay
