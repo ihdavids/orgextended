@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
+import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
@@ -55,13 +55,13 @@ class FileInfo:
         
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
-        self.org = loads(bufferContents)
+        self.org = loader.loads(bufferContents)
         self.org.setFile(self)
         # Keep track of last change count.
         self.change_count = view.change_count()
 
     def Reload(self):
-        self.org = load(self.filename)
+        self.org = loader.load(self.filename)
         self.org.setFile(self)
 
     def ResetChangeCount(self):
@@ -124,13 +124,13 @@ class FileInfo:
         parentLevel = level-1
         while(cur.level < parentLevel):
             if(cur.num_children == 0):
-                tree = loads("* " + str(datetime.datetime()))
+                tree = loader.loads("* " + str(datetime.datetime()))
                 cur.insert_child(tree[1])
             cur = cur.get_last_child()
         if(heading == None or heading.isspace() or heading.strip() == ""):
             return cur
         else:
-            tree = loads(heading)
+            tree = loader.loads(heading)
             cur.insert_child(tree[1])
             cur = cur.get_last_child()
         return cur
@@ -166,7 +166,7 @@ class OrgDb:
             self.orgPaths = sets.Get("orgDirs",None)
         filename = self.FilenameFromFileOrView(fileOrView)
         if(util.isPotentialOrgFile(filename)):
-            file = FileInfo(filename, load(filename), self.orgPaths)
+            file = FileInfo(filename, loader.load(filename), self.orgPaths)
             self.AddFileInfo(file)
             return file
         else:
@@ -259,7 +259,7 @@ class OrgDb:
                         continue
                     try:
                         filename = str(path)
-                        file = FileInfo(filename,load(filename), self.orgPaths)
+                        file = FileInfo(filename,loader.load(filename), self.orgPaths)
                         self.AddFileInfo(file)
                     except Exception as e:
                         #x = sys.exc_info()

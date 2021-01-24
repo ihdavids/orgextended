@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
+import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
@@ -104,7 +104,7 @@ def onDeactivated(view):
             bufferContentsToInsert += "\n"
         didInsert = False
         # Get a capture node
-        captureNode = loads(bufferContentsToInsert)
+        captureNode = loader.loads(bufferContentsToInsert)
         # if we moused out of the window we might be replacing
         # ourselves again.
         if(lastHeader == None):

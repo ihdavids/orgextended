@@ -5,7 +5,6 @@ import re
 from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
 import OrgExtended.orgparse.node as node
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav

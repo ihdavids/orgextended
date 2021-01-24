@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
+import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
 import OrgExtended.orgparse.date as orgdate
 from   OrgExtended.orgparse.sublimenode import * 
@@ -309,7 +309,7 @@ class OrgMoveHeadingUpCommand(sublime_plugin.TextCommand):
 
             # Extract the text and make a new tree
             nodetext = self.view.substr(reg)
-            extraTree = loads(nodetext)
+            extraTree = loader.loads(nodetext)
             # Remove the old node
             curNode.remove_node()
 
@@ -337,7 +337,7 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
 
             # Extract the text and make a new tree
             nodetext = self.view.substr(reg)
-            extraTree = loads(nodetext)
+            extraTree = loader.loads(nodetext)
             # Remove the old node
             curNode.remove_node()
 

@@ -6,7 +6,6 @@ import re
 from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
 import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
