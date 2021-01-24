@@ -10,14 +10,14 @@
                 "id": "package-settings", 
                 "children": [
                     {
-                        "caption": "OrgExtended", 
+                        "caption": "Org Extended", 
                         "children": [
                             {
                                 "caption": "Docs", 
                                 "args": {
-                                    "file": "${packages}/OrgExtended/docs/start.org"
+                                    "url": "https://github.com/ihdavids/orgextended_docs/blob/master/start.org"
                                 }, 
-                                "command": "open_file"
+                                "command": "open_url"
                             }, 
                             {
                                 "caption": "-"
@@ -37,19 +37,21 @@
                                 "caption": "-"
                             },
                             {
-                                "caption": "Settings – Default", 
-                                "args": {
-                                    "file": "${packages}/OrgExtended/orgextended.sublime-settings"
-                                }, 
-                                "command": "open_file"
-                            }, 
+                                "caption": "Settings",
+                                "command": "edit_settings", "args":
+                                {
+                                    "base_file": "${packages}/OrgExtended/orgextended.sublime-settings",
+                                    "default": "// OrgExtended Settings - User\n{\n\t$0\n}\n"
+                                }
+                            },
                             {
-                                "caption": "Settings – User", 
-                                "args": {
-                                    "file": "${packages}/User/orgextended.sublime-settings"
-                                }, 
-                                "command": "open_file"
-                            }, 
+                                "caption": "Key Bindings",
+                                "command": "edit_settings", "args":
+                                {
+                                    "base_file": "${packages}/OrgExtended/Default.sublime-keymap",
+                                    "user_file": "${packages}/User/Default ($platform).sublime-keymap"
+                                }
+                            },
                             {
                                 "caption": "-"
                             }

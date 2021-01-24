@@ -13,3 +13,6 @@
     - Fixed archive notation to work without the colon separator.
     - added <q and <v quote and verse snippets
     - Added these release notes
+    - Improved settings to use the new settings ui.
+    - Changed docs link in settings to open the docs repo rather than
+      opening the docs in sublime.

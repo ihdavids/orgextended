@@ -1,5 +1,8 @@
 {
 	// The color scheme to use for the capture buffer
+    // Right now I only have a light and dark scheme. In the future
+    // I hope to allow your color scheme to impact the scheme and to provide
+    // a means of extending your scheme with the org colors
 	"color_scheme": "Packages/OrgExtended/orgextended.sublime-color-scheme",
 
     // Turn on TableEditor for orgmode
@@ -65,6 +68,13 @@
             // function <name>- generic function to find location for you
             "target": ["file","{refile}"],
             "snippet": "meeting_heading",
+
+            // This can be panel or direct
+            // Panel will open up a panel that copies its contents to your target when
+            // the panel loses focus. Direct will open up the actual file at your traget
+            // during the capture
+            "openas": "panel",
+
     		//"template": "* MEETING $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
             // prepend - Normally new captured information will be appended at the target location (last child, last table line, last list item, …). Setting this property changes that.
             // immediate-finish - When set, do not offer to edit the information, just file it away immediately. This makes sense if the template only needs information that can be added automatically.
@@ -180,6 +190,14 @@
     // Day view starts at 6am and ends at 7pm
     "agendaDayStart": 6,
     "agendaDayEnd": 19,  
+
+    // By default our first day of the week is Sunday
+    // But some people prefer the first day to be monday
+    // Set first day to 1.
+    // If you would like to only see the work week
+    // set num days to 5 as well.
+    "agendaFirstDay": 0,
+    "agendaWeekViewNumDays": 7,
 
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
