@@ -937,7 +937,10 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
 
     @classmethod
     def is_applicable(cls, settings):
-        return "orgagenda" in settings.get("color_scheme","not here")
+        try:
+            return "orgagenda" in settings.get("color_scheme","not here")
+        except:
+            return False
 
     def __init__(self, view):
         super(CompositeViewListener, self).__init__(view)
