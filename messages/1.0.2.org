@@ -11,3 +11,5 @@
 	- Working on named targets for blocks in the parser, this is to facilitate
 	  eventual chainging of inputs in the bable execution. 
     - Fixed archive notation to work without the colon separator.
+    - added <q and <v quote and verse snippets
+    - Added these release notes
