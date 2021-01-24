@@ -169,7 +169,7 @@ def ShouldFoldLocalCycle(view):
 # '-----------------------------------'
 def fold_local_cycle(view):
     fnode = db.Get().AtInView(view)
-    if(fnode):
+    if(fnode and not fnode.is_root()):
         row, col = view.curRowCol()
         if(fnode.start_row == row):
             if(fnode.is_folded(view)):
