@@ -2,12 +2,9 @@ import sublime
 import sublime_plugin
 import datetime
 import re
-from pathlib import Path
 import os
 import fnmatch
-from .orgparse.__init__ import *
 import OrgExtended.orgparse.node as node
-from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
