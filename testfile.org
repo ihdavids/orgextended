@@ -11,7 +11,7 @@ Custom TODO cycling is understood.
 // and will reject the archive file.
 #+ARCHIVE: %s_archive::* Archive
 // While these are supported they are not highlighted like A B C D E are
-//#+PRORITIES: 1 2 3 4 5
+#+PRIORITIES: 1 2 3 4 5
 #+HTML_STYLE: refined
 
 * Introduction
@@ -90,6 +90,18 @@ Custom TODO cycling is understood.
 
   Pressing enter on the link will try to do the right thing.
   [[file:./docs/links.org::#a-unique-id][Custom Id Link]]
+
+  This is a link to a target internal to an org file
+  [[Target1][Link To Target1]]
+  [[testfile.org::Target1][Link To Target1]]
+
+  Links to headings
+  [[file:testfile.org::*Scheduling][Scheduling]]
+  [[file:*Scheduling][Scheduling]]
+
+  Links to named objects
+  [[MyNamedObject][Link to Named Object]]
+  [[testfile.org::MyNamedObject][Link to Named Object]]
 
 * NOTE Scheduling
 
@@ -208,7 +220,7 @@ Custom TODO cycling is understood.
 ***** TODO [#D] Third priorty item
 ****** TODO [#E] Third priorty item
 
-
+* This has no priorities
 
 * Inline Images
   Links can be used to show images or open
@@ -233,7 +245,6 @@ Custom TODO cycling is understood.
   |----------------+-----------+-----------|
   | Something else |         5 |         6 |
 
-
 * Clocking
   #+BEGIN: clocktable :scope subtree :level 2
   |Heading|Time|
@@ -256,4 +267,22 @@ Custom TODO cycling is understood.
   #+BEGIN: clocktable :scope subtree :level 2
   This is a dynamic block
   #+END:
-    
+
+  1. Not in the list below
+* Numbered Lists
+  1. Carrots
+  2. Beets
+  3. Rhubarb
+     1. Pie
+     2. Crumble
+     3. Is there something here?
+  4. Yogurt
+     1. Greek
+  5. Cheese
+  6. Goats Milk
+
+* TODO Today
+  SCHEDULED: <2021-01-18 Mon 11:00> 
+* TODO Tomorrow
+  SCHEDULED: <2021-01-19 Tue 09:00>
+
