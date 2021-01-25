@@ -937,10 +937,13 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
 
     @classmethod
     def is_applicable(cls, settings):
-        try:
-            return "orgagenda" in settings.get("color_scheme","not here")
-        except:
-            return False
+        # 4095 seems to crash when querying settings
+        if(sublime.version() != 4095):
+            try:
+                return "orgagenda" in settings.get("color_scheme","not here")
+            except:
+                return False
+        return False
 
     def __init__(self, view):
         super(CompositeViewListener, self).__init__(view)

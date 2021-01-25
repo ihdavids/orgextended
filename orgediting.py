@@ -24,8 +24,6 @@ import OrgExtended.orgdatepicker as datep
 import OrgExtended.orginsertselected as insSel
 import OrgExtended.orglinks as orglink
 
-defaultPriorities = ["A","B","C","D","E"]
-
 log = logging.getLogger(__name__)
 
 # MOVING TO ANY DONE STATE:
@@ -96,8 +94,7 @@ def ShouldClose(node, fromState, toState):
     # NOTE: We need to get the todo transitions
     #       into this as well!
     toState = toState.strip()
-    globalStartup = sets.Get("startup",[])
-    startup = node.root.startup(globalStartup)
+    startup = node.root.startup()
     if(IsDoneState(node, toState) and Startup.logdone in startup):
         return True
 
@@ -118,8 +115,7 @@ def ShouldNote(node, fromState, toState):
     # NOTE: We need to get the todo transitions
     #       into this as well!
     toState = toState.strip()
-    globalStartup = sets.Get("startup",[])
-    startup = node.root.startup(globalStartup)
+    startup = node.root.startup()
     if(IsDoneState(node,toState) and Startup.lognotedone in startup):
         return True
 
@@ -234,7 +230,7 @@ class OrgPriorityChangeCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone = None):
         self.onDone = onDone
         self.node = db.Get().AtInView(self.view)
-        self.priorities = sets.Get("priorities", defaultPriorities)
+        self.priorities = self.node.priorities()
         self.priorities = copy.copy(self.priorities)
         self.priorities.append("none")
         row = self.node.start_row
@@ -551,7 +547,7 @@ class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         self.onDone = onDone
         self.input = insSel.OrgInput()
-        print(str(db.Get().customids))
+        #print(str(db.Get().customids))
         self.input.run("Custom Id:",db.Get().customids, evt.Make(self.on_done))
 
 class OrgSetTodayCommand(sublime_plugin.TextCommand):

@@ -14,9 +14,25 @@ from .inline import to_plain_text
 from .utils.py3compat import PY3, unicode
 import copy
 from .startup import *
+import OrgExtended.asettings as sets
 
-    # Returns true if this is more than just a heading
 
+@add_method(node.OrgBaseNode)
+def priorities(self, defaultValue = None):
+    if(defaultValue == None):
+        defaultValue = ["A","B","C","D","E"]
+    priorityValues = sets.Get("priorities", defaultValue)
+    return self.list_comment("PRIORITIES", priorityValues)
+
+
+@add_method(node.OrgBaseNode)
+def startup(self, defaultVal = None):
+    if(defaultVal == None):
+        defaultVal = []
+    globalStartup = sets.Get("startup",defaultVal)
+    return self.list_comment("STARTUP", globalStartup)
+
+# Returns true if this is more than just a heading
 @add_method(node.OrgBaseNode)
 def spans_lines(self, view):
     s = self.start_row

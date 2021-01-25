@@ -417,9 +417,13 @@ class OrgBaseNode(Sequence):
             return self._special_comments[key]
         return defaultVal
     
-    def startup(self, defaultVal):
+    def list_comment(self, key, defaultVal):
+        if(defaultVal == None):
+            defaultVal = []
+        if(self.parent):
+            defaultVal = self.parent.list_comment(key, defaultVal)
         comment = " ".join(defaultVal)
-        val = self.get_comment("STARTUP",[comment])[0].split(" ")
+        val = self.get_comment(key,[comment])[0].split(" ")
         return val
 
     @property
