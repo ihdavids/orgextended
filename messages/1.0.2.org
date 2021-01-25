@@ -19,3 +19,5 @@
   - Fixed global tab cycling on first line of file.
   - agendaFirstDay can now be the english name of a day of the week OR an integer.
   - Month view in the agenda now respects agendaFirstDay
+  - PRIORITIES comment is now respected in change priority command
+  - STARTUP comment now recurses
