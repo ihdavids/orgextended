@@ -127,7 +127,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			extensions = ext.find_extension_modules('src')
+			extensions = ext.find_extension_modules('src', ["plantuml", "powershell", "python"])
 			line = view.substr(view.line(start))
 			m = RE_SRC_BLOCK.search(line)
 			if(not m):

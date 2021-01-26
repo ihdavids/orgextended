@@ -81,18 +81,18 @@ class Resolver(AbstractLinkResolver):
         basename = os.path.basename(filepath)
         for pattern in self.force_load_patterns:
             if fnmatch(basename, pattern):
-                print('found in force_load_patterns')
+                #print('found in force_load_patterns')
                 return False
         return True
 
         folder_exclude_patterns = self.settings.get('folder_exclude_patterns')
         if basename in folder_exclude_patterns:
-            print('found in folder_exclude_patterns')
+            #print('found in folder_exclude_patterns')
             return True
         file_exclude_patterns = self.settings.get('file_exclude_patterns')
         for pattern in file_exclude_patterns:
             if fnmatch(basename, pattern):
-                print('found in file_exclude_patterns')
+                #print('found in file_exclude_patterns')
                 return True
         return False
 
@@ -115,11 +115,11 @@ class Resolver(AbstractLinkResolver):
         # The presence of a custom ID means we jump
         # using a different means
         if(cid):
-            print("Found ID trying to jump to: " + cid)
+            #print("Found ID trying to jump to: " + cid)
             db.Get().JumpToCustomId(cid)
             return True
         if(heading):
-            print("Found Heading trying to jump to: " + heading)
+            #print("Found Heading trying to jump to: " + heading)
             fpath = self.view.RelativeTo(filepath).lower()
             fi = db.Get().FindInfo(fpath)
             if(fi):
@@ -129,7 +129,7 @@ class Resolver(AbstractLinkResolver):
                         col = 0
                         break
         if(textmatch):
-            print("Found Textmatch trying to jump to: " + textmatch)
+            #print("Found Textmatch trying to jump to: " + textmatch)
             fpath = self.view.RelativeTo(filepath).lower()
             if(self.tryMatchDirectTarget(fpath, textmatch)):
                 return True
@@ -154,7 +154,8 @@ class Resolver(AbstractLinkResolver):
             self.view.window().open_file(filepath, sublime.ENCODED_POSITION)
             return True
         else:
-            print('file_is_excluded: ' + filepath)
+            #print('file_is_excluded: ' + filepath)
+            pass
 
         return None
 
@@ -164,5 +165,5 @@ class Resolver(AbstractLinkResolver):
 
     def execute(self, content):
         if content is not True:
-            print('normal open')
+            #print('normal open')
             return super(Resolver, self).execute(content)

@@ -65,10 +65,10 @@ class Resolver(AbstractRegexLinkResolver):
         else:
             cmd = command + ['start ' + content]
 
-        print('HTTP*****')
-        print(repr(content), content)
-        print(repr(cmd))
-        print(cmd)
+        #print('HTTP*****')
+        #print(repr(content), content)
+        #print(repr(cmd))
+        #print(cmd)
         sublime.status_message('Executing: %s' % cmd)
         if sys.platform != 'win32':
             process = subprocess.Popen(

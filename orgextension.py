@@ -36,22 +36,26 @@ def load_module(basemodule, folder, filename):
 	return module
 
 def GetUserFolder():
-	base = os.path.dirname(os.path.abspath(__file__))
-	return os.path.join(base,'..','User')
+	base = sublime.packages_path()
+	#base = os.path.dirname(os.path.abspath(__file__))
+	return os.path.join(base,'User')
 
 
-def find_extension_modules(folder):
+def find_extension_modules(folder, builtins):
 	importlib.invalidate_caches()
-	base = os.path.dirname(os.path.abspath(__file__))
+	#base = os.path.dirname(os.path.abspath(__file__))
+	base = sublime.packages_path()
 	path = base + '/' + folder
 	moduleTable = {}
 	# Built in extensions
-	for root, dirnames, filenames in os.walk(path):
-		for filename in fnmatch.filter(filenames, '*.py'):
-			if '__init__' in filename or 'abstract' in filename:
-				continue
-			module = load_module("OrgExtended", folder, filename)
-			moduleTable[filename.split('.')[0]] = module
+	#for root, dirnames, filenames in os.walk(path):
+	#	for filename in fnmatch.filter(filenames, '*.py'):
+	#		if '__init__' in filename or 'abstract' in filename:
+	#			continue
+	for filename in builtins:
+		filename = filename + ".py"
+		module = load_module("OrgExtended", folder, filename)
+		moduleTable[filename.split('.')[0]] = module
 	# User generated extensions
 	path = base + '/../User/' + folder
 	for root, dirnames, filenames in os.walk(path):
