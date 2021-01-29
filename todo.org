@@ -1,4 +1,4 @@
-* TODO Things I want [10/41]
+* TODO Things I want [11/41]
 	- [ ] Named Objects [0%]
 		- [ ] Works with babel
 		- [ ] Identifies tables and other things
@@ -7,7 +7,7 @@
 		- [x] Basic capture buffer
 		- [x] Templates in config file.
 		- [x] Capture targetting
-			- [ ] *Capture manages level properly (BROKEN)*
+			- [x] *Capture manages level properly (BROKEN)*
 		- [x] Capture using sublime snippets
 		- [ ] Capture panel size controls?
 	- [-] Parsing [4/5]
@@ -150,8 +150,8 @@
 
 * TODO Next
 ** TODO Agenda
-	- [ ] Week View
-	- [ ] Week Quick Select
+	- [x] Week View
+	- [x] Week Quick Select
 
 ** TODO Notifications
     - [x] Linux popup
