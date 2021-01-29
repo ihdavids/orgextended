@@ -25,7 +25,7 @@ def ensure_dir(file_path):
 def download_highlightjs():
 	users = os.path.join(ext.GetUserFolder(),"highlightjs")
 	if(os.path.exists(users)):
-		log.error('highlightjs folder exists not downloading')
+		log.info(' download_highlighjs - highlightjs folder exists not downloading')
 		return
 	import requests
 	# We have to get the csrf token out of the document

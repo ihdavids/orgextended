@@ -6,10 +6,19 @@ from .abstract import AbstractLinkResolver
 import OrgExtended.orgdb as db
 from OrgExtended.orgutil.util import *
 
+PATTERN_SETTING = 'resolver.local_file.pattern'
+PATTERN_DEFAULT = r'^(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+))|(::\*(?P<heading>[a-zA-Z0-9!$@%&_-]+)))?\s*$'
+
+FORCE_LOAD_SETTING = 'resolver.local_file.force_into_sublime'
+
+
 class Resolver(AbstractLinkResolver):
     def __init__(self, view):
         super(Resolver, self).__init__(view)
         self.view = view
+        get = self.settings.get
+        pattern = get(PATTERN_SETTING, PATTERN_DEFAULT)
+        self.regex = re.compile(pattern)        
 
     def is_internal_link(self, filepath):
     	fp = filepath.strip()

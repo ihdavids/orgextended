@@ -484,8 +484,8 @@ class HtmlDoc:
 		self.fs.close()
 
 
-# Export the entire file using pandoc 
-class OrgExportFileOHtmlCommand(sublime_plugin.TextCommand):
+# Export the entire file using our internal exporter
+class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 	def build_head(self, doc):
 		highlight      = GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
 		doc.AddInlineStyle(GetHighlightJsCss(highlight))
@@ -521,14 +521,15 @@ class OrgExportFileOHtmlCommand(sublime_plugin.TextCommand):
 	def run(self,edit, onDone=None):
 		self.file = db.Get().FindInfo(self.view)
 		if(None == self.file):
-			log.debug("Not an org file? Cannot build reveal document")
+			log.error("Not an org file? Cannot build reveal document")
 			evt.EmitIf(onDone)	
 			return
 		doc = None
 		self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
-		print("STYLE: " + self.style)
+		log.log(51,"EXPORT STYLE: " + self.style)
 		try:
-			doc = HtmlDoc(HtmlFilename(self.view), self.file)
+			outputFilename = HtmlFilename(self.view)
+			doc = HtmlDoc(outputFilename, self.file)
 			doc.style = self.style
 			doc.StartHead()
 			self.build_head(doc)
@@ -540,7 +541,12 @@ class OrgExportFileOHtmlCommand(sublime_plugin.TextCommand):
 		finally:	
 			if(None != doc):
 				doc.Close()
+			log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
+			self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
+			sublime.set_timeout(self.clear_status, 1000*10)
 			evt.EmitIf(onDone)
+	def clear_status(self):
+		self.view.set_status("ORG_EXPORT","")
 
 def sync_up_on_closed():
 	notice.Get().BuildToday()
@@ -552,18 +558,18 @@ class OrgDownloadHighlighJs(sublime_plugin.TextCommand):
 		import OrgExtended.orgutil.webpull as wp
 		wp.download_highlightjs()
 
-class OrgExportSubtreeAsOHtmlCommand(sublime_plugin.TextCommand):
+class OrgExportSubtreeAsOrgHtmlCommand(sublime_plugin.TextCommand):
 	def onDone(self):
 		# Remove this item from the DB!
+		outputFilename = HtmlFilename(self.tempView)
 		db.Get().Remove(self.tempView)
 		self.tempView.set_scratch(True)
 		self.view.window().focus_view(self.tempView)
 		self.view.window().run_command("close_file")	
 		self.tempView = None
 		self.view.window().focus_view(self.view)
-		sublime.set_timeout_async(lambda: sync_up_on_closed(), 1000)
+		sublime.set_timeout(lambda: sync_up_on_closed(), 1000)
 		db.Get().RebuildDb()
-
 
 	def run(self,edit):
 		n = db.Get().AtInView(self.view)
@@ -575,6 +581,6 @@ class OrgExportSubtreeAsOHtmlCommand(sublime_plugin.TextCommand):
 		#if "#+TITLE:" not in ct:
 		#	start = "#+TITLE: " + os.path.splitext(os.path.basename(self.view.file_name()))[0]
 		tempFile = tf.CreateTempFileFromRegion(self.view, r, ".org", start)
-		print("temp file: " + str(tempFile))
+		#print("temp file: " + str(tempFile))
 		self.tempView = self.view.window().open_file(tempFile)
-		self.tempView.run_command('org_export_file_oHtml', {"onDone": evt.Make(self.onDone)})
+		self.tempView.run_command('org_export_file_org_html', {"onDone": evt.Make(self.onDone)})

@@ -99,11 +99,11 @@
 
     // Export
     {"caption": "Org Export File As Reveal Js","command": "org_export_file_reveal_js"   },
-    {"caption": "Org Export File As OHtml",    "command": "org_export_file_oHtml"       },
-    {"caption": "Org Export Subtree As OHtml", "command": "org_export_subtree_as_oHtml" },
-    {"caption": "Org Export File As Html",     "command": "org_export_file_as_html"     },
-    {"caption": "Org Export Subtree As Html",  "command": "org_export_subtree_as_html"  },
-    {"caption": "Org Test Thing",              "command":   "org_show_item"  },
+    {"caption": "Org Export File As Html",     "command": "org_export_file_org_html"       },
+    {"caption": "Org Export Subtree As Html",  "command": "org_export_subtree_as_org_html" },
+    {"caption": "Org Pandoc File To Html",     "command": "org_export_file_as_html"     },
+    {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"  },
+    //{"caption": "Org Test Thing",              "command": "org_show_item"  },
 
     {"caption": "Org Download Highligh Js", "command": "org_download_highligh_js"  }
 ]

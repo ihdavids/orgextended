@@ -281,8 +281,12 @@ Custom TODO cycling is understood.
   5. Cheese
   6. Goats Milk
 
-* TODO Today
-  SCHEDULED: <2021-01-18 Mon 11:00> 
+* Named Object Target
+
+  #+NAME: MyNamedObject
+  | Hello      | World |
+  | Some Table |       |
+
 * TODO Tomorrow
   SCHEDULED: <2021-01-19 Tue 09:00>
 
