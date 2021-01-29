@@ -168,11 +168,17 @@ def GetStyleRelatedData(style, extension):
 		with open(inHeader) as f:
 			contents = f.read()
 			return contents
-	inHeader = os.path.join(sublime.packages_path(),"OrgExtended", "htmlstyles", style + extension)
-	if(os.path.isfile(inHeader)):
-		with open(inHeader) as f:
-			contents = f.read()
-			return contents
+	resourceName = "Packages/OrgExtended/htmlstyles/" + style + extension
+	try:
+		contents = sublime.load_resource(resourceName)
+		return contents
+	except:
+		pass
+	#inHeader = os.path.join(sublime.packages_path(),"OrgExtended", "htmlstyles", style + extension)
+	#if(os.path.isfile(inHeader)):
+	#	with open(inHeader) as f:
+	#		contents = f.read()
+	#		return contents
 	return ""
 
 

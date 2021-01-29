@@ -9,12 +9,10 @@ import re
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	print("EXECUTE STARTED")
 	# create file-like string to capture output
 	codeOut = io.StringIO()
 	codeErr = io.StringIO()
 	code    = cmd.source
-	print("TRYING TO EXECUTE 2")
 	# capture output and errors
 	oldOut     = sys.stdout
 	oldErr     = sys.stderr

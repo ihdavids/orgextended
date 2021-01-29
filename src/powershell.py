@@ -13,7 +13,6 @@ def Extension(cmd):
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	print("EXECUTE STARTED")
 	commandLine = [r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", cmd.filename]
 	try:
 		startupinfo = subprocess.STARTUPINFO()
