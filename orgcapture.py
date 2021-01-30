@@ -336,7 +336,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
     def cleanup_capture_panel(self):
         global captureBufferName
         if(not self.openas):
-            self.panel.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
+            self.panel.set_syntax_file('Packages/OrgExtended/OrgExtended.sublime-syntax')
             self.panel.set_name(captureBufferName)
 
     # In OpenAs mode we insert some pre-heading stars

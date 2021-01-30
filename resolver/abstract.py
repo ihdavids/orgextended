@@ -16,7 +16,7 @@ class AbstractLinkResolver(object):
 
     def __init__(self, view):
         self.view = view
-        self.settings      = sublime.load_settings('orgextended.sublime-settings')
+        self.settings      = sublime.load_settings('OrgExtended.sublime-settings')
         self.link_commands = self.settings.get('resolver.abstract.commands', DEFAULT_OPEN_LINK_COMMANDS)
 
     def extract(self, content):
@@ -83,7 +83,7 @@ class AbstractRegexLinkResolver(AbstractLinkResolver):
 
     def __init__(self, view):
         self.view = view
-        self.settings      = sublime.load_settings('orgextended.sublime-settings')
+        self.settings      = sublime.load_settings('OrgExtended.sublime-settings')
         self.link_commands = self.settings.get('resolver.abstract.commands', DEFAULT_OPEN_LINK_COMMANDS)
         self.regex         = None
 

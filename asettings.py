@@ -24,7 +24,7 @@ class ASettings:
 		return val
 
 
-configFilename    = "orgextended"
+configFilename    = "OrgExtended"
 
 def setup_user_settings():
 	filename = configFilename + ".sublime-settings"
