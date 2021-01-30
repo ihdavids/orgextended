@@ -3,7 +3,7 @@
     // Right now I only have a light and dark scheme. In the future
     // I hope to allow your color scheme to impact the scheme and to provide
     // a means of extending your scheme with the org colors
-	"color_scheme": "Packages/OrgExtended/orgextended.sublime-color-scheme",
+	"color_scheme": "Packages/OrgExtended/OrgExtended.sublime-color-scheme",
 
     // Turn on TableEditor for orgmode
     "enable_table_editor": true,
