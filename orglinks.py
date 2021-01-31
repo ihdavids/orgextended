@@ -208,14 +208,14 @@ class ImageHandler:
 
     @staticmethod
     def save_cache():
-       user_settings_path = os.path.join(sublime.packages_path(), "User","orgextended_image_cache.yaml")
+       user_settings_path = os.path.join(sublime.packages_path(), "User","OrgExtended_image_cache.yaml")
        f = open(user_settings_path,"w")
        data = yaml.dump(ImageHandler.Cache, f)
        f.close() 
 
     @staticmethod
     def load_cache():
-        user_settings_path = os.path.join(sublime.packages_path(), "User","orgextended_image_cache.yaml")
+        user_settings_path = os.path.join(sublime.packages_path(), "User","OrgExtended_image_cache.yaml")
         if(os.path.isfile(user_settings_path)):
             stream = open(user_settings_path, 'r')
             ImageHandler.Cache = yaml.load(stream, Loader=yaml.SafeLoader)

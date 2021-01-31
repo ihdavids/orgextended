@@ -56,7 +56,7 @@ class ClockManager:
 
 	@staticmethod
 	def ClockPath():
-	   return os.path.join(sublime.packages_path(), "User","orgextended_clocks.yaml")
+	   return os.path.join(sublime.packages_path(), "User","OrgExtended_Clocks.yaml")
 
 
 	@staticmethod

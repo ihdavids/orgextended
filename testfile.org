@@ -133,7 +133,7 @@ Custom TODO cycling is understood.
 	Working on supporting a variety of source code block styles.
 	Hopefully I can support some of the babel engine as well eventually
 
-	With the way org works the orgextended.sublime-color-scheme has to own your
+	With the way org works the OrgExtended.sublime-color-scheme has to own your
 	ENTIRE color scheme. You can override any of it by providing your own sublime color scheme.
 
 	I have cheated here and pulled form the Monokai Extended tmTheme (I always found that language, theme confusing when it is a color scheme not theme)
@@ -288,5 +288,4 @@ Custom TODO cycling is understood.
   | Some Table |       |
 
 * TODO Tomorrow
-  SCHEDULED: <2021-01-19 Tue 09:00>
 

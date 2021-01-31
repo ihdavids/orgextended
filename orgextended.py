@@ -161,7 +161,7 @@ class OrgCore(sublime_plugin.EventListener):
 class OrgNewFileCommand(sublime_plugin.WindowCommand):
     def run(self):
         view = self.window.new_file()
-        view.set_syntax_file('Packages/OrgExtended/orgextended.sublime-syntax')
+        view.set_syntax_file('Packages/OrgExtended/OrgExtended.sublime-syntax')
 
 # Iterate over all open "tabs" and sync them up so they are folded the way they are supposed to be.
 class OrgOnLoadSyncUpCommand(sublime_plugin.WindowCommand):

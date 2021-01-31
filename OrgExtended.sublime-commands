@@ -5,14 +5,14 @@
         "caption": "Preferences: OrgExtended Settings – Default",
         "command": "open_file",
         "args": {
-            "file": "${packages}/OrgExtended/orgextended.sublime-settings"
+            "file": "${packages}/OrgExtended/OrgExtended.sublime-settings"
         }
     },
     {
         "caption": "Preferences: OrgExtended Settings – User",
         "command": "open_file",
         "args": {
-            "file": "${packages}/User/orgextended.sublime-settings"
+            "file": "${packages}/User/OrgExtended.sublime-settings"
         }
     },
     {"caption": "TableNext", "command":"table_editor_next_field"},
