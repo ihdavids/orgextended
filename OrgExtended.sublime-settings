@@ -192,8 +192,8 @@
     //"agendaHeaderFormat": "%A \t%d %B %Y",
 
     // Day view starts at 6am and ends at 7pm
-    "agendaDayStart": 6,
-    "agendaDayEnd": 19,  
+    "agendaDayStartTime": 6,
+    "agendaDayEndTime": 19,  
 
     // If you would like to only see the work week
     // set num days to 5 and the firstDayOfWeek above

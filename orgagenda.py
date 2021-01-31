@@ -761,8 +761,8 @@ class AgendaView(AgendaBaseView):
         self.InsertAgendaHeading(edit)
         self.RenderDateHeading(edit, self.now)
         view     = self.view
-        dayStart = sets.Get("agendaDayStart",6)
-        dayEnd   = sets.Get("agendaDayEnd",19)  
+        dayStart = sets.Get("agendaDayStartTime",6)
+        dayEnd   = sets.Get("agendaDayEndTime",19)  
         allDat = []
         before = True
         for h in range(dayStart, dayEnd):
