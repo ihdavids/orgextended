@@ -471,7 +471,7 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
             dateval = orgdate.OrgDateFreeFloating.from_str(dateval)
         # TODO: Find scheduled and replace it as well.
         node = db.Get().AtInView(self.view)
-        if(not node.is_root()):
+        if(node and not node.is_root()):
             self.oldsel = self.view.sel()[0]
             pt = self.view.text_point(node.start_row,0)
             l = self.view.line(pt)

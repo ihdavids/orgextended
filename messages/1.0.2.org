@@ -21,3 +21,9 @@
   - Month view in the agenda now respects agendaFirstDay
   - PRIORITIES comment is now respected in change priority command
   - STARTUP comment now recurses
+  - WARNING: orgextended.sublime-syntax renamed to OrgExtended. This is so the
+  	title appears as OrgExtended in the syntax list on the bottom right of sublime.
+  	This can caust errors when loading sublime with an old settings file.
+  	Please carefully rename your settings file and close all org tabs.
+  - Fixed a number of issues when loading as a zipped package. Export should
+    work from a package again. 

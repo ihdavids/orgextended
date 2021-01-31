@@ -183,6 +183,10 @@
         "Flags":   ["Todos : tagfilter |TAG1 |OTHERTAGS", "Todos : tagfilter OTHERTAGS"],
     },
 
+    // By default our first day of the week is Sunday
+    // But some people prefer the first day to be monday
+    // Set first day to Monday
+    "firstDayOfWeek": "Sunday",
 
     // Configure the agenda header format
     //"agendaHeaderFormat": "%A \t%d %B %Y",
@@ -191,12 +195,9 @@
     "agendaDayStart": 6,
     "agendaDayEnd": 19,  
 
-    // By default our first day of the week is Sunday
-    // But some people prefer the first day to be monday
-    // Set first day to 1.
     // If you would like to only see the work week
-    // set num days to 5 as well.
-    "agendaFirstDay": 0,
+    // set num days to 5 and the firstDayOfWeek above
+    // to Monday
     "agendaWeekViewNumDays": 7,
 
     // This is the template used to notify outside of sublime on org notifications 

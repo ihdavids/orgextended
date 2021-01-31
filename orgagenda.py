@@ -471,7 +471,7 @@ def IsAfterNow(n, now):
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,**kwargs):
         super(CalendarView, self).__init__(name, setup, **kwargs)
-        dayOffset = sets.GetDateAsIndex("agendaFirstDay","Sunday")
+        dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
         self.dv = dpick.DateView("orgagenda.now",firstDayOffset = dayOffset)
 
     def UpdateNow(self, now=None):
@@ -629,7 +629,7 @@ class WeekView(AgendaBaseView):
             wday = -1
         wstart = self.now + datetime.timedelta(days=-(wday+1))
         dayNames  = ["Sun","Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
-        dayOffset = sets.GetDateAsIndex("agendaFirstDay","Sunday")
+        dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
         numDays   = sets.Get("agendaWeekViewNumDays",7)
         for i in range(0,numDays):
             index = dayOffset + i

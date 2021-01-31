@@ -4,6 +4,7 @@ import sublime_plugin
 import datetime
 from OrgExtended.orgparse.date import *
 import OrgExtended.pymitter as evt
+import OrgExtended.asettings as sets
 
 def CreateUniqueViewNamed(name, mapped=None):
 	# Close the view if it exists
@@ -136,7 +137,11 @@ class DateView:
 		self.HighlightDay(self.cdate.start)
 
 	def ReShow(self):
+		if(self.cdate == None):
+			return
 		now = self.cdate.start
+		if(now == None):
+			return
 		mid = (now.month - self.midmonth + 1)
 		if(mid < 0 or mid > 2):
 			self.Render(now)
@@ -211,8 +216,8 @@ class DateView:
 
 
 class DatePicker:
-	def __init__(self):
-		self.dateView = DateView()
+	def __init__(self,firstDayOffset=0):
+		self.dateView = DateView(None, firstDayOffset)
 		self.months = []
 
 	def on_done(self, text):
@@ -345,5 +350,6 @@ class OrgDatePickerNextMonthCommand(sublime_plugin.TextCommand):
 
 def Pick(onDone):
 	global datePicker
-	datePicker = DatePicker()
+	dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
+	datePicker = DatePicker(dayOffset)
 	datePicker.Show(datetime.datetime.now(), onDone)
