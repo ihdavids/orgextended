@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import datetime
 import re
+import regex
 from pathlib import Path
 import os
 import fnmatch
@@ -122,6 +123,8 @@ def GetCollapsibleCss():
 """
 
 
+RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-Z0-9._-]+)\s+(?P<value>([^:]|((?<! )[:]))+))+$")
+RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
 RE_SCHEDULING_LINE = re.compile(r"^\s*(SCHEDULED|CLOSED|DEADLINE|CLOCK)[:].*")
 RE_DRAWER_LINE = re.compile(r"^\s*[:].+[:]\s*$")
 RE_END_DRAWER_LINE = re.compile(r"^\s*[:](END|end)[:]\s*$")
@@ -306,6 +309,22 @@ class HtmlDoc:
 		level = n.level + 1
 		self.fs.write("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
 
+	def AttributesGather(self, l):
+		m = RE_ATTR.match(l)
+		# We capture #+ATTR_HTML: lines
+		if(m):
+			keys = m.captures('name')
+			vals = m.captures('value')
+			if not hasattr(self,'attrs'):
+				self.attrs = {}
+			for i in range(len(keys)):
+				self.attrs[keys[i]] = vals[i]
+			return True
+		# We skip #+ATTR_ORG: lines
+		m = RE_ATTR_ORG.match(l)
+		if(m):
+			return True
+		return False
 
 	def EscAndLinks(self, l):
 		line = html.escape(l)
@@ -317,13 +336,18 @@ class HtmlDoc:
 				desc = link
 			else:
 				desc = desc.strip()
-			if(link.endswith(".png") or link.endswith(".jpg") or link.endswith(".gif")):
+			if(link.endswith(".png") or link.endswith(".jpg") or link.endswith(".jpeg") or link.endswith(".gif")):
 				if(link.startswith("file:")):
 					link = re.sub(r'^file:','',link)	
 				extradata = ""	
 				if(self.commentName and self.commentName in link):
 					extradata =  " " + self.commentData
 					self.commentName = None
+				if(hasattr(self,'attrs')):
+					if('width' in self.attrs):
+						extradata += "width=\"" + str(self.attrs['width']) + "\" "
+					if('height' in self.attrs):
+						extradata += "height=\"" + str(self.attrs['height']) + "\" "
 				line = RE_LINK.sub("<img src=\"{link}\" alt=\"{desc}\"{extradata}>".format(link=link,desc=desc,extradata=extradata),line)
 			else:
 				line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
@@ -353,6 +377,8 @@ class HtmlDoc:
 		inSrc    = False
 		skipSrc  = False
 		for l in slide._lines[1:]:
+			if(self.AttributesGather(l)):
+				continue
 			if(inDrawer):
 				if(RE_END_DRAWER_LINE.search(l)):
 					inDrawer = False
