@@ -309,6 +309,9 @@ class HtmlDoc:
 		level = n.level + 1
 		self.fs.write("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
 
+	def ClearAttributes(self):
+		self.attrs = {}
+
 	def AttributesGather(self, l):
 		m = RE_ATTR.match(l)
 		# We capture #+ATTR_HTML: lines
@@ -344,13 +347,13 @@ class HtmlDoc:
 					extradata =  " " + self.commentData
 					self.commentName = None
 				if(hasattr(self,'attrs')):
-					if('width' in self.attrs):
-						extradata += "width=\"" + str(self.attrs['width']) + "\" "
-					if('height' in self.attrs):
-						extradata += "height=\"" + str(self.attrs['height']) + "\" "
+					for key in self.attrs:
+						extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
 				line = RE_LINK.sub("<img src=\"{link}\" alt=\"{desc}\"{extradata}>".format(link=link,desc=desc,extradata=extradata),line)
+				self.ClearAttributes()
 			else:
 				line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
+				self.ClearAttributes()
 		else:
 			line = RE_BOLD.sub(r"<b>\1</b>",line)
 			line = RE_ITALICS.sub(r"<i>\1</i>",line)
