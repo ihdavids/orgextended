@@ -2,5 +2,6 @@
 	"install": "messages/install.org",
 	"1.0.0": "messages/install.org",
 	"1.0.1": "messages/1.0.1.org",
-	"1.0.2": "messages/1.2.0.org"
+	"1.0.2": "messages/1.0.2.org"
+	"1.0.3": "messages/1.0.3.org"
 }

@@ -1,0 +1,3 @@
+* 1.0.3
+	- HTML Exporter has better support for HTML_ATTR comments.
+	
