@@ -1,3 +1,6 @@
 * 1.0.3
 	- HTML Exporter has better support for HTML_ATTR comments.
-	
+	- Capture now works on ST4 4096+ with the new modifiers
+	- Direct capture mode has had some fixes that handle spaces on a line and end of file better	
+	- WeekView in calendar now respects agendaDayStartTime and agendaDayEndTime
+		- View will be truncated to the hours specified

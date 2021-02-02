@@ -539,7 +539,22 @@ class WeekView(AgendaBaseView):
         self.cellSize    = 5
         pt = self.view.size()
         row, c = self.view.rowcol(pt)
-        header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
+        dayStart = sets.Get("agendaDayStartTime",6)
+        dayEnd   = sets.Get("agendaDayEndTime",19)
+        if(dayEnd > 23):
+            dayEnd = 23
+        if(dayStart < 0):
+            dayStart = 0
+        if(dayStart > dayEnd):
+            dayStart = 0
+            dayEnd   = 23
+        header = "     "
+        for i in range(dayStart, dayEnd+1):
+            if(i == 10):
+                header += " "
+            header += "   {:2d}".format(i)
+        header +="  \n"
+        #header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
         self.view.insert(edit, self.view.size(), header)
         col = self.startOffset + hour*self.cellSize
         s = self.view.text_point(row,col)
@@ -573,7 +588,16 @@ class WeekView(AgendaBaseView):
         lastMatchEntry = None
         matchCount     = 0
         doneMatchCount = 0
-        for hour in range(0,24):
+        dayStart = sets.Get("agendaDayStartTime",6)
+        dayEnd   = sets.Get("agendaDayEndTime",19)
+        if(dayEnd > 23):
+            dayEnd = 23
+        if(dayStart < 0):
+            dayStart = 0
+        if(dayStart > dayEnd):
+            dayStart = 0
+            dayEnd   = 23
+        for hour in range(dayStart,dayEnd+1):
             for minSlot in range(0,self.cellSize):
                 match = None
                 matche = None
@@ -584,7 +608,7 @@ class WeekView(AgendaBaseView):
                         matche = entry
                 if(lastMatch != match and lastMatch != None):
                     s = self.view.text_point(row,lastMatchStart)
-                    e = self.view.text_point(row,self.startOffset + hour*self.cellSize + minSlot)
+                    e = self.view.text_point(row,self.startOffset + (hour-dayStart)*self.cellSize + minSlot)
                     reg = sublime.Region(s, e)
                     if(IsDone(lastMatch)):
                         style = "orgagenda.week.done." + str(doneMatchCount)
@@ -600,7 +624,7 @@ class WeekView(AgendaBaseView):
                     if(lastMatch != match):
                         lastMatch      = match
                         lastMatchEntry = matche
-                        lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
+                        lastMatchStart = self.startOffset + (hour-dayStart)*self.cellSize + minSlot
                     d = distanceFromStart(match, hour, minSlot)
                     # If the time slot is larger than the name we space pad it
                     c = " "
@@ -610,7 +634,7 @@ class WeekView(AgendaBaseView):
                 else:
                     if(lastMatch != match):
                         lastMatch      = match
-                        lastMatchStart = self.startOffset + hour*self.cellSize + minSlot
+                        lastMatchStart = self.startOffset + (hour-dayStart)*self.cellSize + minSlot
                         lastMatchEntry = matche
                     if(minSlot < 4):
                         self.view.insert(edit, self.view.size(), ".")

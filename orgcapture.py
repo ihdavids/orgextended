@@ -301,23 +301,24 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
 class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
     def on_done(self, index):
         pass
-    def on_done_base(self, index):
+    def on_done_base_st3(self, index):
         if(index < 0):
             return
         self.templates         = sets.Get("captureTemplates",[])
         self.on_done(index)
+    def on_done_base_st4(self, index, modifiers):
+        self.on_done_base_st3(index)
     def run(self, edit):
         templates = sets.Get("captureTemplates",[])
         temps = []
         for temp in templates:
             log.debug("TEMPLATE: ", temp)
             temps.append(temp['name'])
-        self.view.window().show_quick_panel(temps, self.on_done_base, -1, -1)
+        if(int(sublime.version()) >= 4096):
+            self.view.window().show_quick_panel(temps, self.on_done_base_st4, -1, -1)
+        else:
+            self.view.window().show_quick_panel(temps, self.on_done_base_st3, -1, -1)
 
-
-class OrgCaptureDirectCommand(OrgCaptureBaseCommand):
-    def on_done():
-        pass
 
 # Capture some text into our refile org file
 class OrgCaptureCommand(OrgCaptureBaseCommand):
@@ -343,9 +344,11 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
     # Before inserting the snippet. This SHOULD get our
     # heading where it needs to be?
     def on_added_stars(self):
+        self.pt = self.panel.text_point(self.insertRow,0)
         linev = self.panel.line(self.pt)
+        linetxt = self.panel.substr(linev)
         self.panel.sel().clear()
-        self.panel.sel().add(linev.end())
+        self.panel.sel().add(linev.begin() + len(linetxt.strip()))
         self.insert_snippet(self.index)
 
     def on_panel_ready(self, index, openas, panel):
@@ -371,29 +374,31 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             window.focus_view(panel)
             self.cleanup_capture_panel()
         elif('snippet' in template):
-            level = 0
-            pt = None
+            self.level = 0
+            self.pt = None
             prefix = ""
             if(self.openas):
                 insertAt = captureFile.At(at)
-                pt = panel.text_point(insertAt.end_row+1,0)
-                linev = panel.line(pt)
+                self.pt = panel.text_point(insertAt.end_row+1,0)
+                self.insertRow = insertAt.end_row+1
+                linev = panel.line(self.pt)
                 linetxt = panel.substr(linev)
                 if(linetxt and not linetxt.strip() == ""):
                     prefix = "\n"
-                    pt = linev.end()
+                    self.pt = linev.end()
+                    self.insertRow += 1
                 else:
-                    pt = linev.end()
+                    self.pt = linev.begin()
                 panel.sel().clear()
-                panel.sel().add(pt)
+                panel.sel().add(self.pt)
                 level = insertAt.level
             else:
                 window.run_command('show_panel', args={'panel': 'output.orgcapture'})
+            self.level = level
             if(self.openas and level > 0):
-                self.pt = pt
                 self.index = index
                 self.panel = panel
-                self.panel.Insert(pt, "*" * level, evt.Make(self.on_added_stars))
+                self.panel.Insert(self.pt, prefix + ("*" * level), evt.Make(self.on_added_stars))
             else:
                 self.insert_snippet(index)
 
