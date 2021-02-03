@@ -150,8 +150,9 @@ pre, code, kbd, samp {
   font-size: 0.98em;
   background: #ccc;
   border-radius: 25px; 
-  box-shadow: 5px 5px 10px #888888;
 }
+
+#box-shadow: 5px 5px 10px #888888;
 
 pre {
   white-space: pre;
@@ -270,6 +271,12 @@ table td {
   border-left: 1px solid #ddd;
   vertical-align: top;
 }
+.table-number {
+  color:#ccc;
+  font-weight: bold;
+}
+caption.t-above { caption-side: top; }
+caption.t-bottom { caption-side: bottom; }
 .figure-number {
   color:aaa;
   font-weight: bold;

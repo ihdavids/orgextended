@@ -247,6 +247,7 @@ class HtmlDoc:
 		self.fs.write("<html lang=\"en\" class>\n")
 		self.commentName = None
 		self.figureIndex = 1
+		self.tableIndex = 1
 
 	def AddJs(self,link):
 		self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
@@ -470,6 +471,10 @@ class HtmlDoc:
 			m = RE_TABLE_ROW.search(l)
 			if(m):
 				self.fs.write("    <table>\n")
+				if(hasattr(self,'caption') and self.caption):
+					self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
+					self.tableIndex += 1
+					self.ClearAttributes()
 				if(not RE_TABLE_SEPARATOR.search(l)):
 					tds = l.split('|')
 					if(len(tds) > 3):

@@ -240,6 +240,7 @@ Custom TODO cycling is understood.
   a little tweaking to get working, I have just made it a dependency
   and embedded it into our generic tab cycling for now.
 
+  #+CAPTION: This is a table caption
   |   Heading 1    | Heading 2 | Heading 3 |
   |----------------+-----------+-----------|
   | Some data      |         1 |         3 |
