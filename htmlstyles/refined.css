@@ -23,7 +23,7 @@ body {
 .node-body.h2 {
 	border-top-style: solid;
 	border-top-color: #595959;
-    background-image: linear-gradient(to top right, #555 , #555, #555, #555, #444);	
+  #background-image: linear-gradient(to top right, #555 , #555, #555, #555, #444);	
 }
 
 a {
@@ -269,6 +269,13 @@ table td {
   border-top: 1px dotted #aaa;
   border-left: 1px solid #ddd;
   vertical-align: top;
+}
+.figure-number {
+  color:aaa;
+  font-weight: bold;
+}
+.figure {
+  font-style: italic;
 }
 
 .author {

@@ -123,6 +123,7 @@ def GetCollapsibleCss():
 """
 
 
+RE_CAPTION = regex.compile(r"^\s*[#][+]CAPTION[:]\s*(?P<caption>.*)")
 RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-Z0-9._-]+)\s+(?P<value>([^:]|((?<! )[:]))+))+$")
 RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
 RE_SCHEDULING_LINE = re.compile(r"^\s*(SCHEDULED|CLOSED|DEADLINE|CLOCK)[:].*")
@@ -245,6 +246,7 @@ class HtmlDoc:
 		self.fs.write("<!-- exported by orgextended html exporter -->\n")
 		self.fs.write("<html lang=\"en\" class>\n")
 		self.commentName = None
+		self.figureIndex = 1
 
 	def AddJs(self,link):
 		self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
@@ -311,8 +313,15 @@ class HtmlDoc:
 
 	def ClearAttributes(self):
 		self.attrs = {}
+		self.caption = None
 
 	def AttributesGather(self, l):
+		m = RE_CAPTION.match(l)
+		if(not hasattr(self, 'caption')):
+			self.caption = None
+		if(m):
+			self.caption = m.captures('caption')[0]
+			return True
 		m = RE_ATTR.match(l)
 		# We capture #+ATTR_HTML: lines
 		if(m):
@@ -349,7 +358,13 @@ class HtmlDoc:
 				if(hasattr(self,'attrs')):
 					for key in self.attrs:
 						extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
-				line = RE_LINK.sub("<img src=\"{link}\" alt=\"{desc}\"{extradata}>".format(link=link,desc=desc,extradata=extradata),line)
+				preamble = ""
+				postable = ""
+				if(hasattr(self,'caption') and self.caption):
+					preamble = "<div class=\"figure\"><p>"
+					postamble = "</p><p><span class=\"figure-number\">Figure {index}: </span>{caption}</p></div>".format(index=self.figureIndex,caption=self.caption)
+					self.figureIndex += 1
+				line = RE_LINK.sub("{preamble}<img src=\"{link}\" alt=\"{desc}\"{extradata}>{postamble}".format(preamble=preamble,link=link,desc=desc,extradata=extradata,postamble=postamble),line)
 				self.ClearAttributes()
 			else:
 				line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)

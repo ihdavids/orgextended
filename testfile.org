@@ -227,7 +227,9 @@ Custom TODO cycling is understood.
   up an image viewer if followed.
 
   Run: OrgShowImage on this link
-  [[file:./docs/sublime.png]]
+  #+CAPTION: This is a caption for this image
+  #+ATTR_HTML: :width 200
+  [[file:./images/orgstart.gif]]
 
 * Table Editor
   Eventually we will probably have to own table editing
@@ -288,4 +290,6 @@ Custom TODO cycling is understood.
   | Some Table |       |
 
 * TODO Tomorrow
-
+  SCHEDULED: <2021-02-01 Mon 10:00> 
+* TODO Today
+  SCHEDULED: <2021-01-31 Sun 09:25> 
