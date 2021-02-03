@@ -123,6 +123,11 @@ def GetCollapsibleCss():
 """
 
 
+RE_TITLE = regex.compile(r"^\s*[#][+](TITLE|title)[:]\s*(?P<data>.*)")
+RE_AUTHOR = regex.compile(r"^\s*[#][+](AUTHOR|author)[:]\s*(?P<data>.*)")
+RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
+RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
+RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
 RE_CAPTION = regex.compile(r"^\s*[#][+]CAPTION[:]\s*(?P<caption>.*)")
 RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-Z0-9._-]+)\s+(?P<value>([^:]|((?<! )[:]))+))+$")
 RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
@@ -241,13 +246,21 @@ def GetStyleData(style, file):
 class HtmlDoc:
 	def __init__(self, filename, file):
 		self.file = file
+		self.PreScan()
 		self.fs = open(filename,"w")
 		self.fs.write("<!DOCTYPE html>\n")
 		self.fs.write("<!-- exported by orgextended html exporter -->\n")
-		self.fs.write("<html lang=\"en\" class>\n")
+		if(self.language):
+			self.fs.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"{language}\" xml:lang=\"{language}\">".format(language=self.language))
+		else:	
+			self.fs.write("<html lang=\"en\" class>\n")
 		self.commentName = None
 		self.figureIndex = 1
 		self.tableIndex = 1
+
+	def PreScan(self):
+		for l in self.file.org._lines:
+			self.ExportCommentsGather(l)
 
 	def AddJs(self,link):
 		self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
@@ -274,6 +287,12 @@ class HtmlDoc:
 		data = GetHeaderData(self.style, self.file)
 		self.fs.write(data)
 		self.fs.write("  </head>\n")
+
+	def AddExportMeta(self):
+		if(self.title):
+			self.fs.write("<title>{title}</title>".format(title=self.title))
+		if(self.author):
+			self.fs.write("<meta name=\"author\" content=\"{author}\" />".format(author=self.author))
 
 	def StartDocument(self, file):
 		self.fs.write("  <div class=\"ready\">\n")
@@ -316,7 +335,36 @@ class HtmlDoc:
 		self.attrs = {}
 		self.caption = None
 
+	def ExportCommentsGather(self, l):
+		if not hasattr(self,'title'):
+			self.title = None
+		if not hasattr(self,'author'):
+			self.author = None
+		if not hasattr(self,'language'):
+			self.language = None
+		if not hasattr(self,'email'):
+			self.email = None
+		if not hasattr(self,'date'):
+			self.date = None
+		m = RE_TITLE.match(l)
+		if(m):
+			self.title = m.captures('data')[0]
+		m = RE_AUTHOR.match(l)
+		if(m):
+			self.author = m.captures('data')[0]
+		m = RE_LANGUAGE.match(l)
+		if(m):
+			self.language = m.captures('data')[0]
+		m = RE_EMAIL.match(l)
+		if(m):
+			self.email = m.captures('data')[0]
+		m = RE_DATE.match(l)
+		if(m):
+			self.date = m.captures('data')[0]
+
 	def AttributesGather(self, l):
+		if(self.ExportCommentsGather(l)):
+			return True
 		m = RE_CAPTION.match(l)
 		if(not hasattr(self, 'caption')):
 			self.caption = None
@@ -534,7 +582,17 @@ class HtmlDoc:
 		self.fs.write("<script>hljs.initHighlightingOnLoad();</script>\n")
 		self.InsertJs(GetCollapsibleCode())
 
+	def Postamble(self):
+		self.fs.write("<div id=\"postamble\" class=\"status\">")
+		if(self.date):
+			self.fs.write("<p class=\"date\">Date: {date}</p>".format(date=self.date))
+		if(self.author):
+			self.fs.write("<p class=\"author\">Author: {author}</p>".format(author=self.author))
+		self.fs.write("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
+		self.fs.write("</div>")
+
 	def Close(self):
+		self.Postamble()
 		self.fs.write("</html>\n")
 		self.fs.close()
 
@@ -546,6 +604,7 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 		doc.AddInlineStyle(GetHighlightJsCss(highlight))
 		doc.AddInlineStyle(GetCollapsibleCss())
 		doc.AddInlineStyle(GetStyleData(self.style, self.file))
+		doc.AddExportMeta()
 
 	def build_node(self, doc, n):
 		doc.StartNode(n)
