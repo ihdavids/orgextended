@@ -1,2 +1,5 @@
-* 1.0.4
+* 1.0.4 HTML Exporter Improvements
 	- #+CAPTION comments export a custom figure for tables and images.
+		- At the moment captions are always t-above style.
+		- Figures are done with a div and span pair. 
+		- Styles include: .figure .figure-number and caption.t-above and caption.table-number
