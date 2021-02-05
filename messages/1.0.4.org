@@ -3,3 +3,7 @@
 		- At the moment captions are always t-above style.
 		- Figures are done with a div and span pair. 
 		- Styles include: .figure .figure-number and caption.t-above and caption.table-number
+	- #+AUTHOR, #+TITLE, #+EMAIL, #+LANGUAGE tags have rudimentary support although very
+	  rough.
+	- #+NAME is stripped out of output properly.
+

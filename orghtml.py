@@ -125,6 +125,7 @@ def GetCollapsibleCss():
 
 RE_TITLE = regex.compile(r"^\s*[#][+](TITLE|title)[:]\s*(?P<data>.*)")
 RE_AUTHOR = regex.compile(r"^\s*[#][+](AUTHOR|author)[:]\s*(?P<data>.*)")
+RE_NAME = regex.compile(r"^\s*[#][+](NAME|name)[:]\s*(?P<data>.*)")
 RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
 RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
 RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
@@ -346,21 +347,32 @@ class HtmlDoc:
 			self.email = None
 		if not hasattr(self,'date'):
 			self.date = None
+		if not hasattr(self,'name'):
+			self.name = None
 		m = RE_TITLE.match(l)
 		if(m):
 			self.title = m.captures('data')[0]
+			return True
 		m = RE_AUTHOR.match(l)
 		if(m):
 			self.author = m.captures('data')[0]
+			return True
 		m = RE_LANGUAGE.match(l)
 		if(m):
 			self.language = m.captures('data')[0]
+			return True
 		m = RE_EMAIL.match(l)
 		if(m):
 			self.email = m.captures('data')[0]
+			return True
 		m = RE_DATE.match(l)
 		if(m):
 			self.date = m.captures('data')[0]
+			return True
+		m = RE_NAME.match(l)
+		if(m):
+			self.name = m.captures('data')[0]
+			return True
 
 	def AttributesGather(self, l):
 		if(self.ExportCommentsGather(l)):
