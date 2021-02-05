@@ -1,0 +1,3 @@
+* 1.0.5
+** Syntax Highlighting
+	- bash blocks uses embed to allow them to escape properly

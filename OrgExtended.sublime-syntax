@@ -422,14 +422,11 @@ contexts:
         2: orgmode.fence.sourceblock
         3: orgmode.fence.language
         4: orgmode.fence.sourceblock
-      push:
-        - meta_scope: orgmode.raw.block
-        - meta_content_scope: source.shell.bash
-        - match: '{{endsrc}}'
-          captures:
-            1: orgmode.fence.sourceblock
-          pop: true
-        - include: scope:source.shell.bash
+      embed: scope:source.shell.bash
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.raw.block
+      escape_captures:
+        1: orgmode.fence.sourceblock
     - match: '{{beginsrc}}((lua)\s*)'
       captures:
         1: orgmode.fence.sourceblock
