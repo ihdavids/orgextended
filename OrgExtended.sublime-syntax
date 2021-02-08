@@ -27,27 +27,27 @@ contexts:
       pop: true
     - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*({{tags}})?
       captures:
-        2: orgmode.state.todo
-        3: orgmode.state.blocked
-        4: orgmode.state.waiting
-        5: orgmode.state.cancelled
-        6: orgmode.state.done
-        7: orgmode.state.meeting
-        8: orgmode.state.phone
-        9: orgmode.state.note
-        10: orgmode.state.inprogress
-        11: orgmode.state.doing
-        12: orgmode.state.next
-        13: orgmode.state.reassigned
-        14: orgmode.priority
-        15: orgmode.priority.value
-        16: orgmode.priority.value.a
-        17: orgmode.priority.value.b
-        18: orgmode.priority.value.c
-        19: orgmode.priority.value.d
-        20: orgmode.priority.value.e
-        21: orgmode.priority.value.general
-        22: orgmode.tags.header
+        2: variable.parameter orgmode.state.todo
+        3: variable.parameter orgmode.state.blocked
+        4: variable.parameter orgmode.state.waiting
+        5: variable.parameter orgmode.state.cancelled
+        6: variable.parameter orgmode.state.done
+        7: variable.parameter orgmode.state.meeting
+        8: variable.parameter orgmode.state.phone
+        9: variable.parameter orgmode.state.note
+        10: variable.parameter orgmode.state.inprogress
+        11: variable.parameter orgmode.state.doing
+        12: variable.parameter orgmode.state.next
+        13: variable.parameter orgmode.state.reassigned
+        14: string.quoted orgmode.priority
+        15: string.quoted orgmode.priority.value
+        16: string.quoted orgmode.priority.value.a
+        17: string.quoted orgmode.priority.value.b
+        18: string.quoted orgmode.priority.value.c
+        19: string.quoted orgmode.priority.value.d
+        20: string.quoted orgmode.priority.value.e
+        21: string.quoted orgmode.priority.value.general
+        22: entity.name.tag.orgmode orgmode.tags.header
   main:
     # The main context is the initial starting point of our syntax.
     # Include other contexts from here (or specify them directly).
@@ -67,38 +67,38 @@ contexts:
       # embed_scope: entity.name.function.orgmode orgmode.headline
     - match: ^\s*[*]\s+
       push:
-        - meta_scope: entity.name.function.orgmode orgmode.headline
+        - meta_scope: entity.name.class.orgmode orgmode.headline
         - include: header-matches
     - match: ^\s*([*])[*]\s+
       captures:
         1: comment  orgmode.preamble
       push:
-        - meta_scope: keyword.control.conditional.orgmode orgmode.headline2
+        - meta_scope: entity.name.function.orgmode orgmode.headline2
         - include: header-matches
     - match: ^\s*([*][*])[*]\s+
       captures:
         1: comment orgmode.preamble
       push:
-        - meta_scope: variable.language.orgmode orgmode.headline3
+        - meta_scope: entity.other.attribute-name.orgmode orgmode.headline3
         - include: header-matches
     - match: ^\s*([*][*][*])[*]\s+
       captures:
         1: comment orgmode.preamble
       push:
-        - meta_scope: string.unquoted orgmode.headline4
+        - meta_scope: entity.name.section.orgmode orgmode.headline4
         - include: header-matches
     - match: ^\s*([*][*][*][*])[*]\s+
       captures:
-        1: orgmode.preamble
+        1: comment orgmode.preamble
       push:
-        - meta_scope: constant orgmode.headline5
+        - meta_scope: entity.name.type.orgmode orgmode.headline5
         - include: header-matches
     - match: ^\s*([*][*][*][*][*])[*]\s+
       captures:
-        1: orgmode.preamble
+        1: comment orgmode.preamble
       scope: orgmode.headline6
       push:
-        - meta_scope: orgmode.headline6
+        - meta_scope: entity.name.filename orgmode.headline6
         - include: header-matches
 
     - match: ^\s*(\|.+\|)
@@ -180,7 +180,7 @@ contexts:
       scope: orgmode.link.internal.headline
       # :TAG:
     - match: "(^|\\s):[\\w\\d:]+:"
-      scope: orgmode.tags
+      scope: entity.name.tag.orgmode orgmode.tags
       # [code] block, not sure what these are.
     - match: \[code\]\s*
       push:  code
