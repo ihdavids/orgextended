@@ -71,31 +71,27 @@ contexts:
         - include: header-matches
     - match: ^\s*([*])[*]\s+
       captures:
-        1: orgmode.preamble
-      scope: orgmode.headline2
+        1: comment  orgmode.preamble
       push:
-        - meta_scope: orgmode.headline2
+        - meta_scope: keyword.control.conditional.orgmode orgmode.headline2
         - include: header-matches
     - match: ^\s*([*][*])[*]\s+
       captures:
-        1: orgmode.preamble
-      scope: orgmode.headline3
+        1: comment orgmode.preamble
       push:
-        - meta_scope: orgmode.headline3
+        - meta_scope: variable.language.orgmode orgmode.headline3
         - include: header-matches
     - match: ^\s*([*][*][*])[*]\s+
       captures:
-        1: orgmode.preamble
-      scope: orgmode.headline4
+        1: comment orgmode.preamble
       push:
-        - meta_scope: orgmode.headline4
+        - meta_scope: string.unquoted orgmode.headline4
         - include: header-matches
     - match: ^\s*([*][*][*][*])[*]\s+
       captures:
         1: orgmode.preamble
-      scope: orgmode.headline5
       push:
-        - meta_scope: orgmode.headline5
+        - meta_scope: constant orgmode.headline5
         - include: header-matches
     - match: ^\s*([*][*][*][*][*])[*]\s+
       captures:
