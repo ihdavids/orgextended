@@ -22,24 +22,10 @@ contexts:
   # meta_include_prototype: false.
   #prototype:
   #- include: comments
-  main:
-    # The main context is the initial starting point of our syntax.
-    # Include other contexts from here (or specify them directly).
-    #- include: keywords
-    #- include: numbers
-    #- include: strings
-      # --- # Todo investigate what this actually is?
-    - match: ^\s*\-\-\- [^\n]*
-      scope: orgmode.page
-      # ~~~~~ # Todo investigate what this is?
-    - match: ^\s*[~]+ [^\n]*
-      scope: orgmode.break
-
-
-      # Generic headline, TODO: Make multiple of these so we can color them
-      # and sub captures so we can hide the extraneous stars
-    - match: ^\s*[*] ({{state}} )?({{priority}})?[^\[\]:\n]*({{tags}})?
-      scope: orgmode.headline
+  header-matches:
+    - match: $
+      pop: true
+    - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*({{tags}})?
       captures:
         2: orgmode.state.todo
         3: orgmode.state.blocked
@@ -61,137 +47,63 @@ contexts:
         19: orgmode.priority.value.d
         20: orgmode.priority.value.e
         21: orgmode.priority.value.general
-        22: orgmode.tags.headline
-    - match: ^\s*([*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
+        22: orgmode.tags.header
+  main:
+    # The main context is the initial starting point of our syntax.
+    # Include other contexts from here (or specify them directly).
+    #- include: keywords
+    #- include: numbers
+    #- include: strings
+      # --- # Todo investigate what this actually is?
+    - match: ^\s*\-\-\- [^\n]*
+      scope: orgmode.page
+      # ~~~~~ # Todo investigate what this is?
+    - match: ^\s*[~]+ [^\n]*
+      scope: orgmode.break
+
+
+      # Generic headline, TODO: Make multiple of these so we can color them
+      # and sub captures so we can hide the extraneous stars
+      # embed_scope: entity.name.function.orgmode orgmode.headline
+    - match: ^\s*[*]\s+
+      push:
+        - meta_scope: entity.name.function.orgmode orgmode.headline
+        - include: header-matches
+    - match: ^\s*([*])[*]\s+
       captures:
         1: orgmode.preamble
-        2: orgmode.headline2
-        4: orgmode.state.todo
-        5: orgmode.state.blocked
-        6: orgmode.state.waiting
-        7: orgmode.state.cancelled
-        8: orgmode.state.done
-        9: orgmode.state.meeting
-        10: orgmode.state.phone
-        11: orgmode.state.note
-        12: orgmode.state.inprogress
-        13: orgmode.state.doing
-        14: orgmode.state.next
-        15: orgmode.state.reassigned
-        16: orgmode.priority
-        17: orgmode.priority.value
-        18: orgmode.priority.value.a
-        19: orgmode.priority.value.b
-        20: orgmode.priority.value.c
-        21: orgmode.priority.value.d
-        22: orgmode.priority.value.e
-        23: orgmode.priority.value.general
-        24: orgmode.tags.header
       scope: orgmode.headline2
-    - match: ^\s*([*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
+      push:
+        - meta_scope: orgmode.headline2
+        - include: header-matches
+    - match: ^\s*([*][*])[*]\s+
       captures:
         1: orgmode.preamble
-        2: orgmode.headline3
-        4: orgmode.state.todo
-        5: orgmode.state.blocked
-        6: orgmode.state.waiting
-        7: orgmode.state.cancelled
-        8: orgmode.state.done
-        9: orgmode.state.meeting
-        10: orgmode.state.phone
-        11: orgmode.state.note
-        12: orgmode.state.inprogress
-        13: orgmode.state.doing
-        14: orgmode.state.next
-        15: orgmode.state.reassigned
-        16: orgmode.priority
-        17: orgmode.priority.value
-        18: orgmode.priority.value.a
-        19: orgmode.priority.value.b
-        20: orgmode.priority.value.c
-        21: orgmode.priority.value.d
-        22: orgmode.priority.value.e
-        23: orgmode.priority.value.general
-        24: orgmode.tags.header
       scope: orgmode.headline3
-    - match: ^\s*([*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
+      push:
+        - meta_scope: orgmode.headline3
+        - include: header-matches
+    - match: ^\s*([*][*][*])[*]\s+
       captures:
         1: orgmode.preamble
-        2: orgmode.headline4
-        4: orgmode.state.todo
-        5: orgmode.state.blocked
-        6: orgmode.state.waiting
-        7: orgmode.state.cancelled
-        8: orgmode.state.done
-        9: orgmode.state.meeting
-        10: orgmode.state.phone
-        11: orgmode.state.note
-        12: orgmode.state.inprogress
-        13: orgmode.state.doing
-        14: orgmode.state.next
-        15: orgmode.state.reassigned
-        16: orgmode.priority
-        17: orgmode.priority.value
-        18: orgmode.priority.value.a
-        19: orgmode.priority.value.b
-        20: orgmode.priority.value.c
-        21: orgmode.priority.value.d
-        22: orgmode.priority.value.e
-        23: orgmode.priority.value.general
-        24: orgmode.tags.header
       scope: orgmode.headline4
-    - match: ^\s*([*][*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
+      push:
+        - meta_scope: orgmode.headline4
+        - include: header-matches
+    - match: ^\s*([*][*][*][*])[*]\s+
       captures:
         1: orgmode.preamble
-        2: orgmode.headline5
-        4: orgmode.state.todo
-        5: orgmode.state.blocked
-        6: orgmode.state.waiting
-        7: orgmode.state.cancelled
-        8: orgmode.state.done
-        9: orgmode.state.meeting
-        10: orgmode.state.phone
-        11: orgmode.state.note
-        12: orgmode.state.inprogress
-        13: orgmode.state.doing
-        14: orgmode.state.next
-        15: orgmode.state.reassigned
-        16: orgmode.priority
-        17: orgmode.priority.value
-        18: orgmode.priority.value.a
-        19: orgmode.priority.value.b
-        20: orgmode.priority.value.c
-        21: orgmode.priority.value.d
-        22: orgmode.priority.value.e
-        23: orgmode.priority.value.general
-        24: orgmode.tags.header
       scope: orgmode.headline5
-    - match: ^\s*([*][*][*][*][*])([*] ({{state}}\s+)?({{priority}})?[^\[\]:\n]*)({{tags}})?
+      push:
+        - meta_scope: orgmode.headline5
+        - include: header-matches
+    - match: ^\s*([*][*][*][*][*])[*]\s+
       captures:
         1: orgmode.preamble
-        2: orgmode.headline6
-        4: orgmode.state.todo
-        5: orgmode.state.blocked
-        6: orgmode.state.waiting
-        7: orgmode.state.cancelled
-        8: orgmode.state.done
-        9: orgmode.state.meeting
-        10: orgmode.state.phone
-        11: orgmode.state.note
-        12: orgmode.state.inprogress
-        13: orgmode.state.doing
-        14: orgmode.state.next
-        15: orgmode.state.reassigned
-        16: orgmode.priority
-        17: orgmode.priority.value
-        18: orgmode.priority.value.a
-        19: orgmode.priority.value.b
-        20: orgmode.priority.value.c
-        21: orgmode.priority.value.d
-        22: orgmode.priority.value.e
-        23: orgmode.priority.value.general
-        24: orgmode.tags.header
       scope: orgmode.headline6
+      push:
+        - meta_scope: orgmode.headline6
+        - include: header-matches
 
     - match: ^\s*(\|.+\|)
       captures:
