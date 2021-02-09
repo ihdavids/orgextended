@@ -56,10 +56,10 @@ contexts:
     #- include: strings
       # --- # Todo investigate what this actually is?
     - match: ^\s*\-\-\- [^\n]*
-      scope: orgmode.page
+      scope: comment orgmode.page
       # ~~~~~ # Todo investigate what this is?
     - match: ^\s*[~]+ [^\n]*
-      scope: orgmode.break
+      scope: comment orgmode.break
 
 
       # Generic headline, TODO: Make multiple of these so we can color them
@@ -108,20 +108,20 @@ contexts:
       # DEADLINE: <DATETIME>
     - match: "(DEADLINE:)\\s+({{datetime}})"
       captures:
-        1: orgmode.statekeyword
-        2: orgmode.datetime
+        1: keyword orgmode.statekeyword
+        2: markup.italic orgmode.datetime
       scope: orgmode.deadline
       # SCHEDULED: <DATETIME>
     - match: "(SCHEDULED:)\\s+({{datetime}})"
       captures:
-        1: orgmode.statekeyword
-        2: orgmode.datetime
+        1: keyword orgmode.statekeyword
+        2: markup.italic orgmode.datetime
       scope: orgmode.scheduled
       # CLOSED: [DATETIME]
     - match: "(CLOSED:)\\s+({{unscheddatetime}})"
       captures:
-        1: orgmode.statekeyword
-        2: orgmode.unscheddatetime
+        1: keyword orgmode.statekeyword
+        2: markup.italic orgmode.unscheddatetime
       scope: orgmode.closed
       # numbered list
     - match: "^\\s*[0-9]+[.)]\\s+(([^:]+\\s+)(::))?"
@@ -148,9 +148,9 @@ contexts:
     - match: (\[[ ]\])\s?
       scope: orgmode.checkbox
     - match: (\[[xX]\])\s?
-      scope: orgmode.checkbox.checked
+      scope: region.greenish orgmode.checkbox.checked
     - match: (\[[\-]\])\s?
-      scope: orgmode.checkbox.blocked
+      scope: region.redish orgmode.checkbox.blocked
       # [#/#] Checkbox summary
     - match: (\[\d*[/%]\d*\])
       scope: orgmode.checkbox.summary
@@ -188,16 +188,16 @@ contexts:
       push: pythonstack
 
     - match: \*[^*]+\*
-      scope: orgmode.bold
+      scope: markup.bold orgmode.bold
 
     - match: /[^/]+/
-      scope: orgmode.italics
+      scope: markup.italic orgmode.italics
 
     - match: _[^_]+_
-      scope: orgmode.underline
+      scope: markup.underline orgmode.underline
 
     - match: \+[^\+]+\+
-      scope: orgmode.strikethrough
+      scope: markup.underline orgmode.strikethrough
 
     - match: ~[^~]+~
       scope: orgmode.code
@@ -468,8 +468,8 @@ contexts:
     - match: '^\s*(\#\+(?!(BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
       scope: orgmode.controltag
       captures:
-        1: orgmode.controltag.tag
-        4: orgmode.controltag.text
+        1: keyword orgmode.controltag.tag
+        4: comment orgmode.controltag.text
 
     # #+BEGIN: NAME dynamic block support
     - match: '((\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'
