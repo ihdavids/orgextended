@@ -6,3 +6,4 @@
 	          color schemes are still the preferred means of viewing an org file.
 	  - Eventual goal is to take an existing active color scheme and provide a tool to
 	    extend it to support all the org coloring. This is a first step in that direction.
+	- Created languagelist.yaml to make it easier to add new languages to the syntax.
