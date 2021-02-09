@@ -131,44 +131,52 @@ contexts:
         4: punctuation orgmode.definition.marker
       scope: orgmode.numberedlist
       # bullet list
-    - match: "^\\s*\\- (([^:]+\\s+)(::))?"
+    - match: "^\\s*(\\-) (([^:]+\\s+)(::))?"
       captures:
-        2: keyword orgmode.definition
-        3: punctuation orgmode.definition.marker
+        1: constant.character
+        3: keyword orgmode.definition
+        4: punctuation orgmode.definition.marker
       scope: orgmode.tack.minus
       # bullet list
-    - match: "^\\s*\\+ (([^:]+\\s+)(::))?"
+    - match: "^\\s*(\\+) (([^:]+\\s+)(::))?"
       captures:
-        2: keyword orgmode.definition
-        3: punctuation orgmode.definition.marker
+        1: constant.character
+        3: keyword orgmode.definition
+        4: punctuation orgmode.definition.marker
       scope: orgmode.tack.plus
       # To follow up: -> and =>
     - match: "^\\s*(\\-\\>|\\=\\>) "
       scope: orgmode.follow_up
       # [-] Checkbox
     - match: (\[[ ]\])\s?
-      scope: orgmode.checkbox
-    - match: (\[[xX]\])\s?
-      scope: region.greenish orgmode.checkbox.checked
-    - match: (\[[\-]\])\s?
-      scope: region.redish orgmode.checkbox.blocked
+      scope: string orgmode.checkbox
+    - match: (\[([xX])\])\s?
+      scope: orgmode.checkbox.checked
+      captures:
+        1: string
+        2: keyword orgmode.checkbox.checked 
+    - match: (\[([\-])\])\s?
+      scope: orgmode.checkbox.blocked
+      captures:
+        1: string
+        2: constant.other orgmode.checkbox.blocked
       # [#/#] Checkbox summary
     - match: (\[\d*[/%]\d*\])
-      scope: orgmode.checkbox.summary
+      scope: string orgmode.checkbox.summary
       # [[link]]
     - match: \[(\[([^\]]+)\])\]
       captures:
         1: orgmode.link.textblock
-        2: orgmode.link.text.href
-      scope: orgmode.link
+        2: comment orgmode.link.text.href
+      scope: markup.underline.link orgmode.link
       # [[link][name]]
     - match: \[(\[([^\]]+)\])(\[([^\]]+)\])\]
       captures:
         1: orgmode.link.hrefblock
-        2: orgmode.link.href
+        2: comment orgmode.link.href
         3: orgmode.link.textblock
-        4: orgmode.link.text
-      scope: orgmode.link
+        4: markup.bold orgmode.link.text
+      scope: markup.underline.link orgmode.link
     - match: http[s]?://[^ \t]+
       scope: orgmode.link.href
     - match: \b([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})\b
@@ -219,8 +227,8 @@ contexts:
       captures:
         1: orgmode.fence
       push:
-        - meta_scope: orgmode.raw.block
-        - meta_content_scope: orgmode.raw.block
+        - meta_scope: constant.other orgmode.raw.block
+        - meta_content_scope: markup.raw.block orgmode.raw.block
         - match: '(\s*\#\+(END_CENTER|end_center)\s*)'
           captures:
             1: orgmode.fence
@@ -229,8 +237,8 @@ contexts:
       captures:
         1: orgmode.fence
       push:
-        - meta_scope: orgmode.raw.block
-        - meta_content_scope: orgmode.raw.block
+        - meta_scope: constant.other orgmode.raw.block
+        - meta_content_scope: markup.raw.block orgmode.raw.block
         - match: '(\s*\#\+(END_VERSE|end_verse)\s*)'
           captures:
             1: orgmode.fence
@@ -239,8 +247,8 @@ contexts:
       captures:
         1: orgmode.fence
       push:
-        - meta_scope: orgmode.raw.block
-        - meta_content_scope: orgmode.raw.block
+        - meta_scope: constant.other orgmode.raw.block
+        - meta_content_scope: markup.raw.block orgmode.raw.block
         - match: '(\s*\#\+(END_QUOTE|end_quote)\s*)'
           captures:
             1: orgmode.fence
@@ -249,8 +257,8 @@ contexts:
       captures:
         1: orgmode.fence
       push:
-        - meta_scope: orgmode.raw.block
-        - meta_content_scope: orgmode.raw.block
+        - meta_scope: constant.other orgmode.raw.block
+        - meta_content_scope: markup.raw.block orgmode.raw.block
         - match: '(\s*\#\+(END_EXAMPLE|end_example)\s*)'
           captures:
             1: orgmode.fence
