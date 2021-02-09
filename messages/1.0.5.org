@@ -1,3 +1,8 @@
 * 1.0.5
 ** Syntax Highlighting
-	- bash blocks uses embed to allow them to escape properly
+	- Bash blocks uses embed to allow them to escape properly
+	- Core syntax (not agenda and picker) now support standard syntax markers
+	  - NOTE: Not all features are supported or colored. Existing OrgExtended
+	          color schemes are still the preferred means of viewing an org file.
+	  - Eventual goal is to take an existing active color scheme and provide a tool to
+	    extend it to support all the org coloring. This is a first step in that direction.
