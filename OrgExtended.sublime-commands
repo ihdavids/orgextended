@@ -104,6 +104,6 @@
     {"caption": "Org Pandoc File To Html",     "command": "org_export_file_as_html"     },
     {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"  },
     //{"caption": "Org Test Thing",              "command": "org_show_item"  },
-
+    //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
     {"caption": "Org Download Highligh Js", "command": "org_download_highligh_js"  }
 ]

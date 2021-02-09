@@ -1,0 +1,24 @@
+
+- language: python
+- language: cpp
+  source: c++
+- language: C
+  source: c
+- language: perl 
+- language: ini
+- language: bash
+  source: shell.bash
+  match: bash|sh
+- language: lua
+- language: js
+  match: javascript|js
+- language: java
+- language: php
+- language: xml
+  text: xml
+- language: csharp
+  source: cs
+  match: csharp|cs
+- language: powershell
+- language: plantuml
+  source: powershell
