@@ -103,7 +103,7 @@ contexts:
 
     - match: ^\s*(\|.+\|)
       captures:
-        1: orgmode.table.block
+        1: markup.raw.block orgmode.table.block
       scope: orgmode.table
       # DEADLINE: <DATETIME>
     - match: "(DEADLINE:)\\s+({{datetime}})"
@@ -124,22 +124,23 @@ contexts:
         2: markup.italic orgmode.unscheddatetime
       scope: orgmode.closed
       # numbered list
-    - match: "^\\s*[0-9]+[.)]\\s+(([^:]+\\s+)(::))?"
+    - match: "^\\s*([0-9]+[.)])\\s+(([^:]+\\s+)(::))?"
       captures:
-        2: orgmode.definition
-        3: orgmode.definition.marker
+        1: constant.numeric
+        3: keyword orgmode.definition
+        4: punctuation orgmode.definition.marker
       scope: orgmode.numberedlist
       # bullet list
     - match: "^\\s*\\- (([^:]+\\s+)(::))?"
       captures:
-        2: orgmode.definition
-        3: orgmode.definition.marker
+        2: keyword orgmode.definition
+        3: punctuation orgmode.definition.marker
       scope: orgmode.tack.minus
       # bullet list
     - match: "^\\s*\\+ (([^:]+\\s+)(::))?"
       captures:
-        2: orgmode.definition
-        3: orgmode.definition.marker
+        2: keyword orgmode.definition
+        3: punctuation orgmode.definition.marker
       scope: orgmode.tack.plus
       # To follow up: -> and =>
     - match: "^\\s*(\\-\\>|\\=\\>) "
@@ -326,15 +327,15 @@ contexts:
         - include: scope:source.ini
     - match: '{{beginsrc}}((bash|sh)\s*)'
       captures:
-        1: orgmode.fence.sourceblock
+        1: constant.other orgmode.fence.sourceblock
         2: orgmode.fence.sourceblock
-        3: orgmode.fence.language
+        3: keyword orgmode.fence.language
         4: orgmode.fence.sourceblock
       embed: scope:source.shell.bash
       escape: '{{endsrc}}'
-      embed_scope: orgmode.raw.block
+      embed_scope: markup.raw.block orgmode.raw.block
       escape_captures:
-        1: orgmode.fence.sourceblock
+        1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((lua)\s*)'
       captures:
         1: orgmode.fence.sourceblock
@@ -474,18 +475,18 @@ contexts:
     # #+BEGIN: NAME dynamic block support
     - match: '((\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'
       captures:
-        1: orgmode.fence.dynamicblock
+        1: constant.other orgmode.fence.dynamicblock
         2: orgmode.fence.dynamicblock.begin
-        3: orgmode.fence.dynamicblock.name
-        4: orgmode.fence.dynamicblock.params
+        3: keyword orgmode.fence.dynamicblock.name
+        4: variable.parameter orgmode.fence.dynamicblock.params
       push:
         - meta_scope: orgmode.raw.block.dynamicblock
-        - meta_content_scope: source.js
-        - match: '(\#\+END:\s*|\#\+end:\s*)'
+        - meta_content_scope: markup.raw.block orgmode.raw.block
+        - match: '^\s*(\#\+END:\s*|\#\+end:\s*)'
           captures:
-            1: orgmode.fence.dynamicblock.end
+            1: constant.other orgmode.fence.dynamicblock.end
           pop: true
-        - include: scope:source.js
+        #- include: scope:source.js
   code:
     - meta_scope: text
     - match: \s*\[/code\]
