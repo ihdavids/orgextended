@@ -6,7 +6,7 @@
   that has driven me back to Emacs over and over again. I finally decided that I might take a stab
   at building a usable orgmode plugin for sublime.
 
-  ![Start](./images/orgstart.gif)
+  ![Start](https://github.com/ihdavids/orgextended/blob/master/images/orgstart.gif)
 
   NOTE: To get setup, please jump down the Setup link below.
   
@@ -15,7 +15,7 @@
   to compare org with Markdown. Org IS a markup and document interchange
   format like markdown, but it is also much more.
 
-  ![Folding](./images/orgstartfolding.gif)
+  ![Folding](https://github.com/ihdavids/orgextended/blob/master/images/orgstartfolding.gif)
 
   Fundamentally org mode is *2* very /different/ things and fairly hard to describe:
 
