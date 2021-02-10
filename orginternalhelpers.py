@@ -103,6 +103,16 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.state.next",      "#37dae6")
 		self.addscope(cs,"orgmode.state.reassigned","#bab9b8")
 
+	def addpriorities(self, cs):
+		self.addscope(cs,"orgmode.priority","#c27532")
+		self.addscope(cs,"orgmode.priority.value","#f5a55f")
+		self.addscope(cs,"orgmode.priority.value.a","#e05a7b")
+		self.addscope(cs,"orgmode.priority.value.b","#f59a76")
+		self.addscope(cs,"orgmode.priority.value.c","#fab978")
+		self.addscope(cs,"orgmode.priority.value.d","#f5d976")
+		self.addscope(cs,"orgmode.priority.value.e","#bcbfae")
+		self.addscope(cs,"orgmode.priority.value.general","#b59eb5")
+
 	def addfences(self, cs):
 		bg = getBackground(cs, 'markup.raw.block')
 		bg = "color(" + bg + " l(+ 6%))"
@@ -135,6 +145,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			self.addpreamble(cs)
 			self.addstates(cs)
 			self.addfences(cs)
+			self.addpriorities(cs)
 
 			path = os.path.join(sublime.packages_path(),"User","OrgColorSchemes")
 			if(not os.path.exists(path)):
