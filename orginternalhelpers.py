@@ -41,6 +41,15 @@ introBlock = """
     // That said, orgmode offers a wide variety of syntax elements for
     // you to style as needed. Please see blow for more information
     // on some of these scopes.
+    //
+    // The preamble scope is one of the more important scopes. In the
+    // future I hope to produce some ligature fonts that will make the preamble
+    // scope a thing of the past. For now, the preamble is the scope that hides
+    // leading stars in your buffer. I find those visually disturbing and
+    // appreciate working with them being invisible.
+    //
+    // The preamble used the pre-defined background color of your theme to
+    // ensure the stars are invisible.
 """
 
 # TODO Create blocks for each of the relevant blocks of markers
@@ -262,6 +271,42 @@ commentBlock = """
 	//	},
 """
 
+
+stateBlock = """
+    // GENERATED: By OrgExtended
+    //
+    // States are the build in state flow. While org
+    // allows you to define your own state flows
+    // I do not yet have a good way of automatically
+    // adding those to the syntax and color scheme.
+    // (I hope to one day have a way to do that)
+    //
+    // For now the pre-defined state flows have automatic
+    // highlighting and any new ones you define will have
+    // the default. I can of course extend the syntax if desired.
+"""
+
+priorityBlock = """
+    // GENERATED: By OrgExtended
+    //
+    // Much like states I do not have a way to extend the syntax with
+    // new priorities at this time. I hope to devise a good scheme in
+    // the future. 
+    //
+    // That said there is a default set of priorities A,B,C,D,E that
+    // have automatic coloring. These are the color scheme elements that
+    // add that coloring.
+"""
+
+fenceBlock = """
+    // GENERATED: By OrgExtended
+    //
+    // Code blocks have a heading BEGIN_SRC and an ending END_SRC
+    // I find it visually appealing to make these stand out.
+    // You may have different preferences. NOTE: I use a luminance
+    // shift expression to make the chosen color work with your color scheme.
+"""
+
 class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
     def run(self, edit):
     	templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
@@ -323,6 +368,7 @@ def getBackground(cs, scope = None):
 class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 
 	def addstates(self, cs):
+		cs['rules'].append({"COMMENT ORGMODE STATES COMMENT HERE":""})
 		self.addscope(cs,"orgmode.state.todo",      "#e6ab4c")
 		self.addscope(cs,"orgmode.state.blocked",   "#FF0000")
 		self.addscope(cs,"orgmode.state.done",      "#47c94f")
@@ -336,6 +382,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.state.reassigned","#bab9b8")
 
 	def addpriorities(self, cs):
+		cs['rules'].append({"COMMENT ORGMODE PRIORITIES COMMENT HERE":""})
 		self.addscope(cs,"orgmode.priority","#c27532")
 		self.addscope(cs,"orgmode.priority.value","#f5a55f")
 		self.addscope(cs,"orgmode.priority.value.a","#e05a7b")
@@ -346,6 +393,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.priority.value.general","#b59eb5")
 
 	def addfences(self, cs):
+		cs['rules'].append({"COMMENT ORGMODE FENCE COMMENT HERE":""})
 		bg = getBackground(cs, 'markup.raw.block')
 		bg = "color(" + bg + " l(+ 6%))"
 		self.addscope(cs,"orgmode.fence",None, bg,"bold")
@@ -398,11 +446,14 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE SCOPES HERE": ""',commentBlock)
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE INTRO HERE": ""',introBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE FENCE COMMENT HERE": ""',fenceBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE PRIORITIES COMMENT HERE": ""',priorityBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE STATES COMMENT HERE": ""',stateBlock)
 			with open(outputFile,'w') as ofile:
 				ofile.write(jsonStr)
 			newColorScheme = "Packages/User/OrgColorSchemes/" + schemeName
 			print("CHANGING ORIGINAL COLOR SCHEME: " + self.origColorScheme)
-			print("TO COLOR SCHEME: " + self.origColorScheme)
+			print("TO COLOR SCHEME: " + newColorScheme)
 			self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
 			self.mysettings.set("color_scheme", newColorScheme)
 
