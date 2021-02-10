@@ -27,3 +27,13 @@
 	This will ALSO change the active OrgExtended color scheme to be this new color scheme to let you
 	see how it is going to pan out. This may, or may NOT work out well for you!
 
+	NOTE: This is a preview feature. It is still under active development and will change / improve
+	      as I mature it. I felt it might be beneficial to some to release it at this point.
+	      PLEASE only use this feature if you feel confident with your ability to manipulate sublime
+	      color schemes. I have yet to document the feature or test it on a wide variety of color
+	      schemes. Ultimately I would like to include the orgagenda and orgdatepicker schemes into
+	      this one scheme. To do that I need some more creative programmatic means of generating a
+	      starting color palette from a pre-existing one. That will take a bit.
+
+	      However, in the interim I am happily using a generated Guna color scheme on my personal machine.
+
