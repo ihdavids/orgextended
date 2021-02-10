@@ -30,6 +30,13 @@ template = """
       escape_captures:
         1: constant.other orgmode.fence.sourceblock"""
 
+
+# TODO Create blocks for each of the relevant blocks of markers
+#      Create a set of useful markers with comments about how you can customize them
+commentBlock = """
+    // This is a comment block and should be ignored
+"""
+
 class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
     def run(self, edit):
     	templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
@@ -139,8 +146,6 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.origColorScheme = self.settings.get("color_scheme",None)
 		if(self.origColorScheme):
 			self.colorSchemeData = sublime.load_resource(self.origColorScheme)
-			print("COLOR SCHEME: ")
-			print(self.colorSchemeData)
 			cs = ast.literal_eval(self.colorSchemeData)
 			self.addpreamble(cs)
 			self.addstates(cs)
@@ -155,12 +160,16 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			scheme = os.path.splitext(scheme)[0]
 			schemeName = scheme + "_Org.sublime-color-scheme"
 			outputFile = os.path.join(path, schemeName)
+			cs['rules'].append({"THIS SHOULD BE REPLACED":""})
 			jsonStr = json.dumps(cs, sort_keys=True, indent=4)
+			jsonStr = jsonStr.replace('"THIS SHOULD BE REPLACED": ""',commentBlock)
 			with open(outputFile,'w') as ofile:
 				ofile.write(jsonStr)
-			print("COLOR SCHEME: " + self.origColorScheme)
+			newColorScheme = "Packages/User/OrgColorSchemes/" + schemeName
+			print("CHANGING ORIGINAL COLOR SCHEME: " + self.origColorScheme)
+			print("TO COLOR SCHEME: " + self.origColorScheme)
 			self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
-			self.mysettings.set("color_scheme","Packages/User/OrgColorSchemes/" + schemeName)
+			self.mysettings.set("color_scheme", newColorScheme)
 
 
 
