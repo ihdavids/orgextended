@@ -274,7 +274,7 @@ contexts:
         4: comment orgmode.controltag.text
 
     # #+BEGIN: NAME dynamic block support
-    - match: '((\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'
+    - match: '((\s*\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'
       captures:
         1: constant.other orgmode.fence.dynamicblock
         2: orgmode.fence.dynamicblock.begin
@@ -283,7 +283,7 @@ contexts:
       push:
         - meta_scope: orgmode.raw.block.dynamicblock
         - meta_content_scope: markup.raw.block orgmode.raw.block
-        - match: '^\s*(\#\+END:\s*|\#\+end:\s*)'
+        - match: '(^\s*\#\+END:\s*|\#\+end:\s*)'
           captures:
             1: constant.other orgmode.fence.dynamicblock.end
           pop: true

@@ -15,6 +15,7 @@ import json
 import ast
 
 varre = re.compile(r'var\((?P<name>[^)]+)\)')
+colorre = re.compile(r'#(?P<r>[A-Fa-f0-9][A-Fa-f0-9])(?P<g>[A-Fa-f0-9][A-Fa-f0-9])(?P<b>[A-Fa-f0-9][A-Fa-f0-9])(?P<a>[A-Fa-f0-9][A-Fa-f0-9])?')
 
 template = """
     - match: '{{{{beginsrc}}}}(({match})\s*)'
@@ -103,7 +104,9 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.state.reassigned","#bab9b8")
 
 	def addfences(self, cs):
-		self.addscope(cs,"orgmode.fence",None, "#322830","bold")
+		bg = getBackground(cs, 'markup.raw.block')
+		bg = "color(" + bg + " l(+ 6%))"
+		self.addscope(cs,"orgmode.fence",None, bg,"bold")
 
 	def addscope(self, cs, name, fg, bg=None, style=None):
 		if(not findscope(cs, name)):
