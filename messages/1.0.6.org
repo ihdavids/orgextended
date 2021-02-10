@@ -1,0 +1,29 @@
+* 1.0.6
+** Color Scheme Generator
+	This is a bit of an experimental feature to help people
+	use org mode with their own color scheme. It is NOTE complete
+	and not where I want it to be yet. This does not yet touch the agenda
+	or the data picker, but I do eventually intend to work on those as well.
+
+	I feel like orgmode should respect your chosen color scheme!
+
+	- Org Create Color Scheme From Active
+
+	When run from a normal NON org mode buffer will sample the currently
+	active color scheme, create a new color scheme file in:
+
+	#+BEGIN_QUOTE
+	  Packages/User/OrgColorSchems/<originalName>_Org.sublime-color-scheme
+	#+END_QUOTE
+
+	It will then add a couple of key scopes such as:
+
+	- orgmode.preamble :: which is used to make the leading stars invisible on a subheading
+	- orgmode.state.*  :: These are used to give the core built in states some color
+
+	This also adds a comment block in the color scheme file that tries to help new users understand
+	what their options are. Note this is based off your active color scheme.
+
+	This will ALSO change the active OrgExtended color scheme to be this new color scheme to let you
+	see how it is going to pan out. This may, or may NOT work out well for you!
+
