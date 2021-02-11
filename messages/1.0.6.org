@@ -1,7 +1,7 @@
 * 1.0.6
 ** Color Scheme Generator
 	This is a bit of an experimental feature to help people
-	use org mode with their own color scheme. It is NOTE complete
+	use org mode with their own color scheme. It is NOT complete
 	and not where I want it to be yet. This does not yet touch the agenda
 	or the data picker, but I do eventually intend to work on those as well.
 

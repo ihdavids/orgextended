@@ -456,6 +456,8 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			print("TO COLOR SCHEME: " + newColorScheme)
 			self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
 			self.mysettings.set("color_scheme", newColorScheme)
+			self.mysettings = sublime.load_settings('orgdatepicker.sublime-settings')
+			self.mysettings.set("color_scheme", newColorScheme)
 
 
 
