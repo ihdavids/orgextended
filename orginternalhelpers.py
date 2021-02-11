@@ -422,6 +422,23 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.priority.value.e","#bcbfae")
 		self.addscope(cs,"orgmode.priority.value.general","#b59eb5")
 
+	def addagenda(self,cs):
+		bg = getBackground(cs)
+		weekEmpty = "color(" + bg + " l(+ 5%))"
+		self.addscope(cs,"orgagenda.week.empty", weekEmpty, weekEmpty)	
+		self.addscope(cs,"orgagenda.block.1","#623456","#623456")
+		self.addscope(cs,"orgagenda.block.2","#007777","#007777")
+		self.addscope(cs,"orgagenda.block.3","#999900","#999900")
+		self.addscope(cs,"orgagenda.block.4","#007700","#007700")
+		self.addscope(cs,"orgagenda.block.5","#aa5522","#aa5522")
+		self.addscope(cs,"orgagenda.block.6","#f89cf4","#f89cf4")
+		self.addscope(cs,"orgagenda.block.7","#0000ee","#0000ee")
+		
+		self.addscope(cs,"orgagenda.habit.didit","#ffffff","#007700")
+		self.addscope(cs,"orgagenda.habit.scheduled","#333300","#550000")
+		self.addscope(cs,"orgagenda.habit.nothing","#000066","#000066")
+		
+
 	def addfences(self, cs):
 		cs['rules'].append({"COMMENT ORGMODE FENCE COMMENT HERE":""})
 		bg = getBackground(cs, 'markup.raw.block')
@@ -472,6 +489,9 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			outputFile = os.path.join(path, schemeName)
 			cs['rules'].append({"COMMENT ORGMODE SCOPES HERE":""})
 			cs['rules'].append({"COMMENT ORGMODE DATEPICKER SCOPES HERE":""})
+			
+			self.addagenda(cs)
+
 			jsonStr = json.dumps(cs, sort_keys=True, indent=4)
 
 
