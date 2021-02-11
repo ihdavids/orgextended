@@ -9,15 +9,15 @@ contexts:
   main:
     # filename and line location
     - match: '(^[a-zA-Z0-9]+:)'
-      scope: orgagenda.filename
+      scope: string.quoted orgagenda.filename
 
     - match: '[0-9]+:[0-9]+(\.)+ (\-)+'
-      scope: orgagenda.timeseparator
+      scope: comment orgagenda.timeseparator
 
 
     - match: 'H\['
       push:
-        - meta_scope: orgagenda.habit
+        - meta_scope: orgmode.preamble orgagenda.habit
         - match: '[*]'
           scope: orgagenda.habit.didit
         - match: '[.]'
@@ -30,108 +30,108 @@ contexts:
     - match: '^(#)([A-Za-z]+ *[0-9]+)'
       scope: orgagenda.week.today
       captures:
-        1: orgagenda.week.nothing
-        2: orgagenda.week.today
+        1: orgmode.preamble orgagenda.week.nothing
+        2: keyword orgagenda.week.today
 
     # Active day in week view
     - match: '^(&)([A-Za-z]+ *[0-9]+)'
       scope: orgagenda.week.active
       captures:
-        1: orgagenda.week.nothing
-        2: orgagenda.week.active
+        1: orgmode.preamble orgagenda.week.nothing
+        2: string.quoted orgagenda.week.active
 
     # Both day in week view
     - match: '^(@)([A-Za-z]+ *[0-9]+)'
       scope: orgagenda.week.activetoday
       captures:
-        1: orgagenda.week.nothing
-        2: orgagenda.week.activetoday
+        1: orgmode.preamble orgagenda.week.nothing
+        2: constant.numeric orgagenda.week.activetoday
 
     - match: 'W\['
       push:
-        - meta_scope: orgagenda.week
+        - meta_scope: orgmode.preamble orgagenda.week
         - match: '[a-zA-Z0-9 ]'
-          scope: orgagenda.week.normal
+          scope: variable.parameter orgagenda.week.normal
         - match: '[.]'
           scope: orgagenda.week.empty
         - match: '[_]'
-          scope: orgagenda.week.nothing
+          scope: orgmode.preamble orgagenda.week.nothing
         - match: '\]'
           pop: true
 
     - match: '((Su)|(Mo)|(Tu)|(We)|(Th)|(Fr)|(Sa)) '
       scope: orgagenda.header
       captures:
-        2: orgagenda.weekendheader 
-        3: orgagenda.dateheader 
-        4: orgagenda.dateheader 
-        5: orgagenda.dateheader 
-        6: orgagenda.dateheader 
-        7: orgagenda.dateheader 
-        8: orgagenda.weekendheader 
+        2: constant.numeric orgagenda.weekendheader 
+        3: keyword orgagenda.dateheader 
+        4: keyword orgagenda.dateheader 
+        5: keyword orgagenda.dateheader 
+        6: keyword orgagenda.dateheader 
+        7: keyword orgagenda.dateheader 
+        8: constant.numeric orgagenda.weekendheader 
 
     - match: '^[a-zA-Z][^=>:]+$'
-      scope: orgagenda.header
+      scope: keyword orgagenda.header
 
     # Datetime
     - match: '(\d{4,4}-\d{2,2}-\d{2,2} \d{2,2}:\d{2,2}:\d{2,2})'
-      scope: orgagenda.datetime
+      scope: markup.italic orgagenda.datetime
 
     - match: '^\s*now =>.*'
-      scope: orgagenda.now
+      scope: variable.parameter orgagenda.now
 
     - match: '(DONE)'
-      scope: orgagenda.done
+      scope: orgmode.state.done orgagenda.done
 
     - match: '(TODO)'
-      scope: orgagenda.todo
+      scope: orgmode.state.todo orgagenda.todo
 
     - match: '(DOING)'
-      scope: orgagenda.doing
+      scope: orgmode.state.doing orgagenda.doing
 
     - match: '(BLOCKED)'
-      scope: orgagenda.blocked
+      scope: orgmode.state.blocked orgagenda.blocked
 
     - match: '(WAITING)'
-      scope: orgagenda.waiting
+      scope: orgmode.state.waiting orgagenda.waiting
 
     - match: '(CANCELLED)'
-      scope: orgagenda.cancelled
+      scope: orgmode.state.cancelled orgagenda.cancelled
 
     - match: '(IN-PROGRESS)'
-      scope: orgagenda.inprogress
+      scope: orgmode.state.inprogress orgagenda.inprogress
 
     - match: '(NEXT)'
-      scope: orgagenda.next
+      scope: orgmode.state.next orgagenda.next
 
     - match: '\s+-------\s+.*'
-      scope: orgagenda.projecttitle
+      scope: comment orgagenda.projecttitle
 
     - match: '^=====+'
-      scope: orgagenda.blockseparator
+      scope: comment orgagenda.blockseparator
 
     - match: '(January|February|March|April|May|June|July|August|September|October|November|December)\s*([0-9]+)'
-      scope: orgagenda.monthheader
+      scope: constant.numeric orgagenda.monthheader
     
     - match: 'B\['
-      scope: orgagenda.week.nothing
+      scope: orgmode.preamble orgagenda.week.nothing
       push:
         - meta_scope: orgagenda.block
         - match: '[\$]'
-          scope: orgagenda.block.1
+          scope: keyword orgagenda.block.1
         - match: '[\@]'
-          scope: orgagenda.block.2
+          scope: constant.numeric orgagenda.block.2
         - match: '[!]'
-          scope: orgagenda.block.3
+          scope: string orgagenda.block.3
         - match: '[#]'
-          scope: orgagenda.block.4
+          scope: variable.parameter orgagenda.block.4
         - match: '[%]'
-          scope: orgagenda.block.5
+          scope: entity.name.class orgagenda.block.5
         - match: '[\^]'
-          scope: orgagenda.block.6
+          scope: entity.name.function orgagenda.block.6
         - match: '[&]'
-          scope: orgagenda.block.7
+          scope: source orgagenda.block.7
         - match: '\]'
-          scope: orgagenda.week.nothing
+          scope: orgmode.preamble orgagenda.week.nothing
           pop: true
 

@@ -307,6 +307,36 @@ fenceBlock = """
     // shift expression to make the chosen color work with your color scheme.
 """
 
+datePickerBlock = """
+	// GENERATED: By OrgExtended
+	// ====== DATE PICKER =====
+	//
+	// The date picker is the calendar view widget for selecting dates
+	// this view has its own color scheme. The defaults are reasonable
+	// with most color schemes. You may however want to tweak one of these.
+	//
+	//	{
+	//		"scope": "orgdatepicker.weekendheader",
+	//		"foreground": "#5b96f5",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgdatepicker.weekdayheader",
+	//		"foreground": "#0762a3",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgdatepicker.monthheader",
+	//		"foreground": "#7e4794",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgdatepicker.time",
+	//		"foreground": "#aaaaaa",
+	//		"font_style": "bold italic",
+	//	},
+"""
+
 class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
     def run(self, edit):
     	templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
@@ -441,6 +471,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			schemeName = scheme + "_Org.sublime-color-scheme"
 			outputFile = os.path.join(path, schemeName)
 			cs['rules'].append({"COMMENT ORGMODE SCOPES HERE":""})
+			cs['rules'].append({"COMMENT ORGMODE DATEPICKER SCOPES HERE":""})
 			jsonStr = json.dumps(cs, sort_keys=True, indent=4)
 
 
@@ -449,6 +480,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE FENCE COMMENT HERE": ""',fenceBlock)
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE PRIORITIES COMMENT HERE": ""',priorityBlock)
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE STATES COMMENT HERE": ""',stateBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE DATEPICKER SCOPES HERE": ""',datePickerBlock)
 			with open(outputFile,'w') as ofile:
 				ofile.write(jsonStr)
 			newColorScheme = "Packages/User/OrgColorSchemes/" + schemeName
@@ -456,8 +488,15 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			print("TO COLOR SCHEME: " + newColorScheme)
 			self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
 			self.mysettings.set("color_scheme", newColorScheme)
+			sublime.save_settings('OrgExtended.sublime-settings')
+
 			self.mysettings = sublime.load_settings('orgdatepicker.sublime-settings')
 			self.mysettings.set("color_scheme", newColorScheme)
+			sublime.save_settings('orgdatepicker.sublime-settings')
+
+			self.mysettings = sublime.load_settings('orgagenda.sublime-settings')
+			self.mysettings.set("color_scheme", newColorScheme)
+			sublime.save_settings('orgagenda.sublime-settings')
 
 
 
