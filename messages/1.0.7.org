@@ -7,3 +7,4 @@
 	- Color scheme generator will generate some of the key agenda colors.
 	- Color scheme generator will output a comment block for the date picker
 	  describing additional scopes.
+	

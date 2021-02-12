@@ -653,6 +653,9 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.settings = sublime.load_settings('Preferences.sublime-settings')
 		self.origColorScheme = self.settings.get("color_scheme",None)
+		if(".tmTheme" in self.origColorScheme):
+			print("ORGEXTENDED ERROR: Cannot convert .tmTheme files: " + self.origColorScheme)
+			return
 		if(self.origColorScheme):
 			self.colorSchemeData = sublime.load_resource(self.origColorScheme)
 
