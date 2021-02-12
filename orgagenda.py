@@ -556,7 +556,8 @@ class WeekView(AgendaBaseView):
         header +="  \n"
         #header = "         0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20   21   22   23  \n"
         self.view.insert(edit, self.view.size(), header)
-        col = self.startOffset + hour*self.cellSize
+        dayStart = sets.Get("agendaDayStartTime",6)
+        col = self.startOffset + (hour-dayStart)*self.cellSize
         s = self.view.text_point(row,col)
         e = self.view.text_point(row,col+2)
         reg = sublime.Region(s, e)

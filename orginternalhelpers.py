@@ -337,6 +337,170 @@ datePickerBlock = """
 	//	},
 """
 
+agendaIntroBlock = """
+	// GENERATED: By OrgExtended
+	// ====== AGENDA =====
+	//
+	// The agenda has a few unique requirements. It builds some of the blocky
+	// diagrams using colors that have the same foreground as background.
+	//
+	// You can change these colors.
+"""
+
+agendaHabitBlock = """
+	// GENERATED: By OrgExtended
+	//
+	// Habits are a means of tracking repeated tasks in orgmode. The
+	// agena has limited support for habits. The display shows how often
+	// you are achieving your habit.
+"""
+
+agendaWeekEmptyBlock = """
+	// GENERATED: By OrgExtended
+	// 
+	// The weekly empty scope is how we fill the time blocks
+	// that are empty in the weekly view. Usually I fill these with
+	// grey blocks per hour. You may choose otherwise.
+	// The foreground and background should be the same color
+	// to avoid showing the control characters.
+"""
+
+agendaWeekColorsBlock = """
+	// GENERATED: By OrgExtended
+	// 
+	// The week view uses these numeric week colors to randomly highlight
+	// tasks to make them appear unique. You can change this pallete as desired.
+"""
+
+agendaDayColorBlocks = """
+	// GENERATED: By OrgExtended
+	// 
+	// The day color blocks are used in the day view
+	// to show how scheduled todos overlap. This is a range
+	// of colors that show visually how todos fit into your day.
+	// You can choose the color palette although it is best if
+	// these colors have the same foreground and background color.
+"""
+
+agendaNowBlock = """
+	// GENERATED: By OrgExtended
+	//
+	// orgagenda.now is the cursor. It is not used by the syntax
+	// but rather to dynamically insert cursor markers in various
+	// locations in the agenda. Color as you see fit.
+"""
+
+
+agendaScopesBlock = """
+	// GENERATED: By OrgExtended
+	// 
+	// There are more colors you can override in the agenda:
+	// 
+	//	{
+	//		"scope": "orgagenda.header",
+	//		"foreground": "#5b96f5",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.dateheader",
+	//		"foreground": "#5b96f5",
+	//		"font_style": "bold italic underline",
+	//	},
+	//	{
+	//		"scope": "orgagenda.weekendheader",
+	//		"foreground": "#ab96f5",
+	//		"font_style": "bold italic underline",
+	//	},
+	//	{
+	//		"scope": "orgagenda.timeseparator",
+	//		"foreground": "#7c7c7d",
+	//	},
+	//	{
+	//		"scope": "orgagenda.now",
+	//		"foreground": "#a88cd4",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.filename",
+	//		"foreground": "#76b3ae",
+	//	},
+	//	{
+	//		"scope": "orgagenda.todo",
+	//		"foreground": "#a63229",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.doing",
+	//		"foreground": "#d2a2e0",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.blocked",
+	//		"foreground": "#FF0000",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.waiting",
+	//		"foreground": "#ffff00",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.cancelled",
+	//		"foreground": "#bab9b8",
+	//		"font_style": "italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.inprogress",
+	//		"foreground": "#d2a2e0",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.next",
+	//		"foreground": "#3fd9d7",
+	//		"font_style": "bold italic",
+	//	},
+	//	{   // Hide the week markup in the buffer
+	//		"scope": "orgagenda.week",
+	//		"foreground": "var(bgcol)",
+	//	},
+	//	{
+	//		"scope": "orgagenda.week.something",
+	//		"foreground": "#ffffff",
+	//		"background": "#007700",
+	//	},
+	//	{
+	//		"scope": "orgagenda.week.today",
+	//		"foreground": "#f89cf4",
+	//		"font_style": "bold",
+	//	},
+	//	{
+	//		"scope": "orgagenda.week.active",
+	//		"foreground": "#f8fc00",
+	//		"font_style": "bold",
+	//	},
+	//	{
+	//		"scope": "orgagenda.week.activetoday",
+	//		"foreground": "#f89cf4",
+	//		"background": "#485c00",
+	//		"font_style": "bold",
+	//	},
+	//	{
+	//		"scope": "orgagenda.projecttitle",
+	//		"foreground": "#a87932",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.blockseparator",
+	//		"foreground": "#4a4a37",
+	//		"font_style": "bold italic",
+	//	},
+	//	{
+	//		"scope": "orgagenda.monthheader",
+	//		"foreground": "#a87932",
+	//		"font_style": "bold italic",
+	//	},
+"""
+
 class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
     def run(self, edit):
     	templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
@@ -423,9 +587,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.priority.value.general","#b59eb5")
 
 	def addagenda(self,cs):
-		bg = getBackground(cs)
-		weekEmpty = "color(" + bg + " l(+ 5%))"
-		self.addscope(cs,"orgagenda.week.empty", weekEmpty, weekEmpty)	
+		cs['rules'].append({"COMMENT ORGMODE DAYBLOCKS HERE":""})
 		self.addscope(cs,"orgagenda.block.1","#623456","#623456")
 		self.addscope(cs,"orgagenda.block.2","#007777","#007777")
 		self.addscope(cs,"orgagenda.block.3","#999900","#999900")
@@ -434,10 +596,37 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgagenda.block.6","#f89cf4","#f89cf4")
 		self.addscope(cs,"orgagenda.block.7","#0000ee","#0000ee")
 		
+		cs['rules'].append({"COMMENT ORGMODE HABITS HERE":""})
 		self.addscope(cs,"orgagenda.habit.didit","#ffffff","#007700")
 		self.addscope(cs,"orgagenda.habit.scheduled","#333300","#550000")
 		self.addscope(cs,"orgagenda.habit.nothing","#000066","#000066")
-		
+
+		bg = getBackground(cs)
+		weekEmpty = "color(" + bg + " l(+ 5%))"
+		cs['rules'].append({"COMMENT ORGMODE WEEKEMPTY HERE":""})
+		self.addscope(cs,"orgagenda.week.empty", weekEmpty, weekEmpty)	
+
+		cs['rules'].append({"COMMENT ORGMODE AGENDA WEEKCOLORS HERE":""})
+		self.addscope(cs,"orgagenda.week.done.0","#4f4f4f")
+		self.addscope(cs,"orgagenda.week.done.1","#666666")
+		self.addscope(cs,"orgagenda.week.0","#550000")
+		self.addscope(cs,"orgagenda.week.1","#007700")
+		self.addscope(cs,"orgagenda.week.2","#770077")
+		self.addscope(cs,"orgagenda.week.3","#0000ff")
+		self.addscope(cs,"orgagenda.week.4","#999900")
+		self.addscope(cs,"orgagenda.week.5","#007777")
+		self.addscope(cs,"orgagenda.week.6","#aa5522")
+		self.addscope(cs,"orgagenda.week.7","#cc99cc")
+		self.addscope(cs,"orgagenda.week.8","#225522")
+		self.addscope(cs,"orgagenda.week.9","#623456")
+
+		now = "#aaaa00"
+		if('find_highlight' in cs['globals']):
+			now = cs['globals']['find_highlight']
+		cs['rules'].append({"COMMENT ORGMODE AGENDA NOW HERE":""})
+		self.addscope(cs,"orgagenda.now",now)
+
+		cs['rules'].append({"COMMENT ORGMODE AGENDA SCOPES HERE":""})
 
 	def addfences(self, cs):
 		cs['rules'].append({"COMMENT ORGMODE FENCE COMMENT HERE":""})
@@ -487,8 +676,12 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			scheme = os.path.splitext(scheme)[0]
 			schemeName = scheme + "_Org.sublime-color-scheme"
 			outputFile = os.path.join(path, schemeName)
+			# ===========================================================
 			cs['rules'].append({"COMMENT ORGMODE SCOPES HERE":""})
+			# ===========================================================
 			cs['rules'].append({"COMMENT ORGMODE DATEPICKER SCOPES HERE":""})
+			# ===========================================================
+			cs['rules'].append({"COMMENT ORGMODE AGENDA INTRO HERE":""})
 			
 			self.addagenda(cs)
 
@@ -501,22 +694,34 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE PRIORITIES COMMENT HERE": ""',priorityBlock)
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE STATES COMMENT HERE": ""',stateBlock)
 			jsonStr = jsonStr.replace('"COMMENT ORGMODE DATEPICKER SCOPES HERE": ""',datePickerBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE AGENDA INTRO HERE": ""',agendaIntroBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE WEEKEMPTY HERE": ""',agendaWeekEmptyBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE DAYBLOCKS HERE": ""',agendaDayColorBlocks)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE HABITS HERE": ""',agendaHabitBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE AGENDA WEEKCOLORS HERE": ""',agendaWeekColorsBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE AGENDA SCOPES HERE": ""',agendaScopesBlock)
+			jsonStr = jsonStr.replace('"COMMENT ORGMODE AGENDA NOW HERE": ""',agendaNowBlock)
+			
 			with open(outputFile,'w') as ofile:
 				ofile.write(jsonStr)
 			newColorScheme = "Packages/User/OrgColorSchemes/" + schemeName
 			print("CHANGING ORIGINAL COLOR SCHEME: " + self.origColorScheme)
 			print("TO COLOR SCHEME: " + newColorScheme)
-			self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
-			self.mysettings.set("color_scheme", newColorScheme)
-			sublime.save_settings('OrgExtended.sublime-settings')
+			# We need some time for that file to hit the disk before we try to
+			# load from them. Sublime is fast so give us a little time here.
+			sublime.set_timeout(self.setColorSchemes(newColorScheme), 1000)
+			
 
-			self.mysettings = sublime.load_settings('orgdatepicker.sublime-settings')
-			self.mysettings.set("color_scheme", newColorScheme)
-			sublime.save_settings('orgdatepicker.sublime-settings')
-
-			self.mysettings = sublime.load_settings('orgagenda.sublime-settings')
-			self.mysettings.set("color_scheme", newColorScheme)
-			sublime.save_settings('orgagenda.sublime-settings')
+	def setColorSchemes(self, newColorScheme):
+		self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('OrgExtended.sublime-settings')
+		self.mysettings = sublime.load_settings('orgdatepicker.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('orgdatepicker.sublime-settings')
+		self.mysettings = sublime.load_settings('orgagenda.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('orgagenda.sublime-settings')
 
 
 

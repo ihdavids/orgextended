@@ -1,3 +1,9 @@
 * 1.0.7
 ** Color Scheme Generator
 	- Date picker syntax extended to work with generic color schemes
+	- Agenda picker syntax extended to work with generic color schemes
+	- Color scheme generator has time delay to try to avoid popup errors
+	  when generating and switching color schemes.
+	- Color scheme generator will generate some of the key agenda colors.
+	- Color scheme generator will output a comment block for the date picker
+	  describing additional scopes.
