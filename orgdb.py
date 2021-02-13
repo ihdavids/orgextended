@@ -24,11 +24,14 @@ class FileInfo:
     def __init__(self, file, parsed, orgPaths):
         self.org      = parsed
         self.filename = file
-        self.key      = file.lower()
+        self.key      = file.lower() if file else None
         self.change_count = 0
         self.org.setFile(self)
         displayFn = self.key
-        oldLen = len(displayFn)
+        oldLen = len(displayFn) if displayFn else 0
+        if(not displayFn):
+            self.displayFn = "<BUFFER>"
+            return
         for prefix in orgPaths:
             displayFn = displayFn.replace(prefix,"") 
             displayFn = displayFn.replace(prefix.lower(),"")
@@ -169,6 +172,11 @@ class OrgDb:
             file = FileInfo(filename, loader.load(filename), self.orgPaths)
             self.AddFileInfo(file)
             return file
+        elif(util.isView(fileOrView) and util.isOrgSyntax(fileOrView)):
+            bufferContents = fileOrView.substr(sublime.Region(0, fileOrView.size()))
+            file = FileInfo(filename if filename else util.getKey(fileOrView), loader.loads(bufferContents), self.orgPaths)
+            self.AddFileInfo(file)
+            return file
         else:
             log.debug("File is not an org file, not loading into the database: " + str(filename))
             return None
@@ -270,11 +278,16 @@ class OrgDb:
 
     def FindInfo(self, fileOrView):
         try:
-            if(type(fileOrView) is sublime.View):
-                f = self.files[fileOrView.file_name().lower()]
+            if(not fileOrView):
+                return None
+            key = util.getKey(fileOrView).lower()
+            if(key and key in self.files):
+                f = self.files[key]
+            else:
+                f = self.LoadNew(fileOrView)
+            if(f and util.isView(fileOrView)):
                 f.ReloadIfChanged(fileOrView)
-                return f
-            return self.files[fileOrView.lower()]
+            return f
         except:
             try:
                 #log.debug("Trying to load file anew")

@@ -16,6 +16,28 @@ def isPotentialOrgFile(filename):
     exts = sets.Get("validOrgExtensions",[".org", ".org_archive"])
     return (len(fn) > 1 and (fn[1] in exts))
 
+def isOrgSyntax(fileOrView):
+    if(type(fileOrView) is sublime.View):
+        cur = fileOrView.sel()[0]
+        names = fileOrView.scope_name(cur.begin())
+        return 'text.orgmode' in names
+    return False
+
+def isView(fileOrView):
+    return (type(fileOrView) is sublime.View)
+
+def getTempBufferId(view):
+    return "buffer_" + str(view.id())
+
+def getKey(fileOrView):
+    if(isView(fileOrView)):
+        id = fileOrView.file_name()
+        if(not id):
+            return getTempBufferId(fileOrView)
+        return id.lower()
+    else:
+        return fileOrView.lower()
+
 # Sublime doesn't seem to have svg support in minihtml?
 image_extensions = [".jpg", ".png", ".gif"]
 

@@ -1,1 +1,4 @@
 * 1.0.8
+** Folding
+	- Fixed a bug where buffers that are lacking a filename
+	  can still be folded.

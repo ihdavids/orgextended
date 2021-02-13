@@ -135,12 +135,17 @@ class OrgCore(sublime_plugin.EventListener):
         names = view.scope_name(cur.begin())
         return 'dynamicblock' in names
 
+    def IsOrgSyntax(self,view):
+        cur = view.sel()[0]
+        names = view.scope_name(cur.begin())
+        return 'text.orgmode' in names
+
     def ShouldFoldCheckbox(self, view):
         return (not self.ShouldGlobalFold(view)) and folding.ShouldFoldCheckbox(view)
 
     def on_query_context(self, view, key, operator, operand, match_all):
         # A key wants to be inserted, what context are we in for that?
-        if(operator == sublime.OP_EQUAL and util.isPotentialOrgFile(view.file_name())):
+        if(operator == sublime.OP_EQUAL and (util.isPotentialOrgFile(view.file_name()) or self.IsOrgSyntax(view))):
             if(key == 'org_heading'):
                  return operand == self.ShouldLocalFold(view)
             elif(key == 'org_global'):
