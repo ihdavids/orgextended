@@ -23,7 +23,6 @@ import OrgExtended.pymitter as evt
 
 class OrgInternalEraseCommand(sublime_plugin.TextCommand):
     def run(self, edit, start, end, onDone=None):
-        print("ERASE:")
         region = sublime.Region(start, end)
         self.view.erase(edit, region)
         # Reload the file automatically when we edit it.

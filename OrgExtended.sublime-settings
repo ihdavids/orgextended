@@ -200,6 +200,10 @@
     // to Monday
     "agendaWeekViewNumDays": 7,
 
+    // Do you want the system to delete clocking entries smaller than 1 minute
+    // or keep them?
+    "clockingSubMinuteClocks": true,
+    
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
 

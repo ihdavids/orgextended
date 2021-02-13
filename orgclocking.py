@@ -99,7 +99,8 @@ class ClockManager:
 			start = ClockManager.Clock["start"]
 			duration = end - start
 			# Should we keep clocking entries less than a minute?
-			if(duration.seconds < 60):
+			shouldKeep = sets.Get("clockingSubMinuteClocks",True)
+			if(not shouldKeep and duration.seconds < 60):
 				props.RemoveProperty(view, node, "CLOCK")
 			else:
 				props.UpdateProperty(view, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))

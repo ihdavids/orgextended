@@ -2,3 +2,6 @@
 ** Folding
 	- Fixed a bug where buffers that are lacking a filename
 	  can still be folded.
+** Clocking
+	new setting: 
+		- clockingSubMinuteClocks: true will now keep clocking entries that are smaller than a minute
