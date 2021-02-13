@@ -290,62 +290,52 @@ class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
             file = db.Get().FindInfo(self.view)
             file.LoadS(self.view)
 
-# This doesn't work, it is inserting as a child rather than as a sibling AT the point in question.
-# I will need a new insertion command for this.
 class OrgMoveHeadingUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
         if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
-            targetNode = curNode.env._nodes[curNode._index - 1]
-            index = targetNode._index - 1
-            sp    = self.view.text_point(curNode.start_row, 0)
-            ep    = self.view.text_point(curNode.end_row, 0)
-            r     = self.view.line(ep)
-            reg   = sublime.Region(sp, r.end())
+            targetNode = curNode.get_sibling_up()
+            if(targetNode):
+                print(targetNode.heading)
+                index = targetNode._index - 1
+                r,c   = self.view.curRowCol()
+                sp    = self.view.text_point(curNode.start_row, 0)
+                ep    = self.view.text_point(curNode.end_row, 0)
+                r     = self.view.line(ep)
+                reg   = sublime.Region(sp, r.end()+1)
 
-            # Extract the text and make a new tree
-            nodetext = self.view.substr(reg)
-            extraTree = loader.loads(nodetext)
-            # Remove the old node
-            curNode.remove_node()
+                nodetext = self.view.substr(reg)
+                sp    = self.view.text_point(targetNode.start_row, 0)
+                treg   = sublime.Region(sp, sp)
 
-            # Now try to insert at this point.
-            targetNode.insert_at(extraTree[1], index)
-            # Now refile effectively
-            file = db.Get().FindInfo(self.view)
-            #targetNode.insert_at(curNode, )
-            #curNode.remove_node()
-            file.Save()
-            file.Reload()
+                self.view.erase(edit,reg)
+                self.view.insert(edit,sp,nodetext)
+                self.view.sel().clear()
+                np = self.view.text_point(targetNode.start_row, c)
+                self.view.sel().add(np)
 
-# This doesn't work, it is inserting as a child rather than as a sibling AT the point in question.
-# I will need a new insertion command for this.
 class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
         if(curNode and type(curNode) != node.OrgRootNode and curNode._index < (len(curNode.env._nodes) - 1)):
-            targetNode = curNode.env._nodes[curNode._index + 1]
-            index = targetNode._index
-            sp    = self.view.text_point(curNode.start_row, 0)
-            ep    = self.view.text_point(curNode.end_row, 0)
-            r     = self.view.line(ep)
-            reg   = sublime.Region(sp, r.end())
+            targetNode = curNode.get_sibling_down()
+            if(targetNode):
+                temp = curNode
+                curNode = targetNode
+                targetNode = temp
+                print(targetNode.heading)
+                index = targetNode._index - 1
+                sp    = self.view.text_point(curNode.start_row, 0)
+                ep    = self.view.text_point(curNode.end_row, 0)
+                r     = self.view.line(ep)
+                reg   = sublime.Region(sp, r.end()+1)
 
-            # Extract the text and make a new tree
-            nodetext = self.view.substr(reg)
-            extraTree = loader.loads(nodetext)
-            # Remove the old node
-            curNode.remove_node()
+                nodetext = self.view.substr(reg)
+                sp    = self.view.text_point(targetNode.start_row, 0)
+                treg   = sublime.Region(sp, sp)
 
-            # Now try to insert at this point, but we removed ourselves
-            # so take us out of the equation for where we want to be inserted
-            targetNode.insert_at(extraTree[1], index - 1)
-            # Now refile effectively
-            file = db.Get().FindInfo(self.view)
-            #targetNode.insert_at(curNode, )
-            #curNode.remove_node()
-            file.Save()
-            file.Reload()
+                self.view.erase(edit,reg)
+                self.view.insert(edit,sp,nodetext)
 
 class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
     def run(self, edit):

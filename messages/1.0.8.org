@@ -5,3 +5,7 @@
 ** Clocking
 	new setting: 
 		- clockingSubMinuteClocks: true will now keep clocking entries that are smaller than a minute
+** Movement
+	- Fixed move heading up / move heading down. This now does the same
+	  as org-move-subtree-up and org-move-subtree-down.
+	  - Moves headings within siblings at the same level of the tree.
