@@ -1,1 +1,18 @@
 * 1.0.9
+** Editing
+	- Org Select Subtree 
+	  This will select the full subtree of the active heading.
+		- alt+o m s 
+		- <space> m s (neovintageous normal mode)
+    - Org Select Entity
+      This will select just the current node
+        - alt+o m e    (mark entity)
+        - <space> m e  (neovintageous normal mode)
+    - Org Copy Subtree
+      This will copy the entire subtree to the clipboard.
+        - alt+o y s    (yank entity)
+        - <space> y s  (neovintageous normal mode)
+    - Org Copy Entity
+      This will copy the current node to the clipboard.
+        - alt+o y e    (yank entity)
+        - <space> y e  (neovintageous normal mode)

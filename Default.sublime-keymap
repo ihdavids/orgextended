@@ -101,6 +101,10 @@
     { "keys": ["alt+o", "c", "c"],       "command": "org_recalc",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["alt+o", "c", "s"],       "command": "org_insert_checkbox_summary",   "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["alt+o", "y", "l"],       "command": "org_create_link",               "context": []},
+    { "keys": ["alt+o", "m", "s"],       "command": "org_select_subtree",            "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
+    { "keys": ["alt+o", "m", "e"],       "command": "org_select_entity",             "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
+    { "keys": ["alt+o", "y", "s"],       "command": "org_copy_subtree",              "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
+    { "keys": ["alt+o", "y", "e"],       "command": "org_copy_entity",               "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
     // ORG AGENDA
     { "keys": ["alt+o", "o", "a"],       "command": "org_agenda_custom_view",        "context": []  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",                  "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
@@ -148,6 +152,10 @@
     { "keys": [" ", "c", "o"],       "command": "org_clock_out",                 "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "c", "c"],       "command": "org_recalc",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "c", "s"],       "command": "org_insert_checkbox_summary",   "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "m", "s"],       "command": "org_select_subtree",            "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "m", "e"],       "command": "org_select_entity",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "y", "s"],       "command": "org_copy_subtree",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "y", "e"],       "command": "org_copy_entity",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     // ORG AGENDA
     { "keys": [" ", "o", "a"],       "command": "org_agenda_custom_view",        "context": [{"key": "vi_command_mode_aware"}]  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },

@@ -77,6 +77,10 @@
     {"caption": "Org Link To Today",           "command": "org_link_to_today"           },
     {"caption": "Org Update Numbered List",    "command": "org_update_numbered_list"    },
     {"caption": "Org Append Numbered List",    "command": "org_append_numbered_list"    },
+    {"caption": "Org Select Subtree",          "command": "org_select_subtree"          },
+    {"caption": "Org Select Entity",           "command": "org_select_entity"           },
+    {"caption": "Org Copy Subtree",            "command": "org_copy_subtree"            },
+    {"caption": "Org Copy Entity",             "command": "org_copy_entity"             },
 
     // Agenda
     {"caption": "Org Agenda Goto",             "command": "org_agenda_go_to"            },

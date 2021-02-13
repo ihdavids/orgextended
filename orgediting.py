@@ -23,6 +23,7 @@ import OrgExtended.orgproperties as props
 import OrgExtended.orgdatepicker as datep
 import OrgExtended.orginsertselected as insSel
 import OrgExtended.orglinks as orglink
+import OrgExtended.orgneovi as nvi
 
 log = logging.getLogger(__name__)
 
@@ -290,13 +291,59 @@ class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
             file = db.Get().FindInfo(self.view)
             file.LoadS(self.view)
 
+
+class OrgSelectSubtreeCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        curNode = db.Get().AtInView(self.view)
+        if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
+            sp    = self.view.text_point(curNode.start_row, 0)
+            ep    = self.view.text_point(curNode.end_row, 0)
+            r     = self.view.line(ep)
+            reg   = sublime.Region(sp, r.end()+1)
+            self.view.sel().clear()
+            self.view.sel().add(reg)
+
+class OrgCopySubtreeCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        curNode = db.Get().AtInView(self.view)
+        if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
+            sp    = self.view.text_point(curNode.start_row, 0)
+            ep    = self.view.text_point(curNode.end_row, 0)
+            r     = self.view.line(ep)
+            reg   = sublime.Region(sp, r.end()+1)
+            nodetext = self.view.substr(reg)
+            sublime.set_clipboard(nodetext)
+            nvi.TestAndSetClip(self.view, nodetext)
+
+class OrgSelectEntityCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        curNode = db.Get().AtInView(self.view)
+        if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
+            sp    = self.view.text_point(curNode.start_row, 0)
+            ep    = self.view.text_point(curNode.local_end_row, 0)
+            r     = self.view.line(ep)
+            reg   = sublime.Region(sp, r.end()+1)
+            self.view.sel().clear()
+            self.view.sel().add(reg)
+
+class OrgCopyEntityCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        curNode = db.Get().AtInView(self.view)
+        if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
+            sp    = self.view.text_point(curNode.start_row, 0)
+            ep    = self.view.text_point(curNode.local_end_row, 0)
+            r     = self.view.line(ep)
+            reg   = sublime.Region(sp, r.end()+1)
+            nodetext = self.view.substr(reg)
+            sublime.set_clipboard(nodetext)
+            nvi.TestAndSetClip(self.view, nodetext)
+
 class OrgMoveHeadingUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
         if(curNode and type(curNode) != node.OrgRootNode and curNode._index > 1):
             targetNode = curNode.get_sibling_up()
             if(targetNode):
-                print(targetNode.heading)
                 index = targetNode._index - 1
                 r,c   = self.view.curRowCol()
                 sp    = self.view.text_point(curNode.start_row, 0)
@@ -323,7 +370,6 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
                 temp = curNode
                 curNode = targetNode
                 targetNode = temp
-                print(targetNode.heading)
                 index = targetNode._index - 1
                 sp    = self.view.text_point(curNode.start_row, 0)
                 ep    = self.view.text_point(curNode.end_row, 0)
