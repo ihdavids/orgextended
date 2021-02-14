@@ -14,9 +14,29 @@ log = logging.getLogger(__name__)
 def am_in_link(view):
     return view.match_selector(view.sel()[0].begin(), "orgmode.link")
 
+
 def find_all_links(view):
     links = view.find_by_selector("orgmode.link.hrefblock")
     return links
+
+def toggle_link(view):
+    pt = view.sel()[0].end()
+    links = view.find_by_selector("orgmode.link")
+    hrefs = view.find_by_selector("orgmode.link.hrefblock")
+    reg = None
+    for link in links:
+        line = view.line(link.begin())
+        if(line.contains(pt)):
+            for href in hrefs:
+                if(line.contains(href.begin())):
+                    reg = href
+                    break
+            break
+    if(reg):
+        if(view.isRegionFolded(reg)):
+            view.unfold(reg)
+        else:
+            view.fold(reg)
 
 def fold_all_links(view):
     links = find_all_links(view)

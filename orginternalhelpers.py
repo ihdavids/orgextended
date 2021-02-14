@@ -13,59 +13,61 @@ import yaml
 import json
 #from jsoncomment import JsonComment
 import ast
+import OrgExtended.orgxmlthemeparser as tp
+import glob
 
 varre = re.compile(r'var\((?P<name>[^)]+)\)')
 colorre = re.compile(r'#(?P<r>[A-Fa-f0-9][A-Fa-f0-9])(?P<g>[A-Fa-f0-9][A-Fa-f0-9])(?P<b>[A-Fa-f0-9][A-Fa-f0-9])(?P<a>[A-Fa-f0-9][A-Fa-f0-9])?')
 
 template = """
-    - match: '{{{{beginsrc}}}}(({match})\s*)'
-      captures:
-        1: constant.other orgmode.fence.sourceblock
-        2: orgmode.fence.sourceblock
-        3: keyword orgmode.fence.language
-        4: orgmode.fence.sourceblock
-      embed: scope:{source}
-      escape: '{{{{endsrc}}}}'
-      embed_scope: markup.raw.block orgmode.raw.block
-      escape_captures:
-        1: constant.other orgmode.fence.sourceblock"""
+	- match: '{{{{beginsrc}}}}(({match})\s*)'
+	  captures:
+		1: constant.other orgmode.fence.sourceblock
+		2: orgmode.fence.sourceblock
+		3: keyword orgmode.fence.language
+		4: orgmode.fence.sourceblock
+	  embed: scope:{source}
+	  escape: '{{{{endsrc}}}}'
+	  embed_scope: markup.raw.block orgmode.raw.block
+	  escape_captures:
+		1: constant.other orgmode.fence.sourceblock"""
 
 
 introBlock = """
-    // GENERATED: By OrgExtended
-    //
-    // The generator adds a subset of the orgmode specific scopes.
-    // The scopes that it has added tend to play an important role
-    // in making an orgmode buffer operational.
-    //
-    // That said, orgmode offers a wide variety of syntax elements for
-    // you to style as needed. Please see blow for more information
-    // on some of these scopes.
-    //
-    // The preamble scope is one of the more important scopes. In the
-    // future I hope to produce some ligature fonts that will make the preamble
-    // scope a thing of the past. For now, the preamble is the scope that hides
-    // leading stars in your buffer. I find those visually disturbing and
-    // appreciate working with them being invisible.
-    //
-    // The preamble used the pre-defined background color of your theme to
-    // ensure the stars are invisible.
+	// GENERATED: By OrgExtended
+	//
+	// The generator adds a subset of the orgmode specific scopes.
+	// The scopes that it has added tend to play an important role
+	// in making an orgmode buffer operational.
+	//
+	// That said, orgmode offers a wide variety of syntax elements for
+	// you to style as needed. Please see blow for more information
+	// on some of these scopes.
+	//
+	// The preamble scope is one of the more important scopes. In the
+	// future I hope to produce some ligature fonts that will make the preamble
+	// scope a thing of the past. For now, the preamble is the scope that hides
+	// leading stars in your buffer. I find those visually disturbing and
+	// appreciate working with them being invisible.
+	//
+	// The preamble used the pre-defined background color of your theme to
+	// ensure the stars are invisible.
 """
 
 # TODO Create blocks for each of the relevant blocks of markers
 #      Create a set of useful markers with comments about how you can customize them
 commentBlock = """
 	// GENERATED: By Org Extended
-    // 
-    // The generator has added a bunch of useful extensions to the color scheme
-    // That said there is much more than can be done by you to tweak your scheme
-    // to your hearts content. The following comment block is here to give you
-    // ideas of what is possible.
-    //
-    // On a windows box type Ctrl + Alt + Shift + P
-    // to get a view of what scopes are in play on the thing you want to style
-    // This table can help you tweak what you would like to see change
-    //
+	// 
+	// The generator has added a bunch of useful extensions to the color scheme
+	// That said there is much more than can be done by you to tweak your scheme
+	// to your hearts content. The following comment block is here to give you
+	// ideas of what is possible.
+	//
+	// On a windows box type Ctrl + Alt + Shift + P
+	// to get a view of what scopes are in play on the thing you want to style
+	// This table can help you tweak what you would like to see change
+	//
 	//	{
 	//		"scope": "orgmode.break",
 	//		"foreground": "#ed188a",
@@ -273,38 +275,38 @@ commentBlock = """
 
 
 stateBlock = """
-    // GENERATED: By OrgExtended
-    //
-    // States are the build in state flow. While org
-    // allows you to define your own state flows
-    // I do not yet have a good way of automatically
-    // adding those to the syntax and color scheme.
-    // (I hope to one day have a way to do that)
-    //
-    // For now the pre-defined state flows have automatic
-    // highlighting and any new ones you define will have
-    // the default. I can of course extend the syntax if desired.
+	// GENERATED: By OrgExtended
+	//
+	// States are the build in state flow. While org
+	// allows you to define your own state flows
+	// I do not yet have a good way of automatically
+	// adding those to the syntax and color scheme.
+	// (I hope to one day have a way to do that)
+	//
+	// For now the pre-defined state flows have automatic
+	// highlighting and any new ones you define will have
+	// the default. I can of course extend the syntax if desired.
 """
 
 priorityBlock = """
-    // GENERATED: By OrgExtended
-    //
-    // Much like states I do not have a way to extend the syntax with
-    // new priorities at this time. I hope to devise a good scheme in
-    // the future. 
-    //
-    // That said there is a default set of priorities A,B,C,D,E that
-    // have automatic coloring. These are the color scheme elements that
-    // add that coloring.
+	// GENERATED: By OrgExtended
+	//
+	// Much like states I do not have a way to extend the syntax with
+	// new priorities at this time. I hope to devise a good scheme in
+	// the future. 
+	//
+	// That said there is a default set of priorities A,B,C,D,E that
+	// have automatic coloring. These are the color scheme elements that
+	// add that coloring.
 """
 
 fenceBlock = """
-    // GENERATED: By OrgExtended
-    //
-    // Code blocks have a heading BEGIN_SRC and an ending END_SRC
-    // I find it visually appealing to make these stand out.
-    // You may have different preferences. NOTE: I use a luminance
-    // shift expression to make the chosen color work with your color scheme.
+	// GENERATED: By OrgExtended
+	//
+	// Code blocks have a heading BEGIN_SRC and an ending END_SRC
+	// I find it visually appealing to make these stand out.
+	// You may have different preferences. NOTE: I use a luminance
+	// shift expression to make the chosen color work with your color scheme.
 """
 
 datePickerBlock = """
@@ -502,32 +504,32 @@ agendaScopesBlock = """
 """
 
 class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-    	templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
-    	outputFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax")
-    	languageList = os.path.join(sublime.packages_path(),"OrgExtended","languagelist.yaml")
-    	templates = ""
-    	with open(languageList) as file:
-    		documents = yaml.full_load(file)
-    		for item in documents:
-    			if 'text' in item:
-    				item['source'] = "text." + item['language']
-    			elif not 'source' in item:
-    				item['source'] = "source." + item['language']
-    			else:
-    				item['source'] = "source." + item['source']
-    			if not 'match' in item:
-    				item['match'] = item['language']
-    			templates += template.format(**item)
-    	templates += "\n"
-    	with open(templateFile) as tfile:
-    		with open(outputFile, 'w') as ofile:
-    			for line in tfile.readlines():
-    				if("{{INSERT_LANGUAGES_HERE}}" in line):
-    					ofile.write(templates)
-    				else:
-    					ofile.write(line)
-    		#print(templates)
+	def run(self, edit):
+		templateFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax-template")
+		outputFile = os.path.join(sublime.packages_path(),"OrgExtended","OrgExtended.sublime-syntax")
+		languageList = os.path.join(sublime.packages_path(),"OrgExtended","languagelist.yaml")
+		templates = ""
+		with open(languageList) as file:
+			documents = yaml.full_load(file)
+			for item in documents:
+				if 'text' in item:
+					item['source'] = "text." + item['language']
+				elif not 'source' in item:
+					item['source'] = "source." + item['language']
+				else:
+					item['source'] = "source." + item['source']
+				if not 'match' in item:
+					item['match'] = item['language']
+				templates += template.format(**item)
+		templates += "\n"
+		with open(templateFile) as tfile:
+			with open(outputFile, 'w') as ofile:
+				for line in tfile.readlines():
+					if("{{INSERT_LANGUAGES_HERE}}" in line):
+						ofile.write(templates)
+					else:
+						ofile.write(line)
+			#print(templates)
 
 def findscope(cs, name):
 	if(name == None):
@@ -653,13 +655,17 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.settings = sublime.load_settings('Preferences.sublime-settings')
 		self.origColorScheme = self.settings.get("color_scheme",None)
-		if(".tmTheme" in self.origColorScheme):
-			print("ORGEXTENDED ERROR: Cannot convert .tmTheme files: " + self.origColorScheme)
-			return
 		if(self.origColorScheme):
 			self.colorSchemeData = sublime.load_resource(self.origColorScheme)
-
-			cs = ast.literal_eval(self.colorSchemeData)
+			cs = None
+			if(".tmTheme" in self.origColorScheme):
+				try:
+					p = tp.XMLThemeParser(self.colorSchemeData)
+					cs = p.cs
+				except:
+					print("Failed to parse tmTheme file: \n" + traceback.format_exc())
+			else:
+				cs = ast.literal_eval(self.colorSchemeData)
 			if(not cs):
 				print("FAILED TO GENERATE NEW COLOR SCHEME COULD NOT PARSE SCHEME")
 				return
@@ -707,6 +713,7 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 			
 			with open(outputFile,'w') as ofile:
 				ofile.write(jsonStr)
+				ofile.flush()
 			newColorScheme = "Packages/User/OrgColorSchemes/" + schemeName
 			print("CHANGING ORIGINAL COLOR SCHEME: " + self.origColorScheme)
 			print("TO COLOR SCHEME: " + newColorScheme)
@@ -727,4 +734,34 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		sublime.save_settings('orgagenda.sublime-settings')
 
 
-
+class OrgSelectExistingColorSchemeCommand(sublime_plugin.TextCommand):
+	def on_done_st4(self, index, modifiers):
+		self.on_done(index)
+	def on_done(self, index):
+		if(index < 0):
+			return
+		newColorScheme = self.files[index]
+		self.mysettings = sublime.load_settings('OrgExtended.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('OrgExtended.sublime-settings')
+		self.mysettings = sublime.load_settings('orgdatepicker.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('orgdatepicker.sublime-settings')
+		self.mysettings = sublime.load_settings('orgagenda.sublime-settings')
+		self.mysettings.set("color_scheme", newColorScheme)
+		sublime.save_settings('orgagenda.sublime-settings')
+	def run(self, edit):
+		path = os.path.join(sublime.packages_path(),"User","OrgColorSchemes")
+		self.files = glob.glob(os.path.join(path,"*.sublime-color-scheme"))
+		temp = []
+		for file in self.files:
+			file = file.replace(sublime.packages_path(),"")
+			file = "Packages" + file.replace("\\","/")
+			temp.append(file)
+		self.files = temp
+		self.files.append("Packages/OrgExtended/OrgExtended.sublime-color-scheme")
+		self.files.append("Packages/OrgExtended/OrgExtended-Light.sublime-color-scheme")
+		if(int(sublime.version()) >= 4096):
+			self.view.window().show_quick_panel(self.files, self.on_done_st4, -1, -1)
+		else:
+			self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)

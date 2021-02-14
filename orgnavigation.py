@@ -81,7 +81,7 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
             folding.fold_global_cycle(self.view)
             return
         elif(folding.am_in_link(self.view)):
-            folding.fold_all_links(self.view)
+            folding.toggle_link(self.view)
             return
         # In a table, our tab expansion will take priority over Table Editor
         # So we have to own it and if we are in a table forward the command

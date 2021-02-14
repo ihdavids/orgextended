@@ -16,6 +16,16 @@
       This will copy the current node to the clipboard.
         - alt+o y e    (yank entity)
         - <space> y e  (neovintageous normal mode)
+
+** Folding
+  - Fixed link tab cycling.  
+  
+** Color Scheme Generator
+  - The generator is now able to handle simple tmTheme files.
+
+    NOTE: it converts them to sublime-color-scheme files in the output
+          folder.
+
 ** NeoVintageous
 	- For ST4 users - neovintageous has upgraded to python 3.8
 	  this means that my hacks to push register 0 with the values

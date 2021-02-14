@@ -109,6 +109,7 @@
     {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"  },
     //{"caption": "Org Test Thing",              "command": "org_show_item"  },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
-    {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  },
-    {"caption": "Org Download Highligh Js", "command": "org_download_highligh_js"  }
+    {"caption": "Org Download Highligh Js",    "command": "org_download_highligh_js"  },
+    {"caption": "Org Select Color Scheme",     "command": "org_select_existing_color_scheme"  },
+    {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  }
 ]
