@@ -391,7 +391,22 @@ class OrgDate(object):
             if(not type(os) == datetime.date):
                 os = os.date()
             return ss == os
-    
+
+    def after(self, date): 
+        if not isinstance(date, (datetime.datetime, datetime.date)):
+            return False
+        asdt = self._as_datetime
+        if asdt(self.start) <= asdt(date):
+            return True
+        return False
+
+    def before(self, date): 
+        if not isinstance(date, (datetime.datetime, datetime.date)):
+            return False
+        asdt = self._as_datetime
+        if asdt(self.start) >= asdt(date):
+            return True
+        return False
 
     def _datetime_in_range(self, date):
         if not isinstance(date, (datetime.datetime, datetime.date)):

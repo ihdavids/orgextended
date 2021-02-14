@@ -150,12 +150,20 @@ def IsTodaysDate(check, today):
     return today == check
 
 def IsToday(n, today):
+    timestamps = n.get_timestamps(active=True,point=True)
+    for t in timestamps:
+        if(t.repeating):
+            next = t.next_repeat_from_today
+            return IsTodaysDate(next, today)
+        else:
+            if(t.has_overlap(today)):
+                return True
     if(n.scheduled):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from_today
             return IsTodaysDate(next, today)
         else:
-            return n.scheduled.has_overlap(today)
+            return n.scheduled.after(today)
     return False
 
 def IsAllDay(n):
@@ -174,19 +182,13 @@ def IsAllDay(n):
             return False
         return True
 
-
-def IsInHour(n, hour):
-    if(not n or not n.scheduled):
+def HasTimestamp(n):
+    if(not n):
         return False
+    timestamps = n.get_timestamps(active=True,point=True)
+    return n.scheduled or (timestamps and len(timestamps) > 0)
 
-    if(not n.scheduled.has_time()):
-        return False
-
-    if(n.scheduled.repeating):
-        next = n.scheduled.next_repeat_from_today
-        return next.hour == hour
-    s = n.scheduled.start
-    e = n.scheduled.end
+def IsInHourBracket(s, e, hour):
     if(not e):
         # TODO Make this configurable
         e = s + datetime.timedelta(minutes=30)
@@ -194,11 +196,38 @@ def IsInHour(n, hour):
     # Ranged tasks have to fit within the hour, point tasks have to 
     if( Overlaps(s.hour*60 + s.minute, e.hour*60 + e.minute, hour*60, hour*60 + 59)):
         return True
-    #if((not n.scheduled.end and n.scheduled.start.hour == hour) 
-    #    or 
-    #    (n.scheduled.end and n.scheduled.start.hour >= hour and n.scheduled.end.hour <= hour)):
-    #    return True
-    return False
+
+
+def IsInHour(n, hour):
+    if(not n):
+        return None
+
+    timestamps = n.get_timestamps(active=True, point=True)
+    if(timestamps):
+        for t in timestamps:
+            if(t.has_time()):
+                if(t.repeating):
+                    next = n.scheduled.next_repeat_from_today
+                    return next.hour == hour
+                else:
+                    s = t.start
+                    e = t.end
+                    if(IsInHourBracket(s,e,hour)):
+                        return t
+    if(not n.scheduled):
+        return None
+
+    if(not n.scheduled.has_time()):
+        return None
+
+    if(n.scheduled.repeating):
+        next = n.scheduled.next_repeat_from_today
+        return next.hour == hour
+    s = n.scheduled.start
+    e = n.scheduled.end
+    if(IsInHourBracket(s,e,hour)):
+        return n.scheduled
+    return None
 
 
 def Overlaps(s,e,rs,re):
@@ -220,18 +249,7 @@ def Overlaps(s,e,rs,re):
         return True
     return False
 
-def IsInHourAndMinute(n, hour, mstart, mend):
-    if(not n.scheduled):
-        return False
-
-    if(not n.scheduled.has_time()):
-        return False
-
-    if(n.scheduled.repeating):
-        next = n.scheduled.next_repeat_from_today
-        return next.hour == hour
-    s = n.scheduled.start
-    e = n.scheduled.end
+def IsInHourAndMinuteBracket(s,e,hour,mstart,mend):
     if(not e):
         # TODO Make this configurable
         e = s + datetime.timedelta(minutes=30)
@@ -242,8 +260,40 @@ def IsInHourAndMinute(n, hour, mstart, mend):
         return True
     return False
 
-def distanceFromStart(n, hour, minSlot):
-    rv = 5*(hour - n.scheduled.start.hour) + (minSlot - int(n.scheduled.start.minute/12))
+def IsInHourAndMinute(n, hour, mstart, mend):
+    if(not n):
+        return None
+    timestamps = n.get_timestamps(active=True, point=True)
+    if(timestamps):
+        for t in timestamps:
+            if(t.has_time()):
+                if(t.repeating):
+                    next = n.scheduled.next_repeat_from_today
+                    return next.hour == hour
+                else:
+                    s = t.start
+                    e = t.end
+                    if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
+                        return t
+
+    if(not n.scheduled):
+        return None
+
+    if(not n.scheduled.has_time()):
+        return None
+
+    if(n.scheduled.repeating):
+        next = n.scheduled.next_repeat_from_today
+        return next.hour == hour
+    s = n.scheduled.start
+    e = n.scheduled.end
+    if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
+        return n.scheduled
+    return None
+
+def distanceFromStart(e, hour, minSlot):
+    ts = e['ts']
+    rv = 5*(hour - ts.start.hour) + (minSlot - int(ts.start.minute/12))
     return rv
 
 # ================================================================================
@@ -270,6 +320,7 @@ class AgendaBaseView:
         self.noclose = "noclose" in kwargs
         self.nodeadline = "nodeadline" in kwargs
         self.noschedule = "noschedule" in kwargs
+        self.onlyTasks  = "onlytasks" in kwargs
 
         if(setup):
             self.SetupView()
@@ -417,15 +468,17 @@ class AgendaBaseView:
     def AddEntry(self, node, file):
         self.entries.append({"node": node, "file": file})
 
-    def MarkEntryAt(self, entry):
+    def MarkEntryAt(self, entry, ts= None):
         if(not 'at' in entry):
             entry['at'] = []
         entry['at'].append(self.view.rowcol(self.view.size())[0])
+        entry['ts'] = ts
     
-    def MarkEntryAtRegion(self, entry, reg):
+    def MarkEntryAtRegion(self, entry, reg, ts=None):
         if(not 'at' in entry):
             entry['at'] = []
         entry['at'].append(reg)
+        entry['ts'] = ts
 
     def At(self, row, col):
         for e in self.entries:
@@ -580,8 +633,20 @@ class WeekView(AgendaBaseView):
         daydata = []
         for entry in self.entries:
             n = entry['node']
-            if(n.scheduled.start.day == date.day):
+            timestamps = n.get_timestamps(active=True,point=True)
+            shouldContinue = False
+            for t in timestamps:
+                if(t.start.day == date.day):
+                    daydata.append(entry)
+                    entry['ts'] = t
+                    shouldContinue = True
+                    break
+            if(shouldContinue):
+                continue
+            if(n.scheduled and n.scheduled.start.day == date.day):
                 daydata.append(entry)
+                entry['ts'] = n.scheduled
+                continue
         daydata.sort(key=bystartnodedatekey)
 
         lastMatchStart = 0
@@ -604,7 +669,9 @@ class WeekView(AgendaBaseView):
                 matche = None
                 for entry in daydata:
                     n = entry['node']
-                    if(IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)):
+                    ts = IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)
+                    entry['ts'] = ts
+                    if(ts):
                         match = n
                         matche = entry
                 if(lastMatch != match and lastMatch != None):
@@ -626,7 +693,7 @@ class WeekView(AgendaBaseView):
                         lastMatch      = match
                         lastMatchEntry = matche
                         lastMatchStart = self.startOffset + (hour-dayStart)*self.cellSize + minSlot
-                    d = distanceFromStart(match, hour, minSlot)
+                    d = distanceFromStart(matche, hour, minSlot)
                     # If the time slot is larger than the name we space pad it
                     c = " "
                     if(d < len(match.heading) and d >= 0):
@@ -664,7 +731,7 @@ class WeekView(AgendaBaseView):
                 self.InsertDay(dayNames[index % len(dayNames)], wstart + datetime.timedelta(days=index) , edit)
 
     def FilterEntry(self, n, filename):
-        return (IsTodo(n) or IsDone(n)) and not IsProject(n) and n.scheduled
+        return (not self.onlyTasks or (IsTodo(node) or IsDone(n))) and not IsProject(n) and HasTimestamp(n)
 
 
 # ============================================================ 
@@ -777,9 +844,10 @@ class AgendaView(AgendaBaseView):
                 out = out + self.sym[symIdx]
         return out
 
-    def RenderAgendaEntry(self,edit,filename,n,h):
+    def RenderAgendaEntry(self,edit,filename,n,h,ts):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+
 
 
     def RenderView(self, edit):
@@ -805,9 +873,12 @@ class AgendaView(AgendaBaseView):
                     foundItems.sort(key=bystartnodedatekey)
                     for it in foundItems:
                         n = it['node']
+                        ts = it['ts']
+                        if(ts == None):
+                            ts = n.scheduled
                         filename = it['file'].AgendaFilenameTag()
                         self.MarkEntryAt(it)
-                        self.RenderAgendaEntry(edit,filename,n,h)
+                        self.RenderAgendaEntry(edit,filename,n,h,ts)
                         didNotInsert = False
                 view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d} - - - - - - - - - - - - - - - - - - - - - \n".format("now =>", self.now.hour, self.now.minute) )
                 foundItems = []
@@ -822,22 +893,26 @@ class AgendaView(AgendaBaseView):
                     foundItems.sort(key=bystartnodedatekey)
                     for it in foundItems:
                         n = it['node']
+                        ts = it['ts']
+                        if(ts == None):
+                            ts = n.scheduled
                         filename = it['file'].AgendaFilenameTag()
                         self.MarkEntryAt(it)
-                        self.RenderAgendaEntry(edit,filename,n,h)
+                        self.RenderAgendaEntry(edit,filename,n,h,ts)
                         didNotInsert = False
                 before = False
             else:
                 for entry in self.entries:
                     n = entry['node']
                     filename = entry['file'].AgendaFilenameTag()
-                    if(IsInHour(n, h) and (not 'found' in entry or (not before and entry['found'] == 'b'))):
+                    ts = IsInHour(n,h)
+                    if(ts and (not 'found' in entry or (not before and entry['found'] == 'b'))):
                         if(before):
                             entry['found'] = 'b'
                         else:
                             entry['found'] = 'a'
-                        self.MarkEntryAt(entry)
-                        self.RenderAgendaEntry(edit,filename,n,h)
+                        self.MarkEntryAt(entry, ts)
+                        self.RenderAgendaEntry(edit,filename,n,h,ts)
                         didNotInsert = False
             if(didNotInsert):
                 empty = " " * 12
@@ -857,7 +932,8 @@ class AgendaView(AgendaBaseView):
                 view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo, n.heading, self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
-        return (IsTodo(node) and IsToday(node, self.now))
+        rc = (not self.onlyTasks or IsTodo(node)) and IsToday(node, self.now)
+        return rc
 
 RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
 # ================================================================================
