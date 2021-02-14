@@ -9,3 +9,9 @@
 	  #+BEGIN_QUOTE
 	  [[$1][$2]] $0  
 	  #+END_QUOTE
+
+** Agenda View
+	- Truncated filename in day view for filenames longer than 12 characters.
+
+** ST4
+	- Fixed quick panel views to continue to work on ST4 builds. 

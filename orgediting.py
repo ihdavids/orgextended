@@ -215,6 +215,8 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
 
 # Use a menu to change the priority of an item
 class OrgPriorityChangeCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
     def on_done(self, index):
         if(index < 0):
             return
@@ -246,7 +248,10 @@ class OrgPriorityChangeCommand(sublime_plugin.TextCommand):
         sp  = self.view.text_point(row,0)
         self.row = self.view.line(sp)
         self.bufferContents = self.view.substr(self.row)
-        self.view.window().show_quick_panel(self.priorities, self.on_done, -1, -1)
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.priorities, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.priorities, self.on_done_st4, -1, -1)
 
 def indent_node(view, node, edit):
     # Indent the node itself
