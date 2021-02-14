@@ -26,6 +26,10 @@
     NOTE: it converts them to sublime-color-scheme files in the output
           folder.
 
+  - Added Org Select Color Scheme menu item to switch Org between color schemes
+    you have already generated. NOTE: same caveats hold about having org files
+    open when switching. Sublime does not automatically switch existing views.
+
 ** NeoVintageous
 	- For ST4 users - neovintageous has upgraded to python 3.8
 	  this means that my hacks to push register 0 with the values
