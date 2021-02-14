@@ -148,6 +148,9 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
         else:
             self.do_close_if_needed()
 
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+
     def on_done(self, index):
         if(index < 0):
             return
@@ -205,7 +208,10 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
         sp  = self.view.text_point(row,0)
         self.row = self.view.line(sp)
         self.bufferContents = self.view.substr(self.row)
-        self.view.window().show_quick_panel(self.todoStates, self.on_done, -1, -1)
+        if(sublime.version() <= 4096):
+            self.view.window().show_quick_panel(self.todoStates, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.todoStates, self.on_done_st4, -1, -1)
 
 # Use a menu to change the priority of an item
 class OrgPriorityChangeCommand(sublime_plugin.TextCommand):

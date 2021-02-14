@@ -1236,6 +1236,8 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
 #       5. Various Filtered Todo lists.
 #       6. Try an HTML version of a todo?
 class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
     def on_done(self, index):
         if(index < 0):
             return
@@ -1247,7 +1249,10 @@ class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
         self.onDone = onDone
         self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         self.keys = list(self.views.keys())
-        self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        if(sublime.version() <= 4096):
+            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
 # ================================================================================
 # Change the TODO status of the node.

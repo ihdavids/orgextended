@@ -1,0 +1,7 @@
+<snippet>
+    <content>
+    <![CDATA[[[$1][$2]] $0]]></content>
+    <tabTrigger>&lt;l</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>link</description>
+</snippet>

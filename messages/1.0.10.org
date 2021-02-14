@@ -1,0 +1,11 @@
+* 1.0.10
+** Snippets
+	- Added link insertion snippet
+	  #+BEGIN_QUOTE
+	    <l
+	  #+END_QUOTE
+
+	  Will insert a new quote jumping between the fields and jumping after the link when done
+	  #+BEGIN_QUOTE
+	  [[$1][$2]] $0  
+	  #+END_QUOTE

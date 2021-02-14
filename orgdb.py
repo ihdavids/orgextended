@@ -456,6 +456,8 @@ class OrgReloadFileCommand(sublime_plugin.TextCommand):
             log.debug("FAILED TO FIND FILE INFO?")
 
 class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
     def on_done(self, index):
         if(index < 0):
             return
@@ -466,7 +468,10 @@ class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
         self.view.window().open_file(path, sublime.ENCODED_POSITION)
 
     def run(self, edit):
-        self.view.window().show_quick_panel(orgDb.customids, self.on_done, -1, -1)
+        if(sublime.version() <= 4096):
+            self.view.window().show_quick_panel(orgDb.customids, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(orgDb.customids, self.on_done_st4, -1, -1)
 
 
 class OrgJumpToTodayCommand(sublime_plugin.TextCommand):

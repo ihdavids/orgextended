@@ -35,6 +35,8 @@ class OrgDownCommand(sublime_plugin.TextCommand):
 
 
 class OrgJumpInFileCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
     def on_done(self, index):
         view = self.view
         (curRow,curCol) = view.curRowCol()
@@ -50,7 +52,10 @@ class OrgJumpInFileCommand(sublime_plugin.TextCommand):
             view.set_status("Error: ", "filename {0} not found in orgDb".format(view.file_name()))
     def run(self, edit):
         headings = db.Get().Headings(self.view)
-        self.view.window().show_quick_panel(headings, self.on_done, -1, -1)
+        if(sublime.version() <= 4096):
+            self.view.window().show_quick_panel(headings, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(headings, self.on_done_st4, -1, -1)
 
 RE_TABLE_MATCH = re.compile(r"^\s*\|")
 def table_tabbing(view):

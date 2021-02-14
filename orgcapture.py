@@ -147,6 +147,8 @@ def onPostWindowCommand(window, cmd, args):
 
 
 class OrgCopyCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
     def on_done(self, index):
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
         node = db.Get().AtInView(self.view)
@@ -159,7 +161,10 @@ class OrgCopyCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
-        self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
+        if(sublime.version() <= 4096):
+            self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
 class OrgOpenRefileCommand(sublime_plugin.TextCommand):
     def run(self,edit):
@@ -269,6 +274,8 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
 
         
 class OrgRefileCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifiers):
+        self.on_done(index)
     def on_done(self, index):
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
         view = self.view
@@ -296,7 +303,10 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
-        self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
 class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
     def on_done(self, index):
@@ -436,7 +446,8 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         sublime.active_window().active_view().settings().set('auto_indent',ai)
         self.cleanup_capture_panel()
 
-
+    def on_done_st4(self,index,modifiers):
+        self.on_done(index)
     def on_done(self, index):
         if(index < 0):
             return
