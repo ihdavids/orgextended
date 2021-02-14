@@ -161,7 +161,7 @@ class OrgCopyCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
-        if(sublime.version() <= 4096):
+        if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)

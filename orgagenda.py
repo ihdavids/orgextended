@@ -963,7 +963,7 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
     @classmethod
     def is_applicable(cls, settings):
         # 4095 seems to crash when querying settings
-        if(sublime.version() != 4095):
+        if(int(sublime.version()) != 4095):
             try:
                 return "orgagenda" in settings.get("color_scheme","not here")
             except:
@@ -1249,7 +1249,7 @@ class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
         self.onDone = onDone
         self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         self.keys = list(self.views.keys())
-        if(sublime.version() <= 4096):
+        if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)

@@ -208,7 +208,7 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
         sp  = self.view.text_point(row,0)
         self.row = self.view.line(sp)
         self.bufferContents = self.view.substr(self.row)
-        if(sublime.version() <= 4096):
+        if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.todoStates, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.todoStates, self.on_done_st4, -1, -1)

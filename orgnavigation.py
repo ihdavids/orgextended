@@ -52,7 +52,7 @@ class OrgJumpInFileCommand(sublime_plugin.TextCommand):
             view.set_status("Error: ", "filename {0} not found in orgDb".format(view.file_name()))
     def run(self, edit):
         headings = db.Get().Headings(self.view)
-        if(sublime.version() <= 4096):
+        if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(headings, self.on_done_st4, -1, -1)

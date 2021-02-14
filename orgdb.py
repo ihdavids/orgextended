@@ -468,7 +468,7 @@ class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
         self.view.window().open_file(path, sublime.ENCODED_POSITION)
 
     def run(self, edit):
-        if(sublime.version() <= 4096):
+        if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(orgDb.customids, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(orgDb.customids, self.on_done_st4, -1, -1)
