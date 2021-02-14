@@ -779,7 +779,7 @@ class AgendaView(AgendaBaseView):
 
     def RenderAgendaEntry(self,edit,filename,n,h):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:12] , h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, n.scheduled.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
 
 
     def RenderView(self, edit):
