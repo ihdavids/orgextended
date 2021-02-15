@@ -141,7 +141,38 @@ TIMESTAMP_RE = re.compile(
     '|'.join((gene_timestamp_regex('active'),
               gene_timestamp_regex('inactive'))),
     re.VERBOSE)
+def copy_repeat_info(f,t):
+    if(f and hasattr(f,'repeat_rule') and f.repeat_rule):
+        t.repeatpre = f.repeatpre
+        t.repeat_rule = f.repeat_rule
+        t.freq = f.freq
 
+
+def get_repeat_info(rv,mdict):
+    if(not 'inactive_repeatpre' in mdict and not 'active_repeatpre' in mdict):
+        return
+    for prefix in ['active_','inactive_']:
+        repeatpre  = mdict[prefix+'repeatpre']
+        repeatnum  = mdict[prefix+'repeatnum']
+        repeatdwmy = mdict[prefix+'repeatdwmy']
+        if(repeatdwmy is not None and repeatpre is not None):
+            rv.freq = dr.DAILY
+            if(repeatdwmy == 'y'):
+                rv.freq = dr.YEARLY
+            if(repeatdwmy == 'm'):
+                rv.freq = dr.MONTHLY
+            if(repeatdwmy == 'w'):
+                rv.freq = dr.WEEKLY
+            rv.repeatnum = int(repeatnum)
+            if(rv.repeatnum <= 0):
+                rv.repeatnum = 1
+            # Build an org mode repeat rule
+            rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start) 
+            # This determines what to do when you mark the task as done.
+            # + just bump to the next FIXED interval (even if thats in the past)
+            # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.
+            # .+ bump but change the start date to today. 
+            rv.repeatpre   = repeatpre
 
 class OrgDate(object):
 
@@ -154,7 +185,7 @@ class OrgDate(object):
 
     """
 
-    def __init__(self, start, end=None, active=None):
+    def __init__(self, start, end=None, active=None, repeat_rule=None):
         """
         Create :class:`OrgDate` object
 
@@ -192,7 +223,7 @@ class OrgDate(object):
         self._start = self._to_date(start)
         self._end = self._to_date(end)
         self._active = self._active_default if active is None else active
-        self.repeat_rule = None
+        self.repeat_rule = repeat_rule
 
     @staticmethod
     def format_date(now, active):
@@ -422,6 +453,7 @@ class OrgDate(object):
             return datetime.datetime(*date.timetuple()[:3])
         return date
 
+#IANHERE
     @staticmethod
     def _daterange_from_groupdict(dct, prefix=''):
         start_keys = ['year', 'month', 'day', 'hour'    , 'min']
@@ -482,6 +514,7 @@ class OrgDate(object):
     def _datetuple_from_groupdict(cls, dct, prefix=''):
         return cls._daterange_from_groupdict(dct, prefix=prefix)[0]
 
+
     @classmethod
     def list_from_str(cls, string):
         """
@@ -524,10 +557,16 @@ class OrgDate(object):
                 odate = cls(
                     *cls._daterange_from_groupdict(mdict, prefix),
                     active=active)
+            get_repeat_info(odate, mdict)
             # FIXME: treat "repeater" and "warn"
-            return [odate] + cls.list_from_str(rest)
+            ndate = cls.list_from_str(rest)
+            if len(ndate) > 0:
+                copy_repeat_info(ndate[0], odate)
+            return [odate] + ndate
         else:
             return []
+
+
 
     @classmethod
     def from_str(cls, string):

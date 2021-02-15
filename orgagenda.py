@@ -29,6 +29,9 @@ TODO_VIEW   = "Org Todos"
 
 ViewMappings = {}
 
+def IsRawDate(ts):
+    return isinstance(ts,datetime.date) or isinstance(ts,datetime.datetime)
+
 def FindMappedView(view):
     if(view.name() in ViewMappings):
         return ViewMappings[view.name()]
@@ -150,49 +153,54 @@ def IsTodaysDate(check, today):
     return today == check
 
 def IsInMonthCheck(t, now):
-    return (t.start.month >= (now.month-1) and t.start.month <= (now.month+1))
+    if(IsRawDate(t)):
+        return (t.month >= (now.month-1) and t.month <= (now.month+1))
+    else:
+        return (t.start.month >= (now.month-1) and t.start.month <= (now.month+1))
 
 def IsInMonth(n, now):
     if(not n):
-        return None
+        return (None,None)
     if(n):
         timestamps = n.get_timestamps(active=True,point=True)
         for t in timestamps:
             if(t.repeating):
-                next = t.next_repeat_from_today
+                next = t.next_repeat_from(now)
                 if(IsInMonthCheck(next, now)):
-                    return next
+                    return (next,True)
             else:
                 if(IsInMonthCheck(t, now)):
-                    return t
+                    return (t,False)
         if(n.scheduled):
             if(IsInMonthCheck(n.scheduled, now)):
-                return n.scheduled
+                return (n.scheduled.start,n.scheduled.repeating)
+    return (None,None)
 
 def IsToday(n, today):
     timestamps = n.get_timestamps(active=True,point=True)
     for t in timestamps:
         if(t.repeating):
-            next = t.next_repeat_from_today
-            return IsTodaysDate(next, today)
+            next = t.next_repeat_from(today)
+            if IsTodaysDate(next, today):
+                return next
         else:
             if(t.has_overlap(today)):
-                return True
+                return t
     if(n.scheduled):
         if(n.scheduled.repeating):
-            next = n.scheduled.next_repeat_from_today
+            next = n.scheduled.next_repeat_from(today)
             return IsTodaysDate(next, today)
         else:
             return n.scheduled.after(today)
-    return False
+    return None
 
-def IsAllDay(n):
+def IsAllDay(n,today):
     if(not n):
         return None
     timestamps = n.get_timestamps(active=True,point=True)
     for t in timestamps:
         if(t.repeating):
-            dt = t.next_repeat_from_today
+            dt = t.next_repeat_from(today)
             if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
                 return dt
         else:
@@ -202,7 +210,7 @@ def IsAllDay(n):
     if(not n.scheduled):
         return None
     if(n.scheduled.repeating):
-        dt = n.scheduled.next_repeat_from_today
+        dt = n.scheduled.next_repeat_from(today)
         if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
             return n.scheduled
         else:
@@ -230,7 +238,7 @@ def IsInHourBracket(s, e, hour):
         return True
 
 
-def IsInHour(n, hour):
+def IsInHour(n, hour, today):
     if(not n):
         return None
 
@@ -239,8 +247,9 @@ def IsInHour(n, hour):
         for t in timestamps:
             if(t.has_time()):
                 if(t.repeating):
-                    next = n.scheduled.next_repeat_from_today
-                    return next.hour == hour
+                    next = t.next_repeat_from(today)
+                    if(next.hour == hour):
+                        return next
                 else:
                     s = t.start
                     e = t.end
@@ -253,7 +262,7 @@ def IsInHour(n, hour):
         return None
 
     if(n.scheduled.repeating):
-        next = n.scheduled.next_repeat_from_today
+        next = n.scheduled.next_repeat_from(today)
         return next.hour == hour
     s = n.scheduled.start
     e = n.scheduled.end
@@ -292,7 +301,7 @@ def IsInHourAndMinuteBracket(s,e,hour,mstart,mend):
         return True
     return False
 
-def IsInHourAndMinute(n, hour, mstart, mend):
+def IsInHourAndMinute(n, hour, mstart, mend, today):
     if(not n):
         return None
     timestamps = n.get_timestamps(active=True, point=True)
@@ -300,8 +309,9 @@ def IsInHourAndMinute(n, hour, mstart, mend):
         for t in timestamps:
             if(t.has_time()):
                 if(t.repeating):
-                    next = n.scheduled.next_repeat_from_today
-                    return next.hour == hour
+                    next = t.next_repeat_from(today)
+                    if(next.hour == hour):
+                        return next
                 else:
                     s = t.start
                     e = t.end
@@ -315,7 +325,7 @@ def IsInHourAndMinute(n, hour, mstart, mend):
         return None
 
     if(n.scheduled.repeating):
-        next = n.scheduled.next_repeat_from_today
+        next = n.scheduled.next_repeat_from(today)
         return next.hour == hour
     s = n.scheduled.start
     e = n.scheduled.end
@@ -323,9 +333,13 @@ def IsInHourAndMinute(n, hour, mstart, mend):
         return n.scheduled
     return None
 
+
 def distanceFromStart(e, hour, minSlot):
     ts = e['ts']
-    rv = 5*(hour - ts.start.hour) + (minSlot - int(ts.start.minute/12))
+    if(IsRawDate(ts)):
+        rv = 5*(hour - ts.hour) + (minSlot - int(ts.minute/12))
+    else:
+        rv = 5*(hour - ts.start.hour) + (minSlot - int(ts.start.minute/12))
     return rv
 
 # ================================================================================
@@ -579,10 +593,10 @@ class CalendarView(AgendaBaseView):
         toHighlight = []
         for entry in self.entries:
             n = entry['node']
-            ts = IsInMonth(n, self.now)
+            ts, repeating = IsInMonth(n, self.now)
             if(ts):
-                self.AddTodo(ts.start)
-            if(ts and ts.repeating):
+                self.AddTodo(ts)
+            if(ts and repeating):
                 self.AddRepeating(ts)
 
     def FilterEntry(self, n, filename):
@@ -700,7 +714,7 @@ class WeekView(AgendaBaseView):
                 matche = None
                 for entry in daydata:
                     n = entry['node']
-                    ts = IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12)
+                    ts = IsInHourAndMinute(n, hour, minSlot*12, (minSlot+1)*12,date)
                     entry['ts'] = ts
                     if(ts):
                         match = n
@@ -835,7 +849,7 @@ class AgendaView(AgendaBaseView):
     def ClearAgendaBlocks(self,h):
         for i in range(0, len(self.blocks)):
             n = self.blocks[i]
-            if(not IsInHour(n, h)):
+            if(not IsInHour(n, h,self.now)):
                 self.ReleaseSymbol(i)
                 self.blocks[i] = None
 
@@ -877,7 +891,10 @@ class AgendaView(AgendaBaseView):
 
     def RenderAgendaEntry(self,edit,filename,n,h,ts):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        if(IsRawDate(ts)):
+            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.minute, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        else:
+            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
 
 
 
@@ -896,7 +913,7 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
-                    ts = IsInHour(n, h)
+                    ts = IsInHour(n, h, self.now)
                     if(IsBeforeNow(n, self.now) and ts):
                         entry['ts'] = ts
                         if(not 'found' in entry):
@@ -910,7 +927,7 @@ class AgendaView(AgendaBaseView):
                         if(ts == None):
                             ts = n.scheduled
                         filename = it['file'].AgendaFilenameTag()
-                        self.MarkEntryAt(it)
+                        self.MarkEntryAt(it,ts)
                         self.RenderAgendaEntry(edit,filename,n,h,ts)
                         didNotInsert = False
                 view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d} - - - - - - - - - - - - - - - - - - - - - \n".format("now =>", self.now.hour, self.now.minute) )
@@ -918,7 +935,7 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
-                    ts = IsInHour(n, h)
+                    ts = IsInHour(n, h, self.now)
                     if(IsAfterNow(n, self.now) and ts):
                         entry['ts'] = ts
                         if(not 'found' in entry or entry['found'] == 'b'):
@@ -932,7 +949,7 @@ class AgendaView(AgendaBaseView):
                         if(ts == None):
                             ts = n.scheduled
                         filename = it['file'].AgendaFilenameTag()
-                        self.MarkEntryAt(it)
+                        self.MarkEntryAt(it,ts)
                         self.RenderAgendaEntry(edit,filename,n,h,ts)
                         didNotInsert = False
                 before = False
@@ -940,7 +957,7 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     filename = entry['file'].AgendaFilenameTag()
-                    ts = IsInHour(n,h)
+                    ts = IsInHour(n,h,self.now)
                     if(ts and (not 'found' in entry or (not before and entry['found'] == 'b'))):
                         if(before):
                             entry['found'] = 'b'
@@ -962,7 +979,7 @@ class AgendaView(AgendaBaseView):
         for entry in self.entries:
             n = entry['node']
             filename = entry['file'].AgendaFilenameTag()
-            ts = IsAllDay(n)
+            ts = IsAllDay(n,self.now)
             if(ts):
                 self.MarkEntryAt(entry,ts)
                 view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n)))

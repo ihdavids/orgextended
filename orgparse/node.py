@@ -1778,10 +1778,10 @@ class OrgNode(OrgBaseNode):
         """
         return [
             ts for ts in self._timestamps if
-            (((active and ts.is_active()) or
-              (inactive and not ts.is_active())) and
-             ((range and ts.has_end()) or
-              (point and not ts.has_end())))]
+            (((active and hasattr(ts,'is_active') and ts.is_active()) or
+              (inactive and hasattr(ts,'is_active') and not ts.is_active())) and
+             ((range and hasattr(ts,'has_end') and ts.has_end()) or
+              (point and hasattr(ts,'has_end') and not ts.has_end())))]
 
     @property
     def datelist(self):

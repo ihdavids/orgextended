@@ -7,3 +7,4 @@
 	  Before I would only show tasks, these are items with an open TODO state.
 	  Now, by default anything that has an active timestamp or is scheduled will
 	  show up in the agenda UNLESS you set that view to :onlyTasks as a parameter.
+	- DEADLINE is still not supported but support should be comming in a future release.
