@@ -952,7 +952,7 @@ class AgendaView(AgendaBaseView):
             filename = entry['file'].AgendaFilenameTag()
             if(IsAllDay(n)):
                 self.MarkEntryAt(entry)
-                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo, n.heading, self.BuildHabitDisplay(n)))
+                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
         rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and IsToday(node, self.now)
