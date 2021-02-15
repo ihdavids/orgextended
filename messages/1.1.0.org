@@ -3,8 +3,32 @@
 	- Support active timestamps vs SCHEDULED
 	  SCHEDULED is when you want to start on a task
 	  while tasks with a timestamp are scheduled at a point in time.
+
+	  #+BEGIN_EXAMPLE
+	    ** TODO Heading
+	       SCHEDULED: <startdate>  <-- This will appear in the agenda until you close the task
+	    ** TODO HEADING
+	       <date>  <-- This will appear in the agenda but only at the date specified
+	  #+END_EXAMPLE
+
 	- BREAKING CHANGE
 	  Before I would only show tasks, these are items with an open TODO state.
 	  Now, by default anything that has an active timestamp or is scheduled will
-	  show up in the agenda UNLESS you set that view to :onlyTasks as a parameter.
+	  show up in the agenda UNLESS you set that view to :onlytasks as a parameter.
+	  #+BEGIN_EXAMPLE
+	    ** HEADING
+	       <date>  <-- This will now appear in the agenda where before it would not
+	  #+END_EXAMPLE
+
+	  #+BEGIN_SRC js
+      "AgendaCustomViews": 
+      {
+        "Default": ["Calendar", "Week", "Day : onlytasks", "Blocked Projects", "Next Tasks", "Loose Tasks"],
+        "Todos":   ["Todos"],
+      }
+	  #+END_SRC
+
+	  Note the onlytasks parameter, that will filter out non tasks from the Day view in my
+	  default agenda view.
+
 	- DEADLINE is still not supported but support should be comming in a future release.
