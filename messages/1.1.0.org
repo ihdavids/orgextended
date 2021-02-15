@@ -1,0 +1,9 @@
+* 1.1.0
+** Scheduling
+	- Support active timestamps vs SCHEDULED
+	  SCHEDULED is when you want to start on a task
+	  while tasks with a timestamp are scheduled at a point in time.
+	- BREAKING CHANGE
+	  Before I would only show tasks, these are items with an open TODO state.
+	  Now, by default anything that has an active timestamp or is scheduled will
+	  show up in the agenda UNLESS you set that view to :onlyTasks as a parameter.

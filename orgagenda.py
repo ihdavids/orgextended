@@ -149,6 +149,26 @@ def IsTodaysDate(check, today):
         today = today.date()
     return today == check
 
+def IsInMonthCheck(t, now):
+    return (t.start.month >= (now.month-1) and t.start.month <= (now.month+1))
+
+def IsInMonth(n, now):
+    if(not n):
+        return None
+    if(n):
+        timestamps = n.get_timestamps(active=True,point=True)
+        for t in timestamps:
+            if(t.repeating):
+                next = t.next_repeat_from_today
+                if(IsInMonthCheck(next, now)):
+                    return next
+            else:
+                if(IsInMonthCheck(t, now)):
+                    return t
+        if(n.scheduled):
+            if(IsInMonthCheck(n.scheduled, now)):
+                return n.scheduled
+
 def IsToday(n, today):
     timestamps = n.get_timestamps(active=True,point=True)
     for t in timestamps:
@@ -547,15 +567,14 @@ class CalendarView(AgendaBaseView):
         toHighlight = []
         for entry in self.entries:
             n = entry['node']
-            if(n.scheduled.start.month >= (self.now.month-1) and n.scheduled.start.month <= (self.now.month+1)):
-                self.AddTodo(n.scheduled.start)
-            if(n.scheduled.repeating):
-                next = n.scheduled.next_repeat_from_today
-                if(next.month >= (self.now.month-1) and next.month <= (self.now.month+1)):
-                    self.AddRepeating(next)
+            ts = IsInMonth(n, self.now)
+            if(ts):
+                self.AddTodo(ts.start)
+            if(ts and ts.repeating):
+                self.AddRepeating(ts)
 
     def FilterEntry(self, n, filename):
-        return IsTodo(n) and not IsProject(n) and n.scheduled
+        return (not self.onlyTasks or (IsTodo(n) and not IsDone(n))) and not IsProject(n) and HasTimestamp(n)
 
 def bystartdate(a, b):
     if a.scheduled.start > b.scheduled.start:
@@ -846,7 +865,7 @@ class AgendaView(AgendaBaseView):
 
     def RenderAgendaEntry(self,edit,filename,n,h,ts):
         view = self.view
-        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo, n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+        view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{6}] {3} {4:55} {5}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
 
 
 
@@ -865,7 +884,9 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
-                    if(IsBeforeNow(n, self.now) and IsInHour(n, h)):
+                    ts = IsInHour(n, h)
+                    if(IsBeforeNow(n, self.now) and ts):
+                        entry['ts'] = ts
                         if(not 'found' in entry):
                             foundItems.append(entry)
                             entry['found'] = 'b'
@@ -885,7 +906,9 @@ class AgendaView(AgendaBaseView):
                 for entry in self.entries:
                     n = entry['node']
                     #filename = entry['file'].AgendaFilenameTag()
-                    if(IsAfterNow(n, self.now) and IsInHour(n, h)):
+                    ts = IsInHour(n, h)
+                    if(IsAfterNow(n, self.now) and ts):
+                        entry['ts'] = ts
                         if(not 'found' in entry or entry['found'] == 'b'):
                             foundItems.append(entry)
                             entry['found'] = 'a'
@@ -932,7 +955,7 @@ class AgendaView(AgendaBaseView):
                 view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo, n.heading, self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
-        rc = (not self.onlyTasks or IsTodo(node)) and IsToday(node, self.now)
+        rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and IsToday(node, self.now)
         return rc
 
 RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
