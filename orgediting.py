@@ -349,6 +349,45 @@ class OrgCopyEntityCommand(sublime_plugin.TextCommand):
             sublime.set_clipboard(nodetext)
             nvi.TestAndSetClip(self.view, nodetext)
 
+class OrgCopyLinkHrefCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if(self.view.match_selector(self.view.sel()[0].begin(), "orgmode.link")):
+            pt = self.view.sel()[0].end()
+            links = self.view.find_by_selector("orgmode.link")
+            hrefs = self.view.find_by_selector("orgmode.link.href")
+            reg = None
+            for link in links:
+                line = self.view.line(link.begin())
+                if(line.contains(pt)):
+                    for href in hrefs:
+                        if(line.contains(href.begin())):
+                            reg = href
+                            break
+                    break
+            if(reg):
+                nodetext = self.view.substr(reg)
+                sublime.set_clipboard(nodetext)
+                nvi.TestAndSetClip(self.view, nodetext)
+
+class OrgSelectLinkHrefCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if(self.view.match_selector(self.view.sel()[0].begin(), "orgmode.link")):
+            pt = self.view.sel()[0].end()
+            links = self.view.find_by_selector("orgmode.link")
+            hrefs = self.view.find_by_selector("orgmode.link.href")
+            reg = None
+            for link in links:
+                line = self.view.line(link.begin())
+                if(line.contains(pt)):
+                    for href in hrefs:
+                        if(line.contains(href.begin())):
+                            reg = href
+                            break
+                    break
+            if(reg):
+                self.view.sel().clear()
+                self.view.sel().add(reg)
+
 class OrgMoveHeadingUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)

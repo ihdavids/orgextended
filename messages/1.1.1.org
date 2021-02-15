@@ -1,0 +1,13 @@
+* 1.1.1
+** Scheduling
+	- DEADLINE works in the agenda
+
+** Editing
+	- New Link Editing Commands
+	  Org Copy Href will copy the href out of a link onto the clipboard
+	  currently not bound to a keybinding.	
+
+	  Org Select Href will select the href in a link, even
+	  if it is folded.
+
+	  currently not bound to a keybinding
