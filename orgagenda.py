@@ -187,20 +187,32 @@ def IsToday(n, today):
     return False
 
 def IsAllDay(n):
+    if(not n):
+        return None
+    timestamps = n.get_timestamps(active=True,point=True)
+    for t in timestamps:
+        if(t.repeating):
+            dt = t.next_repeat_from_today
+            if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
+                return dt
+        else:
+            if(t.has_end() or t.has_time()):
+                continue
+            return t
     if(not n.scheduled):
-        return False
+        return None
     if(n.scheduled.repeating):
         dt = n.scheduled.next_repeat_from_today
         if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
-            return True
+            return n.scheduled
         else:
-            return False
+            return None
     else:
         if(n.scheduled.has_end()):
-            return False
+            return None
         if(n.scheduled.has_time()):
-            return False
-        return True
+            return None
+        return n.scheduled
 
 def HasTimestamp(n):
     if(not n):
@@ -950,8 +962,9 @@ class AgendaView(AgendaBaseView):
         for entry in self.entries:
             n = entry['node']
             filename = entry['file'].AgendaFilenameTag()
-            if(IsAllDay(n)):
-                self.MarkEntryAt(entry)
+            ts = IsAllDay(n)
+            if(ts):
+                self.MarkEntryAt(entry,ts)
                 view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
