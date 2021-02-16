@@ -73,6 +73,8 @@
     {"caption": "Org Closed",                  "command": "org_insert_closed"           },
     {"caption": "Org Insert CustomId",         "command": "org_insert_custom_id"        },
     {"caption": "Org Schedule",                "command": "org_schedule"                },
+    {"caption": "Org Deadline",                "command": "org_deadline"                },
+    {"caption": "Org Timestamp",               "command": "org_active_timestamp"        },
     {"caption": "Org Create Link",             "command": "org_create_link"             },
     {"caption": "Org Link To Today",           "command": "org_link_to_today"           },
     {"caption": "Org Update Numbered List",    "command": "org_update_numbered_list"    },

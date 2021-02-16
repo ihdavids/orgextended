@@ -545,10 +545,16 @@ class OrgInsertDateActiveCommand(sublime_plugin.TextCommand):
         datep.Pick(evt.Make(self.insert))
 
 
-class OrgScheduleCommand(sublime_plugin.TextCommand):
+class OrgBaseTimestampCommand(sublime_plugin.TextCommand):
+    def __init__(self,unknown, prefix):
+        super(OrgBaseTimestampCommand, self).__init__(unknown)
+        self.prefix = prefix
+
     def insert(self, date):
         if(date):
             self.view.Insert(self.view.sel()[0].begin(), OrgDate.format_clock(date.start, active=True))
+        else:
+            self.view.Erase(self.reg)
         self.view.sel().clear()
         self.view.sel().add(self.oldsel)
 
@@ -568,7 +574,10 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
             if(self.view.isBeyondLastRow(node.start_row+1)):
                 nl = "\n"
                 addnl = 0
-            self.view.insert(edit, l.end() + addnl, nl + node.indent() + "SCHEDULED:  \n")
+            insertpt = l.end() + addnl
+            endpt = insertpt + len(nl) + len(node.indent()) + len(self.prefix)
+            self.reg = sublime.Region(insertpt, endpt)
+            self.view.insert(edit, insertpt, nl + node.indent() + self.prefix)
             pt = self.view.text_point(node.start_row+1,0)
             l = self.view.line(pt)
             self.view.sel().clear()
@@ -578,6 +587,17 @@ class OrgScheduleCommand(sublime_plugin.TextCommand):
             else:
                 self.insert(dateval)
 
+class OrgScheduleCommand(OrgBaseTimestampCommand):
+    def __init__(self,unknown):
+        super(OrgScheduleCommand, self).__init__(unknown,"SCHEDULED:  \n")
+
+class OrgDeadlineCommand(OrgBaseTimestampCommand):
+    def __init__(self,unknown):
+        super(OrgDeadlineCommand, self).__init__(unknown,"DEADLINE:  \n")
+
+class OrgActiveTimestampCommand(OrgBaseTimestampCommand):
+    def __init__(self,unknown):
+        super(OrgActiveTimestampCommand, self).__init__(unknown,"  \n")
 
 class OrgInsertClosedCommand(sublime_plugin.TextCommand):
     def run(self, edit):
