@@ -1,6 +1,12 @@
 * 1.1.1
 ** Scheduling
-	- DEADLINE works in the agenda
+	- DEADLINE works in the agenda. Very minimal visualization at this time.
+	  Will show Warning, Due and Overdue messages on the right hand side of the day view.
+	- DEADLINE: <........ -3d> basic warning cookies work 
+	- Fixed a bug with new SCHEDULED: behaviour in week view.
+	- Removed visualization in the CalendarView for SCHEDULED and DEADLINE while I figure
+	  out the best way to visualize that, that is not super ugly. 
+
 
 ** Editing
 	- New Link Editing Commands
