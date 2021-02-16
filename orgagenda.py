@@ -164,7 +164,7 @@ def IsInMonth(n, now):
     if(not n):
         return (None,None)
     if(n):
-        timestamps = n.get_timestamps(active=True,point=True)
+        timestamps = n.get_timestamps(active=True,point=True,range=True)
         for t in timestamps:
             if(t.repeating):
                 next = t.next_repeat_from(now)
@@ -182,7 +182,7 @@ def IsInMonth(n, now):
     return (None,None)
 
 def IsToday(n, today):
-    timestamps = n.get_timestamps(active=True,point=True)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
             next = t.next_repeat_from(today)
@@ -205,7 +205,7 @@ def IsToday(n, today):
 def IsAllDay(n,today):
     if(not n):
         return None
-    timestamps = n.get_timestamps(active=True,point=True)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
             dt = t.next_repeat_from(today)
@@ -232,7 +232,7 @@ def IsAllDay(n,today):
 def HasTimestamp(n):
     if(not n):
         return False
-    timestamps = n.get_timestamps(active=True,point=True)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     return n.scheduled or (timestamps and len(timestamps) > 0) or n.deadline
 
 def IsInHourBracket(s, e, hour):
@@ -248,8 +248,7 @@ def IsInHourBracket(s, e, hour):
 def IsInHour(n, hour, today):
     if(not n):
         return None
-
-    timestamps = n.get_timestamps(active=True, point=True)
+    timestamps = n.get_timestamps(active=True, point=True,range=True)
     if(timestamps):
         for t in timestamps:
             if(t.has_time()):
@@ -311,7 +310,7 @@ def IsInHourAndMinuteBracket(s,e,hour,mstart,mend):
 def IsInHourAndMinute(n, hour, mstart, mend, today):
     if(not n):
         return None
-    timestamps = n.get_timestamps(active=True, point=True)
+    timestamps = n.get_timestamps(active=True, point=True,range=True)
     if(timestamps):
         for t in timestamps:
             if(t.has_time()):
@@ -693,7 +692,7 @@ class WeekView(AgendaBaseView):
         daydata = []
         for entry in self.entries:
             n = entry['node']
-            timestamps = n.get_timestamps(active=True,point=True)
+            timestamps = n.get_timestamps(active=True,point=True,range=True)
             shouldContinue = False
             for t in timestamps:
                 if(t.start.day == date.day):
@@ -703,11 +702,11 @@ class WeekView(AgendaBaseView):
                     break
             if(shouldContinue):
                 continue
-            if(n.scheduled and n.scheduled.start.date() <= date.date()):
+            if(n.scheduled and (n.scheduled.start.date() < date.date() and not IsDone(n) or n.scheduled.start.date() == date.date())):
                 daydata.append(entry)
                 entry['ts'] = n.scheduled
                 continue
-            if(n.deadline and n.deadline.deadline_start <= date and not IsDone(n)):
+            if(n.deadline and (n.deadline.deadline_start.date() < date.date() and not IsDone(n) or n.deadline.deadline_start.date() == date.date())):
                 daydata.append(entry)
                 entry['ts'] = n.deadline
                 continue
