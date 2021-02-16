@@ -1,1 +1,3 @@
 * 1.1.3
+	- Fixing regression in 1.1.2
+	  New shared keybinding command was being instantiated improperly

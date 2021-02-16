@@ -546,7 +546,7 @@ class OrgInsertDateActiveCommand(sublime_plugin.TextCommand):
 
 
 class OrgBaseTimestampCommand(sublime_plugin.TextCommand):
-    def __init__(self,unknown, prefix):
+    def __init__(self,unknown=None, prefix=None):
         super(OrgBaseTimestampCommand, self).__init__(unknown)
         self.prefix = prefix
 
@@ -588,15 +588,15 @@ class OrgBaseTimestampCommand(sublime_plugin.TextCommand):
                 self.insert(dateval)
 
 class OrgScheduleCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgScheduleCommand, self).__init__(unknown,"SCHEDULED:  \n")
 
 class OrgDeadlineCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgDeadlineCommand, self).__init__(unknown,"DEADLINE:  \n")
 
 class OrgActiveTimestampCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgActiveTimestampCommand, self).__init__(unknown,"  \n")
 
 class OrgInsertClosedCommand(sublime_plugin.TextCommand):
