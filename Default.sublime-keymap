@@ -79,7 +79,7 @@
     { "keys": ["ctrl+shift+enter"],  "command": "org_generic_insert_aux",          "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
 
     // Normal non vim style bindings
-    { "keys": ["alt+o","c"],         "command": "org_capture",                  },
+    { "keys": ["alt+o","z"],         "command": "org_capture",                  },
     { "keys": ["alt+o","a", "d"],    "command": "org_agenda_day_view",          },
 
     { "keys": ["alt+o", "t"],        "command": "org_toggle",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },

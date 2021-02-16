@@ -1,0 +1,4 @@
+* 1.1.4
+** Editing
+	- Changed default keybinding. Capture is now Alt+o z to mirror neovintageous mode with Z
+		(it also did not work before due to other Alt+o c ... commands)
