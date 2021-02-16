@@ -622,6 +622,11 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgagenda.week.8","#225522")
 		self.addscope(cs,"orgagenda.week.9","#623456")
 
+
+		self.addscope(cs,"orgmode.deadline.warning","#999900",bg)
+		self.addscope(cs,"orgmode.deadline.overdue","#880088",bg)
+		self.addscope(cs,"orgmode.deadline.due","#007700",bg)
+
 		now = "#aaaa00"
 		if('find_highlight' in cs['globals']):
 			now = cs['globals']['find_highlight']

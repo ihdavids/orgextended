@@ -15,14 +15,20 @@ contexts:
       scope: comment orgagenda.timeseparator
 
 
-    - match: 'D: @\d+-\d+-\d+'
+    - match: '(D:@)\d+-\d+-\d+'
       scope: region.yellowish orgmode.deadline.warning
+      captures:
+        1: comment orgmode.preamble
     
-    - match: 'D: Overdue'
+    - match: '(D: )Overdue'
       scope: region.redish orgmode.deadline.overdue
+      captures:
+        1: comment orgmode.preamble
     
-    - match: 'D: Due Today'
-      scope: region.greenish orgmode.deadline.overdue
+    - match: '(D: )Due Today'
+      scope: region.greenish orgmode.deadline.due
+      captures:
+        1: comment orgmode.preamble
 
     - match: 'H\['
       push:

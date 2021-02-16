@@ -912,9 +912,9 @@ class AgendaView(AgendaBaseView):
     def RenderAgendaEntry(self,edit,filename,n,h,ts):
         view = self.view
         if(IsRawDate(ts)):
-            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{7}] {3} {4:55} {5}{6}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.minute, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{7}] {3} {4:45} {5}{6}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.minute, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
         else:
-            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{7}] {3} {4:55} {5}{6}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
+            view.insert(edit, view.size(), "{0:12} {1:02d}:{2:02d}B[{7}] {3} {4:45} {5}{6}\n".format(filename if (len(filename) <= 12) else filename[:11] + ":" , h, ts.start.minute, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n), self.GetAgendaBlocks(n,h)))
 
     def BuildDeadlineDisplay(self, node):
         if(node.deadline):
@@ -924,7 +924,7 @@ class AgendaView(AgendaBaseView):
                 elif(node.deadline.start.date() == self.now.date()):
                     return "D: Due Today"
                 else:
-                    return "D: @" + str(node.deadline.start.date())
+                    return "D:@" + str(node.deadline.start.date())
         else:
             return ""
 
