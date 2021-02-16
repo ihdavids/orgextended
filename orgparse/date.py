@@ -149,30 +149,50 @@ def copy_repeat_info(f,t):
 
 
 def get_repeat_info(rv,mdict):
-    if(not 'inactive_repeatpre' in mdict and not 'active_repeatpre' in mdict):
-        return
+
     for prefix in ['active_','inactive_']:
-        repeatpre  = mdict[prefix+'repeatpre']
-        repeatnum  = mdict[prefix+'repeatnum']
-        repeatdwmy = mdict[prefix+'repeatdwmy']
-        if(repeatdwmy is not None and repeatpre is not None):
-            rv.freq = dr.DAILY
-            if(repeatdwmy == 'y'):
-                rv.freq = dr.YEARLY
-            if(repeatdwmy == 'm'):
-                rv.freq = dr.MONTHLY
-            if(repeatdwmy == 'w'):
-                rv.freq = dr.WEEKLY
-            rv.repeatnum = int(repeatnum)
-            if(rv.repeatnum <= 0):
-                rv.repeatnum = 1
-            # Build an org mode repeat rule
-            rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start) 
-            # This determines what to do when you mark the task as done.
-            # + just bump to the next FIXED interval (even if thats in the past)
-            # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.
-            # .+ bump but change the start date to today. 
-            rv.repeatpre   = repeatpre
+        if(prefix+'repeatpre' in mdict):
+            repeatpre  = mdict[prefix+'repeatpre']
+            repeatnum  = mdict[prefix+'repeatnum']
+            repeatdwmy = mdict[prefix+'repeatdwmy']
+            if(repeatdwmy is not None and repeatpre is not None):
+                rv.freq = dr.DAILY
+                if(repeatdwmy == 'y'):
+                    rv.freq = dr.YEARLY
+                if(repeatdwmy == 'm'):
+                    rv.freq = dr.MONTHLY
+                if(repeatdwmy == 'w'):
+                    rv.freq = dr.WEEKLY
+                rv.repeatnum = int(repeatnum)
+                if(rv.repeatnum <= 0):
+                    rv.repeatnum = 1
+                # Build an org mode repeat rule
+                rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start) 
+                # This determines what to do when you mark the task as done.
+                # + just bump to the next FIXED interval (even if thats in the past)
+                # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.
+                # .+ bump but change the start date to today. 
+                rv.repeatpre   = repeatpre
+        if(prefix+'warnpre' in mdict):
+            warnpre  = mdict[prefix+'warnpre']
+            warnnum  = mdict[prefix+'warnnum']
+            warndwmy = mdict[prefix+'warndwmy']
+            if(warndwmy is not None and warnpre is not None):
+                rv.warnnum = int(warnnum)
+                if(rv.warnnum <= 0):
+                    rv.warnnum = 1
+                rv.wfreq = dr.DAILY
+                rv.warn_rule = datetime.timedelta(days=rv.warnnum)
+                if(warndwmy == 'y'):
+                    rv.warn_rule = datetime.timedelta(years=rv.warnnum)
+                    rv.wfreq = dr.YEARLY
+                if(warndwmy == 'm'):
+                    rv.warn_rule = datetime.timedelta(months=rv.warnnum)
+                    rv.wfreq = dr.MONTHLY
+                if(warndwmy == 'w'):
+                    rv.warn_rule = datetime.timedelta(weeks=rv.warnnum)
+                    rv.wfreq = dr.WEEKLY
+                rv.warnpre   = warnpre
 
 class OrgDate(object):
 
@@ -185,7 +205,7 @@ class OrgDate(object):
 
     """
 
-    def __init__(self, start, end=None, active=None, repeat_rule=None):
+    def __init__(self, start, end=None, active=None, repeat_rule=None, warn_rule=None):
         """
         Create :class:`OrgDate` object
 
@@ -224,6 +244,7 @@ class OrgDate(object):
         self._end = self._to_date(end)
         self._active = self._active_default if active is None else active
         self.repeat_rule = repeat_rule
+        self.warn_rule = warn_rule
 
     @staticmethod
     def format_date(now, active):
@@ -323,6 +344,10 @@ class OrgDate(object):
         return self.repeat_rule != None
 
     @property
+    def warning(self):
+        return self.warn_rule != None
+
+    @property
     def next_repeat_from_now(self):
         now = datetime.datetime.now()
         return self.repeat_rule.after(now,inc=True) 
@@ -337,6 +362,12 @@ class OrgDate(object):
     def next_repeat_from(self,now):
         #now = now.replace(hour=0,minute=0,second=0,microsecond=0)
         return self.repeat_rule.after(now,inc=False) 
+
+    @property
+    def deadline_start(self):
+        if(not self.warning):
+            self.warn_rule = datetime.timedelta(days=1)
+        return self.start - self.warn_rule
 
     @property
     def start(self):
@@ -641,6 +672,26 @@ class OrgDateSDCBase(OrgDate):
                 # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.
                 # .+ bump but change the start date to today. 
                 rv.repeatpre   = repeatpre
+
+            warnpre  = mdict['warnpre']
+            warnnum  = mdict['warnnum']
+            warndwmy = mdict['warndwmy']
+            if(warndwmy is not None and warnpre is not None):
+                rv.warnnum = int(warnnum)
+                if(rv.warnnum <= 0):
+                    rv.warnnum = 1
+                rv.wfreq = dr.DAILY
+                rv.warn_rule = datetime.timedelta(days=rv.warnnum)
+                if(warndwmy == 'y'):
+                    rv.warn_rule = datetime.timedelta(years=rv.warnnum)
+                    rv.wfreq = dr.YEARLY
+                if(warndwmy == 'm'):
+                    rv.warn_rule = datetime.timedelta(months=rv.warnnum)
+                    rv.wfreq = dr.MONTHLY
+                if(warndwmy == 'w'):
+                    rv.warn_rule = datetime.timedelta(weeks=rv.warnnum)
+                    rv.wfreq = dr.WEEKLY
+                rv.warnpre   = warnpre
             return rv
         else:
             return cls(None)
