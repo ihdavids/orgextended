@@ -185,21 +185,35 @@ def IsToday(n, today):
     timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
-            next = t.next_repeat_from(today)
-            if IsTodaysDate(next, today):
-                return next
+            if(IsTodaysDate(t.start, today)):
+                return t
+            next = t.start
+            while(next <= today):
+                if IsTodaysDate(next, today):
+                    return next
+                next = t.next_repeat_from(next)
         else:
             if(t.has_overlap(today)):
                 return t
     if(n.scheduled):
         if(n.scheduled.repeating):
-            next = n.scheduled.next_repeat_from(today)
-            return IsTodaysDate(next, today)
+            next = n.scheduled.start
+            while(next <= today):
+                if IsTodaysDate(next, today):
+                    return next
+                next = n.scheduled.next_repeat_from(next)
         else:
             return n.scheduled.after(today)
     if(n.deadline):
         start = n.deadline.deadline_start
-        return start <= today
+        if start <= today:
+            return n.deadline
+        if(n.deadline.repeating):
+            next = n.deadline.start
+            while(next <= today):
+                if IsTodaysDate(next, today):
+                    return next
+                next = n.scheduled.next_repeat_from(next)
     return None
 
 def IsAllDay(n,today):
@@ -327,7 +341,8 @@ def IsInHourAndMinute(n, hour, mstart, mend, today):
     if(n.scheduled and n.scheduled.has_time()):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from(today)
-            return next.hour == hour
+            if(next.hour == hour):
+                return next
         s = n.scheduled.start
         e = n.scheduled.end
         if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
