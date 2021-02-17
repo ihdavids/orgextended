@@ -32,6 +32,16 @@ ViewMappings = {}
 def IsRawDate(ts):
     return isinstance(ts,datetime.date) or isinstance(ts,datetime.datetime)
 
+def EnsureDateTime(ts):
+    if(isinstance(ts,datetime.date)):
+        return datetime.datetime.combine(ts, datetime.datetime.min.time())
+    return ts
+
+def EnsureDate(ts):
+    if(isinstance(ts,datetime.datetime)):
+        return ts.date()
+    return ts
+
 def FindMappedView(view):
     if(view.name() in ViewMappings):
         return ViewMappings[view.name()]
@@ -188,7 +198,7 @@ def IsToday(n, today):
             if(IsTodaysDate(t.start, today)):
                 return t
             next = t.start
-            while(next <= today):
+            while(EnsureDateTime(next) <= EnsureDateTime(today)):
                 if IsTodaysDate(next, today):
                     return next
                 next = t.next_repeat_from(next)
@@ -198,10 +208,10 @@ def IsToday(n, today):
     if(n.scheduled):
         if(n.scheduled.repeating):
             next = n.scheduled.start
-            while(next <= today):
+            while(EnsureDateTime(next) <= EnsureDateTime(today)):
                 if IsTodaysDate(next, today):
                     return next
-                next = n.scheduled.next_repeat_from(next)
+                next = n.scheduled.next_repeat_from(EnsureDateTime(next))
         else:
             return n.scheduled.after(today)
     if(n.deadline):
@@ -210,10 +220,10 @@ def IsToday(n, today):
             return n.deadline
         if(n.deadline.repeating):
             next = n.deadline.start
-            while(next <= today):
+            while(EnsureDateTime(next) <= EnsureDateTime(today)):
                 if IsTodaysDate(next, today):
                     return next
-                next = n.scheduled.next_repeat_from(next)
+                next = n.scheduled.next_repeat_from(EnsureDateTime(next))
     return None
 
 def IsAllDay(n,today):
@@ -717,11 +727,11 @@ class WeekView(AgendaBaseView):
                     break
             if(shouldContinue):
                 continue
-            if(n.scheduled and (n.scheduled.start.date() < date.date() and not IsDone(n) or n.scheduled.start.date() == date.date())):
+            if(n.scheduled and (EnsureDate(n.scheduled.start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.scheduled.start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.scheduled
                 continue
-            if(n.deadline and (n.deadline.deadline_start.date() < date.date() and not IsDone(n) or n.deadline.deadline_start.date() == date.date())):
+            if(n.deadline and (EnsureDate(n.deadline.deadline_start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.deadline.deadline_start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.deadline
                 continue
