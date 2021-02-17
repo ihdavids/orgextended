@@ -37,7 +37,6 @@ def InsertDrawerIfNotPresent(view, node, drawer = ":PROPERTIES:", onDone=None):
     # Properties should be the first drawer...
     if(drawer != ":PROPERTIES:" and node.property_drawer_location):
         drawerRow = node.property_drawer_location[1] + 1
-        
     # Also skip over SCHEDULED, DEADLINE and CLOSED lines
     for row in range(drawerRow, node.local_end_row + 1):
         pt = view.text_point(row, 0)
@@ -52,7 +51,8 @@ def InsertDrawerIfNotPresent(view, node, drawer = ":PROPERTIES:", onDone=None):
 
     drawerHere = view.text_point(drawerRow, 0)
     newline = "\n" if view.isBeyondLastRow(drawerRow) else ""
-    node.set_property_drawer_location((drawerRow,drawerRow+1))
+    if(drawer == ":PROPERTIES:"):
+        node.set_property_drawer_location((drawerRow,drawerRow+1))
     view.run_command("org_internal_insert", {"location": drawerHere, "text": newline + indent + drawer +"\n" + indent + ":END:\n","onDone":onDone})
     return True
 
@@ -87,6 +87,8 @@ def UpdateProperty(view, node, key, value, onDone=None):
     def OnDrawer():
         # File is reloaded have to regrab node
         n = db.Get().At(view, node.start_row)
+        if(not n):
+            log.error("Failed to look up property drawer! Something is wrong!")
         start, end = n.property_drawer_location
         lkey = key.lower().strip()
         mrow = None

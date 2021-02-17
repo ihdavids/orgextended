@@ -85,8 +85,15 @@ def IsDoneState(node, toState):
     return toState in node.env.done_keys
 
 def ShouldRecur(node, fromState, toState):
-    if(IsDoneState(node, toState) and node.scheduled and node.scheduled.repeating):
-        return True
+    if(IsDoneState(node, toState)):
+        if(node.scheduled and node.scheduled.repeating):
+            return True
+        if(node.deadline and node.deadline.repeating):
+            return True
+        timestamps = n.get_timestamps(active=True,point=True,range=True)
+        for t in timestamps:
+            if(t and t.repeating):
+                return True
     return False
 
 def ShouldClose(node, fromState, toState):
