@@ -138,6 +138,8 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
     # recurrence needs to update the base timestamp!
     # This needs to respect the .+ ++ and + markers
     def on_update_timestamps_if_needed(self, row=0):
+        # We have to reload our node as we updated things.
+        self.node = db.Get().At(self.view, self.node.start_row)
         if(row > (self.node.local_end_row+1)):
             self.on_totally_done()
         for i in range(self.node.start_row+row, self.node.local_end_row+1):
