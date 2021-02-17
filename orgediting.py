@@ -24,6 +24,7 @@ import OrgExtended.orgdatepicker as datep
 import OrgExtended.orginsertselected as insSel
 import OrgExtended.orglinks as orglink
 import OrgExtended.orgneovi as nvi
+import OrgExtended.orgagenda as oa
 
 log = logging.getLogger(__name__)
 
@@ -156,10 +157,10 @@ class OrgTodoChangeCommand(sublime_plugin.TextCommand):
                         next  = t.start
                         next2 = t.end
                         if(t.repeatpre == "+"):
-                            next = t.next_repeat_from(next)
+                            next = t.next_repeat_from(oa.EnsureDateTime(next))
                         elif(t.repeatpre == "++"):
                             while(next < now):
-                                next = t.next_repeat_from(next)
+                                next = t.next_repeat_from(oa.EnsureDateTime(next))
                         elif(t.repeatpre == ".+"):
                             next = t.next_repeat_from(now)
                         s = m.start(1)

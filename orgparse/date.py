@@ -168,7 +168,7 @@ def get_repeat_info(rv,mdict):
                 if(rv.repeatnum <= 0):
                     rv.repeatnum = 1
                 # Build an org mode repeat rule
-                rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start) 
+                rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start,cache=True) 
                 # This determines what to do when you mark the task as done.
                 # + just bump to the next FIXED interval (even if thats in the past)
                 # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.
@@ -668,7 +668,7 @@ class OrgDateSDCBase(OrgDate):
                 if(rv.repeatnum <= 0):
                     rv.repeatnum = 1
                 # Build an org mode repeat rule
-                rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start) 
+                rv.repeat_rule = dr.rrule(rv.freq,interval=rv.repeatnum,dtstart=rv.start,cache=True) 
                 # This determines what to do when you mark the task as done.
                 # + just bump to the next FIXED interval (even if thats in the past)
                 # ++ bump to the next FIXED interval, in the future. (IE next sunday) even if you missed some.

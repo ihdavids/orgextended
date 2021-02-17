@@ -192,38 +192,47 @@ def IsInMonth(n, now):
     return (None,None)
 
 def IsToday(n, today):
+    # 4 months of per day scheduling is the maximum 
+    # we are willing to loop to avoid crazy slow loops.
+    kMaxLoops = sets.GetInt("agendaMaxScheduledIterations", 120)
     timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
             if(IsTodaysDate(t.start, today)):
                 return t
-            next = t.start
-            while(EnsureDateTime(next) <= EnsureDateTime(today)):
+            next = EnsureDateTime(t.start)
+            loopcount = 0
+            while(next <= EnsureDateTime(today) and loopcount <= kMaxLoops):
                 if IsTodaysDate(next, today):
                     return next
-                next = t.next_repeat_from(next)
+                next = t.next_repeat_from(EnsureDateTime(next))
+                loopcount += 1
         else:
             if(t.has_overlap(today)):
                 return t
     if(n.scheduled):
         if(n.scheduled.repeating):
             next = n.scheduled.start
-            while(EnsureDateTime(next) <= EnsureDateTime(today)):
+            loopcount = 0
+            while(EnsureDateTime(next) <= EnsureDateTime(today) and loopcount <= kMaxLoops):
                 if IsTodaysDate(next, today):
                     return next
                 next = n.scheduled.next_repeat_from(EnsureDateTime(next))
+                loopcount += 1
         else:
             return n.scheduled.after(today)
     if(n.deadline):
-        start = n.deadline.deadline_start
+        start = EnsureDateTime(n.deadline.deadline_start)
         if start <= today:
             return n.deadline
         if(n.deadline.repeating):
             next = n.deadline.start
-            while(EnsureDateTime(next) <= EnsureDateTime(today)):
+            loopcount = 0
+            while(EnsureDateTime(next) <= EnsureDateTime(today) and loopcount <= kMaxLoops):
                 if IsTodaysDate(next, today):
                     return next
-                next = n.scheduled.next_repeat_from(EnsureDateTime(next))
+                next = n.deadline.next_repeat_from(EnsureDateTime(next))
+                loopcount += 1
     return None
 
 def IsAllDay(n,today):
@@ -249,6 +258,8 @@ def IsAllDay(n,today):
                 return n.scheduled
     if(n.deadline):
         dt = n.deadline.deadline_start
+        if(isinstance(dt,datetime.date)):
+            return True
         if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
             return today
     return None
@@ -289,13 +300,13 @@ def IsInHour(n, hour, today):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from(today)
             return next.hour == hour
-        s = n.scheduled.start
-        e = n.scheduled.end
+        s = EnsureDateTime(n.scheduled.start)
+        e = EnsureDateTime(n.scheduled.end)
         if(IsInHourBracket(s,e,hour)):
             return n.scheduled
     if(n.deadline):
-        s = n.deadline.start
-        e = n.deadline.end
+        s = EnsureDateTime(n.deadline.start)
+        e = EnsureDateTime(n.deadline.end)
         if(IsInHourBracket(s,e,hour)):
             return n.deadline
     return None
@@ -359,8 +370,8 @@ def IsInHourAndMinute(n, hour, mstart, mend, today):
             return n.scheduled
 
     if(n.deadline):
-        s = n.deadline.start
-        e = n.deadline.end
+        s = EnsureDateTime(n.deadline.start)
+        e = EnsureDateTime(n.deadline.end)
         if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
             return n.deadline
     return None
@@ -593,12 +604,20 @@ class AgendaBaseView:
         pass
 
 def IsBeforeNow(ts, now):
-    return ts and (not ts.has_time() or ts.start.time() < now.time())
-    #return n.scheduled and (not n.scheduled.has_time() or n.scheduled.start.time() < now.time())
+    if(isinstance(ts,orgdate.OrgDate)):
+        return ts and (not ts.has_time() or ts.start.time() < now.time())
+    elif(ts and isinstance(ts,datetime.datetime)):
+        return ts.time() < now.time()
+    else:
+        return False
 
 def IsAfterNow(ts, now):
-    return ts and ts.has_time() and ts.start.time() >= now.time()
-    #return n.scheduled and n.scheduled.has_time() and n.scheduled.start.time() >= now.time()
+    if(isinstance(ts,orgdate.OrgDate)):
+        return ts and ts.has_time() and ts.start.time() >= now.time()
+    elif(ts and isinstance(ts,datetime.datetime)):
+        return ts.time() >= now.time()
+    else:
+        return False
 
 # ============================================================ 
 class CalendarView(AgendaBaseView):
@@ -942,13 +961,13 @@ class AgendaView(AgendaBaseView):
 
     def BuildDeadlineDisplay(self, node):
         if(node.deadline):
-            if(node.deadline.deadline_start <= self.now):
-                if(node.deadline.start.date() < self.now.date()):
+            if(EnsureDateTime(node.deadline.deadline_start) <= self.now):
+                if(EnsureDateTime(node.deadline.start).date() < self.now.date()):
                     return "D: Overdue"
-                elif(node.deadline.start.date() == self.now.date()):
+                elif(EnsureDateTime(node.deadline.start).date() == self.now.date()):
                     return "D: Due Today"
                 else:
-                    return "D:@" + str(node.deadline.start.date())
+                    return "D:@" + str(EnsureDateTime(node.deadline.start).date())
         else:
             return ""
 
@@ -1037,7 +1056,7 @@ class AgendaView(AgendaBaseView):
             ts = IsAllDay(n,self.now)
             if(ts):
                 self.MarkEntryAt(entry,ts)
-                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n)))
+                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3} {4}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
         rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and IsToday(node, self.now)

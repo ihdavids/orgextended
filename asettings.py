@@ -111,6 +111,14 @@ def RepresentsInt(s):
     except ValueError:
         return False	
 
+def GetInt(name, defaultValue):
+	v = Get(name, defaultValue)
+	try:
+		i = int(v)
+		return i
+	except:
+		return defaultValue
+
 # Will return a date or an index as an integer where 0 means Sunday
 # and so on in the week.
 def GetDateAsIndex(name, defaultValue):
