@@ -14,3 +14,5 @@
 	  the date at which they were closed. In the future I hope to make that happen. NOTE:
 	  they do not show up in the day view at the moment. I will work to improve that in a future
 	  release.
+	- Toggling a task to done with a recurring timestamp will set the LAST_REPEAT and LOGBOOK
+	  entries properly now.

@@ -87,14 +87,14 @@ def IsDoneState(node, toState):
 def ShouldRecur(node, fromState, toState):
     if(IsDoneState(node, toState)):
         if(node.scheduled and node.scheduled.repeating):
-            return True
+            return node.scheduled
         if(node.deadline and node.deadline.repeating):
-            return True
-        timestamps = n.get_timestamps(active=True,point=True,range=True)
+            return node.deadline
+        timestamps = node.get_timestamps(active=True,point=True,range=True)
         for t in timestamps:
             if(t and t.repeating):
-                return True
-    return False
+                return t
+    return None
 
 def ShouldClose(node, fromState, toState):
     if(ShouldRecur(node,fromState,toState)):
@@ -129,14 +129,62 @@ def ShouldNote(node, fromState, toState):
 
 
 
+RE_T = re.compile(r'\s(?P<time><\s*\d+-\d+-\d+\s+[^>]+>)(\s+|$)')
 # Use a menu to change the todo state of an item
 class OrgTodoChangeCommand(sublime_plugin.TextCommand):
     def on_totally_done(self):
         evt.EmitIf(self.onDone)
 
+    # recurrence needs to update the base timestamp!
+    # This needs to respect the .+ ++ and + markers
+    def on_update_timestamps_if_needed(self, row=0):
+        if(row > (self.node.local_end_row+1)):
+            self.on_totally_done()
+        for i in range(self.node.start_row+row, self.node.local_end_row+1):
+            pt = self.view.text_point(i, 0)
+            line = self.view.line(pt)
+            txt = self.view.substr(line)
+            m = RE_T.search(txt)
+            now = datetime.datetime.now()
+            if(m):
+                tsl = OrgDate.list_from_str(m.group('time'))
+                if(tsl):
+                    t = tsl[0]
+                    if(t.repeating):
+                        next  = t.start
+                        next2 = t.end
+                        if(t.repeatpre == "+"):
+                            next = t.next_repeat_from(next)
+                        elif(t.repeatpre == "++"):
+                            while(next < now):
+                                next = t.next_repeat_from(next)
+                        elif(t.repeatpre == ".+"):
+                            next = t.next_repeat_from(now)
+                        s = m.start(1)
+                        e = m.end(1)
+                        rpt = t.repeatpre + str(t.repeatnum) + t.repeatdwmy
+                        wrn = ""
+                        if(t.warning):
+                            wrn = " " + t.warnpre + str(t.warnnum) + t.warndwmy
+                        if(t.has_end()):
+                            if(t.has_time()):
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a %H:%M-") + t.end.strftime("%H:%M ")+ rpt + wrn + ">"  + txt[e:]
+                            else:
+                                # This really shouldn't happen.
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a ")+ rpt + wrn + ">" + txt[e:]
+                        else:
+                            if(t.has_time()):
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a %H:%M ") + rpt + wrn + ">" +txt[e:]
+                            else:
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a ")+ rpt + wrn + ">" + txt[e:]
+                        self.view.run_command("org_internal_replace", {"start": line.begin(), "end": line.end(), "text": nout, "onDone": evt.Make(lambda:self.on_update_timestamps_if_needed(i+1)) })
+                        return
+        self.on_totally_done()
+
     def do_recurrence_if_needed(self):
-        if(ShouldRecur(self.node,self.fromState,self.newState)):
-            InsertRecurrence(self.view, self.node, self.fromState, self.newState, evt.Make(self.on_totally_done))
+        self.rec = ShouldRecur(self.node,self.fromState,self.newState)
+        if(self.rec):
+            InsertRecurrence(self.view, self.node, self.fromState, self.newState, evt.Make(self.on_update_timestamps_if_needed))
         else:
             self.on_totally_done()
 
