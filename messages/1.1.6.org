@@ -1,1 +1,3 @@
 * 1.1.6
+	- Added keybindings utility function to help author docs.
+	- Bug found with active timestamps not recurring properly datetime conversion was not working properly
