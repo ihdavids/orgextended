@@ -33,7 +33,7 @@ def IsRawDate(ts):
     return isinstance(ts,datetime.date) or isinstance(ts,datetime.datetime)
 
 def EnsureDateTime(ts):
-    if(isinstance(ts,datetime.date)):
+    if(ts and not isinstance(ts,datetime.datetime)):
         return datetime.datetime.combine(ts, datetime.datetime.min.time())
     return ts
 
@@ -205,7 +205,7 @@ def IsToday(n, today):
             while(next <= EnsureDateTime(today) and loopcount <= kMaxLoops):
                 if IsTodaysDate(next, today):
                     return next
-                next = t.next_repeat_from(EnsureDateTime(next))
+                next = t.next_repeat_from(next)
                 loopcount += 1
         else:
             if(t.has_overlap(today)):
