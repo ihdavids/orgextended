@@ -9,60 +9,55 @@
         [
             { "key": "eol_selector",   "operator": "equal",     "operand": "text.orgmode" },
             { "key": "org_heading",    "operator": "equal",     "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["shift+tab"],         "command": "org_global_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_heading",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_link",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_global",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_table",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_checkbox",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_block",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-
+            { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
     { "keys": ["tab"], "command": "expand_snippet", "context":
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
-            { "key": "has_snippet" }, 
+            { "key": "has_snippet" }
         ]
     },
 
@@ -79,8 +74,8 @@
     { "keys": ["ctrl+shift+enter"],  "command": "org_generic_insert_aux",          "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
 
     // Normal non vim style bindings
-    { "keys": ["alt+o","z"],         "command": "org_capture",                  },
-    { "keys": ["alt+o","a", "d"],    "command": "org_agenda_day_view",          },
+    { "keys": ["alt+o","z"],         "command": "org_capture"                  },
+    { "keys": ["alt+o","a", "d"],    "command": "org_agenda_day_view"          },
 
     { "keys": ["alt+o", "t"],        "command": "org_toggle",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": ["alt+o", "R"],        "command": "org_refile",                    "context": [{ "key": "eol_selector", "operand": "text.orgmode"}] },
@@ -181,6 +176,6 @@
     { "keys": ["alt+."],             "command": "org_date_picker_next_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
     // ORG INPUT SELECTOR
     { "keys": ["down"],             "command": "org_input_down",                "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
-    { "keys": ["up"],               "command": "org_input_up",                  "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
+    { "keys": ["up"],               "command": "org_input_up",                  "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  }
 ]
  

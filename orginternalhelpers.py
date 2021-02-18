@@ -770,3 +770,82 @@ class OrgSelectExistingColorSchemeCommand(sublime_plugin.TextCommand):
 			self.view.window().show_quick_panel(self.files, self.on_done_st4, -1, -1)
 		else:
 			self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
+
+
+class OrgCreateKeymapDocCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		commandsData = sublime.load_resource("Packages/OrgExtended/OrgExtended.sublime-commands")
+		commandsData = re.sub(r"//.*\n","\n",commandsData)
+		com = ast.literal_eval(commandsData)
+
+		keymapData = sublime.load_resource("Packages/OrgExtended/Default.sublime-keymap")
+		keymapData = re.sub(r"//.*\n","",keymapData)
+		keymapData = re.sub(r"\n\s*\n","\n",keymapData)
+		keymapData = re.sub(r"\r\s*\r","",keymapData)
+		keys = json.loads(keymapData)
+		coms = {}
+		for c in com:
+			cmd = c['command']
+			cap = c['caption']
+			coms[cmd] = {'cap': cap}
+
+		for k in keys:
+			kks  = k['keys']	
+			cmd  = k['command']
+			cntx = "everywhere"
+			vi   = False
+			if('context' in k):
+				for i in k['context']:
+					if('key' in i and 'vi_command_mode_aware' == i['key']):
+						vi = True
+					if('operand' in i):
+						if(isinstance(i['operand'],str)):
+							cntx = i['operand']
+			if(cmd in coms):
+				if(not 'keys' in coms[cmd]):
+					coms[cmd]['keys'] = {}
+				if(vi):
+					coms[cmd]['keys']['vi'] = kks
+				else:
+					coms[cmd]['keys']['norm'] = kks
+				coms[cmd]['cntx'] = cntx
+				coms[cmd]['vi']   = vi
+			else:
+				if(vi):
+					coms[cmd] = {'keys': {'vi': kks}, 'cntx': cntx}
+				else:
+					coms[cmd] = {'keys': {'norm': kks}, 'cntx': cntx}
+		out = ""
+		contexts = {"Date Picker": "orgdateeditor", "Org File":"orgmode", "Org Agenda":"orgagenda", "Unbound":"","Everywhere":"everywhere", "Quick Input": "orginput" }
+		for name,con in contexts.items():
+			out += "* " + name + "\n"
+			out += " |Normal Keys| Vim Keys | Command|Operation| \n"
+			out +="|-\n"
+			for k,i in coms.items():
+				if(not k.startswith("org_")):
+					continue
+				if(('cntx' in i and con != "" and con in i['cntx']) or ('cntx' not in i and con == "")): 
+					if('keys' in i):
+						if('norm' in i['keys']):
+							out += "|" + str(i['keys']['norm']).replace('[','').replace(']','').replace("'",'')
+						else:
+							out += "|"
+						if('vi' in i['keys']):
+							out += "|" + str(i['keys']['vi']).replace('[','').replace(']','').replace("' '","<space>").replace("'",'')
+						else:
+							out += "|"
+					else:
+						out += "||"
+					if('cap' in i):
+						out += "|" + i['cap']
+					else:
+						out += "|"
+					out += "|" + k + "|\n"
+			out += "\n\n"
+		self.view.insert(edit,0,out)
+
+		pass
+
+
+
+
