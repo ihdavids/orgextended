@@ -161,7 +161,6 @@ class OrgCore(sublime_plugin.EventListener):
         return False
 
 
-
 # Create a new file.
 class OrgNewFileCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -174,9 +173,12 @@ class OrgOnLoadSyncUpCommand(sublime_plugin.WindowCommand):
         sheets = self.window.sheets()
         for sheet in sheets:
             view = sheet.view()
-            if(view and view.file_name()):
+            if(view):
                 # Todo detect buffer type as well in the future?
                 # for now we can only do files on disk
-                log.debug("OnLoad: " + view.file_name())
+                if(view.file_name()):
+                    log.debug("OnLoad: " + view.file_name())
+                else:
+                    log.debug("Loading Unamed Buffer: " + str(view.id()))
                 onLoad(view)
             

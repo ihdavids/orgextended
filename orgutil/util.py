@@ -23,6 +23,15 @@ def isOrgSyntax(fileOrView):
         return 'text.orgmode' in names
     return False
 
+def isPotentialOrgFileOrBuffer(fileOrView):
+    if(isOrgSyntax(fileOrView)):
+        return True
+    if(type(fileOrView) is sublime.View and fileOrView.file_name()):
+        return isPotentialOrgFile(fileOrView.file_name())
+    elif(type(fileOrView) is str):
+        return isPotentialOrgFile(fileOrView)
+    return False
+
 def isView(fileOrView):
     return (type(fileOrView) is sublime.View)
 

@@ -29,6 +29,14 @@ TODO_VIEW   = "Org Todos"
 
 ViewMappings = {}
 
+
+def ReloadAllUnsavedBuffers():
+    sheets = sublime.active_window().sheets()
+    for sheet in sheets:
+        view = sheet.view()
+        if(view and util.isPotentialOrgFileOrBuffer(view)):
+            db.Get().FindInfo(view)
+
 def IsRawDate(ts):
     return isinstance(ts,datetime.date) or isinstance(ts,datetime.datetime)
 
@@ -1411,6 +1419,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         pos = None
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
+        ReloadAllUnsavedBuffers()
         views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         views = views[toShow]
         nameOfShow = toShow
@@ -1504,6 +1513,7 @@ class OrgAgendaGoToSplitCommand(sublime_plugin.TextCommand):
 class OrgTagFilteredTodoViewInternalCommand(sublime_plugin.TextCommand):
     def run(self,edit,tags):
         # TODO: add filtering to this and name it nicely
+        ReloadAllUnsavedBuffers()
         todo = TodoView(TODO_VIEW + " Filtered By: " + tags,tagfilter=tags)
         todo.DoRenderView(edit)
 

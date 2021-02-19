@@ -1,0 +1,16 @@
+* 1.1.7
+** Editing
+	- Request: [[https://github.com/ihdavids/orgextended/issues/13][Checkboxes in Headings]]
+
+	- Checkbox summaries at the END of a heading but before tags are now supported and will be updated when
+	  a checkbox is toggled:
+
+*** TODO [#A] Heading with summary [33%]   :TAG:
+	- [ ] A
+	- [ ] B
+	- [x] C
+	    - [x] D
+
+** Agenda
+    - Request: [[https://github.com/ihdavids/orgextended/issues/10][Agenda Items Not Showing]]
+	- Org Agenda will reload all open buffers to pick up agenda items in unsaved buffers
