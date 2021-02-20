@@ -172,6 +172,27 @@ def AppendLine(view, edit, insertHere=True, veryEnd=False):
     view.run_command('org_update_numbered_list')
     #UpdateLine(view,edit)
 
+def getListAtPoint(view):
+    crow = view.curRow()
+    parent = view.findParentByIndent(view.curLine(), RE_NOTHEADERS, RE_NUMLINE)
+    if(None != parent):
+        prow, _ = view.rowcol(parent.begin())
+        children, erow = findChildrenByIndent(view, parent)
+        things = []
+        for c in children:
+            srow, _ = view.rowcol(c.begin())
+            if(len(things) > 0):
+                things[len(things)-1][0][1] = srow 
+            sortby = view.getLine(srow)
+            m = RE_NUMLINE.search(sortby)
+            if(m):
+                sortby = m.group('data')
+            things.append([[srow,0],sortby])
+        if(len(things) > 0):
+            things[len(things)-1][0][1] = erow-1
+        return things
+    return None
+
 
 def isNumberedLine(view,sel=None):
     point = None

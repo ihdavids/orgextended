@@ -384,6 +384,53 @@ def deindent_node(view, node, edit):
     else:
         log.debug("Did not get star, not deindenting it " + str(len(bufferContents)) + " " + bufferContents)
 
+# Thing is a region, and first line of the thing tuple
+# things is a list of thing
+def sort_things_alphabetically(things,reverse=False):
+    things.sort(key=lambda thing: thing[1],reverse=reverse)
+
+
+class OrgSortThingsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # Get a list of things
+        things = None
+        wasNumbered = False
+        if(numberedlist.isNumberedLine(self.view)):
+            wasNumbered = True
+            things = numberedlist.getListAtPoint(self.view)
+        if(not things):
+            log.error(" Could not sort at point")
+            return
+        # Build macro region
+        start = things[0][0][0]
+        end   = things[len(things)-1][0][1]
+        sp  = self.view.text_point(start,0)
+        ep  = self.view.text_point(end,0)
+        ep  = self.view.line(ep).end()
+        reg = sublime.Region(sp,ep)
+
+        # Sort the things
+        sort_things_alphabetically(things)
+
+        # Copy from macro region to sorted version
+        buffer = ""
+        for thing in things:
+            print(str(thing))
+            bs = self.view.text_point(thing[0][0],0)
+            be = self.view.text_point(thing[0][1]-1,0)
+            be = self.view.line(be).end()
+            breg = sublime.Region(bs,be)
+            ss = self.view.substr(breg) + "\n"
+            print("SS: " + ss)
+            buffer += ss
+        # Replace the macro region with new str
+        self.view.replace(edit, reg, buffer)
+        if(wasNumbered):
+            self.view.run_command('org_update_numbered_list')
+        pass
+
+
+
 class OrgSelectSubtreeCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
