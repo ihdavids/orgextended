@@ -145,6 +145,9 @@ class OrgGenericInsertCommand(sublime_plugin.TextCommand):
         if(cb):
             self.view.run_command('org_insert_checkbox')
             return
+        if(checkbox.isUnorderedList(self.view.substr(line))):
+            self.view.run_command('org_insert_unordered_list')
+            return
         if(numberedlist.isNumberedLine(self.view)):
             numberedlist.AppendLine(self.view, edit)
             return

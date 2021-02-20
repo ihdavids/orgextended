@@ -83,6 +83,7 @@ def curRowCol(self):
 def curRow(self):
     return self.rowcol(self.sel()[0].begin())[0]
 
+# Returns a region that is the current line
 @add_method(sublime.View)
 def curLine(self):
     row = self.curRow()

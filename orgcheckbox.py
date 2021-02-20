@@ -67,7 +67,7 @@ def find_parent(view, region):
         # return the parent we found.
         return view.line(view.text_point(row,0))
 
-def find_children(view, region):
+def find_children(view, region, cre = checkbox_regex):
     row, col = view.rowcol(region.begin())
     line = view.line(region)
     content = view.substr(line)
@@ -88,7 +88,7 @@ def find_children(view, region):
         summary = get_summary(view, line)
         if summary and content.lstrip().startswith("*"):
              break
-        if checkbox_regex.search(content):
+        if cre.search(content):
             cur_indent = len(get_indent(view, content))
             # check for end of descendants
             if cur_indent <= indent:
@@ -291,6 +291,32 @@ class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(ln.end())
 
+uline_info_regex = re.compile(r'^(\s*)([-+]) .*$')
+def isUnorderedList(line):
+    return uline_info_regex.match(line)
+
+class OrgInsertUnorderedListCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        row = self.view.curRow()
+        line = self.view.getLine(row)
+        match = uline_info_regex.match(line)
+        indent = match.group(1)
+        start  = match.group(2)
+        if(start):
+            indent = indent + start + " "
+        reg = self.view.curLine()
+        list_regex   = re.compile(r'\s*([-+]|[^#*|])')
+        children = find_children(self.view, reg, list_regex)
+        if(children and len(children) > 0):
+            reg = children[len(children) - 1]
+            row,_ =self.view.rowcol(reg.begin())
+        self.view.insert(edit,reg.end(),"\n" + indent)
+        # Move to end of line
+        row = row + 1
+        pt = self.view.text_point(row,0)
+        ln = self.view.line(pt)
+        self.view.sel().clear()
+        self.view.sel().add(ln.end())
 
 cbsline_info_regex = re.compile(r'^(\s*)(.*)\[\s*[0-9]*/[0-9]\s*\]\s*$')
 class OrgInsertCheckboxSummaryCommand(sublime_plugin.TextCommand):

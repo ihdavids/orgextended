@@ -25,6 +25,8 @@ import OrgExtended.orginsertselected as insSel
 import OrgExtended.orglinks as orglink
 import OrgExtended.orgneovi as nvi
 import OrgExtended.orgagenda as oa
+import OrgExtended.orgcheckbox as checkbox
+import OrgExtended.orgnumberedlist as numberedlist
 
 log = logging.getLogger(__name__)
 
@@ -323,6 +325,45 @@ def indent_node(view, node, edit):
     for n in node.children:
         indent_node(view, n, edit)
 
+def indent_list(view, row, edit):
+    # Indent the node itself
+    sp  = view.text_point(row,0)
+    view.insert(edit,sp,"  ")
+
+    line = view.lineAt(row)
+    children,crow = numberedlist.findChildrenByIndent(view, line)
+    for r in range(row+1,crow):
+        sp  = view.text_point(r,0)
+        view.insert(edit,sp,"  ")
+
+def deindent_list(view, row, edit):
+    # Get my position and ensure this node CAN de-indent
+    sp  = view.text_point(row,0)
+    ep  = view.text_point(row,1)
+    np  = view.text_point(row,2)
+    bufferContents = view.substr(sublime.Region(sp,np))
+    bufferContentsS = view.substr(sublime.Region(sp,ep))
+    wasTab = bufferContentsS == "\t"
+    if(bufferContents == "  " or wasTab):
+        if(wasTab):
+            view.erase(edit,sublime.Region(sp,ep))
+        else:
+            view.erase(edit,sublime.Region(sp,np))
+        line = view.lineAt(row)
+        children,crow = numberedlist.findChildrenByIndent(view, line)
+        for r in range(row+1,crow):
+            sp  = view.text_point(r,0)
+            ep  = view.text_point(r,1)
+            np  = view.text_point(r,2)
+            bufferContents = view.substr(sublime.Region(sp,np))
+            bufferContentsS = view.substr(sublime.Region(sp,ep))
+            wasTab = bufferContentsS == "\t"
+            if(bufferContents == "  " or wasTab):
+                if(wasTab):
+                    view.erase(edit,sublime.Region(sp,ep))
+                else:
+                    view.erase(edit,sublime.Region(sp,np))
+
 def deindent_node(view, node, edit):
     # Get my position and ensure this node CAN de-indent
     sp  = view.text_point(node.start_row,0)
@@ -345,6 +386,17 @@ def deindent_node(view, node, edit):
 
 class OrgChangeIndentCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        line = self.view.curLine()
+        cb = checkbox.get_checkbox(self.view, line)
+        if(cb):
+            indent_list(self.view,self.view.curRow(), edit)
+            return
+        if(checkbox.isUnorderedList(self.view.substr(line))):
+            indent_list(self.view,self.view.curRow(), edit)
+            return
+        if(numberedlist.isNumberedLine(self.view)):
+            indent_list(self.view,self.view.curRow(), edit)
+            return
         n = db.Get().AtInView(self.view)
         if(n and type(n) != node.OrgRootNode):
             indent_node(self.view, n, edit)
@@ -354,6 +406,17 @@ class OrgChangeIndentCommand(sublime_plugin.TextCommand):
 # This does not handle indention of sub trees! Need to fix that!
 class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        line = self.view.curLine()
+        cb = checkbox.get_checkbox(self.view, line)
+        if(cb):
+            deindent_list(self.view,self.view.curRow(), edit)
+            return
+        if(checkbox.isUnorderedList(self.view.substr(line))):
+            deindent_list(self.view,self.view.curRow(), edit)
+            return
+        if(numberedlist.isNumberedLine(self.view)):
+            deindent_list(self.view,self.view.curRow(), edit)
+            return
         n = db.Get().AtInView(self.view)
         if(n and type(n) != node.OrgRootNode):
             deindent_node(self.view, n, edit)
