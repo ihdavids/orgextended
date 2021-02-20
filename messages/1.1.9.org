@@ -20,5 +20,9 @@
       For numbered lists it will extend the list vs insert where you are.
     - This should now work for all the list types.
 
+*** Org Sort List
+    - Works when cursor is on list types.
+    - Will sort the list aphabetically
+
 ** Agenda
     - Loose Tasks View was sometimes not detecting top level loose tasks

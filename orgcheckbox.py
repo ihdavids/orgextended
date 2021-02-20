@@ -304,6 +304,37 @@ uline_info_regex = re.compile(r'^(\s*)([-+]) .*$')
 def isUnorderedList(line):
     return uline_info_regex.match(line)
 
+
+RE_THING = re.compile(r'^\s*[+-](\s\[[ xX-]\])?\s(?P<data>.*)$')
+RE_NOTHEADERS = re.compile(r'^\s*[\#|0-9]')
+def getListAtPoint(view):
+    parent = view.findParentByIndent(view.curLine(),RE_NOTHEADERS, RE_THING)
+    print(str(parent))
+    if(None != parent):
+        prow, _ = view.rowcol(parent.begin())
+        list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')
+        children = find_children(view, parent, list_regex, True)
+        sortby = view.getLine(prow)
+        m = RE_THING.search(sortby)
+        if(m):
+            sortby = m.group('data')
+        things = [[[prow,0],sortby]]
+        for c in children:
+            srow, _ = view.rowcol(c.begin())
+            if(len(things) > 0):
+                things[len(things)-1][0][1] = srow 
+            sortby = view.getLine(srow)
+            m = RE_THING.search(sortby)
+            if(m):
+                sortby = m.group('data')
+            things.append([[srow,0],sortby])
+        if(len(things) > 0):
+            srow, _ = view.rowcol(children[len(children)-1].end())
+            things[len(things)-1][0][1] = srow+1
+        return things
+    return None
+
+
 class OrgInsertUnorderedListCommand(sublime_plugin.TextCommand):
     def run(self, edit,insertHere=True):
         row = self.view.curRow()

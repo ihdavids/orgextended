@@ -178,7 +178,11 @@ def getListAtPoint(view):
     if(None != parent):
         prow, _ = view.rowcol(parent.begin())
         children, erow = findChildrenByIndent(view, parent)
-        things = []
+        sortby = view.getLine(prow)
+        m = RE_NUMLINE.search(sortby)
+        if(m):
+            sortby = m.group('data')
+        things = [[[prow,0],sortby]]
         for c in children:
             srow, _ = view.rowcol(c.begin())
             if(len(things) > 0):

@@ -85,7 +85,7 @@
     {"caption": "Org Copy Subtree",            "command": "org_copy_subtree"            },
     {"caption": "Org Copy Entity",             "command": "org_copy_entity"             },
     {"caption": "Org Copy Href",               "command": "org_copy_link_href"          },
-    {"caption": "Org Sort Things",             "command": "org_sort_things"             },
+    {"caption": "Org Sort List",               "command": "org_sort_list"               },
 
     // Agenda
     {"caption": "Org Agenda Goto",             "command": "org_agenda_go_to"            },

@@ -390,7 +390,7 @@ def sort_things_alphabetically(things,reverse=False):
     things.sort(key=lambda thing: thing[1],reverse=reverse)
 
 
-class OrgSortThingsCommand(sublime_plugin.TextCommand):
+class OrgSortListCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Get a list of things
         things = None
@@ -398,6 +398,8 @@ class OrgSortThingsCommand(sublime_plugin.TextCommand):
         if(numberedlist.isNumberedLine(self.view)):
             wasNumbered = True
             things = numberedlist.getListAtPoint(self.view)
+        elif(checkbox.isUnorderedList(self.view.getLine(self.view.curRow()))):
+            things = checkbox.getListAtPoint(self.view)
         if(not things):
             log.error(" Could not sort at point")
             return
@@ -415,13 +417,11 @@ class OrgSortThingsCommand(sublime_plugin.TextCommand):
         # Copy from macro region to sorted version
         buffer = ""
         for thing in things:
-            print(str(thing))
             bs = self.view.text_point(thing[0][0],0)
             be = self.view.text_point(thing[0][1]-1,0)
             be = self.view.line(be).end()
             breg = sublime.Region(bs,be)
-            ss = self.view.substr(breg) + "\n"
-            print("SS: " + ss)
+            ss = self.view.substr(breg).rstrip() + "\n"
             buffer += ss
         # Replace the macro region with new str
         self.view.replace(edit, reg, buffer)
