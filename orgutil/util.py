@@ -151,27 +151,35 @@ RE_HEADING = re.compile('^[*]+ ')
 #   region
 #   search up
 @add_method(sublime.View)
-def findParentByIndent(view, region):
+def findParentByIndent(view, region, exceptionRe=None, headingRe=None):
     row, col = view.rowcol(region.begin() + 1)
     content  = view.substr(view.line(region))
     indent   = len(view.getIndent(content))
     row     -= 1
     found    = False
+    lastHeading = row
     # Look upward 
     while row >= 0:
         content = view.getLine(row)
         if len(content.strip()):
-            if(RE_HEADING.search(content)):
+            if(headingRe and headingRe.search(content)):
+                lastHeading = row
+            if(RE_HEADING.search(content) or exceptionRe and exceptionRe.search(content)):
+                if(not headingRe):
+                    lastHeading = row
                 found = True
                 break
             cur_indent = len(view.getIndent(content))
             if cur_indent < indent:
+                if(not headingRe):
+                    lastHeading = row
                 found = True
                 break
         row -= 1
     if found:
         # return the parent we found.
-        return view.line(view.text_point(row,0))
+        return view.line(view.text_point(lastHeading,0))
+    return None
 
 
 @add_method(sublime.View)

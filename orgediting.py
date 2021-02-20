@@ -384,46 +384,6 @@ def deindent_node(view, node, edit):
     else:
         log.debug("Did not get star, not deindenting it " + str(len(bufferContents)) + " " + bufferContents)
 
-class OrgChangeIndentCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        line = self.view.curLine()
-        cb = checkbox.get_checkbox(self.view, line)
-        if(cb):
-            indent_list(self.view,self.view.curRow(), edit)
-            return
-        if(checkbox.isUnorderedList(self.view.substr(line))):
-            indent_list(self.view,self.view.curRow(), edit)
-            return
-        if(numberedlist.isNumberedLine(self.view)):
-            indent_list(self.view,self.view.curRow(), edit)
-            return
-        n = db.Get().AtInView(self.view)
-        if(n and type(n) != node.OrgRootNode):
-            indent_node(self.view, n, edit)
-            file = db.Get().FindInfo(self.view)
-            file.LoadS(self.view)
-
-# This does not handle indention of sub trees! Need to fix that!
-class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        line = self.view.curLine()
-        cb = checkbox.get_checkbox(self.view, line)
-        if(cb):
-            deindent_list(self.view,self.view.curRow(), edit)
-            return
-        if(checkbox.isUnorderedList(self.view.substr(line))):
-            deindent_list(self.view,self.view.curRow(), edit)
-            return
-        if(numberedlist.isNumberedLine(self.view)):
-            deindent_list(self.view,self.view.curRow(), edit)
-            return
-        n = db.Get().AtInView(self.view)
-        if(n and type(n) != node.OrgRootNode):
-            deindent_node(self.view, n, edit)
-            file = db.Get().FindInfo(self.view)
-            file.LoadS(self.view)
-
-
 class OrgSelectSubtreeCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)

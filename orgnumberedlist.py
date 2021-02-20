@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 RE_HEADING = re.compile('^[*]+ ')
 RE_NUMLINE = re.compile(r"^\s*(?P<num>[0-9]+)(?P<sep>[.)])(?P<data>\s+(([^:]+\s+)(::))?.*)")
-
+RE_NOTHEADERS = re.compile(r'^\s*[\#-+|]')
 # Returns a list of regions one per line with the children
 # of the current line. This is done by testing for headings
 # or a change in indent.
@@ -64,14 +64,14 @@ def findChildrenByIndent(view, region):
 
 def UpdateLine(view, edit):
     crow = view.curRow()
-    parent = view.findParentByIndent(view.curLine())
+    parent = view.findParentByIndent(view.curLine(),RE_NOTHEADERS, RE_NUMLINE)
     prow, _ = view.rowcol(parent.begin())
     children, erow = findChildrenByIndent(view, view.curLine())
     cur = 1
     curIndent = view.getIndent(view.getLine(prow+1))
     curLen    = len(curIndent)
     indentStack = []
-    for r in range(prow + 1, erow):
+    for r in range(prow, erow):
         line = view.getLine(r)
         if(r < crow and len(line.strip()) <= 0):
             continue
@@ -98,7 +98,7 @@ def UpdateLine(view, edit):
 
 def AppendLine(view, edit, insertHere=True, veryEnd=False):
     crow = view.curRow()
-    parent = view.findParentByIndent(view.curLine())
+    parent = view.findParentByIndent(view.curLine(), RE_NOTHEADERS, RE_NUMLINE)
     prow, _ = view.rowcol(parent.begin())
     children, erow = findChildrenByIndent(view, view.curLine())
     cur = 1
@@ -106,7 +106,7 @@ def AppendLine(view, edit, insertHere=True, veryEnd=False):
     curLen    = len(curIndent)
     indentStack = []
     sep = '.'
-    for r in range(prow + 1, erow+1):
+    for r in range(prow+1, erow+1):
         line = view.getLine(r)
         if(r < crow and len(line.strip()) <= 0):
             continue
@@ -139,7 +139,8 @@ def AppendLine(view, edit, insertHere=True, veryEnd=False):
                 view.insert(edit,point,'{4}{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' ',prefix))
                 view.sel().clear()
                 view.sel().add(point + len(curIndent) + 3)
-                UpdateLine(view,edit)
+                view.run_command('org_update_numbered_list')
+                #UpdateLine(view,edit)
                 return
         else:
             prefix = ""
@@ -150,7 +151,8 @@ def AppendLine(view, edit, insertHere=True, veryEnd=False):
             view.insert(edit,point,'{4}{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' ',prefix))
             view.sel().clear()
             view.sel().add(point + len(curIndent) + 3)
-            UpdateLine(view,edit)
+            view.run_command('org_update_numbered_list')
+            #UpdateLine(view,edit)
             return
     # Okay we didn't insert, have to now
     last_row, _ = view.rowcol(view.size())
@@ -167,7 +169,8 @@ def AppendLine(view, edit, insertHere=True, veryEnd=False):
     view.insert(edit,point,'{5}{0}{1}{2}{3}{4}'.format(curIndent, cur, sep, ' ', newLine,prefix))
     view.sel().clear()
     view.sel().add(point + len(curIndent) + 3)
-    UpdateLine(view,edit)
+    view.run_command('org_update_numbered_list')
+    #UpdateLine(view,edit)
 
 
 def isNumberedLine(view,sel=None):
