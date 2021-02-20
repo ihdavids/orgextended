@@ -134,8 +134,16 @@ def IsTodo(n):
 def IsDone(n):
     return n.todo and n.todo in n.env.done_keys
 
+def HasChildTasks(n):
+    for c in n.children:
+        if(IsTodo(c)):
+            return True
+    return False
+
 def IsProjectTask(n):
-    return (IsTodo(n) and n.parent and (n.parent.is_root() or IsTodo(n.parent)))
+    if(not n or n.is_root()):
+        return False
+    return (IsTodo(n) and n.parent and not n.parent.is_root() and IsTodo(n.parent)) or (IsTodo(n) and n.parent and n.parent.is_root() and HasChildTasks(n))
 
 def IsBlockedProject(n):
     if(IsTodo(n) and n.num_children > 0):
@@ -1112,7 +1120,8 @@ class LooseTasksView(TodoView):
         super(LooseTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
+        rc = IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
+        return rc
 
 
 # ================================================================================
