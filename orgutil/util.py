@@ -136,6 +136,10 @@ def getIndent(view, regionOrLine):
 def getLine(view, row):
     pt = view.text_point(row, 0)
     reg = view.line(pt)
+    if(reg.begin() == reg.end()):
+        return ""
+    if(reg.begin() >= view.size()):
+        return ""
     return view.substr(reg)
 
 RE_HEADING = re.compile('^[*]+ ')
@@ -147,7 +151,7 @@ RE_HEADING = re.compile('^[*]+ ')
 #   search up
 @add_method(sublime.View)
 def findParentByIndent(view, region):
-    row, col = view.rowcol(region.begin())
+    row, col = view.rowcol(region.begin() + 1)
     content  = view.substr(view.line(region))
     indent   = len(view.getIndent(content))
     row     -= 1

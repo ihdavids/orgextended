@@ -73,6 +73,8 @@ def UpdateLine(view, edit):
     indentStack = []
     for r in range(prow + 1, erow):
         line = view.getLine(r)
+        if(r < crow and len(line.strip()) <= 0):
+            continue
         thisIndent = view.getIndent(line)
         thisLen    = len(thisIndent)
         if(thisLen > curLen):
@@ -85,7 +87,6 @@ def UpdateLine(view, edit):
             curIndent, curLen, cur = indentStack.pop()
 
         if(thisLen == curLen):
-            print(line)
             m = RE_NUMLINE.search(line)
             if(m):
                 num = int(m.group('num'))
@@ -95,21 +96,23 @@ def UpdateLine(view, edit):
                 cur += 1
 
 
-def AppendLine(view, edit):
+def AppendLine(view, edit, insertHere=True, veryEnd=False):
     crow = view.curRow()
     parent = view.findParentByIndent(view.curLine())
     prow, _ = view.rowcol(parent.begin())
     children, erow = findChildrenByIndent(view, view.curLine())
     cur = 1
-    curIndent = view.getIndent(view.getLine(prow+1))
+    curIndent = view.getIndent(view.getLine(crow))
     curLen    = len(curIndent)
     indentStack = []
     sep = '.'
     for r in range(prow + 1, erow+1):
         line = view.getLine(r)
+        if(r < crow and len(line.strip()) <= 0):
+            continue
         thisIndent = view.getIndent(line)
         thisLen    = len(thisIndent)
-        if(thisLen > curLen):
+        if(thisLen > curLen and veryEnd):
             indentStack.append((curIndent,curLen, cur))
             curIndent = thisIndent
             curLen    = thisLen
@@ -119,9 +122,8 @@ def AppendLine(view, edit):
             curIndent, curLen, cur = indentStack.pop()
 
         if(thisLen == curLen):
-            print(line)
             m = RE_NUMLINE.search(line)
-            if(m):
+            if(m and (not insertHere or r <= crow)):
                 num = int(m.group('num'))
                 sep = m.group('sep')
                 if(num != cur):
@@ -129,30 +131,40 @@ def AppendLine(view, edit):
                     view.replace(edit, region, '{0}{1}{2}{3}'.format(curIndent, cur, m.group('sep'), m.group('data')))
                 cur += 1
             else:
+                prefix = ""
+                last_row, _ = view.rowcol(view.size())
+                if(r > last_row):
+                    prefix = "\n"
                 point  = view.text_point(r, 0)
-                view.insert(edit,point,'{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' '))
+                view.insert(edit,point,'{4}{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' ',prefix))
                 view.sel().clear()
                 view.sel().add(point + len(curIndent) + 3)
                 UpdateLine(view,edit)
                 return
         else:
+            prefix = ""
+            last_row, _ = view.rowcol(view.size())
+            if(r > last_row):
+                prefix = "\n"
             point  = view.text_point(r, 0)
-            view.insert(edit,point,'{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' '))
+            view.insert(edit,point,'{4}{0}{1}{2}{3}\n'.format(curIndent, cur, sep, ' ',prefix))
             view.sel().clear()
             view.sel().add(point + len(curIndent) + 3)
             UpdateLine(view,edit)
             return
     # Okay we didn't insert, have to now
     last_row, _ = view.rowcol(view.size())
+    prefix = ""
     if(erow > last_row):
-        point  = view.text_point(last_row, 0)
-        view.insert(edit,point,'\n')
-    point  = view.text_point(erow, 0)
-    line = view.getLine(erow)
-    newLine = ''
-    if(len(line) > 0):
-        newLine = '\n'
-    view.insert(edit,point,'{0}{1}{2}{3}{4}'.format(curIndent, cur, sep, ' ', newLine))
+        prefix = "\n"
+        point  = view.size()
+    else:
+        point  = view.text_point(erow, 0)
+        line = view.getLine(erow)
+        newLine = ''
+        if(len(line) > 0):
+            newLine = '\n'
+    view.insert(edit,point,'{5}{0}{1}{2}{3}{4}'.format(curIndent, cur, sep, ' ', newLine,prefix))
     view.sel().clear()
     view.sel().add(point + len(curIndent) + 3)
     UpdateLine(view,edit)
@@ -180,3 +192,13 @@ class OrgAppendNumberedListCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view
         AppendLine(view, edit)
+
+class OrgAppendToEndOfNumberedListCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = self.view
+        AppendLine(view, edit,insertHere=False,veryEnd=False)
+
+class OrgAppendChildToNumberedListCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = self.view
+        AppendLine(view, edit,insertHere=False, veryEnd=True)
