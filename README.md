@@ -55,6 +55,7 @@
 
 # This Plugin
 
+  - [Starter Tutorial](https://github.com/ihdavids/orgextended_docs/blob/master/learning_todos.org) - A startup primer.
   - [Basic Structure](https://github.com/ihdavids/orgextended_docs/blob/master/orgextended.org) - Basic file structure
   - [Setup](https://github.com/ihdavids/orgextended_docs/blob/master/setup.org) - Sublime Setup
   - [Editing](https://github.com/ihdavids/orgextended_docs/blob/master/editing.org) - Editing your org file
