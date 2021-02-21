@@ -114,8 +114,9 @@
     {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"  },
 
     // Table Management
-    {"caption": "Org Import Csv",              "command": "org_import_table_from_csv"   },
-    {"caption": "Org Insert Blank Table",      "command": "org_insert_blank_table"      },
+    {"caption": "Org Import Csv",              "command": "org_import_table_from_csv"     },
+    {"caption": "Org Convert Region To Table", "command": "org_convert_selection_to_table"},
+    {"caption": "Org Insert Blank Table",      "command": "org_insert_blank_table"        },
     //{"caption": "Org Test Thing",              "command": "org_show_item"  },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"     },
