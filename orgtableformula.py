@@ -17,22 +17,29 @@ import OrgExtended.orginsertselected as ins
 
 log = logging.getLogger(__name__)
 
-def insert_file_data(data, view, edit):
+def insert_file_data(data, view, edit, onDone=None):
     # figure out what our separator is.
     # replace the separator with |
-    view.insert(edit, view.sel()[0], data)
+    lines = data.split('\n')
+    data = ""
+    for l in lines:
+        data += '|' + l.strip().replace(',','|') + '|\n'
+    view.run_command("org_internal_insert", {"location": view.sel()[0].begin(), "text": data, "onDone": onDone})
 
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
     def OnFile(self, filename):
-        if(os.path.exists(text)):
+        if(os.path.exists(filename)):
             fileData = ""
             with open(filename,'r') as f:
                 fileData = f.read()
-            insert_file_data(fileData,self.view, self.edit)
-        self.OnDone()
+            self.pos = self.view.sel()[0]
+            insert_file_data(fileData,self.view, self.edit, evt.Make(self.OnDone))
 
     def OnDone(self):
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(self.pos.begin() +1, self.pos.end()+1))
+        self.view.run_command('table_editor_next_field')
         evt.EmitIf(self.onDone)
 
     def run(self, edit, onDone=None):
@@ -59,7 +66,6 @@ class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
                 data += '|-\n'
         self.pos = self.view.sel()[0]
         self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": data, "onDone": self.onDone})
-        #self.view.insert(self.edit,self.view.sel()[0], data)
         self.OnDone()
 
     def OnDone(self):
