@@ -82,6 +82,8 @@ class OrgInput:
     def recalculate(self,text):
         se = re.compile(text.replace(" ",".*"))
         self.matched = []
+        if(not self.options):
+            return
         for i in self.options:
             m = se.search(i)
             if(m):

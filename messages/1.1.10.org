@@ -1,1 +1,4 @@
 * 1.1.10
+** Editing
+	- Added Org Insert Blank Table
+	- This will insert a blank WxH blank table at point.
