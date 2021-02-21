@@ -15,6 +15,7 @@ import traceback
 import OrgExtended.orgfolding
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
+import glob
 
 log = logging.getLogger(__name__)
 
@@ -23,17 +24,25 @@ log = logging.getLogger(__name__)
 inputCommand = None
 class OrgInput:
     def __init__(self):
+        self.amRunning = False
         self.current = None
         self.havePopup = False
         self.skipRecalc = False
+        self.isFileBox  = False
+        self.inputpanel = None
         global inputCommand
         inputCommand = self
 
     def on_done(self, text):
-        if(self.onDone):
+        global inputCommand
+        inputCommand = None
+        self.inputpanel = None
+        if(None != self.onDone):
             evt.Get().emit(self.onDone,text)
 
     def popup(self,content, count = 0):
+        if(None == self.inputpanel):
+            return
         if(count > 2):
             return
         try:
@@ -53,6 +62,8 @@ class OrgInput:
 
 
     def redraw(self):
+        if(None == self.inputpanel):
+            return
         ff = sets.Get("input_font_face","Arial")
         content = "<html><body id=\"orgselect\">"
         content += """<style>
@@ -77,9 +88,20 @@ class OrgInput:
         content += "</div></body></html>"
         #self.inputpanel.show_popup_menu(self.matched,None) 
         #self.inputpanel.show_popup(content,sublime.COOPERATE_WITH_AUTO_COMPLETE,-1) 
-        self.popup(content)
+        if(None != content and content != ""):
+            self.popup(content)
+
+    def findFiles(self,text):
+        self.matched = []
+        if(None != text and len(text) > 1):
+            text = text + "*"
+            self.matched = glob.glob(text)
 
     def recalculate(self,text):
+        if(None == self.inputpanel):
+            return
+        if(not text):
+            return
         se = re.compile(text.replace(" ",".*"))
         self.matched = []
         if(not self.options):
@@ -90,17 +112,27 @@ class OrgInput:
                 self.matched.append(i)
 
     def on_change(self, text):
+        # When we press down we don't want to recalc the box
         if(self.skipRecalc):
             self.skipRecalc = False
         else:
-            self.recalculate(text)
+            if(self.isFileBox):
+                self.findFiles(text)
+            else:
+                self.recalculate(text)
         self.redraw()
 
     def on_cancel(self):
+        global inputCommand
+        inputCommand = None
         if(self.onDone):
             evt.Get().emit(self.onDone,None)
+        self.inputpanel.close()
+        self.inputpanel = None
 
     def down(self):
+        if(not self.amRunning or None == self.inputpanel):
+            return
         self.skipRecalc = True
         mlen = len(self.matched)
         for i in range(0,mlen):
@@ -116,6 +148,8 @@ class OrgInput:
         self.redraw()
 
     def up(self):
+        if(not self.amRunning or None == self.inputpanel):
+            return
         self.skipRecalc = True
         mlen = len(self.matched)
         for i in range(0,mlen):
@@ -138,20 +172,23 @@ class OrgInput:
         self.options = options
         #self.outputpanel = CreateUniqueViewNamed("OrgOptions")
         self.inputpanel = self.view.window().show_input_panel(self.name,"",self.on_done,self.on_change,self.on_cancel)
+        if(None == self.inputpanel):
+            self.inputpanel = self.view.window().show_input_panel(self.name,"",self.on_done,self.on_change,self.on_cancel)
         self.inputpanel.set_name("OrgInput")
         self.inputpanel.set_syntax_file("Packages/OrgExtended/orginput.sublime-syntax")
+        self.amRunning = True
         #self.view.window().show_quick_panel(self.tags, self.on_done, -1, -1)
 
 class OrgInputDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print("DOWN")
         global inputCommand
-        if(inputCommand):
+        if(None != inputCommand and inputCommand):
             inputCommand.down()
 
 class OrgInputUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print("DOWN")
         global inputCommand
-        if(inputCommand):
+        if(None != inputCommand and inputCommand):
             inputCommand.up()

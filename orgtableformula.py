@@ -28,8 +28,11 @@ def insert_file_data(data, view, edit, onDone=None):
 
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
-    def OnFile(self, filename):
-        if(os.path.exists(filename)):
+    def OnFile(self, filename=None):
+        self.inHan = None
+        if(None == filename):
+            return
+        if(os.path.exists(filename) and os.path.isfile(filename)):
             fileData = ""
             with open(filename,'r') as f:
                 fileData = f.read()
@@ -45,8 +48,9 @@ class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         self.edit = edit
         self.onDone = onDone
-        self.input = ins.OrgInput()
-        self.input.run("CSV", None, evt.Make(self.OnFile))
+        self.inHan = ins.OrgInput()
+        self.inHan.isFileBox = True
+        self.inHan.run("CSV", None, evt.Make(self.OnFile))
 
 class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
     def OnDims(self, text):
