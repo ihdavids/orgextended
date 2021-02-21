@@ -26,3 +26,4 @@
 
 ** Agenda
     - Loose Tasks View was sometimes not detecting top level loose tasks
+
