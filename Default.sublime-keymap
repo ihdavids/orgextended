@@ -36,13 +36,6 @@
     { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
-            { "key": "org_table",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true}
-        ]
-    },
-    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
-        [
-            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_checkbox",  "operator": "equal", "operand": true },
             { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
@@ -58,6 +51,23 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "has_snippet" }
+        ]
+    },
+    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_table",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["shift+tab"], "command": "table_editor_previous_field", "context":
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_table",  "operator": "equal", "operand": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
         ]
     },
 
@@ -102,6 +112,115 @@
     { "keys": ["alt+o", "m", "e"],       "command": "org_select_entity",             "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
     { "keys": ["alt+o", "y", "s"],       "command": "org_copy_subtree",              "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
     { "keys": ["alt+o", "y", "e"],       "command": "org_copy_entity",               "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
+
+    // TABLES
+    { "keys": ["alt+o", "t", "a"],       "command": "table_editor_align", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+o","t","j"],         "command": "table_editor_join_lines", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+o","t", "-"],        "command": "table_editor_insert_single_hline", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+o","t", "="],        "command": "table_editor_insert_double_hline", "context":
+        [
+            { "key": "eol_selector", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+o","enter"],         "command": "table_editor_hline_and_move", "context":
+        [
+            { "key": "eol_selector", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["enter"], "command": "table_editor_next_row", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["shift+enter"], "command": "table_editor_split_column_down", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+right"], "command": "table_editor_move_column_right", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+left"], "command": "table_editor_move_column_left", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+shift+left"], "command": "table_editor_delete_column", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+shift+right"], "command": "table_editor_insert_column", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+shift+up"], "command": "table_editor_kill_row", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+shift+down"], "command": "table_editor_insert_row", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+up"], "command": "table_editor_move_row_up", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": ["alt+down"], "command": "table_editor_move_row_down", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+ 
+
     // ORG AGENDA
     { "keys": ["alt+o", "o", "a"],       "command": "org_agenda_custom_view",        "context": []  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",                  "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
@@ -131,7 +250,7 @@
     // Spacemacs style save file
     { "keys": [" ", "f", "s"],       "command": "save",                          "context": [{"key": "vi_command_mode_aware"}]},
     // ORGMODE BINDINGS
-    { "keys": [" ", "t"],            "command": "org_toggle",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "t"],            "command": "org_toggle",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}, { "key": "selector", "operator": "not_equal", "operand": "orgmode.table"} ] },
     { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
@@ -166,6 +285,44 @@
     { "keys": ["c","o"],             "command": "org_agenda_clock_out",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": [">"],                 "command": "org_agenda_goto_next_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["<"],                 "command": "org_agenda_goto_prev_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+
+    // TABLES
+    { "keys": [" ", "t", "a"],       "command": "table_editor_align", "context":
+        [
+            { "key": "vi_command_mode_aware"}, { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": [" ","t","j"],         "command": "table_editor_join_lines", "context":
+        [
+            { "key": "vi_command_mode_aware"}, { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
+        ]
+    },
+    { "keys": [" ","t", "-"],        "command": "table_editor_insert_single_hline", "context":
+        [
+            { "key": "vi_command_mode_aware"}, { "key": "selector", "operator": "equal", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": [" ","t", "="],        "command": "table_editor_insert_double_hline", "context":
+        [
+            { "key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": [" ","enter"],         "command": "table_editor_hline_and_move", "context":
+        [
+            { "key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "orgmode.table"},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+
 
     // ORG DATE PICKER
     { "keys": [">"],                 "command": "org_date_picker_next_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },

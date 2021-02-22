@@ -14,6 +14,7 @@ import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 import OrgExtended.orginsertselected as ins
+import math
 
 log = logging.getLogger(__name__)
 
@@ -22,9 +23,30 @@ def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     # replace the separator with |
     indent = (" " * indentDepth) + " "
     lines = data.split('\n')
+    separator = ','
+    possibles = {",": [], ";": [], "\t": [], " ": []}
+    for l in lines:
+        if(l.strip() == ""):
+            continue
+        for k,v in possibles.items():
+            v.append(l.count(k))
+    vars = {}
+    for k,d in possibles.items():
+        s = sum(d) 
+        mean = s / len(d)
+        print("MEAN: " + str(mean) + " SEP: [" + k + "]")
+        if(mean > 0):
+            variance = math.sqrt(sum([ (x-mean)*(x-mean) for x in d ]) / len(d))
+            vars[k] = variance
+    print(str(vars))
+    print(str(possibles))
+    separator = min(vars, key=vars.get) 
+    print("SEPARATOR CHOSEN: " + separator)
     data = ""
     for l in lines:
-        data += indent + '|' + l.strip().replace(',','|') + '|\n'
+        if(l.strip() == ""):
+            continue
+        data += indent + '|' + l.strip().replace(separator,'|') + '|\n'
     if(replace):
         view.run_command("org_internal_replace", {"start": view.sel()[0].begin(), "end": view.sel()[0].end(), "text": data, "onDone": onDone})
     else:
