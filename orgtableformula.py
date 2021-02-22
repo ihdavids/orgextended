@@ -18,6 +18,11 @@ import math
 
 log = logging.getLogger(__name__)
 
+def isTable(view):
+    names = view.scope_name(view.sel()[0].end())
+    return 'orgmode.table' in names
+
+
 def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     # figure out what our separator is.
     # replace the separator with |
@@ -34,14 +39,14 @@ def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     for k,d in possibles.items():
         s = sum(d) 
         mean = s / len(d)
-        print("MEAN: " + str(mean) + " SEP: [" + k + "]")
+        #print("MEAN: " + str(mean) + " SEP: [" + k + "]")
         if(mean > 0):
             variance = math.sqrt(sum([ (x-mean)*(x-mean) for x in d ]) / len(d))
             vars[k] = variance
-    print(str(vars))
-    print(str(possibles))
+    #print(str(vars))
+    #print(str(possibles))
     separator = min(vars, key=vars.get) 
-    print("SEPARATOR CHOSEN: " + separator)
+    log.info("SEPARATOR CHOSEN: " + separator)
     data = ""
     for l in lines:
         if(l.strip() == ""):
@@ -140,3 +145,54 @@ class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
         self.onDone = onDone
         self.input = ins.OrgInput()
         self.input.run("WxH", None, evt.Make(self.OnDims))
+
+RE_TABLE_LINE = re.compile(r'\s*[|]')
+RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
+def find_formula(view):
+    row = view.curRow()
+    last_row = view.lastRow()
+    for r in range(row,last_row):
+        pt = view.text_point(r, 0)
+        line = view.substr(view.line(pt))
+        m = RE_FMT_LINE.search(line)
+        if(m):
+            return m.group('expr').split('::')
+        elif(RE_TABLE_LINE.search(line)):
+            continue
+        else:
+            return None
+
+def find_table_dimensions(view):
+    row = view.curRow()
+    last_row = view.lastRow()
+    end = last_row
+    start = row
+    for r in range(row,last_row):
+        pt = view.text_point(r, 0)
+        line = view.substr(view.line(pt))
+        if(RE_TABLE_LINE.search(line)):
+            continue
+        else:
+            end = r-1
+            break
+    for r in range(row,0,-1):
+        pt = view.text_point(r, 0)
+        line = view.substr(view.line(pt))
+        if(RE_TABLE_LINE.search(line)):
+            continue
+        else:
+            start = r+1
+            break
+    return [start, end]
+
+
+class OrgExecuteTableCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # Working on formula handling
+        fml = find_formula(self.view)
+        if(None != fml):
+            print(fml)
+        dims = find_table_dimensions(self.view)
+        if(None != dims):
+            print(str(dims))
+        pass

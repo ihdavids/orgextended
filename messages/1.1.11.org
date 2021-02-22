@@ -2,9 +2,10 @@
 ** Table Editing
 	- Incorporated Table Edit keybindings allowing for column and row movement, navigation,
 	  inserting and deleting rows and columns and hline insertion with some key bindings.
-	- Improved separator auto detection. 
+	- Improved separator auto detection during import and region conversion.	
 
 
+	
 
 
 

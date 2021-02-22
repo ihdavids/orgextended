@@ -14,6 +14,7 @@ import OrgExtended.orgnumberedlist as numberedlist
 import OrgExtended.orgdynamicblock as dynamic
 import OrgExtended.orgsourceblock as src
 import OrgExtended.orgediting as editing
+import OrgExtended.orgtableformula as tbl 
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +69,9 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
             return
         if(src.IsSourceBlock(self.view)):
             self.view.run_command('org_execute_source_block')
+            return
+        if(tbl.isTable(self.view)):
+            self.view.run_command('org_execute_table')
             return
         checkbox.recalculate_all_checkbox_summaries(self.view, edit)
         numberedlist.UpdateLine(self.view, edit)
