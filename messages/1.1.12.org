@@ -5,6 +5,8 @@
  	REALLY preliminary table formula preview.
  	The example below runs, but not much else will.
 
+ 	[[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][Spreadsheets In Org]]	
+
  	I am undecided if I will continue with attempting to use
  	the python ast for my expression support or simply 
  	roll my own parser as my limited knowledge of the ast module
@@ -31,6 +33,7 @@
     - Negative or other fancier ranges
     - Named fields
     - Visualizing columns
+    - Horizontal separators are currently considered in cell indexes (this will be fixed)
 
     Right now evaluating a table this is bound to the execute DWIM binding.
 
