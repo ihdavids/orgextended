@@ -1,8 +1,38 @@
 * 1.1.12
 
+** Tables
 
+ 	REALLY preliminary table formula preview.
+ 	The example below runs, but not much else will.
 
+ 	I am undecided if I will continue with attempting to use
+ 	the python ast for my expression support or simply 
+ 	roll my own parser as my limited knowledge of the ast module
+ 	has me at a loss of how to change the default grammar. 
+ 	(If anyone has input and knowledge here that would be beneficial)
 
+    | a | b | c | d | e |
+    |---+---+---+---+---|
+    | a | b | 5 | 1 | 2 |
+    | 1 | 1 | 1 | 1 | 1 |
+    #+TBLFM: @3$5=vmean($1..$5)+sin(@3$1)::$4=$3+5
+
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+
+    Things that do NOT work:
+    - Automatically updating your expressions when you resize the table
+    - Filling in a cell with an expression and having it automatically be moved to tablefmt
+    - Cell highlighting when editing expressions.
+    - calc style output formatting (semi colon)
+    - Negative or other fancier ranges
+    - Named fields
+    - Visualizing columns
+
+    Right now evaluating a table this is bound to the execute DWIM binding.
 
 
 
