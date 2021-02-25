@@ -160,7 +160,6 @@ def formula_rowcol(expr):
     if(len(fields) != 2):
         return (None, None)
     target = fields[0]
-    print(target)
     m = RE_TARGET.search(target)
     if(m):
         row = m.group('row')
@@ -232,7 +231,6 @@ def CellBoxIterator(table,a,b):
 def CellIterator(table,cell):
     r = cell.r
     c = cell.c
-    print("START ROW: " + str(table.StartRow()))
     if(r == '*'):
         rrange = range(table.StartRow(),table.Height()+1)
     else:
@@ -661,12 +659,10 @@ def FormulaIterator(table):
 
 class OrgExecuteTableCommand(sublime_plugin.TextCommand):
     def on_reformat(self):
-        print("RECALC DIMENSIONS")
         self.td.RecalculateTableDimensions()
         self.process_next()
 
     def on_done_cell(self):
-        print("ON DONE CELL")
         self.view.sel().clear()
         self.view.sel().add(self.result[3])
         #self.view.run_command('table_editor_next_field')
@@ -674,18 +670,15 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(self.on_reformat,1)
 
     def process_next(self):
-        print("PROCESS NEXT")
         self.result = next(self.it,None)
         if(None == self.result):
-            print("NONE EXITING")
             self.on_done()
             return
         r,c,val,reg = self.result
-        print("REPLACING WITH: " + str(val))
+        #print("REPLACING WITH: " + str(val))
         self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
 
     def on_done(self):
-        print("DONE")
         pass
 
     def run(self, edit):
