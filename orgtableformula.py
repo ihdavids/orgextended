@@ -453,6 +453,12 @@ class TableDef(simpev.SimpleEval):
             for c in range(1,len(linedef)):
                 names["c"+str(c)] = Cell('*',c,self)
                 names["r"+str(r)+"c"+str(c)] = Cell(r,c,self)
+    def ClearAllRegions(self):
+        for r in range(1,(self.end+2)-self.start):
+            self.view.erase_regions("cell_"+str(r))
+            for c in range(1,len(self.linedef)):
+                self.view.erase_regions("cell__"+str(c))
+                self.view.erase_regions("cell_"+str(r)+"_"+str(c))
     def add_constants(self,n):
         n['pi'] = 3.1415926
     def add_functions(self,f):
@@ -544,7 +550,8 @@ class TableDef(simpev.SimpleEval):
             return text
         return ""
     def FindCellRegion(self,r,c):
-        row = self.start + (r-1)       # 1 is zero
+        row = self.lineToRow[r]
+        #row = self.start + (r-1)       # 1 is zero
         colstart = self.linedef[c-1] 
         colend   = self.linedef[c]
         return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
@@ -555,6 +562,19 @@ class TableDef(simpev.SimpleEval):
             self.view.add_regions("cell_"+str(cell[0])+"_"+str(cell[1]),[reg],style,"",sublime.DRAW_NO_OUTLINE)
     def NumFormulas(self):
         return len(self.formulas) 
+
+    def CursorToFormula(self):
+        fm = self.formulaLine
+        row,col = self.view.curRowCol()
+        if(row != self.formulaRow):
+            return None
+        segs = fm.split('::')
+        acc = 0
+        for idx in range(0,len(segs)):
+            if(col > acc and col < acc+len(segs[idx])):
+                return idx
+            acc += len(segs[idx])
+        return None
 
     def HighlightFormula(self, i):
         dm = self.formulas[i]
@@ -599,8 +619,11 @@ def create_table(view):
     linedef = None
     formula = None
     hlines = []
+    lineToRow = {}
     endHeader = 1
-    for r in range(row,0,-1):
+    formulaRow = None
+    formulaLine = None
+    for r in range(row-1,0,-1):
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
         if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line)):
@@ -608,22 +631,28 @@ def create_table(view):
         row = r+1
         break
     start = row
+    rowNum = 0
     for r in range(row,last_row):
+        rowNum += 1
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
         m = RE_FMT_LINE.search(line)
         if(RE_TABLE_HLINE.search(line)):
             hlines.append(row)
+            rowNum -= 1
             if(endHeader == 1):
                 endHeader = (r - start) + 2
             continue
         elif(RE_TABLE_LINE.search(line)):
             if(None == linedef):
                 linedef = findOccurrences(line,'|')
+            lineToRow[rowNum] = r
             continue
         elif(m):
             end = r-1
             formula = m.group('expr').split('::')
+            formulaRow = r
+            formulaLine = line
             break
         else:
             end = r-1
@@ -641,6 +670,9 @@ def create_table(view):
     td.startRow = endHeader
     #td.linedef = linedef
     td.formulas = []
+    td.formulaRow = formulaRow
+    td.formulaLine = formulaLine
+    td.lineToRow   = lineToRow
     for fm in formula:
         td.formulas.append(Formula(fm))
     return td
@@ -684,7 +716,19 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Working on formula handling
         self.td = create_table(self.view)
+        self.td.ClearAllRegions()
         self.it = FormulaIterator(self.td)
         self.process_next()
         #td.HighlightFormula(i)
-        pass
+
+class OrgClearTableRegionsCommand(sublime_plugin.TextCommand):
+    def run(self,edit):
+        self.td = create_table(self.view)
+        self.td.ClearAllRegions()
+
+class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
+    def run(self,edit):
+        td = create_table(self.view)
+        i = td.CursorToFormula()
+        if(None != i):
+            td.HighlightFormula(i)
