@@ -154,7 +154,7 @@ RE_TABLE_LINE = re.compile(r'\s*[|]')
 RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 
-RE_TARGET = re.compile(r'\s*([@](?P<row>[0-9]+))?([$](?P<col>[0-9]+))?([@](?P<row2>[0-9]+))?\s*')
+RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))\s*')
 def formula_rowcol(expr):
     fields = expr.split('=')
     if(len(fields) != 2):
@@ -164,22 +164,45 @@ def formula_rowcol(expr):
     if(m):
         row = m.group('row')
         col = m.group('col')
-        if(not row):
-            row = m.group('row2')
+        if not row and not col:
+            row = m.group('rowonly')
+            if(row):
+                row = int(row)
+                col = '*'
+                return [[row,col],fields[1]]
+            else:
+                col = m.group('colonly')
+                col = int(col)
+                row = '*'
+                return [[row,col],fields[1]]
         else:
             row = int(row)
-        if not row:
-            row = '*'
-        else:
-            row = int(row)
-        if not col:
-            col = '*'
-        else:
             col = int(col)
-        return ([row, col], fields[1])
-        pass
+            return [[row,col],fields[1]]
     return (None, None)
 
+def formula_sources(expr):
+    ms = RE_TARGET.findall(expr)
+    matches = []
+    for m in ms:
+        row = m.group('row')
+        col = m.group('col')
+        if not row and not col:
+            row = m.group('rowonly')
+            if(row):
+                row = int(row)
+                col = '*'
+                matches.append([row,col])
+            else:
+                col = m.group('colonly')
+                col = int(col)
+                row = '*'
+                matches.append([row,col])
+        else:
+            row = int(row)
+            col = int(col)
+            matches.append([row,col])
+    return matches
 
 #class EvalNoMethods(simpleeval.SimpleEval):
 #    def _eval_call(self, node):
@@ -243,6 +266,18 @@ def CellIterator(table,cell):
         for c in crange:
             yield [r,c]
 
+def RCIterator(table,r,c):
+    if(r == '*'):
+        rrange = range(table.StartRow(),table.Height()+1)
+    else:
+        rrange = range(r,r+1)
+    if(c == '*'):
+        crange = range(table.StartCol(),table.Width()+1)
+    else:
+        crange = range(c,c+1)
+    for r in rrange:
+        for c in crange:
+            yield [r,c]
 
 # ============================================================
 class Cell:
@@ -520,7 +555,7 @@ class TableDef(simpev.SimpleEval):
             self.linedef = res
 
     def Width(self):
-        return len(self.linedef)
+        return len(self.linedef) - 1
 
     def Height(self):
         return (self.end-self.start) + 1
@@ -555,11 +590,13 @@ class TableDef(simpev.SimpleEval):
         colstart = self.linedef[c-1] 
         colend   = self.linedef[c]
         return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
-    def HighlightCells(self, cells):
+    def HighlightCells(self, cells,color):
         for cell in cells:
-            reg = self.FindCellRegion(*cell)
-            style = "orgdatepicker.monthheader"
-            self.view.add_regions("cell_"+str(cell[0])+"_"+str(cell[1]),[reg],style,"",sublime.DRAW_NO_OUTLINE)
+            it = RCIterator(self,*cell)
+            for cc in it:
+                reg = self.FindCellRegion(*cc)
+                style = "orgagenda.week." + str(color)
+                self.view.add_regions("cell_"+str(cc[0])+"_"+str(cc[1]),[reg],style,"",sublime.DRAW_NO_FILL)
     def NumFormulas(self):
         return len(self.formulas) 
 
@@ -578,7 +615,9 @@ class TableDef(simpev.SimpleEval):
 
     def HighlightFormula(self, i):
         dm = self.formulas[i]
-        self.HighlightCells([dm.target])
+        sources = formula_sources(dm.expr)
+        self.HighlightCells(sources,1)
+        self.HighlightCells([dm.target],2)
 
     def FormulaTarget(self, i):
         dm = self.formulas[i]
