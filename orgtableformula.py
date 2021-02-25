@@ -558,7 +558,7 @@ class TableDef(simpev.SimpleEval):
         return len(self.linedef) - 1
 
     def Height(self):
-        return (self.end-self.start) + 1
+        return self.rowCount
 
     def StartRow(self):
         return self.startRow
@@ -579,6 +579,7 @@ class TableDef(simpev.SimpleEval):
         return self.curCol
 
     def GetCellText(self,r,c):
+        self.accessList.append([r,c])
         reg = self.FindCellRegion(r,c)
         if(reg):
             text = self.view.substr(reg)
@@ -592,7 +593,7 @@ class TableDef(simpev.SimpleEval):
         return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
     def HighlightCells(self, cells,color):
         for cell in cells:
-            it = RCIterator(self,*cell)
+            it = RCIterator(self,cell[0],cell[1])
             for cc in it:
                 reg = self.FindCellRegion(*cc)
                 style = "orgagenda.week." + str(color)
@@ -614,16 +615,18 @@ class TableDef(simpev.SimpleEval):
         return None
 
     def HighlightFormula(self, i):
-        dm = self.formulas[i]
-        sources = formula_sources(dm.expr)
-        self.HighlightCells(sources,1)
-        self.HighlightCells([dm.target],2)
+        it = SingleFormulaIterator(self,i)
+        for n in it:
+            r,c,val,reg = n
+            self.HighlightCells(self.accessList,1)
+            self.HighlightCells([[r,c]],2)
 
     def FormulaTarget(self, i):
         dm = self.formulas[i]
         return dm.target
 
     def Execute(self, i):
+        self.accessList = []
         return self.eval(self.formulas[i].expr)
 
 def findOccurrences(s, ch):
@@ -671,6 +674,7 @@ def create_table(view):
         break
     start = row
     rowNum = 0
+    lastRow = 0
     for r in range(row,last_row):
         rowNum += 1
         pt = view.text_point(r, 0)
@@ -680,7 +684,7 @@ def create_table(view):
             hlines.append(row)
             rowNum -= 1
             if(endHeader == 1):
-                endHeader = (r - start) + 2
+                endHeader = (r - start) + 1
             continue
         elif(RE_TABLE_LINE.search(line)):
             if(None == linedef):
@@ -692,9 +696,11 @@ def create_table(view):
             formula = m.group('expr').split('::')
             formulaRow = r
             formulaLine = line
+            lastRow = rowNum - 1
             break
         else:
             end = r-1
+            lastRow = rowNum - 1
             break
     for r in range(row,0,-1):
         pt = view.text_point(r, 0)
@@ -712,9 +718,21 @@ def create_table(view):
     td.formulaRow = formulaRow
     td.formulaLine = formulaLine
     td.lineToRow   = lineToRow
+    td.rowCount = lastRow
     for fm in formula:
         td.formulas.append(Formula(fm))
     return td
+
+
+def SingleFormulaIterator(table,i):
+    target = table.FormulaTarget(i)
+    cell = Cell(target[0],target[1],table)
+    cellIterator = CellIterator(table,cell)
+    for r,c in cellIterator:
+        table.SetCurRow(r)
+        table.SetCurCol(c)
+        val = table.Execute(i)
+        yield [r,c,val,table.FindCellRegion(r,c)]
 
 def FormulaIterator(table):
     for i in range(0,table.NumFormulas()):
