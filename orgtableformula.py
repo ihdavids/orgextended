@@ -151,12 +151,12 @@ class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
         self.input.run("WxH", None, evt.Make(self.OnDims))
 
 RE_TABLE_LINE = re.compile(r'\s*[|]')
+RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 
 RE_TARGET = re.compile(r'\s*([@](?P<row>[0-9]+))?([$](?P<col>[0-9]+))?([@](?P<row2>[0-9]+))?\s*')
 def formula_rowcol(expr):
     fields = expr.split('=')
-    print("NUM FIELDS: " + str(len(fields)))
     if(len(fields) != 2):
         return (None, None)
     target = fields[0]
@@ -199,6 +199,8 @@ class Formula:
 
 def CellRowIterator(table,start,end):
     c = table.CurCol()
+    if(start < table.StartRow()):
+        start = table.StartRow()
     for r in range(start,end+1):
         cell = Cell(r,c,table)
         yield cell
@@ -220,6 +222,8 @@ def CellBoxIterator(table,a,b):
     if(a.c > b.c):
         sc = b.c
         ec = a.c
+    if(sr < table.StartRow()):
+        sr = table.StartRow()
     for r in range(sr,er+1):
         for c in range(sc,ec+1):
             cell = Cell(r,c,table)
@@ -228,12 +232,13 @@ def CellBoxIterator(table,a,b):
 def CellIterator(table,cell):
     r = cell.r
     c = cell.c
+    print("START ROW: " + str(table.StartRow()))
     if(r == '*'):
-        rrange = range(table.StartRow(),table.Width()+1)
+        rrange = range(table.StartRow(),table.Height()+1)
     else:
         rrange = range(r,r+1)
     if(c == '*'):
-        crange = range(table.StartCol(),table.Height()+1)
+        crange = range(table.StartCol(),table.Width()+1)
     else:
         crange = range(c,c+1)
     for r in rrange:
@@ -303,31 +308,120 @@ def GetNum(i):
         return i.GetNum()
     return i
 
+# ============================================================
+#  Functions
+# ============================================================
+
 def safe_mult(a, b):  # pylint: disable=invalid-name
     if hasattr(a, '__len__') and b * len(a) > MAX_STRING_LENGTH:
         raise IterableTooLong('Sorry, I will not evalute something that long.')
     if hasattr(b, '__len__') and a * len(b) > MAX_STRING_LENGTH:
         raise IterableTooLong('Sorry, I will not evalute something that long.')
-    if(isinstance(a,Cell)):
-        a = a.GetVal()
-    if(isinstance(b,Cell)):
-        b = b.GetVal()
-    return a * b
+    return GetVal(a) * GetVal(b)
 
+def safe_pow(a, b):  # pylint: disable=invalid-name
+    if abs(a) > MAX_POWER or abs(b) > MAX_POWER:
+        raise NumberTooHigh("Sorry! I don't want to evaluate {0} ** {1}"
+                            .format(a, b))
+    return GetVal(a) ** GetVal(b)
+
+
+def safe_add(a, b):  # pylint: disable=invalid-name
+    if hasattr(a, '__len__') and hasattr(b, '__len__'):
+        if len(a) + len(b) > MAX_STRING_LENGTH:
+            raise IterableTooLong("Sorry, adding those two together would"
+                                  " make something too long.")
+    return GetVal(a) + GetVal(b)
+
+def tsub(a, b):  # pylint: disable=invalid-name
+    return GetVal(a) - GetVal(b)
+
+def tdiv(a, b):  # pylint: disable=invalid-name
+    return GetVal(a) / GetVal(b)
+
+def tmod(a, b):  # pylint: disable=invalid-name
+    return GetVal(a) % GetVal(b)
+
+def teq(a,b):
+    return GetVal(a) == GetVal(b)
+
+def tneq(a,b):
+    return GetVal(a) != GetVal(b)
+
+def tgt(a,b):
+    return GetVal(a) > GetVal(b)
+
+def tlt(a,b):
+    return GetVal(a) < GetVal(b)
+
+def tge(a,b):
+    return GetVal(a) >= GetVal(b)
+
+def tle(a,b):
+    return GetVal(a) <= GetVal(b)
+
+def tnot(a):
+    return not GetVal(a)
+
+def tusub(a):
+    return - GetVal(a)
+
+def tuadd(a):
+    return + GetVal(a)
 
 def vmean(rng):
     n = 0
     s = 0
     for i in rng:
         num = GetNum(i)
-        print("NUM: " + str(num))
         s += num
         n += 1
     if(n != 0):
-        print("N: " + str(n))
         return float(s) / float(n)
     return 0
 
+def vsum(rng):
+    s = 0
+    for i in rng:
+        s += GetNum(i)
+    return s
+
+def vmedian(rng):
+    data = list(rng)
+    dl = len(data)
+    v = math.floor(dl/2)
+    if(v*2 != dl):
+        return GetNum(data[v+1])
+    else:
+        return (GetNum(data[v]) + GetNum(data[v+1]))/2.0
+
+def vmax(rng):
+    m = -999999999
+    for i in rng:
+        num = GetNum(i)
+        if(num > m):
+            m = num
+    return m
+
+def vmin(rng):
+    m = 999999999
+    for i in rng:
+        num = GetNum(i)
+        if(num < m):
+            m = num
+    return m
+
+def tan(cell):
+    return math.tan(GetNum(cell))
+
+def sin(cell):
+    return math.sin(GetNum(cell))
+
+def cos(cell):
+    return math.cos(GetNum(cell))
+
+def exp(cell):
+    return math.exp(GetNum(cell))
 
 # ============================================================
 class RangeExprOnNonCells(simpev.InvalidExpression):
@@ -361,13 +455,50 @@ class TableDef(simpev.SimpleEval):
             for c in range(1,len(linedef)):
                 names["c"+str(c)] = Cell('*',c,self)
                 names["r"+str(r)+"c"+str(c)] = Cell(r,c,self)
+    def add_constants(self,n):
+        n['pi'] = 3.1415926
+    def add_functions(self,f):
+        f['vmean'] = vmean
+        f['vmedian'] = vmedian
+        f['vmax'] = vmax
+        f['vmin'] = vmin
+        f['vsum'] = vsum
+        f['tan'] = tan
+        f['cos'] = cos
+        f['sin'] = sin
+        f['exp'] = exp
+
+    def add_operators(self,o):
+        o[ast.Mult] = safe_mult
+        o[ast.Add]  = safe_add
+        o[ast.Pow]  = safe_pow
+        o[ast.Sub] = tsub
+        o[ast.Div] = tdiv
+        o[ast.Mod] = tmod
+        o[ast.Eq] = teq
+        o[ast.NotEq] = tneq
+        o[ast.Gt] = tgt
+        o[ast.Lt] = tlt
+        o[ast.GtE] = tge
+        o[ast.LtE] = tle
+        o[ast.Not] = tnot
+        o[ast.USub] = tusub
+        o[ast.UAdd] = tuadd
+
+    #                     ast.In: lambda x, y: op.contains(y, x),
+    #                     ast.NotIn: lambda x, y: not op.contains(y, x),
+    #                     ast.Is: lambda x, y: x is y,
+    #                     ast.IsNot: lambda x, y: x is not y,
+    #                     }
+
     def __init__(self,view, start,end,linedef):
         operators = simpev.DEFAULT_OPERATORS.copy()
         operators[ast.FloorDiv] = self.range_expr
         functions = simpev.DEFAULT_FUNCTIONS.copy()
-        functions['vmean'] = vmean
         names = simpev.DEFAULT_NAMES.copy()
-        operators[ast.Mult] = safe_mult
+        self.add_operators(operators)
+        self.add_functions(functions)
+        self.add_constants(names)
         self.add_cell_names(names,start,end,linedef)
         super(TableDef,self).__init__(operators, functions, names)
         self.curRow = 0
@@ -391,7 +522,7 @@ class TableDef(simpev.SimpleEval):
         return (self.end-self.start) + 1
 
     def StartRow(self):
-        return 1
+        return self.startRow
 
     def StartCol(self):
         return 1
@@ -415,7 +546,7 @@ class TableDef(simpev.SimpleEval):
             return text
         return ""
     def FindCellRegion(self,r,c):
-        row = self.start + r
+        row = self.start + (r-1)       # 1 is zero
         colstart = self.linedef[c-1] 
         colend   = self.linedef[c]
         return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
@@ -458,7 +589,7 @@ def recalculate_linedef(view,row):
     pt = view.text_point(row, 0)
     line = view.substr(view.line(pt))
     linedef = None
-    if(RE_TABLE_LINE.search(line)):
+    if(not RE_TABLE_HLINE.search(line) and RE_TABLE_LINE.search(line)):
         linedef = findOccurrences(line,'|')
     return linedef
 
@@ -469,11 +600,26 @@ def create_table(view):
     start = row
     linedef = None
     formula = None
+    hlines = []
+    endHeader = 1
+    for r in range(row,0,-1):
+        pt = view.text_point(r, 0)
+        line = view.substr(view.line(pt))
+        if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line)):
+            continue
+        row = r+1
+        break
+    start = row
     for r in range(row,last_row):
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
         m = RE_FMT_LINE.search(line)
-        if(RE_TABLE_LINE.search(line)):
+        if(RE_TABLE_HLINE.search(line)):
+            hlines.append(row)
+            if(endHeader == 1):
+                endHeader = (r - start) + 2
+            continue
+        elif(RE_TABLE_LINE.search(line)):
             if(None == linedef):
                 linedef = findOccurrences(line,'|')
             continue
@@ -493,6 +639,8 @@ def create_table(view):
             start = r+1
             break
     td = TableDef(view, start, end, linedef)
+    td.hlines = hlines
+    td.startRow = endHeader
     #td.linedef = linedef
     td.formulas = []
     for fm in formula:
@@ -521,7 +669,8 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         print("ON DONE CELL")
         self.view.sel().clear()
         self.view.sel().add(self.result[3])
-        self.view.run_command('table_editor_next_field')
+        #self.view.run_command('table_editor_next_field')
+        self.view.run_command('table_editor_align')
         sublime.set_timeout(self.on_reformat,1)
 
     def process_next(self):
