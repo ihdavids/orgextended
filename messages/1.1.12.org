@@ -3,6 +3,8 @@
 ** Tables
 
  	REALLY preliminary table formula preview.
+ 	It's buggy!
+
  	The example below runs, but not much else will.
 
  	[[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][Spreadsheets In Org]]	
@@ -35,7 +37,7 @@
     - Visualizing columns
     - Horizontal separators are currently considered in cell indexes (this will be fixed)
 
-    Right now evaluating a table this is bound to the execute DWIM binding.
+    Right now evaluating a table is bound to the execute DWIM binding.
 
 
 
