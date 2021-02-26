@@ -184,6 +184,31 @@ def formula_rowcol(expr):
             return [[row,col],fields[1]]
     return (None, None)
 
+
+# TODO: Make funciton cells work!
+RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))(?P<end>[^@$]|$)')
+def replace_cell_references(expr):
+    while(True):
+        m = RE_TARGET_A.search(expr)
+        if(m):
+            row = m.group('row')
+            col = m.group('col')
+            end = m.group('end')
+            if(not end):
+                end = ""
+            if not row and not col:
+                row = m.group('rowonly')
+                if(row):
+                    expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ')' + end,expr,1)
+                else:
+                    col = m.group('colonly')
+                    expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ')' + end,expr,1)
+            else:
+                expr = RE_TARGET_A.sub('getcell(' + str(row) + "," + str(col) + ")" + end,expr,1)
+        else:
+            break
+    return expr
+
 def formula_sources(expr):
     ms = RE_TARGET.findall(expr)
     matches = []
@@ -219,7 +244,7 @@ def formula_sources(expr):
 class Formula:
     def __init__(self,expr, reg):
         self.target, self.expr = formula_rowcol(expr)
-        self.expr = self.expr.replace("@","r").replace("$","c").replace("..","//")
+        self.expr = replace_cell_references(self.expr.replace("..","//"))
         self.formula   = expr
         self.reg = reg 
 
@@ -486,12 +511,23 @@ class TableDef(simpev.SimpleEval):
                 raise RangeExprOnNonCells("End cells must be wild of same type", "range expression is invalid")
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
+    def getrowcell(self,r):
+        return Cell(r,'*',self)
+
+    def getcolcell(self,c):
+        return Cell('*',c,self)
+
+    def getcell(self,r,c):
+        return Cell(r,c,self)
+
     def add_cell_names(self,names,start,end,linedef):
-        for r in range(1,(end+2)-start):
-            names["r"+str(r)] = lambda: Cell(r,'*',self)
-            for c in range(1,len(linedef)):
-                names["c"+str(c)] = Cell('*',c,self)
-                names["r"+str(r)+"c"+str(c)] = Cell(r,c,self)
+        pass
+        #for r in range(1,(end+2)-start):
+        #    names["r"+str(r)] = Cell(r,'*',self)
+        #    for c in range(1,len(linedef)):
+        #        names["c"+str(c)] = Cell('*',c,self)
+        #        names["r"+str(r)+"c"+str(c)] = Cell(r,c,self)
+        #print(str(names))
     def ClearAllRegions(self):
         for r in range(1,(self.end+2)-self.start):
             self.view.erase_regions("cell_"+str(r))
@@ -513,6 +549,9 @@ class TableDef(simpev.SimpleEval):
         f['cos'] = cos
         f['sin'] = sin
         f['exp'] = exp
+        f['getcell'] = self.getcell
+        f['getrowcell'] = self.getrowcell
+        f['getcolcell'] = self.getcolcell
 
     def add_operators(self,o):
         o[ast.Mult] = safe_mult
@@ -626,9 +665,9 @@ class TableDef(simpev.SimpleEval):
         segs = fm.split('::')
         acc = 0
         for idx in range(0,len(segs)):
-            if(col > acc and col < acc+len(segs[idx])):
+            if(col >= acc and col < acc+len(segs[idx])):
                 return idx
-            acc += len(segs[idx])
+            acc += len(segs[idx]) + 2
         return None
 
     def ReplaceFormula(self,i,formula):
@@ -641,12 +680,12 @@ class TableDef(simpev.SimpleEval):
             pt = self.formulas[self.NumFormulas()-1].reg.end()
             formula = "::" + formula
         else:
-            pt = sublime.text_point(self.end,0)
+            pt = self.view.text_point(self.end,0)
             ll = self.view.line(pt)
-            line = self.substr(line)
+            line = self.view.substr(ll)
             indentCount = 0
-            while(line[indentCount] == ' ' or line[indentCount] == '\t'):
-                ++indentCount
+            while(indentCount < 20 and line[indentCount] == ' ' or line[indentCount] == '\t'):
+                indentCount += 1
             indent = ' ' * indentCount
             formula = "\n" + indent + "#+TBLFM:" + formula
             pt = ll.end()
@@ -683,6 +722,11 @@ class TableDef(simpev.SimpleEval):
         it = SingleFormulaIterator(self,i)
         for n in it:
             r,c,val,reg = n
+            # This is important, the cell COULD return a cell
+            # until we convert it to a string that cell will not
+            # necessarily be touched so the accessList will not be
+            # correct.
+            valStr = str(val)
             self.HighlightCells(self.accessList,1)
             self.HighlightCells([[r,c]],2)
         self.HighlightFormulaRegion(i)
@@ -751,6 +795,10 @@ def recalculate_linedef(view,row):
     if(not RE_TABLE_HLINE.search(line) and RE_TABLE_LINE.search(line)):
         linedef = findOccurrences(line,'|')
     return linedef
+
+# ====================================================================
+# CREATE TABLE
+# ====================================================================
 
 def create_table(view, at=None):
     row = view.curRow()
@@ -937,6 +985,9 @@ class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
             # Direct targeted formula
             if(txt.startswith(":=")):
                 formula = "@" + str(r) + "$" + str(c) + txt[1:]
+            # Row targeted formula
+            if(txt.startswith(">=")):
+                formula = "@" + str(r) + txt[1:]
             # Column formula
             if(txt.startswith("=")):
                 formula = "$" + str(c) + txt

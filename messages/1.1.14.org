@@ -1,0 +1,12 @@
+* 1.1.14
+** Spreadsheet Preview V3
+	- Column cell formula insertion was broken, this is now fixed.
+	- TBLFM expressions on their own lines would cause exceptions
+	- Added non standard row insertion using >= syntax.
+	  While testing this found a bug in row expressions
+
+    | a | b | c | d  |         e          |
+    |---+---+---+----+--------------------|
+    | a | b | 5 | 10 | >=@3               |
+    | 1 | 1 | 1 |  6 | 3.0914709848078967 |
+    #+TBLFM: @3$5=vmean($1..$4)+sin(@3$1)::$4=$3+5::@2=@3
