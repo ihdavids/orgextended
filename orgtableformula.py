@@ -553,6 +553,8 @@ class TableDef(simpev.SimpleEval):
         self.end   = end
         self.view  = view
         self.linedef = linedef
+        self.cellToFormula = None
+        self.accessList = []
 
     def RecalculateTableDimensions(self):
         res = recalculate_linedef(self.view,self.start)
@@ -628,6 +630,27 @@ class TableDef(simpev.SimpleEval):
                 return idx
             acc += len(segs[idx])
         return None
+
+    def ReplaceFormula(self,i,formula):
+        fmla = self.formulas[i]
+        self.view.run_command("org_internal_replace", {"start": fmla.reg.begin(), "end": fmla.reg.end(), "text": formula})
+
+    def AddNewFormula(self, formula):
+        pt = None
+        if(self.NumFormulas() > 0):
+            pt = self.formulas[self.NumFormulas()-1].reg.end()
+            formula = "::" + formula
+        else:
+            pt = sublime.text_point(self.end,0)
+            ll = self.view.line(pt)
+            line = self.substr(line)
+            indentCount = 0
+            while(line[indentCount] == ' ' or line[indentCount] == '\t'):
+                ++indentCount
+            indent = ' ' * indentCount
+            formula = "\n" + indent + "#+TBLFM:" + formula
+            pt = ll.end()
+        self.view.run_command("org_internal_insert", {"location": pt, "text": formula})
 
     def RowToCellRow(self,r):
         for i in range(1,len(self.lineToRow)+1):
@@ -858,14 +881,21 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
 
     def on_done(self):
-        pass
+        evt.EmitIf(self.onDone)
 
-    def run(self, edit):
+    def on_formula_copy_done(self):
         # Working on formula handling
         self.td = create_table(self.view)
         self.td.ClearAllRegions()
         self.it = FormulaIterator(self.td)
         self.process_next()
+
+    def run(self, edit,onDone=None,skipFormula=None):
+        self.onDone = onDone
+        if(skipFormula):
+            self.on_formula_copy_done()
+        else:
+            self.view.run_command('org_fill_in_formula_from_cell',{"onDone": evt.Make(self.on_formula_copy_done)})
         #td.HighlightFormula(i)
 
 # ================================================================================
@@ -895,28 +925,73 @@ class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
                 td.HighlightFormula(formulaIdx)
 
 # ================================================================================
+class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
+    def on_reformat(self):
+        td = create_table(self.view)
+        cell = td.CursorToCell()
+        if(cell):
+            r,c = cell
+            txt = td.GetCellText(r,c).strip()
+            print("FFF: " + txt)
+            formula = None
+            rangeFml = False
+            # Direct targeted formula
+            if(txt.startswith(":=")):
+                formula = "@" + str(r) + "$" + str(c) + txt[1:]
+                print("FORMULA: " + formula)
+            # Column formula
+            if(txt.startswith("=")):
+                formula = "$" + str(c) + txt
+                rangeFml = True
+            if(formula):
+                formulaIdx = td.CellToFormula(cell)
+                if(None != formulaIdx):
+                    td.ReplaceFormula(formulaIdx,formula)
+                else:
+                    td.AddNewFormula(formula)
+        if(self.onDone):
+            evt.EmitIf(self.onDone)
+        else:
+            print("EXECUTING")
+            self.view.run_command('org_execute_table',{'skipFormula': True})
+
+    def run(self,edit,onDone=None):
+        self.onDone = onDone
+        self.view.run_command('table_editor_align')
+        sublime.set_timeout(self.on_reformat,1)
+
+# ================================================================================
 class TableEventListener(sublime_plugin.ViewEventListener):
 
     @classmethod
     def is_applicable(cls, settings):
         # 4095 seems to crash when querying settings
         if(int(sublime.version()) != 4095):
-            return not "not here" in settings.get("orgDirs","not here")
+            try:
+                return not "not here" in settings.get("orgDirs","not here")
+            except:
+                return False
         else:
             return False
 
     def __init__(self, view):
         super(TableEventListener, self).__init__(view)
         self.showing = False
+        self.at = None
+        self.lastpt = None
     
     def on_selection_modified(self):
+        if(self.lastpt and self.lastpt == self.view.sel()[0].begin()):
+            return
+        self.lastpt = self.view.sel()[0].begin()
         if(isTableFormula(self.view)):
             self.view.run_command("org_highlight_formula")
             self.at = self.view.sel()[0].begin()
             self.showing = True
         elif(isTable(self.view)):
             self.view.run_command("org_highlight_formula_from_cell")
-            #self.at = self.view.sel()[0].begin()
+            if(not self.at):
+                self.at = self.view.sel()[0].begin()
             self.showing = True
         elif(self.showing):
             self.view.run_command("org_clear_table_regions", {'at': self.at})
