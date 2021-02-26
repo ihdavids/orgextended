@@ -157,7 +157,7 @@ RE_TABLE_LINE = re.compile(r'\s*[|]')
 RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 
-RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))\s*')
+RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))\s*$')
 def formula_rowcol(expr):
     fields = expr.split('=')
     if(len(fields) != 2):
@@ -662,7 +662,7 @@ class TableDef(simpev.SimpleEval):
             r,c,val,reg = n
             self.HighlightCells(self.accessList,1)
             self.HighlightCells([[r,c]],2)
-            self.HighlightFormulaRegion(i)
+        self.HighlightFormulaRegion(i)
 
     def FormulaTarget(self, i):
         dm = self.formulas[i]
