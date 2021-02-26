@@ -26,6 +26,9 @@ def isTable(view):
     names = view.scope_name(view.sel()[0].end())
     return 'orgmode.table' in names
 
+def isTableFormula(view):
+    names = view.scope_name(view.sel()[0].end())
+    return 'orgmode.tblfm' in names
 
 def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     # figure out what our separator is.
@@ -653,8 +656,10 @@ def recalculate_linedef(view,row):
         linedef = findOccurrences(line,'|')
     return linedef
 
-def create_table(view):
+def create_table(view, at=None):
     row = view.curRow()
+    if(at != None):
+        row,_ = view.rowcol(at)
     last_row = view.lastRow()
     end = last_row
     start = row
@@ -719,8 +724,9 @@ def create_table(view):
     td.formulaLine = formulaLine
     td.lineToRow   = lineToRow
     td.rowCount = lastRow
-    for fm in formula:
-        td.formulas.append(Formula(fm))
+    if(formula):
+        for fm in formula:
+            td.formulas.append(Formula(fm))
     return td
 
 
@@ -779,13 +785,43 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         #td.HighlightFormula(i)
 
 class OrgClearTableRegionsCommand(sublime_plugin.TextCommand):
-    def run(self,edit):
-        self.td = create_table(self.view)
+    def run(self,edit,at=None):
+        self.td = create_table(self.view, at)
         self.td.ClearAllRegions()
 
 class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
     def run(self,edit):
         td = create_table(self.view)
+        td.ClearAllRegions()
         i = td.CursorToFormula()
         if(None != i):
             td.HighlightFormula(i)
+
+
+# ================================================================================
+class TableEventListener(sublime_plugin.ViewEventListener):
+
+    @classmethod
+    def is_applicable(cls, settings):
+        # 4095 seems to crash when querying settings
+        if(int(sublime.version()) != 4095):
+            return not "not here" in settings.get("orgDirs","not here")
+        else:
+            return False
+
+    def __init__(self, view):
+        super(TableEventListener, self).__init__(view)
+        self.showing = False
+    
+    def on_selection_modified(self):
+        if(isTableFormula(self.view)):
+            self.view.run_command("org_highlight_formula")
+            self.at = self.view.sel()[0].begin()
+            self.showing = True
+        elif(self.showing):
+            self.view.run_command("org_clear_table_regions", {'at': self.at})
+            self.showing = False
+
+
+
+    
