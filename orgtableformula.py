@@ -217,10 +217,11 @@ def formula_sources(expr):
 
 
 class Formula:
-    def __init__(self,expr):
+    def __init__(self,expr, reg):
         self.target, self.expr = formula_rowcol(expr)
         self.expr = self.expr.replace("@","r").replace("$","c").replace("..","//")
         self.formula   = expr
+        self.reg = reg 
 
 def CellRowIterator(table,start,end):
     c = table.CurCol()
@@ -497,6 +498,9 @@ class TableDef(simpev.SimpleEval):
             for c in range(1,len(self.linedef)):
                 self.view.erase_regions("cell__"+str(c))
                 self.view.erase_regions("cell_"+str(r)+"_"+str(c))
+        for i in range(0,self.NumFormulas()):
+            self.view.erase_regions("fmla_"+str(i))
+
     def add_constants(self,n):
         n['pi'] = 3.1415926
     def add_functions(self,f):
@@ -601,6 +605,14 @@ class TableDef(simpev.SimpleEval):
                 reg = self.FindCellRegion(*cc)
                 style = "orgagenda.week." + str(color)
                 self.view.add_regions("cell_"+str(cc[0])+"_"+str(cc[1]),[reg],style,"",sublime.DRAW_NO_FILL)
+
+    def HighlightFormulaRegion(self,i,color=3):
+        style = "orgagenda.week." + str(color)
+        if(self.formulas and i >= 0 and i < len(self.formulas)):
+            reg = self.formulas[i].reg
+            if(reg):
+                self.view.add_regions("fmla_"+str(i),[reg],style,"",sublime.DRAW_NO_FILL)
+
     def NumFormulas(self):
         return len(self.formulas) 
 
@@ -617,16 +629,77 @@ class TableDef(simpev.SimpleEval):
             acc += len(segs[idx])
         return None
 
+    def RowToCellRow(self,r):
+        for i in range(1,len(self.lineToRow)+1):
+            if(self.lineToRow[i] == r):
+                return i
+        return 1
+
+    def FindCellColFromCol(self,c):
+        for i in range(0,len(self.linedef)-1):
+            if(c >= self.linedef[i] and c < self.linedef[i+1]):
+                return i+1
+        if(not self.linedef or (len(self.linedef) > 1 and c < self.linedef[0])):
+            return 1
+        return len(self.linedef)-1
+
+    def CursorToCell(self):
+        row,col = self.view.curRowCol()
+        r = self.RowToCellRow(row)
+        c = self.FindCellColFromCol(col)
+        return [r,c]
+
+    def CellToFormula(self, cell):
+        r,c = cell
+        if(self.cellToFormula):
+            if(r in self.cellToFormula and c in self.cellToFormula[r]):
+                return self.cellToFormula[r][c]
+        return None
+
     def HighlightFormula(self, i):
         it = SingleFormulaIterator(self,i)
         for n in it:
             r,c,val,reg = n
             self.HighlightCells(self.accessList,1)
             self.HighlightCells([[r,c]],2)
+            self.HighlightFormulaRegion(i)
 
     def FormulaTarget(self, i):
         dm = self.formulas[i]
         return dm.target
+
+    def FormulaTargetCellIterator(self, i):
+        target = self.FormulaTarget(i)
+        cell = Cell(target[0],target[1],self)
+        cellIterator = CellIterator(self,cell)
+        return cellIterator
+
+    def IsSingleTargetFormula(self,i):
+        target = self.FormulaTarget(i)
+        if(isinstance(target[0],int) and isinstance(target[1],int)):
+            return True
+        return False 
+
+    def AddCellToFormulaMap(self,cell,i):
+        r,c = cell
+        if(not r in self.cellToFormula):
+            self.cellToFormula[r] = {}
+        self.cellToFormula[r][c] = i
+
+    def BuildCellToFormulaMap(self):
+        self.cellToFormula = {}
+        for i in range(0,self.NumFormulas()):
+            if(not self.IsSingleTargetFormula(i)):
+                it = self.FormulaTargetCellIterator(i)
+                if(it):
+                    for c in it:
+                        self.AddCellToFormulaMap(c,i)
+        for i in range(0,self.NumFormulas()):
+            if(self.IsSingleTargetFormula(i)):
+                it = self.FormulaTargetCellIterator(i)
+                if(it):
+                    for c in it:
+                        self.AddCellToFormulaMap(c,i)
 
     def Execute(self, i):
         self.accessList = []
@@ -725,8 +798,18 @@ def create_table(view, at=None):
     td.lineToRow   = lineToRow
     td.rowCount = lastRow
     if(formula):
+        sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
+        first = sre.match(formulaLine)
+        lastend = len(first.group(0))
+        xline = sre.sub('',formulaLine)
+        las = xline.split('::')
+        index = 0
         for fm in formula:
-            td.formulas.append(Formula(fm))
+            fend = lastend+len(las[index])
+            td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend))))
+            index += 1
+            lastend = fend + 2
+        td.BuildCellToFormulaMap()
     return td
 
 
@@ -752,6 +835,7 @@ def FormulaIterator(table):
             yield (r,c,val,table.FindCellRegion(r,c))
     return None
 
+# ================================================================================
 class OrgExecuteTableCommand(sublime_plugin.TextCommand):
     def on_reformat(self):
         self.td.RecalculateTableDimensions()
@@ -784,11 +868,13 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         self.process_next()
         #td.HighlightFormula(i)
 
+# ================================================================================
 class OrgClearTableRegionsCommand(sublime_plugin.TextCommand):
     def run(self,edit,at=None):
         self.td = create_table(self.view, at)
         self.td.ClearAllRegions()
 
+# ================================================================================
 class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
     def run(self,edit):
         td = create_table(self.view)
@@ -797,6 +883,16 @@ class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
         if(None != i):
             td.HighlightFormula(i)
 
+# ================================================================================
+class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
+    def run(self,edit):
+        td = create_table(self.view)
+        td.ClearAllRegions()
+        cell = td.CursorToCell()
+        if(cell):
+            formulaIdx = td.CellToFormula(cell)
+            if(None != formulaIdx):
+                td.HighlightFormula(formulaIdx)
 
 # ================================================================================
 class TableEventListener(sublime_plugin.ViewEventListener):
@@ -818,9 +914,14 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             self.view.run_command("org_highlight_formula")
             self.at = self.view.sel()[0].begin()
             self.showing = True
+        elif(isTable(self.view)):
+            self.view.run_command("org_highlight_formula_from_cell")
+            #self.at = self.view.sel()[0].begin()
+            self.showing = True
         elif(self.showing):
             self.view.run_command("org_clear_table_regions", {'at': self.at})
             self.showing = False
+
 
 
 
