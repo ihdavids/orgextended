@@ -932,13 +932,11 @@ class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
         if(cell):
             r,c = cell
             txt = td.GetCellText(r,c).strip()
-            print("FFF: " + txt)
             formula = None
             rangeFml = False
             # Direct targeted formula
             if(txt.startswith(":=")):
                 formula = "@" + str(r) + "$" + str(c) + txt[1:]
-                print("FORMULA: " + formula)
             # Column formula
             if(txt.startswith("=")):
                 formula = "$" + str(c) + txt
@@ -952,7 +950,6 @@ class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
         if(self.onDone):
             evt.EmitIf(self.onDone)
         else:
-            print("EXECUTING")
             self.view.run_command('org_execute_table',{'skipFormula': True})
 
     def run(self,edit,onDone=None):
