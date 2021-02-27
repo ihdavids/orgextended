@@ -299,16 +299,16 @@ def CellColIterator(table,start,end):
         yield cell
 
 def CellBoxIterator(table,a,b):
-    sr = a.r
-    er = b.r
-    if(a.r > b.r):
-        sr = b.r
-        er = a.r
-    sc = a.c
-    ec = b.c
-    if(a.c > b.c):
-        sc = b.c
-        ec = a.c
+    sr = a.GetRow()
+    er = b.GetRow()
+    if(a.GetRow() > b.GetRow()):
+        sr = b.GetRow()
+        er = a.GetRow()
+    sc = a.GetCol()
+    ec = b.GetCol()
+    if(a.GetCol() > b.GetCol()):
+        sc = b.GetCol()
+        ec = a.GetCol()
     if(sr < table.StartRow()):
         sr = table.StartRow()
     for r in range(sr,er+1):
@@ -578,9 +578,9 @@ class TableDef(simpev.SimpleEval):
     def range_expr(self,a,b):
         if(isinstance(a,Cell) and isinstance(b,Cell)):
             if(a.r == "*" and b.r == "*"):
-                return CellColIterator(a.table, a.c, b.c)
+                return CellColIterator(a.table, a.GetCol(), b.GetCol())
             elif(a.c == "*" and b.c == "*"):
-                return CellRowIterator(a.table, a.r, b.r)
+                return CellRowIterator(a.table, a.GetRow(), b.GetRow())
             elif(a.r != '*' and b.r != '*' and a.c != '*' and b.c != '*'):
                 return CellBoxIterator(a.table,a,b)
             else:
@@ -867,6 +867,7 @@ class TableDef(simpev.SimpleEval):
             val = self.eval(self.formulas[i].expr)
             return val
         except:
+            log.error("TABLE ERROR: %s",traceback.format_exc())
             return "<ERR>"
 
 def findOccurrences(s, ch):
