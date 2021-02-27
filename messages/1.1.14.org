@@ -36,4 +36,14 @@
     |---+---+---+----+--------------------|
     | a | b | 5 | 10 | >=@3               |
     | 1 | 1 | 1 |  6 | 3.0914709848078967 |
-    #+TBLFM: @>$5=vmean($1..$4)+sin(@-1$-1)::$4=$3+5::@2=@3
+    #+TBLFM: @>$5=vmean($1..$4)+sin(@-1$-1)::$4=$#+5::@2=@3
+
+
+    - In addition we have index symbols $# is the current column and @# is the current row
+
+    | idx |   Index Gen   |
+    |-----+---------------|
+    |   1 | Testing Index |
+    |   2 | Generation    |
+    #+TBLFM: $1=@#-1
+

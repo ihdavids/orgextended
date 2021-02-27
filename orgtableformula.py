@@ -191,11 +191,18 @@ def formula_rowcol(expr):
 def isNumeric(v):
     return v.lstrip('-').isnumeric()
 
+def isFunc(v):
+    return 'ridx()' in v or 'cidx()' in v
+
 # TODO: Make funciton cells work!
-RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))(?P<end>[^@$]|$)')
+RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>[-]?[0-9><#]+)[$](?P<col>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
+RE_ROW_TOKEN = re.compile(r'[@][#]')
+RE_COL_TOKEN = re.compile(r'[$][#]')
 def replace_cell_references(expr):
-    #print("EXPS: " + str(expr))
+    print("EXPS: " + str(expr))
     while(True):
+        expr = RE_ROW_TOKEN.sub('ridx()',expr)
+        expr = RE_COL_TOKEN.sub('cidx()',expr)
         m = RE_TARGET_A.search(expr)
         if(m):
             row = m.group('row')
@@ -206,23 +213,23 @@ def replace_cell_references(expr):
             if not row and not col:
                 row = m.group('rowonly')
                 if(row):
-                    if(isNumeric(row)):
+                    if(isNumeric(row) or isFunc(row)):
                         expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ')' + end,expr,1)
                     else:
                         expr = RE_TARGET_A.sub('getrowcell(\'' + str(row) + '\')' + end,expr,1)
                 else:
                     col = m.group('colonly')
-                    if(isNumeric(col)):
+                    if(isNumeric(col) or isFunc(col)):
                         expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ')' + end,expr,1)
                     else:
                         expr = RE_TARGET_A.sub('getcolcell(\'' + str(col) + '\')' + end,expr,1)
             else:
-                rowmarkers = '\'' if not isNumeric(row) else ''
-                colmarkers = '\'' if not isNumeric(col) else ''
+                rowmarkers = '' if not isNumeric(row) or isFunc(row) else '\''
+                colmarkers = '' if not isNumeric(col) or isFunc(col) else '\''
                 expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + colmarkers + str(col) + colmarkers + ")" + end,expr,1)
         else:
             break
-    #print("EXP: " + str(expr))
+    print("EXP: " + str(expr))
     return expr
 
 def formula_sources(expr):
@@ -572,6 +579,13 @@ class TableDef(simpev.SimpleEval):
                 raise RangeExprOnNonCells("End cells must be wild of same type", "range expression is invalid")
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
+
+    def ridx(self):
+        return self.CurRow()
+    
+    def cidx(self):
+        return self.CurCol()
+
     def getrowcell(self,r):
         return Cell(r,'*',self)
 
@@ -610,6 +624,8 @@ class TableDef(simpev.SimpleEval):
         f['cos'] = cos
         f['sin'] = sin
         f['exp'] = exp
+        f['ridx'] = self.ridx
+        f['cidx'] = self.cidx
         f['getcell'] = self.getcell
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
