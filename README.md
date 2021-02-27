@@ -40,6 +40,13 @@
   + As a self documenting configuration file for emacs itself (and other things).
   + Many many more things
 
+  I use org to manage my agenda:
+
+  ![Agenda](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/agenda_day.gif)
+
+  Or to help me manipulate tables of data:
+
+  ![Tables](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/table_hacking.gif)
 
   What makes Org Mode so versatile is the deceptive simplicity of the format
   the flexibility of the simple markup and the the depth of the tools and API's provided around that format.
