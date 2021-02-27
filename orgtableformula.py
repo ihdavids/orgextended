@@ -198,6 +198,7 @@ def isFunc(v):
 RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>[-]?[0-9><#]+)[$](?P<col>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
 RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
+RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
 def replace_cell_references(expr):
     print("EXPS: " + str(expr))
     while(True):
@@ -227,6 +228,13 @@ def replace_cell_references(expr):
                 rowmarkers = '' if not isNumeric(row) or isFunc(row) else '\''
                 colmarkers = '' if not isNumeric(col) or isFunc(col) else '\''
                 expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + colmarkers + str(col) + colmarkers + ")" + end,expr,1)
+        else:
+            break
+    while(True):
+        m = RE_SYMBOL_OR_CELL_NAME.search(expr)
+        if(m):
+            name = m.group('name')
+            expr = RE_SYMBOL_OR_CELL_NAME.sub('symorcell(\'' + name + '\')',expr,1)
         else:
             break
     print("EXP: " + str(expr))
@@ -595,6 +603,12 @@ class TableDef(simpev.SimpleEval):
     def getcell(self,r,c):
         return Cell(r,c,self)
 
+    def symbolOrCell(self,name):
+        # TODO: Look up cell names FIRST
+        #       but only once we have the advanced features
+        if(name in self.consts):
+            return self.consts[name]
+
     def add_cell_names(self,names,start,end,linedef):
         pass
         #for r in range(1,(end+2)-start):
@@ -626,6 +640,7 @@ class TableDef(simpev.SimpleEval):
         f['exp'] = exp
         f['ridx'] = self.ridx
         f['cidx'] = self.cidx
+        f['symorcell'] = self.symbolOrCell
         f['getcell'] = self.getcell
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
@@ -671,6 +686,7 @@ class TableDef(simpev.SimpleEval):
         self.linedef = linedef
         self.cellToFormula = None
         self.accessList = []
+        self.consts = {}
 
     def RecalculateTableDimensions(self):
         res = recalculate_linedef(self.view,self.start)
@@ -885,6 +901,7 @@ def create_table(view, at=None):
     row = view.curRow()
     if(at != None):
         row,_ = view.rowcol(at)
+    start_row = row
     last_row = view.lastRow()
     end = last_row
     start = row
@@ -905,7 +922,7 @@ def create_table(view, at=None):
     start = row
     rowNum = 0
     lastRow = 0
-    for r in range(row,last_row):
+    for r in range(row,last_row+1):
         rowNum += 1
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
@@ -962,6 +979,25 @@ def create_table(view, at=None):
             index += 1
             lastend = fend + 2
         td.BuildCellToFormulaMap()
+    # 
+    if(td):
+        node = db.Get().At(view, start_row)
+        constants = node.list_comment('CONSTANTS',[])
+        consts = {}
+        if(len(constants) > 0):
+            for con in constants:
+                print("CON: " + str(con))
+                cs = con.split('=')
+                if(len(cs) == 2):
+                    name = cs[0].strip()
+                    val  = cs[1].strip()
+                    consts[name] = val
+        props = node.properties
+        if(props):
+            for k,v in props.items():
+                consts['PROP_'+k] = v
+        td.consts = consts
+
     return td
 
 

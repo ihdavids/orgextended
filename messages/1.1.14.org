@@ -47,3 +47,31 @@
     |   2 | Generation    |
     #+TBLFM: $1=@#-1
 
+    - Constants defined in your file can also be used in expressions
+
+    #+CONSTANTS: hello=world a=b
+    | x     | y |
+    | world | b |
+    #+TBLFM:@2$2=$a::@2$1=$hello
+
+
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+    - filling in a cell with an expression and having it automatically be moved to tablefmt
+    - cell highlighting when editing expressions.
+    - horizontal separators are now respected as non cells.
+    - Negative (relative) or arrow cell indexes
+    - Index symbol $# and @#
+
+
+    Things that do NOT work:
+    - Automatically updating your expressions when you resize the table
+    - calc style output formatting (semi colon)
+    - Advanced tabled features / Named fields
+    - box range targets
+    - Visualizing columns
+    - gnu plot support
+    - hline symbols
