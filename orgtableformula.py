@@ -157,7 +157,7 @@ RE_TABLE_LINE = re.compile(r'\s*[|]')
 RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 
-RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))\s*$')
+RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))\s*$')
 def formula_rowcol(expr):
     fields = expr.split('=')
     if(len(fields) != 2):
@@ -170,24 +170,31 @@ def formula_rowcol(expr):
         if not row and not col:
             row = m.group('rowonly')
             if(row):
-                row = int(row)
+                if(isNumeric(row)):
+                    row = int(row)
                 col = '*'
                 return [[row,col],fields[1]]
             else:
                 col = m.group('colonly')
-                col = int(col)
+                if(isNumeric(col)):
+                    col = int(col)
                 row = '*'
                 return [[row,col],fields[1]]
         else:
-            row = int(row)
-            col = int(col)
+            if(isNumeric(row)):
+                row = int(row)
+            if(isNumeric(col)):
+                col = int(col)
             return [[row,col],fields[1]]
     return (None, None)
 
+def isNumeric(v):
+    return v.lstrip('-').isnumeric()
 
 # TODO: Make funciton cells work!
-RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9]+))|([$](?P<colonly>[-]?[0-9]+))|([@](?P<row>[-]?[0-9]+)[$](?P<col>[-]?[0-9]+)))(?P<end>[^@$]|$)')
+RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))(?P<end>[^@$]|$)')
 def replace_cell_references(expr):
+    #print("EXPS: " + str(expr))
     while(True):
         m = RE_TARGET_A.search(expr)
         if(m):
@@ -199,14 +206,23 @@ def replace_cell_references(expr):
             if not row and not col:
                 row = m.group('rowonly')
                 if(row):
-                    expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ')' + end,expr,1)
+                    if(isNumeric(row)):
+                        expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ')' + end,expr,1)
+                    else:
+                        expr = RE_TARGET_A.sub('getrowcell(\'' + str(row) + '\')' + end,expr,1)
                 else:
                     col = m.group('colonly')
-                    expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ')' + end,expr,1)
+                    if(isNumeric(col)):
+                        expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ')' + end,expr,1)
+                    else:
+                        expr = RE_TARGET_A.sub('getcolcell(\'' + str(col) + '\')' + end,expr,1)
             else:
-                expr = RE_TARGET_A.sub('getcell(' + str(row) + "," + str(col) + ")" + end,expr,1)
+                rowmarkers = '\'' if not isNumeric(row) else ''
+                colmarkers = '\'' if not isNumeric(col) else ''
+                expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + colmarkers + str(col) + colmarkers + ")" + end,expr,1)
         else:
             break
+    #print("EXP: " + str(expr))
     return expr
 
 def formula_sources(expr):
@@ -244,6 +260,11 @@ def formula_sources(expr):
 class Formula:
     def __init__(self,expr, reg):
         self.target, self.expr = formula_rowcol(expr)
+        # Never allow our expr to be empty. If we failed to parse it our EXPR is current cell value
+        if(self.expr == None):
+            self.expr = "$0"
+        if(self.target == None):
+            self.target = "@0$0"
         self.expr = replace_cell_references(self.expr.replace("..","//"))
         self.formula   = expr
         self.reg = reg 
@@ -286,11 +307,11 @@ def CellIterator(table,cell):
     if(r == '*'):
         rrange = range(table.StartRow(),table.Height()+1)
     else:
-        rrange = range(r,r+1)
+        rrange = range(cell.GetRow(),cell.GetRow()+1)
     if(c == '*'):
         crange = range(table.StartCol(),table.Width()+1)
     else:
-        crange = range(c,c+1)
+        crange = range(cell.GetCol(),cell.GetCol()+1)
     for r in rrange:
         for c in crange:
             yield [r,c]
@@ -326,14 +347,54 @@ class Cell:
         return NotImplemented 
 
     def GetRow(self):
-        if(self.r == "*"):
+        r = None
+        if(isinstance(self.r,str)):
+            if(self.r == "*"):
+                r = self.table.CurRow()
+            elif(self.r.startswith('>')):
+                cnt = len(self.r.strip())
+                r = self.table.Height() - (cnt-1)
+            elif(self.r.startswith("<")):
+                cnt = len(self.r.strip())
+                r = self.table.StartRow() + (cnt-1)
+        elif(self.r < 0):
+            r = self.table.CurRow() + self.r
+        elif(self.r == 0):
             return self.table.CurRow()
-        return self.r
+        else:
+            r = self.r
+        if(None == r):
+            r = self.table.CurRow()
+        if(r < 1):
+            r = 1
+        if(r > self.table.Height()):
+            r = self.table.Height()
+        return r
 
     def GetCol(self):
-        if(self.c == "*"):
+        c = None
+        if(isinstance(self.c,str)):
+            if(self.c == "*"):
+                c = self.table.CurCol()
+            elif(self.c.startswith(">")):
+                cnt = len(self.c.strip())
+                c = self.table.Width() - (cnt-1)
+            elif(self.c.startswith("<")):
+                cnt = len(self.c.strip())
+                c = self.table.StartCol() + (cnt-1)
+        elif(self.c < 0):
+            c = self.table.CurCol() + self.c
+        elif(self.c == 0):
             return self.table.CurCol()
-        return self.c
+        else:
+            c = self.c
+        if(None == c):
+            c = self.table.CurCol()
+        if(c < 1):
+            c = 1
+        if(c > self.table.Width()):
+            c = self.table.Width()
+        return c
 
     def GetText(self):
         return self.table.GetCellText(self.GetRow(), self.GetCol())
@@ -770,7 +831,11 @@ class TableDef(simpev.SimpleEval):
 
     def Execute(self, i):
         self.accessList = []
-        return self.eval(self.formulas[i].expr)
+        try:
+            val = self.eval(self.formulas[i].expr)
+            return val
+        except:
+            return "<ERR>"
 
 def findOccurrences(s, ch):
     return [i for i, letter in enumerate(s) if letter == ch]

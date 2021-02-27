@@ -10,3 +10,30 @@
     | a | b | 5 | 10 | >=@3               |
     | 1 | 1 | 1 |  6 | 3.0914709848078967 |
     #+TBLFM: @3$5=vmean($1..$4)+sin(@3$1)::$4=$3+5::@2=@3
+
+    - Still using a hacked up version of simple_eval and python ast
+      for the expression parser. Decided using functions rather than names
+      for the expression differences made sense. Even though this is a bit of
+      a misuse of the parser I think I will stick with this approach, it's simple
+      it's functional and will allow me to support the other variable modifiers in the end.
+    - Right now the parser is pretty locked down.
+    - I will probably never support arbitrary lisp like spreadsheets like emacs can.
+      (As much as it would be fun to build a lisp parser here, it's kind of missing the rest of emacs and the massive function library)
+    - Cleaned up some asserts that happened when editing a table. The highligher didn't like targets changing on the fly.
+    - That said, I may support more and more of the calc library and even allow some user made extensions eventually.
+    - My eventual goal is to flesh out my babel hack to a more full featured version with all the power that comes along with that. 
+      Without TRAMP, remote sessions etc. some of the
+      power of bable is muted a little bit. (But who knows, maybe TRAMP is possible in sublime...) That said, we need powerfull spreadsheet
+      support as an input source before really going to town on bable is possible. 
+
+*** New Cell Identifiers
+
+	With the refactor on how I am handling cells I can now support the > and relative cell identifiers
+	-1 is one to the left or one up from the current target being calculated. It is a relative identifier.
+	> means last column while >> means last but one.
+
+    | a | b | c | d  |         e          |
+    |---+---+---+----+--------------------|
+    | a | b | 5 | 10 | >=@3               |
+    | 1 | 1 | 1 |  6 | 3.0914709848078967 |
+    #+TBLFM: @>$5=vmean($1..$4)+sin(@-1$-1)::$4=$3+5::@2=@3
