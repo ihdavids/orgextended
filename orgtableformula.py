@@ -16,9 +16,11 @@ import OrgExtended.pymitter as evt
 import OrgExtended.orginsertselected as ins
 import OrgExtended.simple_eval as simpev
 import math
+import random
 import ast
 import operator as op
 
+random.seed()
 
 log = logging.getLogger(__name__)
 
@@ -163,6 +165,11 @@ def formula_rowcol(expr):
     if(len(fields) != 2):
         return (None, None)
     target = fields[0]
+    targets = target.split('..')
+    if(len(targets)==2):
+        r1 = formula_rowcol(targets[0] + "=")
+        r2 = formula_rowcol(targets[1] + "=")
+        return [r1[0] + r2[0],fields[1]]
     m = RE_TARGET.search(target)
     if(m):
         row = m.group('row')
@@ -200,7 +207,7 @@ RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
 RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
 def replace_cell_references(expr):
-    print("EXPS: " + str(expr))
+    #print("EXPS: " + str(expr))
     while(True):
         expr = RE_ROW_TOKEN.sub('ridx()',expr)
         expr = RE_COL_TOKEN.sub('cidx()',expr)
@@ -237,7 +244,7 @@ def replace_cell_references(expr):
             expr = RE_SYMBOL_OR_CELL_NAME.sub('symorcell(\'' + name + '\')',expr,1)
         else:
             break
-    print("EXP: " + str(expr))
+    #print("EXP: " + str(expr))
     return expr
 
 def formula_sources(expr):
@@ -329,7 +336,8 @@ def CellIterator(table,cell):
         crange = range(cell.GetCol(),cell.GetCol()+1)
     for r in rrange:
         for c in crange:
-            yield [r,c]
+            cell = Cell(r,c,table)
+            yield cell
 
 def RCIterator(table,r,c):
     if(r == '*'):
@@ -359,7 +367,10 @@ class Cell:
             if self.r == other.r and self.c == other.c:
                 return True
             return self.GetText() == other.GetText()
-        return NotImplemented 
+        return NotImplemented
+
+    def rc(self):
+        return (self.r,self.c)
 
     def GetRow(self):
         r = None
@@ -549,6 +560,12 @@ def vmin(rng):
             m = num
     return m
 
+def randomDigit(start, end):
+    return random.randint(GetVal(start),GetVal(end))
+
+def randomFloat():
+    return random.randint(0,1000000)/1000000.0
+
 def tan(cell):
     return math.tan(GetNum(cell))
 
@@ -640,6 +657,8 @@ class TableDef(simpev.SimpleEval):
         f['exp'] = exp
         f['ridx'] = self.ridx
         f['cidx'] = self.cidx
+        f['randomf'] = randomFloat
+        f['random'] = randomDigit
         f['symorcell'] = self.symbolOrCell
         f['getcell'] = self.getcell
         f['getrowcell'] = self.getrowcell
@@ -696,6 +715,8 @@ class TableDef(simpev.SimpleEval):
             self.linedef = res
 
     def Width(self):
+        if(not self.linedef):
+            return 0
         return len(self.linedef) - 1
 
     def Height(self):
@@ -830,18 +851,28 @@ class TableDef(simpev.SimpleEval):
 
     def FormulaTargetCellIterator(self, i):
         target = self.FormulaTarget(i)
-        cell = Cell(target[0],target[1],self)
-        cellIterator = CellIterator(self,cell)
+        if(len(target) == 4):
+            cellStart = Cell(target[0],target[1],self)
+            cellEnd = Cell(target[2],target[3],self)
+            cellIterator = CellBoxIterator(self,cellStart,cellEnd)
+        else:
+            cell = Cell(target[0],target[1],self)
+            cellIterator = CellIterator(self,cell)
         return cellIterator
 
     def IsSingleTargetFormula(self,i):
         target = self.FormulaTarget(i)
-        if(isinstance(target[0],int) and isinstance(target[1],int)):
+        if(len(target) == 2 and isinstance(target[0],int) and isinstance(target[1],int)):
             return True
         return False 
 
     def AddCellToFormulaMap(self,cell,i):
-        r,c = cell
+        r,c = 1,1
+        if(isinstance(cell,Cell)):
+            r = cell.r
+            c = cell.c
+        else:
+            r,c = cell
         if(not r in self.cellToFormula):
             self.cellToFormula[r] = {}
         self.cellToFormula[r][c] = i
@@ -970,15 +1001,16 @@ def create_table(view, at=None):
     if(formula):
         sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
         first = sre.match(formulaLine)
-        lastend = len(first.group(0))
-        xline = sre.sub('',formulaLine)
-        las = xline.split('::')
-        index = 0
-        for fm in formula:
-            fend = lastend+len(las[index])
-            td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend))))
-            index += 1
-            lastend = fend + 2
+        if(first):
+            lastend = len(first.group(0))
+            xline = sre.sub('',formulaLine)
+            las = xline.split('::')
+            index = 0
+            for fm in formula:
+                fend = lastend+len(las[index])
+                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend))))
+                index += 1
+                lastend = fend + 2
         td.BuildCellToFormulaMap()
     # 
     if(td):
@@ -987,7 +1019,6 @@ def create_table(view, at=None):
         consts = {}
         if(len(constants) > 0):
             for con in constants:
-                print("CON: " + str(con))
                 cs = con.split('=')
                 if(len(cs) == 2):
                     name = cs[0].strip()
@@ -1003,10 +1034,9 @@ def create_table(view, at=None):
 
 
 def SingleFormulaIterator(table,i):
-    target = table.FormulaTarget(i)
-    cell = Cell(target[0],target[1],table)
-    cellIterator = CellIterator(table,cell)
-    for r,c in cellIterator:
+    cellIterator = table.FormulaTargetCellIterator(i) 
+    for cell in cellIterator:
+        r,c = cell.rc()
         table.SetCurRow(r)
         table.SetCurCol(c)
         val = table.Execute(i)
@@ -1014,10 +1044,9 @@ def SingleFormulaIterator(table,i):
 
 def FormulaIterator(table):
     for i in range(0,table.NumFormulas()):
-        target = table.FormulaTarget(i)
-        cell = Cell(target[0],target[1],table)
-        cellIterator = CellIterator(table,cell)
-        for r,c in cellIterator:
+        cellIterator = table.FormulaTargetCellIterator(i) 
+        for cell in cellIterator:
+            r,c = cell.rc()
             table.SetCurRow(r)
             table.SetCurCol(c)
             val = table.Execute(i)
