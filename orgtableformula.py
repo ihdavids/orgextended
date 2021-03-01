@@ -964,22 +964,26 @@ def create_table(view, at=None):
     start = row
     rowNum = 0
     lastRow = 0
+    spacesRow = 0
     for r in range(row,last_row+1):
         rowNum += 1
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
         m = RE_FMT_LINE.search(line)
+        # Found a table hline. These don't get counted
         if(RE_TABLE_HLINE.search(line)):
             hlines.append(r)
             rowNum -= 1
             if(endHeader == 1):
                 endHeader = (r - start) + 1
             continue
+        # Found a table line match and continue
         elif(RE_TABLE_LINE.search(line)):
             if(None == linedef):
                 linedef = findOccurrences(line,'|')
             lineToRow[rowNum] = r
             continue
+        # Found a formula break!
         elif(m):
             end = r-1
             formula = m.group('expr').split('::')
@@ -988,8 +992,18 @@ def create_table(view, at=None):
             lastRow = rowNum - 1
             break
         else:
-            end = r-1
-            lastRow = rowNum - 1
+            # We keep going for blank lines allowing #TBLFM lines with spaces to
+            # be okay.
+            if(line.strip() == ""):
+                if(lastRow == 0):
+                    spacesRow = r
+                    end = r-1
+                    lastRow = rowNum - 1
+                continue
+            else:
+                if(lastRow == 0):
+                    end = r-1
+                    lastRow = rowNum - 1
             break
     for r in range(row,0,-1):
         pt = view.text_point(r, 0)
@@ -1002,6 +1016,7 @@ def create_table(view, at=None):
     td = TableDef(view, start, end, linedef)
     td.hlines = hlines
     td.startRow = endHeader
+    td.spacesRow = spacesRow
     #td.linedef = linedef
     td.formulas = []
     td.formulaRow = formulaRow
@@ -1358,6 +1373,8 @@ class TableEventListener(sublime_plugin.ViewEventListener):
                 lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
                 self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
             elif('table_editor_kill_row' == command_name):
+                # This has a problem! It doesn't move the formula up!
+                # I am going to have to find the formula and delete the blank lines so it gets moved!
                 td = self.GetTable()
                 RE_ROW = re.compile("[@](?P<num>[0-9]+)")
                 line = td.formulaLine
@@ -1378,7 +1395,10 @@ class TableEventListener(sublime_plugin.ViewEventListener):
                         last = s[1]
                 out += line[last:]
                 lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
-                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+                spacesReg = lineReg
+                if(td.spacesRow > 0):
+                    spacesReg = self.view.line(self.view.text_point(td.spacesRow,0))
+                self.view.run_command("org_internal_replace", {"start": spacesReg.begin(), "end": lineReg.end(), "text": out})
             elif('table_editor_insert_row' == command_name):
                 td = self.GetTable()
                 RE_ROW = re.compile("[@](?P<num>[0-9]+)")
