@@ -21,6 +21,11 @@ import ast
 import operator as op
 
 random.seed()
+RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
+RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
+MAX_STRING_LENGTH = 100000
+MAX_COMPREHENSION_LENGTH = 10000
+MAX_POWER = 4000000  # highest exponent
 
 log = logging.getLogger(__name__)
 
@@ -195,6 +200,13 @@ def formula_rowcol(expr):
             return [[row,col],fields[1]]
     return (None, None)
 
+def numberCheck(v):
+    try:
+        float(v)
+        return True
+    except:
+        return False
+
 def isNumeric(v):
     return v.lstrip('-').isnumeric()
 
@@ -280,7 +292,13 @@ def formula_sources(expr):
 
 
 class Formula:
-    def __init__(self,expr, reg):
+    def __init__(self,expr, reg, formatters):
+        self.formatters = formatters
+        self.printfout = None
+        if(self.formatters):
+            m = RE_PRINTFSTYLE.search(self.formatters)
+            if(m):
+                self.printfout = m.group('formatter')
         self.target, self.expr = formula_rowcol(expr)
         # Never allow our expr to be empty. If we failed to parse it our EXPR is current cell value
         if(self.expr == None):
@@ -290,6 +308,8 @@ class Formula:
         self.expr = replace_cell_references(self.expr.replace("..","//"))
         self.formula   = expr
         self.reg = reg 
+    def EmptyIsZero(self):
+        return 'N' in self.formatters
 
 def CellRowIterator(table,start,end):
     c = table.CurCol()
@@ -383,6 +403,9 @@ class Cell:
             elif(self.r.startswith("<")):
                 cnt = len(self.r.strip())
                 r = self.table.StartRow() + (cnt-1)
+            else:
+                if(numberCheck(self.r)):
+                    r = int(self.r)
         elif(self.r < 0):
             r = self.table.CurRow() + self.r
         elif(self.r == 0):
@@ -408,6 +431,9 @@ class Cell:
             elif(self.c.startswith("<")):
                 cnt = len(self.c.strip())
                 c = self.table.StartCol() + (cnt-1)
+            else:
+                if(numberCheck(self.c)):
+                    c = int(self.c)
         elif(self.c < 0):
             c = self.table.CurCol() + self.c
         elif(self.c == 0):
@@ -486,7 +512,7 @@ def tsub(a, b):  # pylint: disable=invalid-name
     return GetVal(a) - GetVal(b)
 
 def tdiv(a, b):  # pylint: disable=invalid-name
-    return GetVal(a) / GetVal(b)
+    return GetNum(a) / GetNum(b)
 
 def tmod(a, b):  # pylint: disable=invalid-name
     return GetVal(a) % GetVal(b)
@@ -560,6 +586,30 @@ def vmin(rng):
             m = num
     return m
 
+def myfloor(num):
+    v = GetNum(num)
+    if(isinstance(v,float)):
+        return math.floor(v)
+    return num 
+
+def myceil(num):
+    v = GetNum(num)
+    if(isinstance(v,float)):
+        return math.ceil(v)
+    return num 
+
+def myround(num):
+    v = GetNum(num)
+    if(isinstance(v,float)):
+        return round(v,0)
+    return num 
+
+def mytrunc(num):
+    v = GetNum(num)
+    if(isinstance(v,float)):
+        return int(v)
+    return num 
+
 def randomDigit(start, end):
     return random.randint(GetVal(start),GetVal(end))
 
@@ -577,6 +627,30 @@ def cos(cell):
 
 def exp(cell):
     return math.exp(GetNum(cell))
+
+def remote(name,cellRef):
+    view = sublime.active_window().active_view()
+    if(view):
+        node = db.Get().AtInView(view)
+        if(node):
+            names = node.names
+            if(names and name in names):
+                row = names[name]['row']
+                last_row = view.lastRow()
+                for r in range(row,last_row):
+                    pt = view.text_point(r, 0)
+                    line = view.substr(view.line(pt))
+                    m = RE_ISCOMMENT.search(line)
+                    if(m):
+                        continue
+                    elif(line.strip() == ""):
+                        continue
+                    else:
+                        row = r
+                        break
+                td = create_table(view,view.text_point(row,0))
+                text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
+                return text
 
 # ============================================================
 class RangeExprOnNonCells(simpev.InvalidExpression):
@@ -624,7 +698,13 @@ class TableDef(simpev.SimpleEval):
         # TODO: Look up cell names FIRST
         #       but only once we have the advanced features
         if(name in self.consts):
-            return self.consts[name]
+            v = self.consts[name].strip()
+            if(numberCheck(v)):
+                if('.' in v):
+                    return float(v)
+                else:
+                    return int(v)
+            return v
 
     def add_cell_names(self,names,start,end,linedef):
         pass
@@ -655,6 +735,10 @@ class TableDef(simpev.SimpleEval):
         f['cos'] = cos
         f['sin'] = sin
         f['exp'] = exp
+        f['floor'] = myfloor
+        f['ceil'] = myceil
+        f['round'] = myround
+        f['trunc'] = mytrunc
         f['ridx'] = self.ridx
         f['cidx'] = self.cidx
         f['randomf'] = randomFloat
@@ -663,6 +747,7 @@ class TableDef(simpev.SimpleEval):
         f['getcell'] = self.getcell
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
+        f['remote'] = remote
 
     def add_operators(self,o):
         o[ast.Mult] = safe_mult
@@ -706,6 +791,7 @@ class TableDef(simpev.SimpleEval):
         self.cellToFormula = None
         self.accessList = []
         self.consts = {}
+        self.emptyiszero = False
 
     def RecalculateTableDimensions(self):
         res = recalculate_linedef(self.view,self.start)
@@ -745,7 +831,11 @@ class TableDef(simpev.SimpleEval):
         reg = self.FindCellRegion(r,c)
         if(reg):
             text = self.view.substr(reg)
+            if(self.emptyiszero and text.strip() == ""):
+                return "0"
             return text
+        if(self.emptyiszero):
+            return "0"
         return ""
     def FindCellRegion(self,r,c):
         if(not r in self.lineToRow):
@@ -855,8 +945,13 @@ class TableDef(simpev.SimpleEval):
         dm = self.formulas[i]
         return dm.target
 
+    def ValidateFormulaCells(self,i):
+        if("INVALID" in self.formulas[i].formula):
+            sublime.status_message("ORG Table WARNING: Formula {0} is targetting an invalid cell!".format(i))
+
     def FormulaTargetCellIterator(self, i):
         target = self.FormulaTarget(i)
+        self.ValidateFormulaCells(i)
         if(len(target) == 4):
             cellStart = Cell(target[0],target[1],self)
             cellEnd = Cell(target[2],target[3],self)
@@ -901,7 +996,10 @@ class TableDef(simpev.SimpleEval):
     def Execute(self, i):
         self.accessList = []
         try:
+            self.emptyiszero = self.formulas[i].EmptyIsZero()
             val = self.eval(self.formulas[i].expr)
+            if(val and isinstance(val,Cell)):
+                val = val.GetVal()
             return val
         except:
             log.error("TABLE ERROR: %s",traceback.format_exc())
@@ -913,6 +1011,10 @@ class TableDef(simpev.SimpleEval):
             formulaIdx = self.CellToFormula(cell)
             return formulaIdx
         return None
+    def FormulaFormatter(self,i):
+        dm = self.formulas[i]
+        return dm.printfout
+
 
 def findOccurrences(s, ch):
     return [i for i, letter in enumerate(s) if letter == ch]
@@ -1035,28 +1137,35 @@ def create_table(view, at=None):
             las = xline.split('::')
             index = 0
             for fm in formula:
+                formatters = fm.split(';')
+                if(len(formatters) > 1):
+                    fm = formatters[0]
+                    formatters = formatters[1]
+                else:
+                    formatters = ""
                 fend = lastend+len(las[index])
-                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend))))
+                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend)),formatters))
                 index += 1
                 lastend = fend + 2
         td.BuildCellToFormulaMap()
     # 
     if(td):
         node = db.Get().At(view, start_row)
-        constants = node.list_comment('CONSTANTS',[])
-        consts = {}
-        if(len(constants) > 0):
-            for con in constants:
-                cs = con.split('=')
-                if(len(cs) == 2):
-                    name = cs[0].strip()
-                    val  = cs[1].strip()
-                    consts[name] = val
-        props = node.properties
-        if(props):
-            for k,v in props.items():
-                consts['PROP_'+k] = v
-        td.consts = consts
+        if(node):
+            constants = node.list_comment('CONSTANTS',[])
+            consts = {}
+            if(constants and len(constants) > 0):
+                for con in constants:
+                    cs = con.split('=')
+                    if(len(cs) == 2):
+                        name = cs[0].strip()
+                        val  = cs[1].strip()
+                        consts[name] = val
+            props = node.properties
+            if(props and len(props) > 0):
+                for k,v in props.items():
+                    consts['PROP_'+k] = v
+            td.consts = consts
 
     return td
 
@@ -1078,7 +1187,7 @@ def FormulaIterator(table):
             table.SetCurRow(r)
             table.SetCurCol(c)
             val = table.Execute(i)
-            yield (r,c,val,table.FindCellRegion(r,c))
+            yield (r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i))
     return None
 
 # ================================================================================
@@ -1099,7 +1208,9 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         if(None == self.result):
             self.on_done()
             return
-        r,c,val,reg = self.result
+        r,c,val,reg,fmt = self.result
+        if(val and isinstance(val,float) and fmt and "%" in fmt):
+            val = fmt % val
         #print("REPLACING WITH: " + str(val))
         self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
 
@@ -1231,7 +1342,6 @@ class TableEventListener(sublime_plugin.ViewEventListener):
     
     def wasLastRow(self,td):
         rc = self.preCell[0] >= td.Height()
-        print(str(rc))
         return rc
 
     def wasFirstCol(self):
@@ -1249,14 +1359,11 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         r = self.preRow
         pre = r+1
         rc = (pre in self.hlines)
-        print("PP: " + str(rc))
-        print(str(self.hlines))
         return rc
 
     def wasHLine(self):
         r = self.preRow
         rc = (r in self.hlines)
-        print("PP2: " + str(rc))
         return rc
 
     def on_text_command(self, command_name, args=None):
