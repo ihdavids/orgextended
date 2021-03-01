@@ -748,6 +748,8 @@ class TableDef(simpev.SimpleEval):
             return text
         return ""
     def FindCellRegion(self,r,c):
+        if(not r in self.lineToRow):
+            return None
         row = self.lineToRow[r]
         #row = self.start + (r-1)       # 1 is zero
         colstart = self.linedef[c-1] 
@@ -758,8 +760,9 @@ class TableDef(simpev.SimpleEval):
             it = RCIterator(self,cell[0],cell[1])
             for cc in it:
                 reg = self.FindCellRegion(*cc)
-                style = "orgagenda.week." + str(color)
-                self.view.add_regions("cell_"+str(cc[0])+"_"+str(cc[1]),[reg],style,"",sublime.DRAW_NO_FILL)
+                if(reg):
+                    style = "orgagenda.week." + str(color)
+                    self.view.add_regions("cell_"+str(cc[0])+"_"+str(cc[1]),[reg],style,"",sublime.DRAW_NO_FILL)
 
     def HighlightFormulaRegion(self,i,color=3):
         style = "orgagenda.week." + str(color)
