@@ -91,6 +91,101 @@ class OrgConvertSelectionToTableCommand(sublime_plugin.TextCommand):
         if(len(fileData) > 6):
             insert_file_data(level,fileData,self.view, self.edit, evt.Make(self.OnDone), True)
 
+table_phantoms = []
+
+class OrgHideTableRowsCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        for f in table_phantoms:
+            self.view.erase_phantoms(f)
+        self.OnDone()
+
+
+class OrgShowTableRowsCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+
+    def ToRomanNumeral(self,input):
+        if not 0 < input < 4000:
+            raise ValueError("Argument must be between 1 and 3999")
+        ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
+        nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
+        result = []
+        for i in range(len(ints)):
+            count = int(input / ints[i])
+            result.append(nums[i] * count)
+            input -= ints[i] * count
+        return ''.join(result)
+
+    def RowToCellRow(self,r):
+        for i in range(1,len(self.td.lineToRow)+1):
+            if(self.td.lineToRow[i] == r):
+                return str(i)
+        count = 0;
+        for h in self.td.hlines:
+            if h == r:
+                return self.ToRomanNumeral(count+1)
+            ++count
+        return "U"
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.td = create_table(self.view)
+        if(self.td):
+            hline = self.td.start-1
+            if(self.td.hlines and len(self.td.hlines) > 0):
+                hline = self.td.hlines[0]
+            line = self.view.line(self.view.text_point(self.td.start,0))
+            indent = self.view.substr(line).find("|")
+            for r in range(self.td.start,self.td.end+1):
+                pt = self.view.text_point(r,indent)
+                region = sublime.Region(pt,pt)
+                idx = self.RowToCellRow(r)
+                body = """
+                <body id="table-index-popup">
+                <style>
+                    div.heading {{
+                        color: #880077;
+                        padding: 0px;
+                        font-weight: bold;
+                        }}
+                </style>
+                <div class="heading">{0}</div>
+                </body>
+                """.format(idx)
+                key = "table_" + str(self.td.start) + "_row_" + str(r)
+                table_phantoms.append(key)
+                self.view.add_phantom("table_" + str(self.td.start) + "_row_" + str(r),region,body,sublime.LAYOUT_INLINE)
+                for c in range(1,self.td.Width()+1):
+                    if(not idx.isnumeric()):
+                        break
+                    print("II: " + str(idx) + "x" + str(c))
+                    reg = self.td.FindCellRegion(int(idx),c)
+                    if(not reg):
+                        continue
+                    row,col = self.view.rowcol(reg.begin())
+                    pt1 = self.view.text_point(row,col)
+                    pt2 = self.view.text_point(self.td.end,col)
+                    region = sublime.Region(pt1,pt1)
+                    body = """
+                    <body id="table-index-popup">
+                    <style>
+                        div.heading {{
+                            color: #880077;
+                            padding: 0px;
+                            font-weight: bold;
+                            }}
+                    </style>
+                    <div class="heading">{0}</div>
+                    </body>
+                    """.format(c)
+                    key = "table_" + str(self.td.start) + "_row_"+str(r)+"_col_" + str(c)
+                    table_phantoms.append(key)
+                    self.view.add_phantom(key,region,body,sublime.LAYOUT_INLINE)
+                #p = Phantom(region, content, sublime.LAYOUT_INLINE)
+                #phantoms.append(p)
+        self.OnDone()
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
     def OnFile(self, filename=None):

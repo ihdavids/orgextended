@@ -76,6 +76,7 @@
   - [Scheduling](https://github.com/ihdavids/orgextended_docs/blob/master/dates.org) - Dates and times
   - [Time Tracking](https://github.com/ihdavids/orgextended_docs/blob/master/clocking.org) - Clocking and clock reports
   - [Dynamic Blocks](https://github.com/ihdavids/orgextended_docs/blob/master/dynamicblocks.org) - Run arbitrary code
+  - [Tables](https://github.com/ihdavids/orgextended_docs/blob/master/tables.org) - Spreadsheet like capabilities
   - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
 
   The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
