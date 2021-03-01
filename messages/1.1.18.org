@@ -1,0 +1,2 @@
+* 1.1.18
+	- Line and column visualization using phantoms
