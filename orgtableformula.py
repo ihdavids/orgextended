@@ -845,6 +845,9 @@ class TableDef(simpev.SimpleEval):
             self.HighlightCells([[r,c]],2)
         self.HighlightFormulaRegion(i)
 
+    def GetFormula(self,i):
+        return self.formulas[i]
+
     def FormulaTarget(self, i):
         dm = self.formulas[i]
         return dm.target
@@ -900,6 +903,13 @@ class TableDef(simpev.SimpleEval):
         except:
             log.error("TABLE ERROR: %s",traceback.format_exc())
             return "<ERR>"
+
+    def GetFormulaAt(self):
+        cell = self.CursorToCell()
+        if(cell):
+            formulaIdx = self.CellToFormula(cell)
+            return formulaIdx
+        return None
 
 def findOccurrences(s, ch):
     return [i for i, letter in enumerate(s) if letter == ch]
@@ -960,7 +970,7 @@ def create_table(view, at=None):
         line = view.substr(view.line(pt))
         m = RE_FMT_LINE.search(line)
         if(RE_TABLE_HLINE.search(line)):
-            hlines.append(row)
+            hlines.append(r)
             rowNum -= 1
             if(endHeader == 1):
                 endHeader = (r - start) + 1
@@ -1113,11 +1123,9 @@ class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
     def run(self,edit):
         td = create_table(self.view)
         td.ClearAllRegions()
-        cell = td.CursorToCell()
-        if(cell):
-            formulaIdx = td.CellToFormula(cell)
-            if(None != formulaIdx):
-                td.HighlightFormula(formulaIdx)
+        formulaIdx = td.GetFormulaAt()
+        if(None != formulaIdx):
+            td.HighlightFormula(formulaIdx)
 
 # ================================================================================
 class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
@@ -1174,7 +1182,15 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         self.showing = False
         self.at = None
         self.lastpt = None
-    
+   
+    def GetTable(self):
+        # TODO: Create table cache
+        if(isTable(self.view)):
+            td = create_table(self.view)
+            return td
+        return None
+
+
     def on_selection_modified(self):
         if(self.lastpt and self.lastpt == self.view.sel()[0].begin()):
             return
@@ -1192,6 +1208,237 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             self.view.run_command("org_clear_table_regions", {'at': self.at})
             self.showing = False
 
+    def wasFirstRow(self):
+        return self.preCell[0] <= 1
+    
+    def wasLastRow(self,td):
+        rc = self.preCell[0] >= td.Height()
+        print(str(rc))
+        return rc
+
+    def wasFirstCol(self):
+        return self.preCell[1] <= 1
+    
+    def wasLastCol(self,td):
+        return self.preCell[1] >= td.Width()
+
+    def wasPostToHLine(self):
+        r = self.preRow
+        prior = r-1
+        return (prior in self.hlines)
+    
+    def wasPreToHLine(self):
+        r = self.preRow
+        pre = r+1
+        rc = (pre in self.hlines)
+        print("PP: " + str(rc))
+        print(str(self.hlines))
+        return rc
+
+    def wasHLine(self):
+        r = self.preRow
+        rc = (r in self.hlines)
+        print("PP2: " + str(rc))
+        return rc
+
+    def on_text_command(self, command_name, args=None):
+        if('table_editor' in command_name):
+            td = self.GetTable()
+            self.preCell = None
+            self.preRow,col = self.view.curRowCol()
+            if(td):
+                self.preCell = td.CursorToCell()
+                self.hlines  = td.hlines
+    def on_post_text_command(self, command_name, args= None):
+        if(hasattr(self,'preCell') and self.preCell != None):
+            if('table_editor_move_row_up' == command_name):
+                # Also if pre was an hline
+                if(self.wasFirstRow() or self.wasHLine() or self.wasPostToHLine()):
+                    return
+                # 2 rows flipped
+                td = self.GetTable()
+                RE_ROW = re.compile("[@](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num == self.preCell[0]):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    elif(num == (self.preCell[0]-1)):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_move_row_down' == command_name):
+                # Also if pre was an hline
+                td = self.GetTable()
+                if(self.wasLastRow(td) or self.wasHLine() or self.wasPreToHLine()):
+                    return
+                # 2 rows flipped
+                RE_ROW = re.compile("[@](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num == self.preCell[0]):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    elif(num == (self.preCell[0]+1)):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_move_column_left' == command_name):
+                if(self.wasFirstCol()):
+                    return
+                # 2 cols flipped
+                td = self.GetTable()
+                RE_ROW = re.compile("[$](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num == self.preCell[1]):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    elif(num == (self.preCell[1]-1)):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_move_column_right' == command_name):
+                td = self.GetTable()
+                if(self.wasLastCol(td)):
+                    return
+                # 2 cols flipped
+                RE_ROW = re.compile("[$](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num == self.preCell[1]):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    elif(num == (self.preCell[1]+1)):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_kill_row' == command_name):
+                td = self.GetTable()
+                RE_ROW = re.compile("[@](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num > self.preCell[0]):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    if(num == self.preCell[0]):
+                        out += line[last:s[0]] + "@INVALID"
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_insert_row' == command_name):
+                td = self.GetTable()
+                RE_ROW = re.compile("[@](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num >= self.preCell[0]):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "@" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_delete_column' == command_name):
+                td = self.GetTable()
+                RE_ROW = re.compile("[$](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num > self.preCell[1]):
+                        newNum = num - 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    if(num == self.preCell[1]):
+                        out += line[last:s[0]] + "$INVALID"
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
+            elif('table_editor_insert_column' == command_name):
+                td = self.GetTable()
+                RE_ROW = re.compile("[$](?P<num>[0-9]+)")
+                line = td.formulaLine
+                out = ""
+                last = 0
+                for m in RE_ROW.finditer(line):
+                    s = m.span()
+                    num = int(m.group('num'))
+                    if(num >= self.preCell[1]):
+                        newNum = num + 1
+                        out += line[last:s[0]] + "$" + str(newNum)
+                        last = s[1]
+                    else:
+                        out += line[last:s[1]]
+                        last = s[1]
+                out += line[last:]
+                lineReg = self.view.line(self.view.text_point(td.formulaRow,0))
+                self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
 
 
 
