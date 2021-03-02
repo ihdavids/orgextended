@@ -303,13 +303,13 @@ def numberCheck(v):
         return False
 
 def isNumeric(v):
-    return v.lstrip('-').isnumeric()
+    return v.lstrip('-').lstrip('+').isnumeric()
 
 def isFunc(v):
     return 'ridx()' in v or 'cidx()' in v
 
 # TODO: Make funciton cells work!
-RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>[-]?[0-9><#]+)[$](?P<col>([-]?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
+RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>((?P<rosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>((?P<cosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>(?P<rsign>[+-])?[0-9><#]+)[$](?P<col>((?P<csign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
 RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
 RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
@@ -322,26 +322,34 @@ def replace_cell_references(expr):
         if(m):
             row = m.group('row')
             col = m.group('col')
+            rs  = m.group('rsign')
+            cs  = m.group('csign')
             end = m.group('end')
             if(not end):
                 end = ""
             if not row and not col:
                 row = m.group('rowonly')
                 if(row):
+                    rs = m.group('rosign')
+                    rs = '1' if rs else '0'
                     if(isNumeric(row) or isFunc(row)):
-                        expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ')' + end,expr,1)
+                        expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ',' + rs + ')' + end,expr,1)
                     else:
-                        expr = RE_TARGET_A.sub('getrowcell(\'' + str(row) + '\')' + end,expr,1)
+                        expr = RE_TARGET_A.sub('getrowcell(\'' + str(row) + '\''+","+rs+')' + end,expr,1)
                 else:
                     col = m.group('colonly')
+                    cs = m.group('cosign')
+                    cs = '1' if cs else '0'
                     if(isNumeric(col) or isFunc(col)):
-                        expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ')' + end,expr,1)
+                        expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ',' + cs + ')' + end,expr,1)
                     else:
-                        expr = RE_TARGET_A.sub('getcolcell(\'' + str(col) + '\')' + end,expr,1)
+                        expr = RE_TARGET_A.sub('getcolcell(\'' + str(col) + '\'' +","+cs+ ')' + end,expr,1)
             else:
                 rowmarkers = '' if not isNumeric(row) or isFunc(row) else '\''
                 colmarkers = '' if not isNumeric(col) or isFunc(col) else '\''
-                expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + colmarkers + str(col) + colmarkers + ")" + end,expr,1)
+                cs = '1' if cs else '0'
+                rs = '1' if rs else '0'
+                expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + rs + "," + colmarkers + str(col) + colmarkers + "," + cs + ")" + end,expr,1)
         else:
             break
     while(True):
@@ -469,10 +477,12 @@ def RCIterator(table,r,c):
 
 # ============================================================
 class Cell:
-    def __init__(self,r,c,table):
+    def __init__(self,r,c,table,rrelative=0,crelative=0):
         self.r = r
         self.c = c
         self.table = table
+        self.rrelative = rrelative
+        self.crelative = crelative
 
     def __str__(self):
         return self.GetText()
@@ -501,7 +511,7 @@ class Cell:
             else:
                 if(numberCheck(self.r)):
                     r = int(self.r)
-        elif(self.r < 0):
+        elif(self.r < 0 or self.rrelative):
             r = self.table.CurRow() + self.r
         elif(self.r == 0):
             return self.table.CurRow()
@@ -529,7 +539,7 @@ class Cell:
             else:
                 if(numberCheck(self.c)):
                     c = int(self.c)
-        elif(self.c < 0):
+        elif(self.c < 0 or self.crelative):
             c = self.table.CurCol() + self.c
         elif(self.c == 0):
             return self.table.CurCol()
@@ -780,14 +790,14 @@ class TableDef(simpev.SimpleEval):
     def cidx(self):
         return self.CurCol()
 
-    def getrowcell(self,r):
-        return Cell(r,'*',self)
+    def getrowcell(self,r,relative):
+        return Cell(r,'*',self,relative,0)
 
-    def getcolcell(self,c):
-        return Cell('*',c,self)
+    def getcolcell(self,c,relative):
+        return Cell('*',c,self,0,relative)
 
-    def getcell(self,r,c):
-        return Cell(r,c,self)
+    def getcell(self,r,c,rrelative,crelative):
+        return Cell(r,c,self,rrelative,crelative)
 
     def symbolOrCell(self,name):
         # TODO: Look up cell names FIRST

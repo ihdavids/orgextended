@@ -3,6 +3,12 @@
 	- A crude stab at a table visualization
 	- "Org Show Table Rows" - will show a set of phantoms that ID the rows and columns to help when authoring formulas
 	- "Org Hide Table Rows" - will hide the phantoms.
+    - Fixed positive relative offsets, they were not working:
+
+    | a | b | c | d | e | f |
+    | 4 | 5 | 6 | 7 | 8 | 9 |
+    | 1 | 2 | 3 | 4 | 5 | 6 |
+    #+TBLFM:@2= @+1+3
     
     Things that work:
     - Evaluation of rows and columns with basic arithmetic
@@ -26,3 +32,4 @@
     - Advanced tabled features / Named fields
     - gnu plot support
     - more functions
+

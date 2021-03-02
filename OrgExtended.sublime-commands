@@ -120,6 +120,8 @@
     {"caption": "Org Clear Table Highlights",  "command": "org_clear_table_regions"           },
     {"caption": "Org Highlight Formula",       "command": "org_highlight_formula"             },
     {"caption": "Org Eval Cell",               "command": "org_fill_in_formula_from_cell"     },
+    {"caption": "Org Show Table Rows",         "command": "org_show_table_rows"               },
+    {"caption": "Org Hide Table Rows",         "command": "org_hide_table_rows"               },
     //{"caption": "Org Test Thing",              "command": "org_show_item"  },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },
