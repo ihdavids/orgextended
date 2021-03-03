@@ -15,6 +15,7 @@ import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 import OrgExtended.orginsertselected as ins
 import OrgExtended.simple_eval as simpev
+import OrgExtended.orgextension as ext
 import math
 import random
 import ast
@@ -36,6 +37,34 @@ def isTable(view):
 def isTableFormula(view):
     names = view.scope_name(view.sel()[0].end())
     return 'orgmode.tblfm' in names
+
+class TableCache:
+    def __init__(self):
+        self.cachedTables = []
+        self.change_count = -1
+
+    def _FindTable(self,row,view):
+        if(self.change_count >= view.change_count()):
+            for t in self.cachedTables:
+                if row >= t[0][0] and row <= t[0][1]:
+                    return t[1]
+        else:
+            self.change_count = view.change_count()
+            self.cachedTables = []
+        return None
+
+    def GetTable(self,view,at=None):
+        row = view.curRow()
+        if(at != None):
+            row,_ = view.rowcol(at)
+        td = self._FindTable(row,view)
+        if(not td):
+            td = create_table(view,at)
+            self.cachedTables.append(((td.start,td.end),td))
+        return td
+
+tableCache = TableCache()
+
 
 def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     # figure out what our separator is.
@@ -160,7 +189,7 @@ class OrgShowTableRowsCommand(sublime_plugin.TextCommand):
                 for c in range(1,self.td.Width()+1):
                     if(not idx.isnumeric()):
                         break
-                    print("II: " + str(idx) + "x" + str(c))
+                    #print("II: " + str(idx) + "x" + str(c))
                     reg = self.td.FindCellRegion(int(idx),c)
                     if(not reg):
                         continue
@@ -854,6 +883,13 @@ class TableDef(simpev.SimpleEval):
         f['getcolcell'] = self.getcolcell
         f['remote'] = remote
 
+    def add_dynamic_functions(self,f):
+        dynamic = ext.find_extension_modules('orgtable', [])
+        for k in dynamic.keys():
+            if(hasattr(dynamic[k],"Execute")):
+                f[k] = dynamic[k].Execute
+            else:
+                log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
     def add_operators(self,o):
         o[ast.Mult] = safe_mult
         o[ast.Add]  = safe_add
@@ -884,6 +920,7 @@ class TableDef(simpev.SimpleEval):
         names = simpev.DEFAULT_NAMES.copy()
         self.add_operators(operators)
         self.add_functions(functions)
+        self.add_dynamic_functions(functions)
         self.add_constants(names)
         self.add_cell_names(names,start,end,linedef)
         super(TableDef,self).__init__(operators, functions, names)
@@ -1340,26 +1377,32 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
 # ================================================================================
 class OrgClearTableRegionsCommand(sublime_plugin.TextCommand):
     def run(self,edit,at=None):
-        self.td = create_table(self.view, at)
-        self.td.ClearAllRegions()
+        global tableCache
+        self.td = tableCache.GetTable(self.view,at)
+        if(self.td):
+            self.td.ClearAllRegions()
 
 # ================================================================================
 class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
     def run(self,edit):
-        td = create_table(self.view)
-        td.ClearAllRegions()
-        i = td.CursorToFormula()
-        if(None != i):
-            td.HighlightFormula(i)
+        global tableCache
+        td = tableCache.GetTable(self.view)
+        if(td):
+            td.ClearAllRegions()
+            i = td.CursorToFormula()
+            if(None != i):
+                td.HighlightFormula(i)
 
 # ================================================================================
 class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
     def run(self,edit):
-        td = create_table(self.view)
-        td.ClearAllRegions()
-        formulaIdx = td.GetFormulaAt()
-        if(None != formulaIdx):
-            td.HighlightFormula(formulaIdx)
+        global tableCache
+        td = tableCache.GetTable(self.view)
+        if(td):
+            td.ClearAllRegions()
+            formulaIdx = td.GetFormulaAt()
+            if(None != formulaIdx):
+                td.HighlightFormula(formulaIdx)
 
 # ================================================================================
 class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
@@ -1397,6 +1440,7 @@ class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
         self.view.run_command('table_editor_align')
         sublime.set_timeout(self.on_reformat,1)
 
+
 # ================================================================================
 class TableEventListener(sublime_plugin.ViewEventListener):
 
@@ -1416,14 +1460,13 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         self.showing = False
         self.at = None
         self.lastpt = None
-   
+        global tableCache
+        self.tableCache = tableCache
+  
     def GetTable(self):
-        # TODO: Create table cache
         if(isTable(self.view)):
-            td = create_table(self.view)
-            return td
+            return tableCache.GetTable(self.view)
         return None
-
 
     def on_selection_modified(self):
         if(self.lastpt and self.lastpt == self.view.sel()[0].begin()):
@@ -1676,5 +1719,3 @@ class TableEventListener(sublime_plugin.ViewEventListener):
                 self.view.run_command("org_internal_replace", {"start": lineReg.begin(), "end": lineReg.end(), "text": out})
 
 
-
-    

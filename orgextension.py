@@ -57,12 +57,12 @@ def find_extension_modules(folder, builtins):
 		module = load_module("OrgExtended", folder, filename)
 		moduleTable[filename.split('.')[0]] = module
 	# User generated extensions
-	path = base + '/../User/' + folder
+	path = os.path.join(base,'User',folder)
 	for root, dirnames, filenames in os.walk(path):
 		for filename in fnmatch.filter(filenames, '*.py'):
 			if '__init__' in filename or 'abstract' in filename:
 				continue
-			module = load_module("OrgExtended", folder, filename)
+			module = load_module("User", folder, filename)
 			moduleTable[filename.split('.')[0]] = module
 	return moduleTable
 
