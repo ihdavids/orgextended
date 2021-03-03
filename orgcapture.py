@@ -401,14 +401,13 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                     self.pt = linev.begin()
                 panel.sel().clear()
                 panel.sel().add(self.pt)
-                level = insertAt.level
+                self.level = insertAt.level
             else:
                 window.run_command('show_panel', args={'panel': 'output.orgcapture'})
-            self.level = level
-            if(self.openas and level > 0):
+            if(self.openas and self.level > 0):
                 self.index = index
                 self.panel = panel
-                self.panel.Insert(self.pt, prefix + ("*" * level), evt.Make(self.on_added_stars))
+                self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:
                 self.insert_snippet(index)
 
