@@ -1,4 +1,10 @@
-* TODO Things I want [11/41]
+* TODO Things I want [18/42]
+	- [ ] Extensibility [0/4]
+		- [ ] Avoid reloading when files do not change
+		- [ ] Similar folder names for all extensions in User folder
+		- [ ] Document all extensibility in user folder (and test it)
+		- [ ] Symbol and function table is only created once and reused. 
+		- [ ] Document all items available in the settings file. (Might be best just to do this in the settings file?)
 	- [ ] Named Objects [0%]
 		- [ ] Works with babel
 		- [ ] Identifies tables and other things
@@ -10,12 +16,14 @@
 			- [x] *Capture manages level properly (BROKEN)*
 		- [x] Capture using sublime snippets
 		- [ ] Capture panel size controls?
+		- [ ] Capture with view vs panel (better for neovintageous users)
 	- [-] Parsing [4/5]
 		- [x] Basic file parsing
 		- [x] Tags parsed.
 		- [x] Comments (#+) available
 		- [x] Positions available
 		- [ ] Stripping to keep in memory size down.
+		- [ ] Folding on unsaved files seems to have a problem sometimes
 	- [-] Refiling [2/3]
 		- [x] Basic Refile support
 		- [x] Basic Copy support
@@ -41,7 +49,7 @@
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
 	- [x] Numbered Lists
-	- [-] Editing [12/14]
+	- [-] Editing [13/14]
 		- [ ] Todo cycling
 		- [x] Todo menu
 		- [x] Priority menu
@@ -49,20 +57,22 @@
 		- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
 		- [x] Caret looks okay
 		- [x] Indent, De-Indent heading and subtree
-		- [ ] Heading movement, like you can do with lines
+		- [x] Heading movement, like you can do with lines
 		- [x] Checkbox insert?
 		- [x] Sublime snippets?
 		- [x] Auto indenting of checkboxes (with tab)
 		- [x] Property insertion
 		- [x] Fix Tag Insertion (tooltip is broken for some reason)
 		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
-	- [-] Links [9/17]
+	- [-] Links [11/19]
 		- [x] Orgmode style links
 		- [x] images displayed inline
 		- [ ] #+ATTR_ORG: :width 100 supported for images
 		- [x] Single entry links vs with description (don't auto fold)
 		- [x] Follow links on various platforms.
-		- [ ] Link copy and insertion
+		- [x] Link copy
+		- [ ] Link insertion
+		- [x] Link snippet
 		- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
 		- [ ] Links in templates.
 		- [x] Ensure file: works (currently doesn't work that well)
@@ -83,13 +93,32 @@
 		- [ ] Strings?
 		- [ ] Finish the babel work.
 		- [ ] Htmlify
-	- [-] Tables [1/5]
+	- [-] Tables [16/23]
 		- [x] Basic table editing (Table Edit?)
-		- [ ] Syntax highlighting of tables
+		- [x] Syntax highlighting of tables
+		- [x] Formula highlighting in tables
 		- [ ] Bold headers in tables
-		- [ ] Table formats
+		- [x] Table formats
 		- [ ] Table parameters to execution blocks
+		- [x] Relative offsets in tables
+		- [x] In cell formulas
+		- [x] From edge symbols
+		- [x] Date time calc functions
+		- [x] Start column for column formulas
+		- [x] Range operator for cells
+		- [x] Range targets for cells
+		- [x] HLine indexes
+		- [x] Table visualization
+		- [x] Table resizing updates formulas
+		- [x] Extensible functions for tables
+		- [x] Documentation page for tables
+		- [ ] Extensible symbols for tables
+		- [ ] Advanced table features
+		- [ ] Gnu Plot Support
+		- [ ] Table cache handles multiple files.
+		- [ ] Remote keyword handles tables in other files.
 	- [x] Checkbox summary updating
+		- [x] Recursive mode for checkbox summaries (1.1.19)
 	- [x] Checkbox percentages
 	- [-] Dynamic Blocks [3/5]
 		- [x] Basic dynamic blocks
@@ -98,7 +127,7 @@
 		- [x] Clock reports
 		- [ ] execute all dynamic blocks in file command
 	- [x] Basic Clocking
-	- [-] Agenda [7/8]
+	- [x] Agenda [8/8]
 		- [x] Todo list (dynamic)
 		- [x] Extensible agenda views
 		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
@@ -106,7 +135,7 @@
 		- [x] More extensible views.
 		- [x] Week View
 		- [x] Calendar is selectable for day view?
-		- [ ] Formatting for today line in day view?
+		- [x] Formatting for today line in day view?
 	- [-] Agenda Notifications [2/4]
 	    - [x] Windows Support
 	    - [ ] Fully customizable
@@ -131,22 +160,22 @@
 		- [x] Example block snippet
 	- [x] Quotes
 	- [x] Src blocks (more languages finish the color scheme)
-	- [ ] Symbol indexing for headers
+	- [x] Symbol indexing for headers
 	- [x] Color highlighting for #+ symbols
 	- [x] Image display? Is that possible?
-	- [-] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
+	- [x] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
 	- [ ] Persistent folding between open and close
-	- [ ] Agenda? Integration with existing plugin?
+	- [x] Agenda? Integration with existing plugin?
 	- [ ] Jira integration?
 	- [ ] Google calendar integration?
 	- [ ] Searching by tag (like occur style?)
-	- [-] Export... probably refer and document using pandoc?
+	- [x] Export... probably refer and document using pandoc?
 		- [x] Reveal.js support
-		- [-] Export subtree
+		- [x] Export subtree
 	- [ ] Presentation mode from a file.
 	- [ ] Column view (Is this possible in sublime?)
 	- [ ] Effort Estimate
-	- [-] Vintageous bindings
+	- [x] Vintageous bindings
 
 * TODO Next
 ** TODO Agenda
