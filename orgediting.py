@@ -564,22 +564,27 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
+        needsNewline = False
         if(not curNode):
             level = 1
             here = sublime.Region(self.view.size(),self.view.size())
             reg  = here
         else:
             level = curNode.level
-            reg = curNode.region(self.view)
+            reg = curNode.region(self.view,True)  # trim ending whitespace
             if(level == 0):
                 level = 1
                 here = sublime.Region(view.size(),view.size())
             else:
                 here = sublime.Region(reg.end(),reg.end())
+                text = self.view.substr(self.view.line(here))
+                if(text.strip() != ""):
+                    needsNewline = True
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
-        self.view.insert(edit,self.view.sel()[0].begin(),'\n')
+        if(needsNewline):
+            self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
         self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str(level)+".sublime-snippet"})
@@ -588,6 +593,7 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         curNode = db.Get().AtInView(self.view)
+        needsNewline = False
         if(not curNode):
             file = db.Get().FindInfo(self.view)
             if(len(file.org) > 0):
@@ -599,16 +605,20 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
             reg  = here
         else:
             level = curNode.level
-            reg = curNode.region(self.view)
+            reg = curNode.region(self.view, True)
             if(level == 0):
                 level = 1
                 here = sublime.Region(view.size(),view.size())
             else:
                 here = sublime.Region(reg.end(),reg.end())
+                text = self.view.substr(self.view.line(here))
+                if(text.strip() != ""):
+                    needsNewline = True
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
-        self.view.insert(edit,self.view.sel()[0].begin(),'\n')
+        if(needsNewline):
+            self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
         self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str((level+1))+".sublime-snippet"})
@@ -745,6 +755,7 @@ class OrgInsertClosedCommand(sublime_plugin.TextCommand):
             toInsert = orgdate.OrgDate.format_clock(now, False)
             self.view.insert(edit, l.end() + addnl, nl + node.indent() + "CLOSED: "+toInsert+"\n")
 
+# ================================================================================
 RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
@@ -771,6 +782,7 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
         self.input.run("Tag:",db.Get().tags,evt.Make(self.on_done))
 
 
+# ================================================================================
 class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
         if(text):
@@ -784,6 +796,7 @@ class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
         #print(str(db.Get().customids))
         self.input.run("Custom Id:",db.Get().customids, evt.Make(self.on_done))
 
+# ================================================================================
 class OrgSetTodayCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         self.onDone = onDone
