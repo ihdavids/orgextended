@@ -744,6 +744,39 @@ def mytrunc(num):
         return int(v)
     return num 
 
+def mynow():
+    return datetime.datetime.now()
+
+def myyear(dt):
+    return dt.year
+
+def myday(dt):
+    return dt.day
+
+def mymonth(dt):
+    return dt.month
+
+def myhour(dt):
+    return dt.hour
+
+def myminute(dt):
+    return dt.minute
+
+def mysecond(dt):
+    return dt.second
+
+def myweekday(dt):
+    return dt.date().weekday()
+
+def myyearday(dt):
+    return dt.timetuple().tm_yday
+
+def mytime(dt):
+    return dt.time()
+
+def mydate(dt):
+    return dt.date()
+
 def randomDigit(start, end):
     return random.randint(GetVal(start),GetVal(end))
 
@@ -882,6 +915,19 @@ class TableDef(simpev.SimpleEval):
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
         f['remote'] = remote
+        f['now'] = mynow
+        f['year'] = myyear
+        f['day'] = myday
+        f['month'] = mymonth
+        f['hour'] = myhour
+        f['minute'] = myminute
+        f['second'] = mysecond
+        f['time'] = mytime
+        f['date'] = mydate
+        f['weekday'] = myweekday
+        f['yearday'] = myyearday
+        # abs
+        # now
 
     def add_dynamic_functions(self,f):
         exts = sets.Get("enableTableExtensions",None)

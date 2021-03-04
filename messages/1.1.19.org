@@ -8,7 +8,7 @@
 	Packages/User/orgtable/<yourfunction>.py
 	#+END_EXAMPLE
 
-	Here I have created a file called now.py:
+	Here I have created a file called nowstr.py:
 
 	#+BEGIN_SRC python
     def Execute():
@@ -24,7 +24,7 @@
 
 	| 2021-03-03 12:42:03.720657 | b | c | d | e |
 	| 2021-03-03 12:42:03.738691 |   |   |   |   |
-    #+TBLFM:$1=now()
+    #+TBLFM:$1=nowstr()
 
     I will have further examples in the documentation going forward.
 
@@ -36,6 +36,26 @@
     "enableTableExtensions": true,
    	#+END_EXAMPLE	
 
+*** Data Time methods
+
+	Added a bunch of the datetime methods
+
+   |             A              |
+   |----------------------------|
+   | 2021-03-03 19:56:44.294403 |
+   | 2021                       |
+   | 3                          |
+   | 3                          |
+   | 2021-03-03                 |
+   | 19:56:44.375228            |
+   | 19                         |
+   | 56                         |
+   | 44                         |
+   | 2                          |
+   | 62                         |
+   #+TBLFM:@2$1=now()::@3$1=year(now())::@4$1=month(now())::@5$1=day(now())::@6$1=date(now())::@7$1=time(now())::@10$1=second(now())::@9$1=minute(now())::@8$1=hour(now())::@11$1=weekday(now())::@12$1=yearday(now())
+
+
 ** Checkboxes
   :PROPERTIES:
     :COOKIE_DATA: recursive
@@ -45,7 +65,7 @@
   This can be set using the COOKIE_DATA property above or using the global setting:
 
   #+BEGIN_EXAMPLE
-      checkboxSummaryRecursive  
+      "checkboxSummaryRecursive": true,
   #+END_EXAMPLE
 
  - [-] Testing parent	[3/6]
