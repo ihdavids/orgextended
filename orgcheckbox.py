@@ -67,7 +67,7 @@ def find_parent(view, region):
         # return the parent we found.
         return view.line(view.text_point(row,0))
 
-def find_children(view, region, cre = checkbox_regex, includeSiblings=False):
+def find_children(view, region, cre = checkbox_regex, includeSiblings=False, recursiveChildFind=False):
     row, col = view.rowcol(region.begin())
     line = view.line(region)
     content = view.substr(line)
@@ -96,11 +96,14 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False):
             elif not includeSiblings and cur_indent <= indent:
                 break
             # only immediate children (and siblings)
-            if child_indent is None:
-                child_indent = cur_indent
-            if cur_indent == child_indent:
-                children.append(line)
-            if(includeSiblings and cur_indent < child_indent):
+            if(not recursiveChildFind):
+                if child_indent is None:
+                    child_indent = cur_indent
+                if cur_indent == child_indent:
+                    children.append(line)
+                if(includeSiblings and cur_indent < child_indent):
+                    children.append(line)
+            else:
                 children.append(line)
         row += 1
     return children
@@ -174,7 +177,18 @@ def get_check_char(view, check_state):
         return 'E'
 
 def recalc_summary(view, region):
-    children = find_children(view, region)
+    recursive = sets.Get("checkboxSummaryRecursive",False)
+    at = db.Get().AtInView(view)
+    if(at):
+        props = at.properties
+        if(props and 'COOKIE_DATA' in props):
+            cook = props['COOKIE_DATA']
+            if(cook and 'notrecursive' in cook):
+                recursive = False
+            elif(cook and 'recursive' in cook):
+                recursive = True
+    children = None
+    children = find_children(view, region, checkbox_regex, False, recursive)
     if not len(children) > 0:
         return (0, 0)
     num_children = len(children)
@@ -309,7 +323,7 @@ RE_THING = re.compile(r'^\s*[+-](\s\[[ xX-]\])?\s(?P<data>.*)$')
 RE_NOTHEADERS = re.compile(r'^\s*[\#|0-9]')
 def getListAtPoint(view):
     parent = view.findParentByIndent(view.curLine(),RE_NOTHEADERS, RE_THING)
-    print(str(parent))
+    #print(str(parent))
     if(None != parent):
         prow, _ = view.rowcol(parent.begin())
         list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')

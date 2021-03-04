@@ -884,12 +884,14 @@ class TableDef(simpev.SimpleEval):
         f['remote'] = remote
 
     def add_dynamic_functions(self,f):
-        dynamic = ext.find_extension_modules('orgtable', [])
-        for k in dynamic.keys():
-            if(hasattr(dynamic[k],"Execute")):
-                f[k] = dynamic[k].Execute
-            else:
-                log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
+        exts = sets.Get("enableTableExtensions",None)
+        if(exts):
+            dynamic = ext.find_extension_modules('orgtable', [])
+            for k in dynamic.keys():
+                if(hasattr(dynamic[k],"Execute")):
+                    f[k] = dynamic[k].Execute
+                else:
+                    log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
     def add_operators(self,o):
         o[ast.Mult] = safe_mult
         o[ast.Add]  = safe_add
@@ -1042,7 +1044,7 @@ class TableDef(simpev.SimpleEval):
 
     def RowToCellRow(self,r):
         for i in range(1,len(self.lineToRow)+1):
-            if(self.lineToRow[i] == r):
+            if(i in self.lineToRow and self.lineToRow[i] == r):
                 return i
         return 1
 
