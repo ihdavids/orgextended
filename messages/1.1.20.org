@@ -1,0 +1,8 @@
+* 1.1.20
+** Editing
+	- Heading and Child heading insertion now ignores whitespace at the end of a node
+** Extensions
+	- Improved extension reloading on modification. Before it would force reload to often
+	  now we track and reload only when we have to. This should improve table performance
+	  a little. This is in prep for the advanced table features including automatic
+	  cell calculations on # fields.

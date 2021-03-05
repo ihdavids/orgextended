@@ -1,6 +1,6 @@
 * TODO Things I want [18/42]
-	- [ ] Extensibility [0/4]
-		- [ ] Avoid reloading when files do not change
+	- [-] Extensibility [1/5]
+		- [x] Avoid reloading when files do not change
 		- [ ] Similar folder names for all extensions in User folder
 		- [ ] Document all extensibility in user folder (and test it)
 		- [ ] Symbol and function table is only created once and reused. 
@@ -8,7 +8,7 @@
 	- [ ] Named Objects [0%]
 		- [ ] Works with babel
 		- [ ] Identifies tables and other things
-	- [-] Capture [66%]
+	- [-] Capture [57%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
 		- [x] Templates in config file.
@@ -17,7 +17,7 @@
 		- [x] Capture using sublime snippets
 		- [ ] Capture panel size controls?
 		- [ ] Capture with view vs panel (better for neovintageous users)
-	- [-] Parsing [4/5]
+	- [-] Parsing [4/6]
 		- [x] Basic file parsing
 		- [x] Tags parsed.
 		- [x] Comments (#+) available

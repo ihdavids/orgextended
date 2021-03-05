@@ -59,7 +59,7 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 				return
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			dynamic = ext.find_extension_modules('dynamic', ["insertdatetime", "clocktable"])
+			dynamic = ext.find_extension_modules('orgdynamic', ["insertdatetime", "clocktable"])
 			line = view.substr(view.line(start))
 			m = RE_DYN_BLOCK.search(line)
 			if(not m):
