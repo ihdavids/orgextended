@@ -26,3 +26,20 @@
   source: lisp
 - language: emacs-lisp
   source: lisp
+- language: yaml
+- language: rust
+- language: sql
+- language: r
+- language: html
+  text: html.basic
+- language: go
+- language: ledger
+- language: make
+  source: makefile
+- language: makefile
+  source: makefile
+- language: typescript
+  match: typescript|ts
+  source: ts
+
+

@@ -16,3 +16,14 @@
 
 ** Syntax
 	- Added lisp coloring for source blocks marked with lisp or emacs-lisp as the language.
+	Also added the following language identifiers to src blocks:
+	- yaml
+	- rust
+	- sql
+	- r
+	- html
+	- go
+	- ledger
+	- make|makefile
+  	- typescript|ts
+

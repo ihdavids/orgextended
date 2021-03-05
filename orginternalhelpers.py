@@ -513,7 +513,7 @@ class OrgRegenSyntaxTemplateCommand(sublime_plugin.TextCommand):
 			documents = yaml.full_load(file)
 			for item in documents:
 				if 'text' in item:
-					item['source'] = "text." + item['language']
+					item['source'] = "text." + item['text']
 				elif not 'source' in item:
 					item['source'] = "source." + item['language']
 				else:
