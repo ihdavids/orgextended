@@ -18,8 +18,9 @@ import importlib
 
 log = logging.getLogger(__name__)
 
+lastModCache = {}
 
-def load_module(basemodule, folder, filename):
+def load_module(basemodule, folder, filename,force = False):
 	if sys.version_info[0] < 3:
 		module_path = folder + '.' + filename.split('.')[0]
 		name = filename.split('.')[0]
@@ -30,7 +31,7 @@ def load_module(basemodule, folder, filename):
 		#for m in sys.modules:
 		#	if(module_path in m):
 		#		print("KEY: " + str(m))
-		if module_path in sys.modules:
+		if force and module_path in sys.modules:
 			del sys.modules[module_path]
 		module = importlib.import_module(module_path)
 	return module
@@ -62,7 +63,16 @@ def find_extension_modules(folder, builtins):
 		for filename in fnmatch.filter(filenames, '*.py'):
 			if '__init__' in filename or 'abstract' in filename:
 				continue
-			module = load_module("User", folder, filename)
+			# Only reload if the file is newer.
+			# NOTE: Due to how import works, it will not
+			#       reload the file until sublime reloads
+			#       so we have to track that ourselves
+			#       in the loadModCache.
+			fullfilename = os.path.join(path,filename)
+			lastMod = os.path.getmtime(fullfilename)
+			force = fullfilename not in lastModCache or lastMod > lastModCache[fullfilename]
+			lastModCache[fullfilename] = lastMod
+			module = load_module("User", folder, filename, force)
 			moduleTable[filename.split('.')[0]] = module
 	return moduleTable
 
