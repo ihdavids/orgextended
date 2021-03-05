@@ -15,4 +15,4 @@
 	- Fixed small issue with syntax coloring
 
 ** Syntax
-	- Added lisp coloring for source blocks
+	- Added lisp coloring for source blocks marked with lisp or emacs-lisp as the language.
