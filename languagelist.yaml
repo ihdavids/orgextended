@@ -22,3 +22,7 @@
 - language: powershell
 - language: plantuml
   source: powershell
+- language: lisp
+  source: lisp
+- language: emacs-lisp
+  source: lisp

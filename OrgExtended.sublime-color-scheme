@@ -16,6 +16,111 @@
 	},
 	"rules": [
 		{
+			"foreground": "#191919FF",
+			"scope": "col_999999FF",
+			"background": "#999999FF"
+		},
+		{
+			"foreground": "#C1C1C1FF",
+			"scope": "col_0645CDFF",
+			"background": "#0645CDFF"
+		},
+		{
+			"foreground": "#E0E0E0FF",
+			"scope": "col_1E74ACFF",
+			"background": "#1E74ACFF"
+		},
+		{
+			"foreground": "#7E7E7EFF",
+			"scope": "col_FEFEFEFF",
+			"background": "#FEFEFEFF"
+		},
+		{
+			"foreground": "#939393FF",
+			"scope": "col_0B0090FF",
+			"background": "#0B0090FF"
+		},
+		{
+			"foreground": "#4C4C4CFF",
+			"scope": "col_CCCCCCFF",
+			"background": "#CCCCCCFF"
+		},
+		{
+			"foreground": "#D8D8D8FF",
+			"scope": "col_765037FF",
+			"background": "#765037FF"
+		},
+		{
+			"foreground": "#C4C4C4FF",
+			"scope": "col_444444FF",
+			"background": "#444444FF"
+		},
+		{
+			"foreground": "#C9C9C9FF",
+			"scope": "col_66402FFF",
+			"background": "#66402FFF"
+		},
+		{
+			"foreground": "#D7D7D7FF",
+			"scope": "col_0066EEFF",
+			"background": "#0066EEFF"
+		},
+		{
+			"foreground": "#2C2C2CFF",
+			"scope": "col_FAA700FF",
+			"background": "#FAA700FF"
+		},
+		{
+			"foreground": "#616161FF",
+			"scope": "col_FFFF00FF",
+			"background": "#FFFF00FF"
+		},
+		{
+			"foreground": "#DBDBDBFF",
+			"scope": "col_1E747CFF",
+			"background": "#1E747CFF"
+		},
+		{
+			"foreground": "#D0D0D0FF",
+			"scope": "col_FFFF004C",
+			"background": "#FFFF004C"
+		},
+		{
+			"foreground": "#BEBEBEFF",
+			"scope": "col_0645ADFF",
+			"background": "#0645ADFF"
+		},
+		{
+			"foreground": "#737373FF",
+			"scope": "col_FFFF99FF",
+			"background": "#FFFF99FF"
+		},
+		{
+			"foreground": "#2A2A2AFF",
+			"scope": "col_AAAAAAFF",
+			"background": "#AAAAAAFF"
+		},
+		{
+			"foreground": "#C6C6C6FF",
+			"scope": "col_474356FF",
+			"background": "#474356FF"
+		},
+		{
+			"foreground": "#5D5D5DFF",
+			"scope": "col_DDDDDDFF",
+			"background": "#DDDDDDFF"
+		},
+		{
+			"foreground": "#6E6E6EFF",
+			"scope": "col_EEEEEEFF",
+			"background": "#EEEEEEFF"
+		},
+		{
+			"foreground": "#3B3B3BFF",
+			"scope": "col_BBBBBBFF",
+			"background": "#BBBBBBFF"
+		},
+		{
 			"scope": "col_008000FF",
 			"background": "#008000FF",
 			"foreground": "#CBCBCBFF"
@@ -627,7 +732,46 @@
         { "scope": "markup.untracked.git_gutter", "foreground": "#565656", },
         // Nginx path
         { "scope": "string.other.path.nginx", "foreground": "#fc951e", },
-
+		{
+			"scope": "orgagenda.week.0",
+			"foreground": "#550000",
+		},
+		{
+			"scope": "orgagenda.week.1",
+			"foreground": "#007700",
+		},
+		{
+			"scope": "orgagenda.week.2",
+			"foreground": "#770077",
+		},
+		{
+			"scope": "orgagenda.week.3",
+			"foreground": "#0000ff",
+		},
+		{
+			"scope": "orgagenda.week.4",
+			"foreground": "#999900",
+		},
+		{
+			"scope": "orgagenda.week.5",
+			"foreground": "#007777",
+		},
+		{
+			"scope": "orgagenda.week.6",
+			"foreground": "#aa5522",
+		},
+		{
+			"scope": "orgagenda.week.7",
+			"foreground": "#cc99cc",
+		},
+		{
+			"scope": "orgagenda.week.8",
+			"foreground": "#225522",
+		},
+		{
+			"scope": "orgagenda.week.9",
+			"foreground": "#623456",
+		},
 
 	]
 }

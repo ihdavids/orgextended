@@ -74,7 +74,7 @@ DEFAULT_LINK_RESOLVERS = [
     'file',
 ]
 
-available_resolvers = ext.find_extension_modules('resolver', DEFAULT_LINK_RESOLVERS)
+available_resolvers = ext.find_extension_modules('orgresolver', DEFAULT_LINK_RESOLVERS)
 linkre              = re.compile(r"\[\[([^\[\]]+)\]\s*(\[[^\[\]]*\])?\]")
 
 # Returns the url from the full link

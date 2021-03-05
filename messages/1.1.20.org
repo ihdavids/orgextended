@@ -6,3 +6,13 @@
 	  now we track and reload only when we have to. This should improve table performance
 	  a little. This is in prep for the advanced table features including automatic
 	  cell calculations on # fields.
+	- Extension folders renamed for consistency:
+		- src folder renamed to orgsrc
+		- resolver folder renamed to orgresolver
+		- dynamic folder renamed to orgdynamic
+		- table extensions were already in orgtable
+** Spreadsheets Preview V7
+	- Fixed small issue with syntax coloring
+
+** Syntax
+	- Added lisp coloring for source blocks

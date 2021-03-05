@@ -20,17 +20,17 @@ varre = re.compile(r'var\((?P<name>[^)]+)\)')
 colorre = re.compile(r'#(?P<r>[A-Fa-f0-9][A-Fa-f0-9])(?P<g>[A-Fa-f0-9][A-Fa-f0-9])(?P<b>[A-Fa-f0-9][A-Fa-f0-9])(?P<a>[A-Fa-f0-9][A-Fa-f0-9])?')
 
 template = """
-	- match: '{{{{beginsrc}}}}(({match})\s*)'
-	  captures:
-		1: constant.other orgmode.fence.sourceblock
-		2: orgmode.fence.sourceblock
-		3: keyword orgmode.fence.language
-		4: orgmode.fence.sourceblock
-	  embed: scope:{source}
-	  escape: '{{{{endsrc}}}}'
-	  embed_scope: markup.raw.block orgmode.raw.block
-	  escape_captures:
-		1: constant.other orgmode.fence.sourceblock"""
+    - match: '{{{{beginsrc}}}}(({match})\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:{source}
+      escape: '{{{{endsrc}}}}'
+      embed_scope: markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock"""
 
 
 introBlock = """
