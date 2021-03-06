@@ -254,8 +254,7 @@ class OrgDb:
         self.Files = []
         self.files = {}
         self.orgPaths = sets.Get("orgDirs",None)
-        # TODO: Add files entry
-        #self.orgFiles = sets.Get("orgFiles",None)
+        self.orgFiles = sets.Get("orgFiles",None)
         self.orgExcludePaths = sets.Get("orgExcludeDirs",None)
         self.orgExcludeFiles = sets.Get("orgExcludeFiles",None)
         matches = []
@@ -272,7 +271,18 @@ class OrgDb:
                     except Exception as e:
                         #x = sys.exc_info()
                         log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
-                        pass 
+        if(self.orgFiles):
+            for orgFile in self.orgFiles:
+                path = orgFile.replace('\\','/')
+                if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
+                    continue
+                try:
+                    filename = str(path)
+                    file = FileInfo(filename,loader.load(filename), self.orgPaths)
+                    self.AddFileInfo(file)
+                except Exception as e:
+                    #x = sys.exc_info()
+                    log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
         self.SortFiles()
         self.RebuildCustomIds()
 
