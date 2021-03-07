@@ -70,7 +70,7 @@ tableCache = TableCache()
 def plot_write_table_data_to(table,f,r,c,first=False):
     txt = table.GetCellText(r,c).strip()
     if(first):
-        if(r == 1 and (table.StartRow() != 1 or not isNumeric(txt))):
+        if(r == 1 and table.StartRow() != 1):
             f.write("#")
     else:
         f.write("\t")
@@ -82,10 +82,10 @@ def plot_build_data_file(table,params):
     params['_datafile'] = datafile
     # Maybe skip the first column if it has lables
     startCol = 1
-    for r in range(1,table.Height() + 1):
-        if(not isNumeric(table.GetCellText(r,1).strip())):
-            startCol += 1
-            break
+    #for r in range(1,table.Height() + 1):
+    #    if(not isNumeric(table.GetCellText(r,1).strip())):
+    #        startCol += 1
+    #        break
     ind = startCol
     if('ind' in params):
         if(startCol > 1):
@@ -166,10 +166,15 @@ def plot_build_command_file(table, params):
                 if(x.strip() != ""):
                     usingVals.append(int(x.strip()))
         ind = 1
+        if('unset' in params):
+            for x in params['unset']:
+                f.write('unset ' + x + '\n')
         if('set' in params):
             for x in params['set']:
                 f.write('set ' + x + '\n')
         for x,y in params.items():
+            if(x == "using"):
+                withstmt = " " + y.replace("\"","") + " "
             if(x == "with"):
                 if(y == 'histograms'):
                     count = 1
@@ -242,6 +247,11 @@ def plot_get_params(table,view):
                     params['set'] = []
                 params['set'].append(v.replace("\"",""))
                 continue
+            if(k == 'unset'):
+                if(not 'unset' in params):
+                    params['unset'] = []
+                params['unset'].append(v.replace("\"",""))
+                continue
             if(k == 'file'):
                 filename = v
                 if(filename == "viewer"):
@@ -256,45 +266,7 @@ def plot_get_params(table,view):
                 continue
             else:
                 params[k] = v
-            continue
-            for m in RE_FN_MATCH.finditer(item):
-                k = m.group(1).strip()
-                v = m.group(2).strip()
-                print("K: " + str(k))
-                print("V: " + str(v))
-                if(k == 'set'):
-                    if(not 'set' in params):
-                        params['set'] = []
-                    params['set'].append(v)
-                if(k == 'output'):
-                    filename = v
-                    sourcepath = os.path.dirname(filename)
-                    if(len(sourcepath) > 2):
-                        params['_sourcepath'] = sourcepath
-                        params['_filename'] = filename
-                    else:
-                        params['_filename'] = os.path.join(params['_sourcepath'],filename)
-                else:
-                    params[k] = v
-                    print("PPP: " + str(params))
-            continue
-            its = item.split(':')
-            if(len(its) == 2):
-                if(its[0] == 'set'):
-                    if(not 'set' in params):
-                        params['set'] = []
-                    params['set'].append(its[1])
-                if(its[0] == 'output'):
-                    filename = its[1]
-                    sourcepath = os.path.dirname(filename)
-                    if(len(sourcepath) > 2):
-                        params['_sourcepath'] = sourcepath
-                        params['_filename'] = its[1]
-                    else:
-                        params['_filename'] = os.path.join(params['_sourcepath'],its[1])
-                else:
-                    params[its[0]] = its[1]
-    print(str(params))
+    #print(str(params))
     return params
 
 RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*")
@@ -331,13 +303,13 @@ def plot_find_results(table,view):
                 return True
         # We just hit the end of the file.
         if(inResults):
-            table.resultsRegion = sublime.Region(view.text_point(startResults,0),view.text_point(fileEndRow,0))
+            table.resultsRegion = sublime.Region(view.text_point(startResults,0),view.line(view.text_point(fileEndRow,0)).end())
             return True
         # We hit the end of the file and didn't find a results tag.
         # We need to make one.
         if(not inResults):
             table.resultsRegion = sublime.Region(view.text_point(table.end+2,0),view.text_point(table.end+2,0))
-            return True
+            return False
 ppp = None
 def plot_table_command(table,view):
     # First get parameters
@@ -353,7 +325,7 @@ def plot_table_command(table,view):
     outpath    = os.path.dirname(output)
     sourcepath = os.path.dirname(view.file_name())
     commandLine = [plotcmd, "-c", ps['_gpltfile'] ]
-    print(str(commandLine))
+    #print(str(commandLine))
     try:
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -368,16 +340,20 @@ def plot_table_command(table,view):
     else:
         popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (o,e) = popen.communicate()
-    print("Plotting data from table:")
-    print(str(o))
-    print(str(e))
-    #if(os.path.exists(ps['_datafile'])):
-    #   os.remove(ps['_datafile']) 
-    #if(os.path.exists(ps['_gpltfile'])):
-    #   os.remove(ps['_gpltfile']) 
+    print("Attempting to plot data from table:")
+    print("STDOUT: \n" + str(o))
+    print("STDERR: \n" + str(e))
+    cullTempFiles = False
+    if(cullTempFiles):
+        if(os.path.exists(ps['_datafile'])):
+            os.remove(ps['_datafile']) 
+        if(os.path.exists(ps['_gpltfile'])):
+            os.remove(ps['_gpltfile']) 
     o = "#+RESULTS:\n[[file:" + output.replace("\\","/") + "]]"
     if(output != "viewer"):
-        plot_find_results(table,view)
+        have = plot_find_results(table,view)
+        if(not have):
+            o = "\n" + o
         view.run_command("org_internal_replace", {"start": table.resultsRegion.begin(), "end": table.resultsRegion.end(), "text": o})
     print(o)
     #return o.split('\n') + e.split('\n')
