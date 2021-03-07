@@ -21,6 +21,7 @@ import random
 import ast
 import operator as op
 import subprocess
+import platform
 
 random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
@@ -139,8 +140,24 @@ def plot_build_command_file(table, params):
     with open(gpltfile,"w") as f:
         title = plot_quote(plot_param(params,'title',"Table Data"))
         f.write('set title ' + title + "\n")
-        f.write('set term png \n')
-        f.write('set output ' + plot_quote(filename.replace('\\','\\\\')) + "\n")
+        ff,ext = os.path.splitext(filename)
+        if(ext == '.png'):
+            f.write('set term png \n')
+        if(ext == '.jpg' or ext == '.jpeg'):
+            f.write('set term jpeg \n')
+        if(ext == '.gif'):
+            f.write('set term gif \n')
+        if(ext == '.html'):
+            f.write('set term canvas \n')
+        if(ext == '.txt'):
+            f.write('set term dumb \n')
+        if(ext == '.svg'):
+            f.write('set term svg \n')
+        if(ext == '.ps'):
+            f.write('set term postscript \n')
+
+        if(filename != "viewer"):
+            f.write('set output ' + plot_quote(filename.replace('\\','\\\\')) + "\n")
         if('deps' in params):
             deps = params['deps']
             t = deps.replace('(',"").replace(")","")
@@ -220,15 +237,16 @@ def plot_get_params(table,view):
             if(k.endswith(':')):
                 k = k[:-1]
             v = ps[i].strip()
-            #print("K: " + str(k))
-            #print("V: " + str(v))
             if(k == 'set'):
                 if(not 'set' in params):
                     params['set'] = []
                 params['set'].append(v.replace("\"",""))
                 continue
-            if(k == 'output'):
+            if(k == 'file'):
                 filename = v
+                if(filename == "viewer"):
+                    params["_filename"] = "viewer"
+                    continue
                 sourcepath = os.path.dirname(filename)
                 if(len(sourcepath) > 2):
                     params['_sourcepath'] = sourcepath
@@ -318,9 +336,9 @@ def plot_find_results(table,view):
         # We hit the end of the file and didn't find a results tag.
         # We need to make one.
         if(not inResults):
-            table.resultsRegion = sublime.Region(view.text_point(table.end+1,0),view.text_point(table.end+1,0))
+            table.resultsRegion = sublime.Region(view.text_point(table.end+2,0),view.text_point(table.end+2,0))
             return True
-
+ppp = None
 def plot_table_command(table,view):
     # First get parameters
     ps = plot_get_params(table,view)
@@ -331,36 +349,36 @@ def plot_table_command(table,view):
     # Shell out to gnu plot
     plotcmd = sets.Get("gnuplot",r"C:\Program Files\gnuplot\bin\gnuplot.exe")
     output = ps['_filename']
+
     outpath    = os.path.dirname(output)
     sourcepath = os.path.dirname(view.file_name())
     commandLine = [plotcmd, "-c", ps['_gpltfile'] ]
-    #print(str(commandLine))
+    print(str(commandLine))
     try:
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     except:
         startupinfo = None
     cwd = os.path.join(sublime.packages_path(),"User") 
-    popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (o,e) = popen.communicate()
+    if(output == "viewer" and platform.system() == "Windows"):
+        global ppp
+        ppp = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        o = ""
+        e = ""
+    else:
+        popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (o,e) = popen.communicate()
     print("Plotting data from table:")
     print(str(o))
     print(str(e))
-    if(os.path.exists(ps['_datafile'])):
-       os.remove(ps['_datafile']) 
-    if(os.path.exists(ps['_gpltfile'])):
-       os.remove(ps['_gpltfile']) 
-    #convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
-    #destFile    = os.path.join(sourcepath,output)
-    #copyfile(convertFile, destFile)
-
-    #print(str(os.path.basename(cmd.sourcefile)))
-    #print(str(os.path.splitext(cmd.filename)))
-    #print(str(os.path.splitext(cmd.sourcefile)))
-    #destFile = os.path.relpath(destFile, sourcepath)
+    #if(os.path.exists(ps['_datafile'])):
+    #   os.remove(ps['_datafile']) 
+    #if(os.path.exists(ps['_gpltfile'])):
+    #   os.remove(ps['_gpltfile']) 
     o = "#+RESULTS:\n[[file:" + output.replace("\\","/") + "]]"
-    plot_find_results(table,view)
-    view.run_command("org_internal_replace", {"start": table.resultsRegion.begin(), "end": table.resultsRegion.end(), "text": o})
+    if(output != "viewer"):
+        plot_find_results(table,view)
+        view.run_command("org_internal_replace", {"start": table.resultsRegion.begin(), "end": table.resultsRegion.end(), "text": o})
     print(o)
     #return o.split('\n') + e.split('\n')
 

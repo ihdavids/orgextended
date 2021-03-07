@@ -1,0 +1,25 @@
+* 1.1.22
+** Spreadsheet Preview V9
+
+	- GPU Plot support extended: file option now allows for several output formats:
+		- file.txt  - dumb option in gnu plot.
+		- file.html - canvas option in gnu plot.
+		- file.jpg  - jpeg option in gnu plot.
+		- file.png  - png option in gnu plot.
+		- file.svg  - svg option in gnu plot.
+		- file.ps   - postscript option in gnu plot.
+		- file.gif  - gif option in gnu plot. 
+
+    #+PLOT: title:"Citas" ind:1 deps:(2 3 4) set:"key autotitle columnheader" unset:xtics set:"auto x" set:"boxwidth 0.25" using:"using 2:xtic(1), for [i=3:4] '' using i" set:"style data histogram" set:"xtics nomirror rotate by -45 scale 0" set:"style histogram rowstacked" set:"style fill solid border -1" file:plot.png
+
+    |    Sede   |  Max   | H-index |  top  |
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0
+
+#+RESULTS:
+[[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot.png]]
+#+RESULTS:
