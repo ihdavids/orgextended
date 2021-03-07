@@ -346,10 +346,10 @@ def plot_table_command(table,view):
     print("Plotting data from table:")
     print(str(o))
     print(str(e))
-    #if(os.path.exists(ps['_datafile'])):
-    #   os.remove(ps['_datafile']) 
-    #if(os.path.exists(ps['_gpltfile'])):
-    #   os.remove(ps['_gpltfile']) 
+    if(os.path.exists(ps['_datafile'])):
+       os.remove(ps['_datafile']) 
+    if(os.path.exists(ps['_gpltfile'])):
+       os.remove(ps['_gpltfile']) 
     #convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
     #destFile    = os.path.join(sourcepath,output)
     #copyfile(convertFile, destFile)
