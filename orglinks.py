@@ -35,6 +35,7 @@ import base64
 import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
+import OrgExtended.pymitter as evt
 
 try:
     import importlib
@@ -398,12 +399,14 @@ class ImageHandler:
 
 
 class OrgShowImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit,onDone=None):
         ImageHandler.show_images(self.view)
+        evt.EmitIf(onDone)
 
 class OrgHideImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit,onDone=None):
         ImageHandler.hide_images(self.view, edit)
+        evt.EmitIf(onDone)
 
 class OrgShowImageCommand(sublime_plugin.TextCommand):
     def run(self, edit):
