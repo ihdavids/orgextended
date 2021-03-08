@@ -261,16 +261,25 @@ class OrgDb:
         if(self.orgPaths):
             for orgPath in self.orgPaths:
                 orgPath = orgPath.replace('\\','/')
-                for path in Path(orgPath).rglob("*.org"):
-                    if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
+                globSuffix = sets.Get("validOrgExtensions",[".org"])
+                for suffix in globSuffix:
+                    if('archive' in suffix):
                         continue
-                    try:
-                        filename = str(path)
-                        file = FileInfo(filename,loader.load(filename), self.orgPaths)
-                        self.AddFileInfo(file)
-                    except Exception as e:
-                        #x = sys.exc_info()
-                        log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
+                    suffix = "*" + suffix
+                    dirGlobPos = orgPath.find("**")
+                    if(dirGlobPos > 0):
+                        suffix  = os.path.join(orgPath[dirGlobPos:],suffix)
+                        orgPath = orgPath[0:dirGlobPos]
+                    for path in Path(orgPath).glob(suffix):
+                        if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
+                            continue
+                        try:
+                            filename = str(path)
+                            file = FileInfo(filename,loader.load(filename), self.orgPaths)
+                            self.AddFileInfo(file)
+                        except Exception as e:
+                            #x = sys.exc_info()
+                            log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
         if(self.orgFiles):
             for orgFile in self.orgFiles:
                 path = orgFile.replace('\\','/')
