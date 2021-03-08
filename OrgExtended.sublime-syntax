@@ -414,6 +414,28 @@ contexts:
         2: orgmode.fence.sourceblock
         3: keyword orgmode.fence.language
         4: orgmode.fence.sourceblock
+      embed: scope:source.plantuml
+      escape: '{{endsrc}}'
+      embed_scope: markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((ditaa)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.ditaa
+      escape: '{{endsrc}}'
+      embed_scope: markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((graphviz)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
       embed: scope:source.powershell
       escape: '{{endsrc}}'
       embed_scope: markup.raw.block orgmode.raw.block

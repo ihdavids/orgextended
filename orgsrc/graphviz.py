@@ -12,24 +12,18 @@ import OrgExtended.asettings as sets
 
 # Python Babel Mode
 def Extension(cmd):
-	return ".pu"
-
-def WrapStart(cmd):
-	return "@startuml"
-
-def WrapEnd(cmd):
-	return "@enduml"
+	return ".dot"
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	jarfile = sets.Get("plantuml",r"D:\Build\.imacs\plantuml.jar")
+	exe = sets.Get("graphviz",r"C:\Program Files\Graphviz\bin\dot.exe")
 	output = "diagram.png"
 	if(cmd.params and "file" in cmd.params):
 		output = cmd.params["file"]
 	outpath     = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
-	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
-	commandLine = [r"java", "-jar", jarfile, cmd.filename]
+	destFile    = os.path.join(sourcepath,output)
+	commandLine = [exe, "-Tpng", cmd.filename, "-o", destFile]
 	print(str(commandLine))
 	#commandLine = [r"java", "-jar", jarfile, "-help"]
 	try:
@@ -44,9 +38,8 @@ def Execute(cmd):
 	#popen.wait()
 	(o,e) = popen.communicate()
 	
-	convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
-	destFile    = os.path.join(sourcepath,output)
-	copyfile(convertFile, destFile)
+	#convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
+	#copyfile(convertFile, destFile)
 	#print(str(os.path.basename(cmd.sourcefile)))
 	#print(str(os.path.splitext(cmd.filename)))
 	#print(str(os.path.splitext(cmd.sourcefile)))

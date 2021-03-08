@@ -40,18 +40,28 @@
    [[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot.png]]
 
 
-* Heading
-    #+PLOT: title:"Citas" ind:2 deps:(3 4) with:histograms file:plot2.png
-    |    Sede   |  Max   | H-index |  top  |
-    |-----------+--------+---------+-------|
-    | Sao Paolo |  71.00 |   11.50 |  13.5 |
-    | Stockholm | 134.19 |   14.33 | 16.33 |
-    | Leeds     | 165.77 |   19.68 | 21.68 |
-    | Morelia   | 257.56 |   17.67 | 19.67 |
-    | Chile     | 257.72 |   21.39 | 23.39 |
-    #+TBLFM:$4=$3+2.0
+** Source Blocks
+    - PlantUml info in docs.
+    - Added auto image preview mode when creating images using diagram methods.
 
-#+RESULTS:
-[[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot2.png]]
+*** New Source Block type
+    - GraphViz support.
+    - Only dot engine is currently supported.
+    - To use add graphviz path to settings file:
 
+    #+BEGIN_EXAMPLE
+      "graphviz": "C:\fullpath\dot.exe"
+    #+END_EXAMPLE
 
+    Create a source block like so and execute it
+    #+BEGIN_SRC graphviz :file graphviz.png
+     digraph G {
+       a -> b;
+       a -> c;
+       c -> d
+     } 
+    #+END_SRC
+
+  
+  
+  

@@ -41,11 +41,25 @@ def IsSourceBlock(view):
 	line = view.getLine(view.curRow())
 	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
 
+
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
+	def OnDone(self):
+		evt.EmitIf(self.onDone)
+
+	def OnShown(self):
+		self.OnDone()
+
+	def OnHidden(self):
+		self.view.run_command("org_show_images",{"onDone": evt.Make(self.OnShown)})
+
 	def on_replaced(self):
 		if(hasattr(self.curmod,"PostExecute")):
 			self.curmod.PostExecute(self)
-		evt.EmitIf(self.onDone)
+
+		if(hasattr(self.curmod,"GeneratesImages") and self.curmod.GeneratesImages(self)):
+			self.view.run_command("org_hide_images",{"onDone": evt.Make(self.OnHidden)})
+		else:
+			self.OnDone()
 
 	def end_results(self,rw):
 		self.endResults     = rw
@@ -127,7 +141,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "powershell", "python"])
+			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "powershell", "python"])
 			line = view.substr(view.line(start))
 			m = RE_SRC_BLOCK.search(line)
 			if(not m):
@@ -194,4 +208,4 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			output = indent.join(self.outputs)
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.on_replaced)})
 		else:
-			log.error("NOT in A Source Block, nothing to run")
+			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")

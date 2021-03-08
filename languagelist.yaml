@@ -21,6 +21,8 @@
   match: csharp|cs
 - language: powershell
 - language: plantuml
+- language: ditaa
+- language: graphviz
   source: powershell
 - language: lisp
   source: lisp
