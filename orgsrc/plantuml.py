@@ -38,7 +38,7 @@ def Execute(cmd):
 	except:
 		startupinfo = None
 	# cwd=working_dir, env=my_env,
-	cwd = os.path.join(sublime.packages_path(),"OrgExtended") 
+	cwd = os.path.join(sublime.packages_path(),"User") 
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	#popen.wait()

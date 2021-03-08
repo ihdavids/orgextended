@@ -1,0 +1,3 @@
+* 1.1.24
+** PlantUml
+	- Fixed bug with working directory that was causing problems when executing as a package.
