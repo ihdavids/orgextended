@@ -67,14 +67,17 @@ class TableCache:
 
 tableCache = TableCache()
 
-def plot_write_table_data_to(table,f,r,c,first=False):
+def plot_write_table_data_to(params,table,f,r,c,first=False):
     txt = table.GetCellText(r,c).strip()
     if(first):
-        if(r == 1 and table.StartRow() != 1):
+        if((r == 1 and table.StartRow() != 1) and not ("include" in params and "header" in params["include"])):
             f.write("#")
     else:
         f.write("\t")
-    f.write(txt)
+    if(not numberCheck(txt) and " " in txt or "\t" in txt):
+        f.write("\""+ txt + "\"")
+    else:
+        f.write(txt)
 
 def plot_build_data_file(table,params):
     filename = params['_filename']
@@ -105,11 +108,11 @@ def plot_build_data_file(table,params):
     with open(datafile,"w") as f:
         for r in range(1,table.Height()+1):
             c = ind
-            plot_write_table_data_to(table,f,r,c,first=True)
+            plot_write_table_data_to(params,table,f,r,c,first=True)
             # Eventually we will need to do this with a user specified range.
             for c in usingVals:
                 if(c != ind):
-                    plot_write_table_data_to(table,f,r,c)
+                    plot_write_table_data_to(params,table,f,r,c)
             f.write("\n")
     return datafile
 
@@ -173,6 +176,8 @@ def plot_build_command_file(table, params):
             for x in params['set']:
                 f.write('set ' + x + '\n')
         for x,y in params.items():
+            if(isinstance(y,str)):
+                y = y.strip()
             if(x == "using"):
                 withstmt = " " + y.replace("\"","") + " "
             if(x == "with"):
@@ -185,11 +190,12 @@ def plot_build_command_file(table, params):
                         if(seriesTitle != ""):
                             seriesTitle = "\"" + seriesTitle + "\""
                         else:
-                            seriesTitle = " \"col "+str(i)+"\""
+                            seriesTitle = "\"col "+str(i)+"\""
                         if(not first):
                             withstmt += ",\"\" using " + str(count) + " with histograms title " + seriesTitle + " "
                         else:
                             withstmt = " using " + str(count) + " with histograms title " + seriesTitle + " "
+                    continue
                 if(y == 'candlesticks'):
                     count = 0
                     for idx in range(0,len(usingVals),4):
@@ -201,6 +207,7 @@ def plot_build_command_file(table, params):
                         else:
                             seriesTitle = "\"series"+str(i)+"\""
                         withstmt = " using " + str(ind)+":"+str(count)+":"+str(count+1)+":"+str(count+2)+":"+str(count+3) + " with "+y+" title " + seriesTitle + " "
+                    continue
                 else:
                     count = 1
                     first = True
@@ -343,13 +350,20 @@ def plot_table_command(table,view):
     print("Attempting to plot data from table:")
     print("STDOUT: \n" + str(o))
     print("STDERR: \n" + str(e))
-    cullTempFiles = False
+    cullTempFiles = True
     if(cullTempFiles):
         if(os.path.exists(ps['_datafile'])):
             os.remove(ps['_datafile']) 
         if(os.path.exists(ps['_gpltfile'])):
             os.remove(ps['_gpltfile']) 
-    o = "#+RESULTS:\n[[file:" + output.replace("\\","/") + "]]"
+    row = view.curRow()
+    node = db.Get().At(view, row)
+    level = 1
+    indent = " "
+    if(node):
+        level = node.level
+        indent = " " * level + " "
+    o = indent + "#+RESULTS:\n"+indent+"[[file:" + output.replace("\\","/") + "]]"
     if(output != "viewer"):
         have = plot_find_results(table,view)
         if(not have):
