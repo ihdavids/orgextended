@@ -1,4 +1,13 @@
 * 1.1.22
+** Configuration
+    - Added directory globbing support to orgDirs
+    #+BEGIN_EXAMPLE
+       "c:\\Users\\ihdav\\notes\\**\\test\\"
+    #+END_EXAMPLE
+
+    This will find valid org extensions in all test sub folders of the path.
+    CAUTION: This will slow down sublime start times with overly large search space!
+
 ** Spreadsheet Preview V9
 
 	- GPU Plot support extended: file option now allows for several output formats:
@@ -10,9 +19,31 @@
 		- file.ps   - postscript option in gnu plot.
 		- file.gif  - gif option in gnu plot. 
 
-    #+PLOT: title:"Citas" ind:1 deps:(2 3 4) set:"key autotitle columnheader" unset:xtics set:"auto x" set:"boxwidth 0.25" using:"using 2:xtic(1), for [i=3:4] '' using i" set:"style data histogram" set:"xtics nomirror rotate by -45 scale 0" set:"style histogram rowstacked" set:"style fill solid border -1" file:plot.png
+	- GPU Plot
+		- Added include:header to include header row in data (you have to account for it in your plot)
+		- Added using statement to allow you to write your own full using statement rather than just the style: 
+		- Improved quoting, spaces in fields are accounted for and quoted.
+		- Improved indent of RESULTS block.
+
+    #+PLOT: title:"Citas" include:header ind:1 deps:(2 3 4) set:"key autotitle columnheader" unset:xtics set:"auto x" set:"boxwidth 0.25" using:"using 2:xtic(1), for [i=3:4] '' using i" set:"style data histogram" set:"xtics nomirror rotate by -45 scale 0" set:"style histogram rowstacked" set:"style fill solid border -1" file:plot.png
 
     |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0
+
+   #+RESULTS:
+   [[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot.png]]
+
+
+* Heading
+    #+PLOT: title:"Citas" ind:2 deps:(3 4) with:histograms file:plot2.png
+    |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
     | Sao Paolo |  71.00 |   11.50 |  13.5 |
     | Stockholm | 134.19 |   14.33 | 16.33 |
     | Leeds     | 165.77 |   19.68 | 21.68 |
@@ -21,5 +52,6 @@
     #+TBLFM:$4=$3+2.0
 
 #+RESULTS:
-[[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot.png]]
-#+RESULTS:
+[[file:C:/Users/ihdav/AppData/Roaming/Sublime Text/Packages/OrgExtended/messages/plot2.png]]
+
+
