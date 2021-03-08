@@ -120,6 +120,13 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
 			return True
 
+	def on_warning_saved(self):
+		if(self.view.is_dirty()):
+			self.view.set_status("Error: ","Failed to save the view. ABORT, cannot execute source block since it is dirty")
+			log.error("Failed to save the view. ABORT, cannot execute source code")
+			return
+		self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
+
 	def run(self, edit, onDone=None):
 		self.onDone = onDone
 		view = self.view
@@ -141,7 +148,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "powershell", "python"])
+			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python"])
 			line = view.substr(view.line(start))
 			m = RE_SRC_BLOCK.search(line)
 			if(not m):
@@ -167,6 +174,17 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			self.e        = view.text_point(self.endRow,0)
 			self.region   = sublime.Region(self.s,self.e)
 			self.sourcefile = view.file_name()
+			# Sanity check that the file exists on disk
+			if(not self.sourcefile or not os.path.exists(self.sourcefile)):
+				self.view.set_status("Error: ","Your source org file must exist on disk. ABORT.")
+				log.error("Your source org file must exist on disk to generate images. The path is used when setting up relative paths.")
+				self.OnDone()
+				return
+			if(view.is_dirty()):
+				log.warning("Your source file has unsaved changes. We cannot run source modifications without saving the buffer.")
+				view.run_command("save", {"async": False})
+				sublime.set_timeout(self.on_warning_saved,1)
+				return
 
 			# We need to find and or buid a results block
 			# so we can replace it with the results.

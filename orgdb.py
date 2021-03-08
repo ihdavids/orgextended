@@ -270,6 +270,12 @@ class OrgDb:
                     if(dirGlobPos > 0):
                         suffix  = os.path.join(orgPath[dirGlobPos:],suffix)
                         orgPath = orgPath[0:dirGlobPos]
+                    if("*" in orgPath):
+                        log.error(" orgDirs only supports double star style directory wildcards! Anything else is not supported: " + str(orgPath))
+                        if(sublime.active_window().active_view()):
+                            sublime.active_window().active_view().set_status("Error: ","orgDirs only supports double star style directory wildcards! Anything else is not supported: " + str(orgPath))
+                        log.error(" skipping orgDirs value: " + str(orgPath))
+                        continue
                     for path in Path(orgPath).glob(suffix):
                         if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
                             continue
