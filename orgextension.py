@@ -55,7 +55,8 @@ def find_extension_modules(folder, builtins):
 	#			continue
 	for filename in builtins:
 		filename = filename + ".py"
-		module = load_module("OrgExtended", folder, filename)
+		force = sets.Get("forceLoadInternalExtensions",False)
+		module = load_module("OrgExtended", folder, filename, force)
 		moduleTable[filename.split('.')[0]] = module
 	# User generated extensions
 	path = os.path.join(base,'User',folder)

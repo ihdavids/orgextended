@@ -17,7 +17,10 @@ def Extension(cmd):
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	exe = sets.Get("graphviz",r"C:\Program Files\Graphviz\bin\dot.exe")
+	exe = sets.Get("graphviz",None)
+	if(exe == None):
+		print("ERROR: cannot find graphviz executable file. Please setup the graphviz key in your settings file")
+		return ["ERROR - missing graphviz executable file"]
 	output = "diagram"
 	format = "png"
 	engine = "default"
@@ -46,6 +49,7 @@ def Execute(cmd):
 	except:
 		startupinfo = None
 	# cwd=working_dir, env=my_env,
+	os.makedirs(os.path.dirname(destFile), exist_ok=True)
 	cwd = os.path.join(sublime.packages_path(),"User") 
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

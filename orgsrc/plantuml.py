@@ -22,7 +22,10 @@ def WrapEnd(cmd):
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	jarfile = sets.Get("plantuml",r"D:\Build\.imacs\plantuml.jar")
+	jarfile = sets.Get("plantuml",None)
+	if(jarfile == None):
+		print("ERROR: cannot find plantuml jar file. Please setup the plantuml key in your settings file")
+		return ["ERROR - missing plantuml.jar file"]
 	output = "diagram.png"
 	if(cmd.params and "file" in cmd.params):
 		output = cmd.params["file"]
@@ -38,6 +41,7 @@ def Execute(cmd):
 	except:
 		startupinfo = None
 	# cwd=working_dir, env=my_env,
+	os.makedirs(os.path.dirname(destFile), exist_ok=True)
 	cwd = os.path.join(sublime.packages_path(),"User") 
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

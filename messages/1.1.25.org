@@ -1,1 +1,12 @@
 * 1.1.25
+  - Non existent subdirs are auto-created 
+
+    #+BEGIN_SRC graphviz :file thisdirdoesnotexist/graphviz.png
+     digraph G {
+       a -> b;
+       a -> c;
+       c -> d
+     } 
+    #+END_SRC
+
+  

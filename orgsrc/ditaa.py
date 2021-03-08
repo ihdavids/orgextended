@@ -18,7 +18,10 @@ def Extension(cmd):
 
 # Actually do the work, return an array of output.
 def Execute(cmd):
-	jarfile = sets.Get("ditaa",r"C:\Users\ihdav\.emacs.d\.local\straight\repos\org-mode\contrib\scripts\ditaa.jar")
+	jarfile = sets.Get("ditaa",None)
+	if(jarfile == None):
+		print("ERROR: cannot find ditaa jar file. Please setup the ditaa key in your settings file")
+		return ["ERROR - missing ditaa.jar file"]
 	output = "diagram.png"
 	if(cmd.params and "file" in cmd.params):
 		output = cmd.params["file"]
@@ -34,6 +37,7 @@ def Execute(cmd):
 	except:
 		startupinfo = None
 	# cwd=working_dir, env=my_env,
+	os.makedirs(outpath, exist_ok=True)
 	cwd = os.path.join(sublime.packages_path(),"User") 
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
