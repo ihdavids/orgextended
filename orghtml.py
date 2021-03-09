@@ -260,6 +260,8 @@ class HtmlDoc:
 		self.tableIndex = 1
 
 	def PreScan(self):
+		if(len(self.file.org._lines) == 0):
+			self.ExportCommentsGather("")
 		for l in self.file.org._lines:
 			self.ExportCommentsGather(l)
 

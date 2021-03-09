@@ -31,3 +31,21 @@
   - C:\Mypath\baz\SubFolder\z.org
 
   Again, this can increase your startup time dramatically. Please use with caution!
+
+** Spreadsheet Preview V10
+  - boxes mode seems to work.
+
+    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:filledcurve file:plot.png
+    |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0
+
+** HTML Export
+  Fixed issue with 0 blank lines at the top of the file.
+  The comment gathering code was not being initialized properly.
+  
