@@ -28,7 +28,7 @@ template = """
         4: orgmode.fence.sourceblock
       embed: scope:{source}
       escape: '{{{{endsrc}}}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock"""
 

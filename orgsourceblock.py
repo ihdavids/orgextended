@@ -38,26 +38,24 @@ RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 
 def IsSourceBlock(view):
-	line = view.getLine(view.curRow())
-	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
+	at = view.sel()[0]
+	return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
 
+def IsSourceFence(view,row):
+	#line = view.getLine(view.curRow())
+	line = view.getLine(row)
+	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def OnDone(self):
 		evt.EmitIf(self.onDone)
-
-	def OnShown(self):
-		self.OnDone()
-
-	def OnHidden(self):
-		self.view.run_command("org_show_images",{"onDone": evt.Make(self.OnShown)})
 
 	def on_replaced(self):
 		if(hasattr(self.curmod,"PostExecute")):
 			self.curmod.PostExecute(self)
 
 		if(hasattr(self.curmod,"GeneratesImages") and self.curmod.GeneratesImages(self)):
-			self.view.run_command("org_hide_images",{"onDone": evt.Make(self.OnHidden)})
+			self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
 		else:
 			self.OnDone()
 
@@ -109,8 +107,12 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 		# We need to make one.
 		if(not inResults):
 			log.debug("Could not locate #+RESULTS tag adding one!")
-			pt = self.view.text_point(self.endRow,0)
-			pt = self.view.line(pt).end() + 1
+			if(self.endRow == self.view.endRow()):
+				pt = self.view.text_point(self.endRow,0)
+				pt = self.view.line(pt).end()
+			else:
+				pt = self.view.text_point(self.endRow,0)
+				pt = self.view.line(pt).end() + 1
 			indent = db.Get().AtInView(self.view).indent()
 			self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
 			self.startResults   = self.endRow + 2 
@@ -131,12 +133,18 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 		self.onDone = onDone
 		view = self.view
 		at = view.sel()[0]
-		if(view.match_selector(at.begin(),'orgmode.fence.sourceblock')):
+		if(view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content')):
+			# Scan up till we find the start of the block.
+			row = view.curRow()
+			while(row > 0):
+				if(IsSourceFence(view, row)):
+					at = sublime.Region(view.text_point(row,1),view.text_point(row,1))
+					break
+				row -= 1
 			# Okay we have a dynamic block, now we need to know where it ends.
 			start = at.begin()
 			end   = None
 			erow = view.endRow()
-			row  = view.curRow()
 			for rw in range(row,erow+1):
 				line = view.substr(view.line(view.text_point(rw,0)))
 				if(RE_END.search(line)):
@@ -223,7 +231,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			level = n.level
 			indent = "\n " * level + " "
 			#outputs = output.split('\n')
-			output = indent.join(self.outputs)
+			output = indent.join(self.outputs).rstrip()
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.on_replaced)})
 		else:
 			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")

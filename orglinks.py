@@ -397,6 +397,22 @@ class ImageHandler:
                 return
             return width, height, ttype
 
+class OrgCycleImagesCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        self.view.sel().clear()
+        self.view.sel().add(self.cursor)
+        evt.EmitIf(self.onDone)
+
+    def OnShown(self):
+        self.OnDone()
+
+    def OnHidden(self):
+        self.view.run_command("org_show_images",{"onDone": evt.Make(self.OnShown)})
+
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.cursor = self.view.sel()[0]
+        self.view.run_command("org_hide_images",{"onDone": evt.Make(self.OnHidden)})
 
 class OrgShowImagesCommand(sublime_plugin.TextCommand):
     def run(self, edit,onDone=None):

@@ -1,12 +1,33 @@
 * 1.1.25
-  - Non existent subdirs are auto-created 
+** Source Block Diagrams
+  - Non existent subdirs are auto-created
+  - Execute block works on any line inside the source block as well as on the fence.
+  - Evaluating a block on the last line of the file was not inserting the RESULTS tag.
+  - Repeated re-evaluation kept adding newlines at the end.
+  - When evaluating source with a diagram the cursor could move, this is now fixes.
 
     #+BEGIN_SRC graphviz :file thisdirdoesnotexist/graphviz.png
      digraph G {
        a -> b;
        a -> c;
-       c -> d
+       c -> d;
      } 
     #+END_SRC
 
-  
+   #+RESULTS:
+   [[file:thisdirdoesnotexist\graphviz.png]]
+
+** Customization
+  - Support single directory wildcards:
+
+  #+BEGIN_EXAMPLE
+    "orgDirs": "C:\Mypath\*\SubFolder"
+  #+END_EXAMPLE
+
+  Will match a single folder wildcard like so:
+
+  - C:\Mypath\foo\SubFolder\x.org
+  - C:\Mypath\bar\SubFolder\y.org
+  - C:\Mypath\baz\SubFolder\z.org
+
+  Again, this can increase your startup time dramatically. Please use with caution!

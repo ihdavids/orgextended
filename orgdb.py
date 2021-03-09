@@ -266,7 +266,7 @@ class OrgDb:
                     if('archive' in suffix):
                         continue
                     suffix = "*" + suffix
-                    dirGlobPos = orgPath.find("**")
+                    dirGlobPos = orgPath.find("*")
                     if(dirGlobPos > 0):
                         suffix  = os.path.join(orgPath[dirGlobPos:],suffix)
                         orgPath = orgPath[0:dirGlobPos]

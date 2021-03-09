@@ -525,12 +525,6 @@ class OrgShowTableRowsCommand(sublime_plugin.TextCommand):
         self.OnDone()
 
 class OrgPlotTableCommand(sublime_plugin.TextCommand):
-    def onHidden(self):
-        self.view.run_command("org_show_images",{"onDone": evt.Make(self.onShown)})
-
-    def onShown(self):
-        self.OnDone()
-
     def OnDone(self):
         evt.EmitIf(self.onDone)
 
@@ -539,7 +533,7 @@ class OrgPlotTableCommand(sublime_plugin.TextCommand):
         plot_table_command(self.td,self.view) 
         self.edit = edit
         self.onDone = onDone
-        self.view.run_command("org_hide_images",{"onDone": evt.Make(self.onHidden)})
+        self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
 
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
