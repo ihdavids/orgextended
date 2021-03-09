@@ -95,6 +95,11 @@ def curLine(self):
     pt = self.text_point(row, 0)
     return self.line(pt)
 
+# Returns a region that is the current line
+@add_method(sublime.View)
+def curLineText(self):
+    return self.substr(self.curLine())
+
 @add_method(sublime.View)
 def lineAt(self,row):
     pt = self.text_point(row, 0)

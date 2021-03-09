@@ -26,6 +26,7 @@ import platform
 random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
 RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
+RE_AUTOLINE = re.compile(r"^\s*[|]\s*[#]\s*[|]")
 MAX_STRING_LENGTH = 100000
 MAX_COMPREHENSION_LENGTH = 10000
 MAX_POWER = 4000000  # highest exponent
@@ -39,6 +40,9 @@ def isTable(view):
 def isTableFormula(view):
     names = view.scope_name(view.sel()[0].end())
     return 'orgmode.tblfm' in names
+
+def isAutoComputeRow(view):
+    return None != RE_AUTOLINE.search(view.curLineText())
 
 class TableCache:
     def __init__(self):
@@ -609,15 +613,16 @@ RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 
 RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))\s*$')
-def formula_rowcol(expr):
+RE_NAMED_TARGET = re.compile(r'\s*[$](?P<name>[a-zA-Z][a-zA-Z0-9]+)')
+def formula_rowcol(expr,table):
     fields = expr.split('=')
     if(len(fields) != 2):
         return (None, None)
     target = fields[0]
     targets = target.split('..')
     if(len(targets)==2):
-        r1 = formula_rowcol(targets[0] + "=")
-        r2 = formula_rowcol(targets[1] + "=")
+        r1 = formula_rowcol(targets[0] + "=",table)
+        r2 = formula_rowcol(targets[1] + "=",table)
         return [r1[0] + r2[0],fields[1]]
     m = RE_TARGET.search(target)
     if(m):
@@ -642,6 +647,12 @@ def formula_rowcol(expr):
             if(isNumeric(col)):
                 col = int(col)
             return [[row,col],fields[1]]
+    else:
+        mn = RE_NAMED_TARGET.search(target)
+        if(mn):
+            cell = table.symbolOrCell(mn.group('name').strip())
+            if(isinstance(cell,Cell)):
+                return [[cell.r,cell.c],fields[1]]
     return (None, None)
 
 def numberCheck(v):
@@ -744,14 +755,16 @@ def formula_sources(expr):
 
 
 class Formula:
-    def __init__(self,expr, reg, formatters):
+    def __init__(self,expr, reg, formatters, table):
+        self.table = table
         self.formatters = formatters
         self.printfout = None
         if(self.formatters):
             m = RE_PRINTFSTYLE.search(self.formatters)
             if(m):
                 self.printfout = m.group('formatter')
-        self.target, self.expr = formula_rowcol(expr)
+        self.target, self.expr = formula_rowcol(expr,table)
+        print("TARGET: " + str(self.target) + " -> " + str(expr))
         # Never allow our expr to be empty. If we failed to parse it our EXPR is current cell value
         if(self.expr == None):
             self.expr = "$0"
@@ -768,6 +781,8 @@ def CellRowIterator(table,start,end):
     if(start < table.StartRow()):
         start = table.StartRow()
     for r in range(start,end+1):
+        if(table.ShouldIgnoreRow(r)):
+            continue
         cell = Cell(r,c,table)
         yield cell
 
@@ -791,6 +806,8 @@ def CellBoxIterator(table,a,b):
     if(sr < table.StartRow()):
         sr = table.StartRow()
     for r in range(sr,er+1):
+        if(table.ShouldIgnoreRow(r)):
+            continue
         for c in range(sc,ec+1):
             cell = Cell(r,c,table)
             yield cell
@@ -807,6 +824,8 @@ def CellIterator(table,cell):
     else:
         crange = range(cell.GetCol(),cell.GetCol()+1)
     for r in rrange:
+        if(table.ShouldIgnoreRow(r)):
+            continue
         for c in crange:
             cell = Cell(r,c,table)
             yield cell
@@ -821,6 +840,8 @@ def RCIterator(table,r,c):
     else:
         crange = range(c,c+1)
     for r in rrange:
+        if(table.ShouldIgnoreRow(r)):
+            continue
         for c in crange:
             yield [r,c]
 
@@ -946,7 +967,12 @@ def safe_mult(a, b):  # pylint: disable=invalid-name
         raise IterableTooLong('Sorry, I will not evalute something that long.')
     if hasattr(b, '__len__') and a * len(b) > MAX_STRING_LENGTH:
         raise IterableTooLong('Sorry, I will not evalute something that long.')
-    return GetVal(a) * GetVal(b)
+    a = GetVal(a)
+    b = GetVal(b)
+    if(isinstance(a,float) or isinstance(b,float)):
+        if(isinstance(a,str) or isinstance(b,str)):
+            return 0
+    return a * b
 
 def safe_pow(a, b):  # pylint: disable=invalid-name
     if abs(a) > MAX_POWER or abs(b) > MAX_POWER:
@@ -1166,6 +1192,9 @@ class TableDef(simpev.SimpleEval):
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
 
+    def ShouldIgnoreRow(self,row):
+        return row in self.ignoreRows
+
     def ridx(self):
         return self.CurRow()
     
@@ -1182,6 +1211,8 @@ class TableDef(simpev.SimpleEval):
         return Cell(r,c,self,rrelative,crelative)
 
     def symbolOrCell(self,name):
+        if name in self.nameToCell:
+            return self.nameToCell[name]
         # TODO: Look up cell names FIRST
         #       but only once we have the advanced features
         if(name in self.consts):
@@ -1503,6 +1534,26 @@ class TableDef(simpev.SimpleEval):
                 if(it):
                     for c in it:
                         self.AddCellToFormulaMap(c,i)
+    
+    def BuildNameMap(self):
+        self.nameToCell = {}
+        for r,row in self.colNames:
+            for c in range(1,self.Width()+1):
+                txt = self.GetCellText(r,c).strip()
+                if(not txt == "" and txt[0].isalpha()):
+                    self.nameToCell[txt] = Cell('*', c, self)
+        # TODO Filter
+        for r,row in self.nameRowsAbove:
+            for c in range(1,self.Width()+1):
+                txt = self.GetCellText(r,c).strip()
+                if(not txt == "" and txt[0].isalpha()):
+                    self.nameToCell[txt] = Cell('*', c, self)
+        # TODO Filter
+        for r,row in self.nameRowsBelow:
+            for c in range(1,self.Width()+1):
+                txt = self.GetCellText(r,c).strip()
+                if(not txt == "" and txt[0].isalpha()):
+                    self.nameToCell[txt] = Cell('*', c, self)
 
     def Execute(self, i):
         self.accessList = []
@@ -1554,7 +1605,7 @@ def recalculate_linedef(view,row):
 # ====================================================================
 # CREATE TABLE
 # ====================================================================
-RE_AUTOCOMPUTE = re.compile(r"^\s*[|]\s*(?P<a>[#_$^*!/])\s*[|]")
+RE_AUTOCOMPUTE = re.compile(r"^\s*[|]\s*(?P<a>[#_$^*!/ ])\s*[|]")
 def create_table(view, at=None):
     row = view.curRow()
     if(at != None):
@@ -1588,6 +1639,7 @@ def create_table(view, at=None):
     colNames       = []
     parameters     = []
     ignore = []
+    ignoreRows = {}
     for r in range(row,last_row+1):
         rowNum += 1
         pt = view.text_point(r, 0)
@@ -1608,10 +1660,12 @@ def create_table(view, at=None):
             # in a special way!
             mm = RE_AUTOCOMPUTE.search(line) 
             if(mm):
-                isAdvanced = True
                 char = mm.group('a')
+                if(char != ' '):
+                    isAdvanced = True
                 # Name row
                 if(char == '!'):
+                    ignoreRows[rowNum] = r
                     ignore.append((rowNum,r))
                     colNames.append((rowNum,r))
                     pass
@@ -1623,22 +1677,27 @@ def create_table(view, at=None):
                     pass
                 # Skip row
                 elif(char == "/"):
+                    ignoreRows[rowNum] = r
                     ignore.append((rowNum,r))
                     pass
                 # Name below
                 elif(char == "_"):
+                    ignoreRows[rowNum] = r
                     namesRowsBelow.append((rowNum,r))
                     ignore.append((rowNum,r))
                     pass
                 # Name above
                 elif(char == "^"):
+                    ignoreRows[rowNum] = r
                     namesRowsAbove.append((rowNum,r))
                     ignore.append((rowNum,r))
                     pass
                 elif(char == "$"):
+                    ignoreRows[rowNum] = r
                     parameters.append((rowNum,r))
                     ignore.append((rowNum,r))
                 else:
+                    ignoreRows[rowNum] = r
                     ignore.append((rowNum,r))
                     pass
                 lineToRow[rowNum] = r
@@ -1689,30 +1748,15 @@ def create_table(view, at=None):
     td.nameRowsAbove = namesRowsAbove
     td.nameRowsBelow = namesRowsBelow
     td.colNames      = colNames
-    td.ignore        = ignore
+    if(isAdvanced):
+        td.ignore        = ignore
+        td.ignoreRows    = ignoreRows
+    else:
+        td.ignore     = []
+        td.ignoreRows = {}
     if(isAdvanced):
         td.startCol = 2
-    if(formula):
-        sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
-        first = sre.match(formulaLine)
-        if(first):
-            lastend = len(first.group(0))
-            xline = sre.sub('',formulaLine)
-            las = xline.split('::')
-            index = 0
-            for fm in formula:
-                formatters = fm.split(';')
-                if(len(formatters) > 1):
-                    fm = formatters[0]
-                    formatters = formatters[1]
-                else:
-                    formatters = ""
-                fend = lastend+len(las[index])
-                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend)),formatters))
-                index += 1
-                lastend = fend + 2
-        td.BuildCellToFormulaMap()
-    # 
+        td.BuildNameMap()
     if(td):
         node = db.Get().At(view, start_row)
         if(node):
@@ -1742,6 +1786,27 @@ def create_table(view, at=None):
                             pp = p.split('=')
                             if(len(pp) == 2):
                                 td.consts[pp[0].strip()] = pp[1].strip()
+    if(formula):
+        sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
+        first = sre.match(formulaLine)
+        if(first):
+            lastend = len(first.group(0))
+            xline = sre.sub('',formulaLine)
+            las = xline.split('::')
+            index = 0
+            for fm in formula:
+                formatters = fm.split(';')
+                if(len(formatters) > 1):
+                    fm = formatters[0]
+                    formatters = formatters[1]
+                else:
+                    formatters = ""
+                fend = lastend+len(las[index])
+                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend)),formatters,td))
+                index += 1
+                lastend = fend + 2
+        td.BuildCellToFormulaMap()
+    # 
     return td
 
 
@@ -1836,6 +1901,38 @@ class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
             formulaIdx = td.GetFormulaAt()
             if(None != formulaIdx):
                 td.HighlightFormula(formulaIdx)
+
+# ================================================================================
+class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
+    def on_reformat(self):
+        self.on_done()
+
+    def on_done_cell(self):
+        self.view.sel().clear()
+        self.view.sel().add(self.result[3])
+        self.view.run_command('table_editor_align')
+        sublime.set_timeout(self.on_reformat,1)
+
+    def on_done(self):
+        evt.EmitIf(self.onDone)
+
+    def run(self,edit,onDone = None):
+        self.onDone = onDone
+        global tableCache
+        td = tableCache.GetTable(self.view)
+        if(td):
+            cell = td.CursorToCell()
+            formulaIdx = td.GetFormulaAt()
+            if(None != formulaIdx):
+                it = SingleFormulaIterator(td,formulaIdx)
+                for n in it:
+                    r,c,val,reg = n
+                    if(r == cell[0] and c == cell[1]):
+                        self.result = n
+                        fmt = td.FormulaFormatter(formulaIdx)
+                        if(val and isinstance(val,float) and fmt and "%" in fmt):
+                            val = fmt % val
+                        self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
 
 # ================================================================================
 class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
@@ -1955,6 +2052,8 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             if(td):
                 self.preCell = td.CursorToCell()
                 self.hlines  = td.hlines
+                if(isAutoComputeRow(self.view)):
+                    self.view.run_command("org_table_auto_compute")
     def on_post_text_command(self, command_name, args= None):
         if(hasattr(self,'preCell') and self.preCell != None):
             if('table_editor_move_row_up' == command_name):

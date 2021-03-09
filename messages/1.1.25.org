@@ -35,7 +35,7 @@
 ** Spreadsheet Preview V10
   - boxes mode seems to work.
 
-    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:filledcurve file:plot.png
+    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:lines file:plot.png
     |    Sede   |  Max   | H-index |  top  |
     |-----------+--------+---------+-------|
     | Sao Paolo |  71.00 |   11.50 |  13.5 |
@@ -45,7 +45,21 @@
     | Chile     | 257.72 |   21.39 | 23.39 |
     #+TBLFM:$4=$3+2.0
 
+*** Start of Advanced Table Features
+    - Auto computed cells now mostly work.
+      Careful with these in big tables.
+    - Row names now mostly work.
+
+    |   |   a   |   b   |    c     |
+    |---+-------+-------+----------|
+    | # | 0.18  | 0.64  | 0.7      |
+    | # | 0.26  | 0.95  | 0.6      |
+    | # | 0.46  | 0.57  | 0.9      |
+    | * | 0.01  | 0.48  | 0.7      |
+    | ^ | hello | world | namedRow |
+    |   |       |       |          |
+    #+TBLFM:$2=rand()*$world;%.2f::$namedRow=rand();%.2f::$3=rand();%.1f
+
 ** HTML Export
   Fixed issue with 0 blank lines at the top of the file.
   The comment gathering code was not being initialized properly.
-  
