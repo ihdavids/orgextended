@@ -48,17 +48,28 @@
 *** Start of Advanced Table Features
     - Auto computed cells now mostly work.
       Careful with these in big tables.
-    - Row names now mostly work.
+      They only auto compute when you use tab or shift tab
+      to move between cells, arrow keys do not recompute
+    - Row names seem to work work.
+    - Above and Below names seem to work
+    - Symbol rows seem to work
 
     |   |   a   |   b   |    c     |
     |---+-------+-------+----------|
-    | # | 0.18  | 0.64  | 0.7      |
-    | # | 0.26  | 0.95  | 0.6      |
-    | # | 0.46  | 0.57  | 0.9      |
-    | * | 0.01  | 0.48  | 0.7      |
+    | # | 0.38  | 0.1   | 0.46     |
+    | # | 0.38  | 0.1   | 0.86     |
+    | # | 0.03  | 0.6   | 0.01     |
+    | * | 0.02  | 0.0   | 0.06     |
     | ^ | hello | world | namedRow |
+    | * |       | 0.3   |          |
     |   |       |       |          |
-    #+TBLFM:$2=rand()*$world;%.2f::$namedRow=rand();%.2f::$3=rand();%.1f
+    | _ | below |       |          |
+    | # | 3.5   | 0.7   |          |
+    | # | 4.5   | 0.9   |          |
+    | # | 4.0   | 0.8   |          |
+    | # | 2.0   | 0.4   |          |
+    | $ | max=5 |       |          |
+    #+TBLFM:$hello=rand()*$world;%.2f::$namedRow=rand();%.2f::$3=rand();%.1f::$below=$3*$max
 
 ** HTML Export
   Fixed issue with 0 blank lines at the top of the file.

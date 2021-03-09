@@ -634,25 +634,25 @@ def formula_rowcol(expr,table):
                 if(isNumeric(row)):
                     row = int(row)
                 col = '*'
-                return [[row,col],fields[1]]
+                return [[row,col],fields[1],None]
             else:
                 col = m.group('colonly')
                 if(isNumeric(col)):
                     col = int(col)
                 row = '*'
-                return [[row,col],fields[1]]
+                return [[row,col],fields[1],None]
         else:
             if(isNumeric(row)):
                 row = int(row)
             if(isNumeric(col)):
                 col = int(col)
-            return [[row,col],fields[1]]
+            return [[row,col],fields[1],None]
     else:
         mn = RE_NAMED_TARGET.search(target)
         if(mn):
             cell = table.symbolOrCell(mn.group('name').strip())
             if(isinstance(cell,Cell)):
-                return [[cell.r,cell.c],fields[1]]
+                return [[cell.r,cell.c],fields[1],cell.rowFilter]
     return (None, None)
 
 def numberCheck(v):
@@ -763,8 +763,8 @@ class Formula:
             m = RE_PRINTFSTYLE.search(self.formatters)
             if(m):
                 self.printfout = m.group('formatter')
-        self.target, self.expr = formula_rowcol(expr,table)
-        print("TARGET: " + str(self.target) + " -> " + str(expr))
+        self.target, self.expr, self.rowFilter = formula_rowcol(expr,table)
+        # print("TARGET: " + str(self.target) + " -> " + str(expr))
         # Never allow our expr to be empty. If we failed to parse it our EXPR is current cell value
         if(self.expr == None):
             self.expr = "$0"
@@ -776,12 +776,16 @@ class Formula:
     def EmptyIsZero(self):
         return 'N' in self.formatters
 
-def CellRowIterator(table,start,end):
+def CellRowIterator(table,start,end, arit=None, brit=None):
     c = table.CurCol()
+    if not arit:
+        arit = NullFilter()
+    if not brit:
+        brit = NullFilter()
     if(start < table.StartRow()):
         start = table.StartRow()
     for r in range(start,end+1):
-        if(table.ShouldIgnoreRow(r)):
+        if(table.ShouldIgnoreRow(r) or arit.filter(r) or brit.filter(r)):
             continue
         cell = Cell(r,c,table)
         yield cell
@@ -806,7 +810,7 @@ def CellBoxIterator(table,a,b):
     if(sr < table.StartRow()):
         sr = table.StartRow()
     for r in range(sr,er+1):
-        if(table.ShouldIgnoreRow(r)):
+        if(table.ShouldIgnoreRow(r) or a.ShouldIgnoreRow(r) or b.ShouldIgnoreRow(r)):
             continue
         for c in range(sc,ec+1):
             cell = Cell(r,c,table)
@@ -815,7 +819,14 @@ def CellBoxIterator(table,a,b):
 def CellIterator(table,cell):
     r = cell.r
     c = cell.c
+    filter = cell.rowFilter
+    if(None == filter):
+        print("FILTER WAS NONE")
+        filter = NullFilter()
+    else:
+        print("HAVE FILTER")
     if(r == '*'):
+        print("HEIGHT: " + str(table.Height()))
         rrange = range(table.StartRow(),table.Height()+1)
     else:
         rrange = range(cell.GetRow(),cell.GetRow()+1)
@@ -824,7 +835,8 @@ def CellIterator(table,cell):
     else:
         crange = range(cell.GetCol(),cell.GetCol()+1)
     for r in rrange:
-        if(table.ShouldIgnoreRow(r)):
+        if(table.ShouldIgnoreRow(r) or filter.filter(r)):
+            print("SKIPPING: " + str(r) + " " + table.GetCellText(r,2))
             continue
         for c in crange:
             cell = Cell(r,c,table)
@@ -847,12 +859,13 @@ def RCIterator(table,r,c):
 
 # ============================================================
 class Cell:
-    def __init__(self,r,c,table,rrelative=0,crelative=0):
+    def __init__(self,r,c,table,rrelative=0,crelative=0,rowFilter=None):
         self.r = r
         self.c = c
         self.table = table
         self.rrelative = rrelative
         self.crelative = crelative
+        self.rowFilter = rowFilter
 
     def __str__(self):
         return self.GetText()
@@ -866,6 +879,12 @@ class Cell:
 
     def rc(self):
         return (self.r,self.c)
+
+    def ShouldIgnoreRow(self, r):
+        if(self.rowFilter):
+            rv = self.rowFilter.filter(r)
+            return rv
+        return False
 
     def GetRow(self):
         r = None
@@ -1176,7 +1195,22 @@ class RangeExprOnNonCells(simpev.InvalidExpression):
         # pylint: disable=bad-super-call
         super(RangeExprOnNonCells, self).__init__(self.message)
 
-
+class NullFilter:
+    def filter(self,x):
+        #print("N: " + str(x))
+        return False
+class AboveFilter:
+    def __init__(self,r):
+        self.r = r
+    def filter(self,x):
+        #print("A: " + str(x) + " >= " + str(self.r))
+        return x >= self.r
+class BelowFilter:
+    def __init__(self,r):
+        self.r = r
+    def filter(self,x):
+        #print("B: " + str(x) + " <= " + str(self.r))
+        return x <= self.r
 # ============================================================
 class TableDef(simpev.SimpleEval):
     def range_expr(self,a,b):
@@ -1184,7 +1218,7 @@ class TableDef(simpev.SimpleEval):
             if(a.r == "*" and b.r == "*"):
                 return CellColIterator(a.table, a.GetCol(), b.GetCol())
             elif(a.c == "*" and b.c == "*"):
-                return CellRowIterator(a.table, a.GetRow(), b.GetRow())
+                return CellRowIterator(a.table, a.GetRow(), b.GetRow(), a.rowFilter, b.rowFilter)
             elif(a.r != '*' and b.r != '*' and a.c != '*' and b.c != '*'):
                 return CellBoxIterator(a.table,a,b)
             else:
@@ -1487,19 +1521,24 @@ class TableDef(simpev.SimpleEval):
         dm = self.formulas[i]
         return dm.target
 
+    def FormulaTargetRowFilter(self, i):
+        dm = self.formulas[i]
+        return dm.rowFilter
+
     def ValidateFormulaCells(self,i):
         if("INVALID" in self.formulas[i].formula):
             sublime.status_message("ORG Table WARNING: Formula {0} is targetting an invalid cell!".format(i))
 
     def FormulaTargetCellIterator(self, i):
         target = self.FormulaTarget(i)
+        rowFilter = self.FormulaTargetRowFilter(i)
         self.ValidateFormulaCells(i)
         if(len(target) == 4):
-            cellStart = Cell(target[0],target[1],self)
-            cellEnd = Cell(target[2],target[3],self)
+            cellStart = Cell(target[0],target[1],self,rowFilter = rowFilter)
+            cellEnd = Cell(target[2],target[3],self,rowFilter = rowFilter)
             cellIterator = CellBoxIterator(self,cellStart,cellEnd)
         else:
-            cell = Cell(target[0],target[1],self)
+            cell = Cell(target[0],target[1],self,rowFilter=rowFilter)
             cellIterator = CellIterator(self,cell)
         return cellIterator
 
@@ -1542,18 +1581,18 @@ class TableDef(simpev.SimpleEval):
                 txt = self.GetCellText(r,c).strip()
                 if(not txt == "" and txt[0].isalpha()):
                     self.nameToCell[txt] = Cell('*', c, self)
-        # TODO Filter
         for r,row in self.nameRowsAbove:
             for c in range(1,self.Width()+1):
                 txt = self.GetCellText(r,c).strip()
                 if(not txt == "" and txt[0].isalpha()):
-                    self.nameToCell[txt] = Cell('*', c, self)
-        # TODO Filter
+                    f = AboveFilter(r)
+                    self.nameToCell[txt] = Cell('*', c, self, rowFilter = f)
         for r,row in self.nameRowsBelow:
             for c in range(1,self.Width()+1):
                 txt = self.GetCellText(r,c).strip()
                 if(not txt == "" and txt[0].isalpha()):
-                    self.nameToCell[txt] = Cell('*', c, self)
+                    f = BelowFilter(r)
+                    self.nameToCell[txt] = Cell('*', c, self, rowFilter = f)
 
     def Execute(self, i):
         self.accessList = []
