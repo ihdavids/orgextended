@@ -1,0 +1,29 @@
+* 1.1.20
+** Editing
+	- Heading and Child heading insertion now ignores whitespace at the end of a node
+** Extensions
+	- Improved extension reloading on modification. Before it would force reload to often
+	  now we track and reload only when we have to. This should improve table performance
+	  a little. This is in prep for the advanced table features including automatic
+	  cell calculations on # fields.
+	- Extension folders renamed for consistency:
+		- src folder renamed to orgsrc
+		- resolver folder renamed to orgresolver
+		- dynamic folder renamed to orgdynamic
+		- table extensions were already in orgtable
+** Spreadsheets Preview V7
+	- Fixed small issue with syntax coloring
+
+** Syntax
+	- Added lisp coloring for source blocks marked with lisp or emacs-lisp as the language.
+	Also added the following language identifiers to src blocks:
+	- yaml
+	- rust
+	- sql
+	- r
+	- html
+	- go
+	- ledger
+	- make|makefile
+  	- typescript|ts
+

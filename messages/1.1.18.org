@@ -1,0 +1,35 @@
+* 1.1.18
+** Spreadsheets
+	- A crude stab at a table visualization
+	- "Org Show Table Rows" - will show a set of phantoms that ID the rows and columns to help when authoring formulas
+	- "Org Hide Table Rows" - will hide the phantoms.
+    - Fixed positive relative offsets, they were not working:
+
+    | a | b | c | d | e | f |
+    | 4 | 5 | 6 | 7 | 8 | 9 |
+    | 1 | 2 | 3 | 4 | 5 | 6 |
+    #+TBLFM:@2= @+1+3
+    
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+    - filling in a cell with an expression and having it automatically be moved to tablefmt
+    - cell highlighting when editing expressions.
+    - horizontal separators are now respected as non cells.
+    - Negative (relative) or arrow cell indexes
+    - Index symbol $# and @#
+    - Automatically updating your expressions when you resize the table
+    - box range targets
+    - basic printf style formatting after semi colon for floating point types: $2=$1/2.0;%.1f
+    - Properties and constants (defined in a CONSTANTS comment) can be used in formulas
+    - remote() references to other named tables.
+    - Visualizing columns and rows
+
+    Things that do NOT work:
+    - Extended calc style output formatting (semi colon)
+    - Advanced tabled features / Named fields
+    - gnu plot support
+    - more functions
+

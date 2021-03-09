@@ -40,6 +40,13 @@
   + As a self documenting configuration file for emacs itself (and other things).
   + Many many more things
 
+  I use org to manage my agenda:
+
+  ![Agenda](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/agenda_day.gif)
+
+  Or to help me manipulate tables of data:
+
+  ![Tables](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/table_hacking.gif)
 
   What makes Org Mode so versatile is the deceptive simplicity of the format
   the flexibility of the simple markup and the the depth of the tools and API's provided around that format.
@@ -55,6 +62,7 @@
 
 # This Plugin
 
+  - [Starter Tutorial](https://github.com/ihdavids/orgextended_docs/blob/master/learning_todos.org) - A startup primer.
   - [Basic Structure](https://github.com/ihdavids/orgextended_docs/blob/master/orgextended.org) - Basic file structure
   - [Setup](https://github.com/ihdavids/orgextended_docs/blob/master/setup.org) - Sublime Setup
   - [Editing](https://github.com/ihdavids/orgextended_docs/blob/master/editing.org) - Editing your org file
@@ -68,6 +76,7 @@
   - [Scheduling](https://github.com/ihdavids/orgextended_docs/blob/master/dates.org) - Dates and times
   - [Time Tracking](https://github.com/ihdavids/orgextended_docs/blob/master/clocking.org) - Clocking and clock reports
   - [Dynamic Blocks](https://github.com/ihdavids/orgextended_docs/blob/master/dynamicblocks.org) - Run arbitrary code
+  - [Tables](https://github.com/ihdavids/orgextended_docs/blob/master/tables.org) - Spreadsheet like capabilities
   - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
 
   The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
@@ -90,6 +99,7 @@
   To help get you started on your Org journey
   Here are some useful external links:
 
+- [Org Mode Site](https://orgmode.org) - Org
 - [The Org Manual](https://orgmode.org/manual/) - The official source of truth for all things orgmode
 - [Org Mode 4 Beginners](https://orgmode.org/worg/org-tutorials/org4beginners.html) - An introduction
 - [David O'Tools Introduction](https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html) - Yet another intro

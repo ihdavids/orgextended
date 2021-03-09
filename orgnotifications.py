@@ -80,7 +80,7 @@ def IsWithinNotificationWindow(n, hours, minutes):
 	if(n.scheduled.repeating):
 		next = n.scheduled.next_repeat_from_today
 		return ((next.hour-hours) == hour and (next.minute - mins) <= minutes) 
-	next = n.scheduled.start
+	next = agenda.EnsureDateTime(n.scheduled.start)
 	return ((next.hour-hours) == hour and (next.minute - mins) <= minutes) 
 
 def GetUID(item):
@@ -147,8 +147,13 @@ class NotificationSystem(threading.Thread):
 					self.AddEntry(n, file)
 
 	def TodayCheck(self, n, file):
-		now = datetime.now()
-		return (agenda.IsTodo(n) and agenda.IsToday(n, now))
+		try:
+			now = datetime.now()
+			return (agenda.IsTodo(n) and agenda.IsToday(n, now))
+		except:
+			if(n):
+				log.error("NOTIFICATIONS FAILED TO PARSE: " + str(n.heading))
+			return False
 
 
 notice = None

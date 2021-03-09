@@ -1,0 +1,34 @@
+* 1.1.21
+** Db
+	- orgFiles was not working, this has been fixed.
+	  [[https://github.com/ihdavids/orgextended/issues/16][orgFiles does not work]] 
+	- Files with a BOM. I can't easily handle BOMs
+	  but I now do try to detect it and swap encodings if
+	  I fail to load the file as utf-8.
+	- Notifications fix. The notification system was asserting on SCHEDULED: <DATE>
+	  where date did not have a time.
+** Spreadsheets Preview V8
+	
+	- Fix for floating point values.
+	- VERY early support for gnuplot
+
+	To use: 
+	- install gnuplot
+	- Set your gnuplot path:
+		#+BEGIN_EXAMPLE
+		  "gnuplot": "<fullpathtognuplot.exe>",
+		#+END_EXAMPLE
+
+	- Run "Org Plot Table" with cursor on the table
+	- Right now I am just dumping an image and using the inline image show option
+	  in the future I may change that.
+
+    #+PLOT: title:"Citas" ind:1 deps:(3 4) with:lines set:grid
+    |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0

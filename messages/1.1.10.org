@@ -1,0 +1,16 @@
+* 1.1.10
+	None of the new commands are bound to a keybinding.
+
+** Blank Table Insert
+	- "Org Insert Blank Table"
+	- This will insert a blank WxH blank table at point.
+
+** Csv Import
+	- "Org Import Csv"
+	- Still in its infancy
+    - Added Org Import Cvs command. Will import a csv file into a table.
+
+** Convert Region To Table
+	- "Org Convert Region To Table"
+	- Only works with commas at the moment.
+	- Tries to convert a region to a table, will improve with time.

@@ -23,6 +23,15 @@ def isOrgSyntax(fileOrView):
         return 'text.orgmode' in names
     return False
 
+def isPotentialOrgFileOrBuffer(fileOrView):
+    if(isOrgSyntax(fileOrView)):
+        return True
+    if(type(fileOrView) is sublime.View and fileOrView.file_name()):
+        return isPotentialOrgFile(fileOrView.file_name())
+    elif(type(fileOrView) is str):
+        return isPotentialOrgFile(fileOrView)
+    return False
+
 def isView(fileOrView):
     return (type(fileOrView) is sublime.View)
 
@@ -75,10 +84,21 @@ def curRow(self):
     return self.rowcol(self.sel()[0].begin())[0]
 
 @add_method(sublime.View)
+def lastRow(self):
+    last_row, _ = self.rowcol(self.size())
+    return last_row
+
+# Returns a region that is the current line
+@add_method(sublime.View)
 def curLine(self):
     row = self.curRow()
     pt = self.text_point(row, 0)
     return self.line(pt)
+
+# Returns a region that is the current line
+@add_method(sublime.View)
+def curLineText(self):
+    return self.substr(self.curLine())
 
 @add_method(sublime.View)
 def lineAt(self,row):
@@ -127,6 +147,10 @@ def getIndent(view, regionOrLine):
 def getLine(view, row):
     pt = view.text_point(row, 0)
     reg = view.line(pt)
+    if(reg.begin() == reg.end()):
+        return ""
+    if(reg.begin() >= view.size()):
+        return ""
     return view.substr(reg)
 
 RE_HEADING = re.compile('^[*]+ ')
@@ -137,27 +161,35 @@ RE_HEADING = re.compile('^[*]+ ')
 #   region
 #   search up
 @add_method(sublime.View)
-def findParentByIndent(view, region):
-    row, col = view.rowcol(region.begin())
+def findParentByIndent(view, region, exceptionRe=None, headingRe=None):
+    row, col = view.rowcol(region.begin() + 1)
     content  = view.substr(view.line(region))
     indent   = len(view.getIndent(content))
     row     -= 1
     found    = False
+    lastHeading = row
     # Look upward 
     while row >= 0:
         content = view.getLine(row)
         if len(content.strip()):
-            if(RE_HEADING.search(content)):
+            if(headingRe and headingRe.search(content)):
+                lastHeading = row
+            if(RE_HEADING.search(content) or exceptionRe and exceptionRe.search(content)):
+                if(not headingRe):
+                    lastHeading = row
                 found = True
                 break
             cur_indent = len(view.getIndent(content))
             if cur_indent < indent:
+                if(not headingRe):
+                    lastHeading = row
                 found = True
                 break
         row -= 1
     if found:
         # return the parent we found.
-        return view.line(view.text_point(row,0))
+        return view.line(view.text_point(lastHeading,0))
+    return None
 
 
 @add_method(sublime.View)

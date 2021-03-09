@@ -27,6 +27,8 @@ class ASettings:
 configFilename    = "OrgExtended"
 
 def setup_user_settings():
+	# This is old and I should remove it!
+	# We don't need this mechanism anymore!
 	filename = configFilename + ".sublime-settings"
 	user_settings_path = os.path.join(
 		sublime.packages_path(),
@@ -38,7 +40,8 @@ def setup_user_settings():
 			sublime.packages_path(),
 			"OrgExtended",
 			filename)
-		shutil.copyfile(default_settings_path, user_settings_path)
+		if os.path.exists(default_settings_path):
+			shutil.copyfile(default_settings_path, user_settings_path)
 
 def setup_mousemap():
 	filename = "Default.sublime-mousemap"
@@ -107,6 +110,14 @@ def RepresentsInt(s):
         return True
     except ValueError:
         return False	
+
+def GetInt(name, defaultValue):
+	v = Get(name, defaultValue)
+	try:
+		i = int(v)
+		return i
+	except:
+		return defaultValue
 
 # Will return a date or an index as an integer where 0 means Sunday
 # and so on in the week.

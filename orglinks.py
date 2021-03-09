@@ -35,6 +35,7 @@ import base64
 import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
+import OrgExtended.pymitter as evt
 
 try:
     import importlib
@@ -74,7 +75,7 @@ DEFAULT_LINK_RESOLVERS = [
     'file',
 ]
 
-available_resolvers = ext.find_extension_modules('resolver', DEFAULT_LINK_RESOLVERS)
+available_resolvers = ext.find_extension_modules('orgresolver', DEFAULT_LINK_RESOLVERS)
 linkre              = re.compile(r"\[\[([^\[\]]+)\]\s*(\[[^\[\]]*\])?\]")
 
 # Returns the url from the full link
@@ -396,14 +397,32 @@ class ImageHandler:
                 return
             return width, height, ttype
 
+class OrgCycleImagesCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        self.view.sel().clear()
+        self.view.sel().add(self.cursor)
+        evt.EmitIf(self.onDone)
+
+    def OnShown(self):
+        self.OnDone()
+
+    def OnHidden(self):
+        self.view.run_command("org_show_images",{"onDone": evt.Make(self.OnShown)})
+
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.cursor = self.view.sel()[0]
+        self.view.run_command("org_hide_images",{"onDone": evt.Make(self.OnHidden)})
 
 class OrgShowImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit,onDone=None):
         ImageHandler.show_images(self.view)
+        evt.EmitIf(onDone)
 
 class OrgHideImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit,onDone=None):
         ImageHandler.hide_images(self.view, edit)
+        evt.EmitIf(onDone)
 
 class OrgShowImageCommand(sublime_plugin.TextCommand):
     def run(self, edit):

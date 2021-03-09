@@ -1,0 +1,78 @@
+* 1.1.14
+** Spreadsheet Preview V3
+	- Column cell formula insertion was broken, this is now fixed.
+	- TBLFM expressions on their own lines would cause exceptions
+	- Added non standard row insertion using >= syntax.
+	  While testing this found a bug in row expressions
+
+    | a | b | c | d  |         e          |
+    |---+---+---+----+--------------------|
+    | a | b | 5 | 10 | >=@3               |
+    | 1 | 1 | 1 |  6 | 3.0914709848078967 |
+    #+TBLFM: @3$5=vmean($1..$4)+sin(@3$1)::$4=$3+5::@2=@3
+
+    - Still using a hacked up version of simple_eval and python ast
+      for the expression parser. Decided using functions rather than names
+      for the expression differences made sense. Even though this is a bit of
+      a misuse of the parser I think I will stick with this approach, it's simple
+      it's functional and will allow me to support the other variable modifiers in the end.
+    - Right now the parser is pretty locked down.
+    - I will probably never support arbitrary lisp like spreadsheets like emacs can.
+      (As much as it would be fun to build a lisp parser here, it's kind of missing the rest of emacs and the massive function library)
+    - Cleaned up some asserts that happened when editing a table. The highligher didn't like targets changing on the fly.
+    - That said, I may support more and more of the calc library and even allow some user made extensions eventually.
+    - My eventual goal is to flesh out my babel hack to a more full featured version with all the power that comes along with that. 
+      Without TRAMP, remote sessions etc. some of the
+      power of bable is muted a little bit. (But who knows, maybe TRAMP is possible in sublime...) That said, we need powerfull spreadsheet
+      support as an input source before really going to town on bable is possible. 
+
+*** New Cell Identifiers
+
+	With the refactor on how I am handling cells I can now support the > and relative cell identifiers
+	-1 is one to the left or one up from the current target being calculated. It is a relative identifier.
+	> means last column while >> means last but one.
+
+    | a | b | c | d  |         e          |
+    |---+---+---+----+--------------------|
+    | a | b | 5 | 10 | >=@3               |
+    | 1 | 1 | 1 |  6 | 3.0914709848078967 |
+    #+TBLFM: @>$5=vmean($1..$4)+sin(@-1$-1)::$4=$#+5::@2=@3
+
+
+    - In addition we have index symbols $# is the current column and @# is the current row
+
+    | idx |   Index Gen   |
+    |-----+---------------|
+    |   1 | Testing Index |
+    |   2 | Generation    |
+    #+TBLFM: $1=@#-1
+
+    - Constants defined in your file can also be used in expressions
+
+    #+CONSTANTS: hello=world a=b
+    | x     | y |
+    | world | b |
+    #+TBLFM:@2$2=$a::@2$1=$hello
+
+
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+    - filling in a cell with an expression and having it automatically be moved to tablefmt
+    - cell highlighting when editing expressions.
+    - horizontal separators are now respected as non cells.
+    - Negative (relative) or arrow cell indexes
+    - Index symbol $# and @#
+
+    Things that do NOT work:
+    - Automatically updating your expressions when you resize the table
+    - calc style output formatting (semi colon)
+    - Advanced tabled features / Named fields
+    - box range targets
+    - Visualizing columns
+    - gnu plot support
+    - hline symbols
+    - more functions
+    - remote() references to other named tables.

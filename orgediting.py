@@ -24,6 +24,9 @@ import OrgExtended.orgdatepicker as datep
 import OrgExtended.orginsertselected as insSel
 import OrgExtended.orglinks as orglink
 import OrgExtended.orgneovi as nvi
+import OrgExtended.orgagenda as oa
+import OrgExtended.orgcheckbox as checkbox
+import OrgExtended.orgnumberedlist as numberedlist
 
 log = logging.getLogger(__name__)
 
@@ -85,9 +88,16 @@ def IsDoneState(node, toState):
     return toState in node.env.done_keys
 
 def ShouldRecur(node, fromState, toState):
-    if(IsDoneState(node, toState) and node.scheduled and node.scheduled.repeating):
-        return True
-    return False
+    if(IsDoneState(node, toState)):
+        if(node.scheduled and node.scheduled.repeating):
+            return node.scheduled
+        if(node.deadline and node.deadline.repeating):
+            return node.deadline
+        timestamps = node.get_timestamps(active=True,point=True,range=True)
+        for t in timestamps:
+            if(t and t.repeating):
+                return t
+    return None
 
 def ShouldClose(node, fromState, toState):
     if(ShouldRecur(node,fromState,toState)):
@@ -122,14 +132,64 @@ def ShouldNote(node, fromState, toState):
 
 
 
+RE_T = re.compile(r'\s(?P<time><\s*\d+-\d+-\d+\s+[^>]+>)(\s+|$)')
 # Use a menu to change the todo state of an item
 class OrgTodoChangeCommand(sublime_plugin.TextCommand):
     def on_totally_done(self):
         evt.EmitIf(self.onDone)
 
+    # recurrence needs to update the base timestamp!
+    # This needs to respect the .+ ++ and + markers
+    def on_update_timestamps_if_needed(self, row=0):
+        # We have to reload our node as we updated things.
+        self.node = db.Get().At(self.view, self.node.start_row)
+        if(row > (self.node.local_end_row+1)):
+            self.on_totally_done()
+        for i in range(self.node.start_row+row, self.node.local_end_row+1):
+            pt = self.view.text_point(i, 0)
+            line = self.view.line(pt)
+            txt = self.view.substr(line)
+            m = RE_T.search(txt)
+            now = datetime.datetime.now()
+            if(m):
+                tsl = OrgDate.list_from_str(m.group('time'))
+                if(tsl):
+                    t = tsl[0]
+                    if(t.repeating):
+                        next  = t.start
+                        next2 = t.end
+                        if(t.repeatpre == "+"):
+                            next = t.next_repeat_from(oa.EnsureDateTime(next))
+                        elif(t.repeatpre == "++"):
+                            while(next < now):
+                                next = t.next_repeat_from(oa.EnsureDateTime(next))
+                        elif(t.repeatpre == ".+"):
+                            next = t.next_repeat_from(now)
+                        s = m.start(1)
+                        e = m.end(1)
+                        rpt = t.repeatpre + str(t.repeatnum) + t.repeatdwmy
+                        wrn = ""
+                        if(t.warning):
+                            wrn = " " + t.warnpre + str(t.warnnum) + t.warndwmy
+                        if(t.has_end()):
+                            if(t.has_time()):
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a %H:%M-") + t.end.strftime("%H:%M ")+ rpt + wrn + ">"  + txt[e:]
+                            else:
+                                # This really shouldn't happen.
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a ")+ rpt + wrn + ">" + txt[e:]
+                        else:
+                            if(t.has_time()):
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a %H:%M ") + rpt + wrn + ">" +txt[e:]
+                            else:
+                                nout = txt[:s] + next.strftime("<%Y-%m-%d %a ")+ rpt + wrn + ">" + txt[e:]
+                        self.view.run_command("org_internal_replace", {"start": line.begin(), "end": line.end(), "text": nout, "onDone": evt.Make(lambda:self.on_update_timestamps_if_needed(i+1)) })
+                        return
+        self.on_totally_done()
+
     def do_recurrence_if_needed(self):
-        if(ShouldRecur(self.node,self.fromState,self.newState)):
-            InsertRecurrence(self.view, self.node, self.fromState, self.newState, evt.Make(self.on_totally_done))
+        self.rec = ShouldRecur(self.node,self.fromState,self.newState)
+        if(self.rec):
+            InsertRecurrence(self.view, self.node, self.fromState, self.newState, evt.Make(self.on_update_timestamps_if_needed))
         else:
             self.on_totally_done()
 
@@ -265,6 +325,45 @@ def indent_node(view, node, edit):
     for n in node.children:
         indent_node(view, n, edit)
 
+def indent_list(view, row, edit):
+    # Indent the node itself
+    sp  = view.text_point(row,0)
+    view.insert(edit,sp,"  ")
+
+    line = view.lineAt(row)
+    children,crow = numberedlist.findChildrenByIndent(view, line)
+    for r in range(row+1,crow):
+        sp  = view.text_point(r,0)
+        view.insert(edit,sp,"  ")
+
+def deindent_list(view, row, edit):
+    # Get my position and ensure this node CAN de-indent
+    sp  = view.text_point(row,0)
+    ep  = view.text_point(row,1)
+    np  = view.text_point(row,2)
+    bufferContents = view.substr(sublime.Region(sp,np))
+    bufferContentsS = view.substr(sublime.Region(sp,ep))
+    wasTab = bufferContentsS == "\t"
+    if(bufferContents == "  " or wasTab):
+        if(wasTab):
+            view.erase(edit,sublime.Region(sp,ep))
+        else:
+            view.erase(edit,sublime.Region(sp,np))
+        line = view.lineAt(row)
+        children,crow = numberedlist.findChildrenByIndent(view, line)
+        for r in range(row+1,crow):
+            sp  = view.text_point(r,0)
+            ep  = view.text_point(r,1)
+            np  = view.text_point(r,2)
+            bufferContents = view.substr(sublime.Region(sp,np))
+            bufferContentsS = view.substr(sublime.Region(sp,ep))
+            wasTab = bufferContentsS == "\t"
+            if(bufferContents == "  " or wasTab):
+                if(wasTab):
+                    view.erase(edit,sublime.Region(sp,ep))
+                else:
+                    view.erase(edit,sublime.Region(sp,np))
+
 def deindent_node(view, node, edit):
     # Get my position and ensure this node CAN de-indent
     sp  = view.text_point(node.start_row,0)
@@ -285,22 +384,51 @@ def deindent_node(view, node, edit):
     else:
         log.debug("Did not get star, not deindenting it " + str(len(bufferContents)) + " " + bufferContents)
 
-class OrgChangeIndentCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        n = db.Get().AtInView(self.view)
-        if(n and type(n) != node.OrgRootNode):
-            indent_node(self.view, n, edit)
-            file = db.Get().FindInfo(self.view)
-            file.LoadS(self.view)
+# Thing is a region, and first line of the thing tuple
+# things is a list of thing
+def sort_things_alphabetically(things,reverse=False):
+    things.sort(key=lambda thing: thing[1],reverse=reverse)
 
-# This does not handle indention of sub trees! Need to fix that!
-class OrgChangeDeIndentCommand(sublime_plugin.TextCommand):
+
+class OrgSortListCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        n = db.Get().AtInView(self.view)
-        if(n and type(n) != node.OrgRootNode):
-            deindent_node(self.view, n, edit)
-            file = db.Get().FindInfo(self.view)
-            file.LoadS(self.view)
+        # Get a list of things
+        things = None
+        wasNumbered = False
+        if(numberedlist.isNumberedLine(self.view)):
+            wasNumbered = True
+            things = numberedlist.getListAtPoint(self.view)
+        elif(checkbox.isUnorderedList(self.view.getLine(self.view.curRow()))):
+            things = checkbox.getListAtPoint(self.view)
+        if(not things):
+            log.error(" Could not sort at point")
+            return
+        # Build macro region
+        start = things[0][0][0]
+        end   = things[len(things)-1][0][1]
+        sp  = self.view.text_point(start,0)
+        ep  = self.view.text_point(end,0)
+        ep  = self.view.line(ep).end()
+        reg = sublime.Region(sp,ep)
+
+        # Sort the things
+        sort_things_alphabetically(things)
+
+        # Copy from macro region to sorted version
+        buffer = ""
+        for thing in things:
+            bs = self.view.text_point(thing[0][0],0)
+            be = self.view.text_point(thing[0][1]-1,0)
+            be = self.view.line(be).end()
+            breg = sublime.Region(bs,be)
+            ss = self.view.substr(breg).rstrip() + "\n"
+            buffer += ss
+        # Replace the macro region with new str
+        self.view.replace(edit, reg, buffer)
+        if(wasNumbered):
+            self.view.run_command('org_update_numbered_list')
+        pass
+
 
 
 class OrgSelectSubtreeCommand(sublime_plugin.TextCommand):
@@ -436,22 +564,27 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         curNode = db.Get().AtInView(self.view)
+        needsNewline = False
         if(not curNode):
             level = 1
             here = sublime.Region(self.view.size(),self.view.size())
             reg  = here
         else:
             level = curNode.level
-            reg = curNode.region(self.view)
+            reg = curNode.region(self.view,True)  # trim ending whitespace
             if(level == 0):
                 level = 1
                 here = sublime.Region(view.size(),view.size())
             else:
                 here = sublime.Region(reg.end(),reg.end())
+                text = self.view.substr(self.view.line(here))
+                if(text.strip() != ""):
+                    needsNewline = True
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
-        self.view.insert(edit,self.view.sel()[0].begin(),'\n')
+        if(needsNewline):
+            self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
         self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str(level)+".sublime-snippet"})
@@ -460,6 +593,7 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
 class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         curNode = db.Get().AtInView(self.view)
+        needsNewline = False
         if(not curNode):
             file = db.Get().FindInfo(self.view)
             if(len(file.org) > 0):
@@ -471,16 +605,20 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
             reg  = here
         else:
             level = curNode.level
-            reg = curNode.region(self.view)
+            reg = curNode.region(self.view, True)
             if(level == 0):
                 level = 1
                 here = sublime.Region(view.size(),view.size())
             else:
                 here = sublime.Region(reg.end(),reg.end())
+                text = self.view.substr(self.view.line(here))
+                if(text.strip() != ""):
+                    needsNewline = True
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
-        self.view.insert(edit,self.view.sel()[0].begin(),'\n')
+        if(needsNewline):
+            self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
         self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str((level+1))+".sublime-snippet"})
@@ -546,7 +684,7 @@ class OrgInsertDateActiveCommand(sublime_plugin.TextCommand):
 
 
 class OrgBaseTimestampCommand(sublime_plugin.TextCommand):
-    def __init__(self,unknown, prefix):
+    def __init__(self,unknown=None, prefix=None):
         super(OrgBaseTimestampCommand, self).__init__(unknown)
         self.prefix = prefix
 
@@ -588,15 +726,15 @@ class OrgBaseTimestampCommand(sublime_plugin.TextCommand):
                 self.insert(dateval)
 
 class OrgScheduleCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgScheduleCommand, self).__init__(unknown,"SCHEDULED:  \n")
 
 class OrgDeadlineCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgDeadlineCommand, self).__init__(unknown,"DEADLINE:  \n")
 
 class OrgActiveTimestampCommand(OrgBaseTimestampCommand):
-    def __init__(self,unknown):
+    def __init__(self,unknown=None):
         super(OrgActiveTimestampCommand, self).__init__(unknown,"  \n")
 
 class OrgInsertClosedCommand(sublime_plugin.TextCommand):
@@ -617,6 +755,7 @@ class OrgInsertClosedCommand(sublime_plugin.TextCommand):
             toInsert = orgdate.OrgDate.format_clock(now, False)
             self.view.insert(edit, l.end() + addnl, nl + node.indent() + "CLOSED: "+toInsert+"\n")
 
+# ================================================================================
 RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
@@ -643,6 +782,7 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
         self.input.run("Tag:",db.Get().tags,evt.Make(self.on_done))
 
 
+# ================================================================================
 class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
         if(text):
@@ -656,6 +796,7 @@ class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
         #print(str(db.Get().customids))
         self.input.run("Custom Id:",db.Get().customids, evt.Make(self.on_done))
 
+# ================================================================================
 class OrgSetTodayCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         self.onDone = onDone

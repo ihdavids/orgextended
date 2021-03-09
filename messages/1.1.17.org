@@ -1,0 +1,94 @@
+* 1.1.17
+*** Spreadsheets Preview V6
+    :PROPERTIES:
+      :testval: 5
+    :END:
+ 	- Invalid cell references now are not assserting in the obvious cases.
+ 	- Invalid cell references now generate a status message during the highligh
+ 	  phase to let you know you have invalid cell references:
+ 	- Fixed a bug with column lookup where it would return curcol sometimes rather than fixed reference.
+ 
+ 	| a | b | c | d | e |
+ 	| 1 | 1 | 1 | 1 | 1 |
+ 	| 2 | 2 | 2 | 2 | 2 |
+  	#+TBLFM:@INVALID=@2+1
+ 
+  	- Removed a bunch of silly debugging prints that were left around from 1.1.16 release!
+  	- SOME support for formatting suffix in formulas:
+  		- N    - Will treat empty cells as 0
+  		- %.#f - Will output # decimal places like a printf
+
+ 	| a     | b     | c   | d     | e     |
+ 	| 1     | 1     |     | 1     | 1     |
+ 	| 0.476 | 0.476 | 0.0 | 0.476 | 0.476 |
+  	#+TBLFM:@3=@2/2.1;N%.3f
+   
+  	- Additional functions:
+  		- floor
+  		- ceil
+  		- round
+  		- trunc
+
+  	- Properties can be referenced in an equation:
+  		$PROP_<name>
+
+  	(See property in node above)
+
+  	#+NAME: TestName
+ 	| a | b  | c  | d  | e  |
+ 	| 5 | 10 | 15 | 20 | 25 |
+  	#+TBLFM:@2=$PROP_testval*$#
+
+  	#+CONSTANTS: pi=3.1415926
+ 	| a   | b   | c   | d    | e    |
+ 	| 3.1 | 6.3 | 9.4 | 12.6 | 15.7 |
+  	#+TBLFM:@2=$pi*$#;%.1f
+
+  	- Remote table references
+  	  here we are grabbing a value from the tabled named TestName
+  	  above:
+ 	| a  | b  | c  | d  | e  |
+ 	| 10 | 10 | 10 | 10 | 10 |
+  	#+TBLFM:@2=remote('TestName',@2$2)
+
+
+  	CURRENT FUNCTIONS:
+        - vmean
+        - vmedian
+        - vmax
+        - vmin
+        - vsum
+        - tan
+        - cos
+        - sin
+        - exp
+        - floor
+        - ceil
+        - round
+        - trunc
+        - randomf
+        - random
+
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+    - filling in a cell with an expression and having it automatically be moved to tablefmt
+    - cell highlighting when editing expressions.
+    - horizontal separators are now respected as non cells.
+    - Negative (relative) or arrow cell indexes
+    - Index symbol $# and @#
+    - Automatically updating your expressions when you resize the table
+    - box range targets
+    - basic printf style formatting after semi colon for floating point types: $2=$1/2.0;%.1f
+    - Properties and constants (defined in a CONSTANTS comment) can be used in formulas
+    - remote() references to other named tables.
+
+    Things that do NOT work:
+    - Extended calc style output formatting (semi colon)
+    - Advanced tabled features / Named fields
+    - Visualizing columns
+    - gnu plot support
+    - hline symbols
+    - more functions

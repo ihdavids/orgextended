@@ -56,7 +56,7 @@ def Execute(view, params):
 	print(str(params))
 	level = get_level(params)
 	if(not 'scope' in params or params['scope'] == 'subtree'):
-		print("SUBTREE")
+		#print("SUBTREE")
 		return handle_subtree(view, params, level)
 	else:
 		print(params['scope'] + " is not implemented")

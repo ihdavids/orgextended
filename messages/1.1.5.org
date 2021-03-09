@@ -1,0 +1,25 @@
+* 1.1.5
+** Stability and Performance
+	- Fixed some issues in the agenda with old SCHEDULED: values
+		We would search forward in time forever trying to find
+		a match in the agenda. This could make org files with REALLY old
+		SCHEDULED tasks that were not closed take a long time to render in the agenda.
+
+		I have now capped it. 4 Months is the default:
+		This goes for deadlines, active timestamps and scheduled values.
+
+		In addition I have enabled some caching for following repeat rules
+		which should improve overall performance here.
+
+		#+BEGIN_EXAMPLE
+		agendaMaxScheduledIterations: 120
+		#+END_EXAMPLE
+
+	- Working to improve handling of dates without times in the agenda.
+	  This could cause some assertions in some of the new scheduled and deadline handling systems
+	  I believe I have all the asserts now but I am working on ensuring intuitive behaviour.
+
+    - Fixed display of plain (no time) DEADLINES, they now show the due date properly
+    - Fixed closing of plain (no time) DEADLINES, they would assert before when trying to update the time.
+	
+

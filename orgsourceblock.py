@@ -38,14 +38,26 @@ RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 
 def IsSourceBlock(view):
-	line = view.getLine(view.curRow())
+	at = view.sel()[0]
+	return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
+
+def IsSourceFence(view,row):
+	#line = view.getLine(view.curRow())
+	line = view.getLine(row)
 	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
+	def OnDone(self):
+		evt.EmitIf(self.onDone)
+
 	def on_replaced(self):
 		if(hasattr(self.curmod,"PostExecute")):
 			self.curmod.PostExecute(self)
-		evt.EmitIf(self.onDone)
+
+		if(hasattr(self.curmod,"GeneratesImages") and self.curmod.GeneratesImages(self)):
+			self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
+		else:
+			self.OnDone()
 
 	def end_results(self,rw):
 		self.endResults     = rw
@@ -95,8 +107,12 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 		# We need to make one.
 		if(not inResults):
 			log.debug("Could not locate #+RESULTS tag adding one!")
-			pt = self.view.text_point(self.endRow,0)
-			pt = self.view.line(pt).end() + 1
+			if(self.endRow == self.view.endRow()):
+				pt = self.view.text_point(self.endRow,0)
+				pt = self.view.line(pt).end()
+			else:
+				pt = self.view.text_point(self.endRow,0)
+				pt = self.view.line(pt).end() + 1
 			indent = db.Get().AtInView(self.view).indent()
 			self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
 			self.startResults   = self.endRow + 2 
@@ -106,16 +122,29 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
 			return True
 
+	def on_warning_saved(self):
+		if(self.view.is_dirty()):
+			self.view.set_status("Error: ","Failed to save the view. ABORT, cannot execute source block since it is dirty")
+			log.error("Failed to save the view. ABORT, cannot execute source code")
+			return
+		self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
+
 	def run(self, edit, onDone=None):
 		self.onDone = onDone
 		view = self.view
 		at = view.sel()[0]
-		if(view.match_selector(at.begin(),'orgmode.fence.sourceblock')):
+		if(view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content')):
+			# Scan up till we find the start of the block.
+			row = view.curRow()
+			while(row > 0):
+				if(IsSourceFence(view, row)):
+					at = sublime.Region(view.text_point(row,1),view.text_point(row,1))
+					break
+				row -= 1
 			# Okay we have a dynamic block, now we need to know where it ends.
 			start = at.begin()
 			end   = None
 			erow = view.endRow()
-			row  = view.curRow()
 			for rw in range(row,erow+1):
 				line = view.substr(view.line(view.text_point(rw,0)))
 				if(RE_END.search(line)):
@@ -127,7 +156,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			extensions = ext.find_extension_modules('src', ["plantuml", "powershell", "python"])
+			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python"])
 			line = view.substr(view.line(start))
 			m = RE_SRC_BLOCK.search(line)
 			if(not m):
@@ -153,6 +182,17 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			self.e        = view.text_point(self.endRow,0)
 			self.region   = sublime.Region(self.s,self.e)
 			self.sourcefile = view.file_name()
+			# Sanity check that the file exists on disk
+			if(not self.sourcefile or not os.path.exists(self.sourcefile)):
+				self.view.set_status("Error: ","Your source org file must exist on disk. ABORT.")
+				log.error("Your source org file must exist on disk to generate images. The path is used when setting up relative paths.")
+				self.OnDone()
+				return
+			if(view.is_dirty()):
+				log.warning("Your source file has unsaved changes. We cannot run source modifications without saving the buffer.")
+				view.run_command("save", {"async": False})
+				sublime.set_timeout(self.on_warning_saved,1)
+				return
 
 			# We need to find and or buid a results block
 			# so we can replace it with the results.
@@ -191,7 +231,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			level = n.level
 			indent = "\n " * level + " "
 			#outputs = output.split('\n')
-			output = indent.join(self.outputs)
+			output = indent.join(self.outputs).rstrip()
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.on_replaced)})
 		else:
-			log.error("NOT in A Source Block, nothing to run")
+			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")

@@ -62,7 +62,7 @@
     {"caption": "Org Todo View",               "command": "org_todo_view"               },
     {"caption": "Org Filtered Todo View",      "command": "org_tag_filtered_todo_view"  },
     {"caption": "Org Exec Dynamic Block",      "command": "org_execute_dynamic_block"   },
-    {"caption": "Org Exec Srouce Block",       "command": "org_execute_source_block"    },
+    {"caption": "Org Exec Source Block",       "command": "org_execute_source_block"    },
     {"caption": "Org Checkbox Toggle",         "command": "org_toggle_checkbox"         },
     {"caption": "Org Recalc Checkbox",         "command": "org_recalc_checkbox_summary" },
     {"caption": "Org Recalc All Checkbox",     "command": "org_recalc_all_checkbox_summaries" },
@@ -85,6 +85,7 @@
     {"caption": "Org Copy Subtree",            "command": "org_copy_subtree"            },
     {"caption": "Org Copy Entity",             "command": "org_copy_entity"             },
     {"caption": "Org Copy Href",               "command": "org_copy_link_href"          },
+    {"caption": "Org Sort List",               "command": "org_sort_list"               },
 
     // Agenda
     {"caption": "Org Agenda Goto",             "command": "org_agenda_go_to"            },
@@ -106,14 +107,26 @@
     {"caption": "Org Date Prev Day",           "command": "org_date_picker_prev_day"    },
 
     // Export
-    {"caption": "Org Export File As Reveal Js","command": "org_export_file_reveal_js"   },
-    {"caption": "Org Export File As Html",     "command": "org_export_file_org_html"       },
-    {"caption": "Org Export Subtree As Html",  "command": "org_export_subtree_as_org_html" },
-    {"caption": "Org Pandoc File To Html",     "command": "org_export_file_as_html"     },
-    {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"  },
+    {"caption": "Org Export File As Reveal Js","command": "org_export_file_reveal_js"         },
+    {"caption": "Org Export File As Html",     "command": "org_export_file_org_html"          },
+    {"caption": "Org Export Subtree As Html",  "command": "org_export_subtree_as_org_html"    },
+    {"caption": "Org Pandoc File To Html",     "command": "org_export_file_as_html"           },
+    {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"        },
+
+    // Table Management
+    {"caption": "Org Import Csv",              "command": "org_import_table_from_csv"         },
+    {"caption": "Org Convert Region To Table", "command": "org_convert_selection_to_table"    },
+    {"caption": "Org Insert Blank Table",      "command": "org_insert_blank_table"            },
+    {"caption": "Org Clear Table Highlights",  "command": "org_clear_table_regions"           },
+    {"caption": "Org Highlight Formula",       "command": "org_highlight_formula"             },
+    {"caption": "Org Eval Cell",               "command": "org_fill_in_formula_from_cell"     },
+    {"caption": "Org Show Table Rows",         "command": "org_show_table_rows"               },
+    {"caption": "Org Hide Table Rows",         "command": "org_hide_table_rows"               },
+    {"caption": "Org Plot Table",              "command": "org_plot_table"                    },
     //{"caption": "Org Test Thing",              "command": "org_show_item"  },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
-    {"caption": "Org Download Highligh Js",    "command": "org_download_highligh_js"  },
+    {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },
+    {"caption": "Org Download Highligh Js",    "command": "org_download_highligh_js"          },
     {"caption": "Org Select Color Scheme",     "command": "org_select_existing_color_scheme"  },
-    {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  }
+    {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  },
 ]

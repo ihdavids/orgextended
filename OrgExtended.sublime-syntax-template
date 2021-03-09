@@ -25,7 +25,7 @@ contexts:
   header-matches:
     - match: $
       pop: true
-    - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*({{tags}})?
+    - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*(\[\d*[/%]\d*\])?({{tags}})?
       captures:
         2: variable.parameter orgmode.state.todo
         3: variable.parameter orgmode.state.blocked
@@ -47,7 +47,8 @@ contexts:
         19: string.quoted orgmode.priority.value.d
         20: string.quoted orgmode.priority.value.e
         21: string.quoted orgmode.priority.value.general
-        22: entity.name.tag.orgmode orgmode.tags.header
+        22: string.quoted orgmode.checkbox.summary
+        23: entity.name.tag.orgmode orgmode.tags.header
   main:
     # The main context is the initial starting point of our syntax.
     # Include other contexts from here (or specify them directly).
@@ -267,11 +268,19 @@ contexts:
       # #+SOMETHING:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks
-    - match: '^\s*(\#\+(?!(BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
+    - match: '^\s*(\#\+(?!(TBLFM|tblfm|BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
       scope: orgmode.controltag
       captures:
         1: keyword orgmode.controltag.tag
         4: comment orgmode.controltag.text
+      # #+TBLFM:
+      # But not a dynamic block
+      # Use negative look ahead to avoid matching begin and end dynamic blocks
+    - match: '^\s*(\#\+(TBLFM|tblfm))\:\s*(.*)'
+      scope: orgmode.table orgmode.controltag orgmode.tblfm
+      captures:
+        1: keyword orgmode.controltag.tag
+        3: comment orgmode.controltag.text
 
     # #+BEGIN: NAME dynamic block support
     - match: '((\s*\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'

@@ -25,7 +25,7 @@ contexts:
   header-matches:
     - match: $
       pop: true
-    - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*({{tags}})?
+    - match: ({{state}}\s+)?({{priority}})?[^\[\]:\n]*(\[\d*[/%]\d*\])?({{tags}})?
       captures:
         2: variable.parameter orgmode.state.todo
         3: variable.parameter orgmode.state.blocked
@@ -47,7 +47,8 @@ contexts:
         19: string.quoted orgmode.priority.value.d
         20: string.quoted orgmode.priority.value.e
         21: string.quoted orgmode.priority.value.general
-        22: entity.name.tag.orgmode orgmode.tags.header
+        22: string.quoted orgmode.checkbox.summary
+        23: entity.name.tag.orgmode orgmode.tags.header
   main:
     # The main context is the initial starting point of our syntax.
     # Include other contexts from here (or specify them directly).
@@ -272,7 +273,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.python
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((cpp)\s*)'
@@ -283,7 +284,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.c++
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((C)\s*)'
@@ -294,7 +295,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.c
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((perl)\s*)'
@@ -305,7 +306,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.perl
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((ini)\s*)'
@@ -316,7 +317,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.ini
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((bash|sh)\s*)'
@@ -327,7 +328,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.shell.bash
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((lua)\s*)'
@@ -338,7 +339,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.lua
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((javascript|js)\s*)'
@@ -349,7 +350,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.js
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((java)\s*)'
@@ -360,7 +361,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.java
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((php)\s*)'
@@ -371,7 +372,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.php
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((xml)\s*)'
@@ -382,7 +383,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:text.xml
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((csharp|cs)\s*)'
@@ -393,7 +394,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.cs
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((powershell)\s*)'
@@ -404,7 +405,7 @@ contexts:
         4: orgmode.fence.sourceblock
       embed: scope:source.powershell
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
     - match: '{{beginsrc}}((plantuml)\s*)'
@@ -413,19 +414,181 @@ contexts:
         2: orgmode.fence.sourceblock
         3: keyword orgmode.fence.language
         4: orgmode.fence.sourceblock
+      embed: scope:source.plantuml
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((ditaa)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.ditaa
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((graphviz)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
       embed: scope:source.powershell
       escape: '{{endsrc}}'
-      embed_scope: markup.raw.block orgmode.raw.block
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((lisp)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.lisp
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((emacs-lisp)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.lisp
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((yaml)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.yaml
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((rust)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.rust
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((sql)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.sql
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((r)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.r
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((html)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:text.html.basic
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((go)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.go
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((ledger)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.ledger
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((make)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.makefile
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((makefile)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.makefile
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((typescript|ts)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.ts
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
       # #+SOMETHING:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks
-    - match: '^\s*(\#\+(?!(BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
+    - match: '^\s*(\#\+(?!(TBLFM|tblfm|BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
       scope: orgmode.controltag
       captures:
         1: keyword orgmode.controltag.tag
         4: comment orgmode.controltag.text
+      # #+TBLFM:
+      # But not a dynamic block
+      # Use negative look ahead to avoid matching begin and end dynamic blocks
+    - match: '^\s*(\#\+(TBLFM|tblfm))\:\s*(.*)'
+      scope: orgmode.table orgmode.controltag orgmode.tblfm
+      captures:
+        1: keyword orgmode.controltag.tag
+        3: comment orgmode.controltag.text
 
     # #+BEGIN: NAME dynamic block support
     - match: '((\s*\#\+BEGIN:|\#\+begin:)\s+([a-zA-Z0-9]+)\s+(.*)?\s*)'

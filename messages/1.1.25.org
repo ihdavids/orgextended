@@ -1,0 +1,76 @@
+* 1.1.25
+** Source Block Diagrams
+  - Non existent subdirs are auto-created
+  - Execute block works on any line inside the source block as well as on the fence.
+  - Evaluating a block on the last line of the file was not inserting the RESULTS tag.
+  - Repeated re-evaluation kept adding newlines at the end.
+  - When evaluating source with a diagram the cursor could move, this is now fixes.
+
+    #+BEGIN_SRC graphviz :file thisdirdoesnotexist/graphviz.png
+     digraph G {
+       a -> b;
+       a -> c;
+       c -> d;
+     } 
+    #+END_SRC
+
+   #+RESULTS:
+   [[file:thisdirdoesnotexist\graphviz.png]]
+
+** Customization
+  - Support single directory wildcards:
+
+  #+BEGIN_EXAMPLE
+    "orgDirs": "C:\Mypath\*\SubFolder"
+  #+END_EXAMPLE
+
+  Will match a single folder wildcard like so:
+
+  - C:\Mypath\foo\SubFolder\x.org
+  - C:\Mypath\bar\SubFolder\y.org
+  - C:\Mypath\baz\SubFolder\z.org
+
+  Again, this can increase your startup time dramatically. Please use with caution!
+
+** Spreadsheet Preview V10
+  - boxes mode seems to work.
+
+    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:lines file:plot.png
+    |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0
+
+*** Start of Advanced Table Features
+    - Auto computed cells now mostly work.
+      Careful with these in big tables.
+      They only auto compute when you use tab or shift tab
+      to move between cells, arrow keys do not recompute
+    - Row names seem to work work.
+    - Above and Below names seem to work
+    - Symbol rows seem to work
+
+    |   |   a   |   b   |    c     |
+    |---+-------+-------+----------|
+    | # | 0.38  | 0.1   | 0.46     |
+    | # | 0.38  | 0.1   | 0.86     |
+    | # | 0.03  | 0.6   | 0.01     |
+    | * | 0.02  | 0.0   | 0.06     |
+    | ^ | hello | world | namedRow |
+    | * |       | 0.3   |          |
+    |   |       |       |          |
+    | _ | below |       |          |
+    | # | 3.5   | 0.7   |          |
+    | # | 4.5   | 0.9   |          |
+    | # | 4.0   | 0.8   |          |
+    | # | 2.0   | 0.4   |          |
+    | $ | max=5 |       |          |
+    #+TBLFM:$hello=rand()*$world;%.2f::$namedRow=rand();%.2f::$3=rand();%.1f::$below=$3*$max
+
+** HTML Export
+  Fixed issue with 0 blank lines at the top of the file.
+  The comment gathering code was not being initialized properly.

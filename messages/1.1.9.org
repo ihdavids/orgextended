@@ -1,0 +1,29 @@
+* 1.1.9
+** Editing
+*** Improved DWIM Additions to Numbered lists   
+    A numbered list preceded by a normal list was confusing
+    DWIM extension. The system was putting the new entry
+    above the unordered list.
+
+    #+BEGIN_EXAMPLE
+    - This would disrupt DWIM editing of the list below
+    - DWIM was finding this list and thinking it was part
+    - of the numbered list.
+    1. I am extending this list
+    2. This is the list I am extending
+    #+END_EXAMPLE   
+
+    The same thing could happen for example blocks or src blocks.
+        
+*** Improved Alternate Additions to Lists
+    - Ctrl+Shift+Enter is an extended insert
+      For numbered lists it will extend the list vs insert where you are.
+    - This should now work for all the list types.
+
+*** Org Sort List
+    - Works when cursor is on list types.
+    - Will sort the list aphabetically
+
+** Agenda
+    - Loose Tasks View was sometimes not detecting top level loose tasks
+

@@ -120,6 +120,36 @@ import OrgExtended.orgparse.utils.py3compat as bs
 import OrgExtended.asettings as sets
 
 
+def bomType(file):
+    """
+    returns file encoding string for open() function
+
+    EXAMPLE:
+        bom = bomtype(file)
+        open(file, encoding=bom, errors='ignore')
+    """
+
+    f = open(file, 'rb')
+    b = f.read(4)
+    f.close()
+
+    if (b[0:3] == b'\xef\xbb\xbf'):
+        return "utf8"
+
+    # Python automatically detects endianess if utf-16 bom is present
+    # write endianess generally determined by endianess of CPU
+    if ((b[0:2] == b'\xfe\xff') or (b[0:2] == b'\xff\xfe')):
+        return "utf16"
+
+    if ((b[0:5] == b'\xfe\xff\x00\x00') 
+              or (b[0:5] == b'\x00\x00\xff\xfe')):
+        return "utf32"
+
+    # If BOM is not provided, then assume its the codepage
+    #     used by your operating system
+    return "cp1252"
+    # For the United States its: cp1252
+
 def load(path):
     """
     Load org-mode document from a file.
@@ -130,14 +160,24 @@ def load(path):
     :rtype: :class:`orgparse.node.OrgRootNode`
 
     """
-    if isinstance(path, bs.basestring):
-        orgfile = codecs.open(path, encoding='utf8')
-        filename = path
-    else:
-        orgfile = path
-        filename = path.name if hasattr(path, 'name') else '<file-like>'
-    return loadi((l.rstrip('\n') for l in orgfile.readlines()),
-                 filename=filename)
+    try:
+
+        if isinstance(path, bs.basestring):
+            orgfile = codecs.open(path, encoding='utf-8-sig')
+            filename = path
+        else:
+            orgfile = path
+            filename = path.name if hasattr(path, 'name') else '<file-like>'
+        return loadi((l.rstrip('\n') for l in orgfile.readlines()),filename=filename)
+    except:
+        bom = bomType(path)
+        if isinstance(path, bs.basestring):
+            orgfile = codecs.open(path, encoding=bom)
+            filename = path
+        else:
+            orgfile = path
+            filename = path.name if hasattr(path, 'name') else '<file-like>'
+        return loadi((l.rstrip('\n') for l in orgfile.readlines()),filename=filename)
 
 
 def loads(string, filename='<string>'):

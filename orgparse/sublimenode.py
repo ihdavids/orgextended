@@ -48,23 +48,41 @@ def local_spans_lines(self, view):
 # returns a sublime region that this node encompases
 # including all children
 @add_method(node.OrgBaseNode)
-def region(self, view):
+def region(self, view, trimEnd = False):
     s  = self.start_row
     e  = self.end_row
     sp = view.text_point(s,0)
     r  = view.line(sp)
     ep = view.text_point(e,0)
     re = view.line(ep)
+    # Trim whitespace off end if we can
+    if(trimEnd):
+        while(e > s):
+            ep = view.text_point(e,0)
+            re = view.line(ep)
+            sl = view.substr(re)
+            if(sl.strip() != ""):
+                break
+            e -= 1
     return sublime.Region(r.end(),re.end()) 
 
 @add_method(node.OrgBaseNode)
-def local_region(self, view):
+def local_region(self, view, trimEnd = False):
     s  = self.start_row
     e  = self.local_end_row
     sp = view.text_point(s,0)
     r  = view.line(sp)
     ep = view.text_point(e,0)
     re = view.line(ep)
+    # Trim whitespace off end if we can
+    if(trimEnd):
+        while(e > s):
+            ep = view.text_point(e,0)
+            re = view.line(ep)
+            sl = view.substr(re)
+            if(sl.strip() != ""):
+                break
+            e -= 1
     return sublime.Region(r.end(),re.end())
 
 @add_method(node.OrgBaseNode)

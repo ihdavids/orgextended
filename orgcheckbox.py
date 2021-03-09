@@ -67,7 +67,7 @@ def find_parent(view, region):
         # return the parent we found.
         return view.line(view.text_point(row,0))
 
-def find_children(view, region):
+def find_children(view, region, cre = checkbox_regex, includeSiblings=False, recursiveChildFind=False):
     row, col = view.rowcol(region.begin())
     line = view.line(region)
     content = view.substr(line)
@@ -88,15 +88,22 @@ def find_children(view, region):
         summary = get_summary(view, line)
         if summary and content.lstrip().startswith("*"):
              break
-        if checkbox_regex.search(content):
+        if cre.search(content):
             cur_indent = len(get_indent(view, content))
             # check for end of descendants
-            if cur_indent <= indent:
+            if includeSiblings and cur_indent < indent:
                 break
-            # only immediate children
-            if child_indent is None:
-                child_indent = cur_indent
-            if cur_indent == child_indent:
+            elif not includeSiblings and cur_indent <= indent:
+                break
+            # only immediate children (and siblings)
+            if(not recursiveChildFind):
+                if child_indent is None:
+                    child_indent = cur_indent
+                if cur_indent == child_indent:
+                    children.append(line)
+                if(includeSiblings and cur_indent < child_indent):
+                    children.append(line)
+            else:
                 children.append(line)
         row += 1
     return children
@@ -170,7 +177,18 @@ def get_check_char(view, check_state):
         return 'E'
 
 def recalc_summary(view, region):
-    children = find_children(view, region)
+    recursive = sets.Get("checkboxSummaryRecursive",False)
+    at = db.Get().AtInView(view)
+    if(at):
+        props = at.properties
+        if(props and 'COOKIE_DATA' in props):
+            cook = props['COOKIE_DATA']
+            if(cook and 'notrecursive' in cook):
+                recursive = False
+            elif(cook and 'recursive' in cook):
+                recursive = True
+    children = None
+    children = find_children(view, region, checkbox_regex, False, recursive)
     if not len(children) > 0:
         return (0, 0)
     num_children = len(children)
@@ -274,7 +292,7 @@ def recalculate_all_checkbox_summaries(view, edit):
 
 cline_info_regex = re.compile(r'^(\s*)([-+0-9](\.)?)?.*$')
 class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit,insertHere=True):
         row = self.view.curRow()
         line = self.view.getLine(row)
         match = cline_info_regex.match(line)
@@ -283,6 +301,11 @@ class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
         if(start):
             indent = indent + start + " [ ] "
         reg = self.view.curLine()
+        list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')
+        children = find_children(self.view, reg, list_regex, not insertHere)
+        if(children and len(children) > 0):
+            reg = children[len(children) - 1]
+            row,_ =self.view.rowcol(reg.begin())
         self.view.insert(edit,reg.end(),"\n" + indent)
         # Move to end of line
         row = row + 1
@@ -291,6 +314,63 @@ class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(ln.end())
 
+uline_info_regex = re.compile(r'^(\s*)([-+]) .*$')
+def isUnorderedList(line):
+    return uline_info_regex.match(line)
+
+
+RE_THING = re.compile(r'^\s*[+-](\s\[[ xX-]\])?\s(?P<data>.*)$')
+RE_NOTHEADERS = re.compile(r'^\s*[\#|0-9]')
+def getListAtPoint(view):
+    parent = view.findParentByIndent(view.curLine(),RE_NOTHEADERS, RE_THING)
+    #print(str(parent))
+    if(None != parent):
+        prow, _ = view.rowcol(parent.begin())
+        list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')
+        children = find_children(view, parent, list_regex, True)
+        sortby = view.getLine(prow)
+        m = RE_THING.search(sortby)
+        if(m):
+            sortby = m.group('data')
+        things = [[[prow,0],sortby]]
+        for c in children:
+            srow, _ = view.rowcol(c.begin())
+            if(len(things) > 0):
+                things[len(things)-1][0][1] = srow 
+            sortby = view.getLine(srow)
+            m = RE_THING.search(sortby)
+            if(m):
+                sortby = m.group('data')
+            things.append([[srow,0],sortby])
+        if(len(things) > 0):
+            srow, _ = view.rowcol(children[len(children)-1].end())
+            things[len(things)-1][0][1] = srow+1
+        return things
+    return None
+
+
+class OrgInsertUnorderedListCommand(sublime_plugin.TextCommand):
+    def run(self, edit,insertHere=True):
+        row = self.view.curRow()
+        line = self.view.getLine(row)
+        match = uline_info_regex.match(line)
+        indent = match.group(1)
+        start  = match.group(2)
+        if(start):
+            indent = indent + start + " "
+        reg = self.view.curLine()
+        list_regex   = re.compile(r'\s*([-+]|[^#*|])')
+        children = find_children(self.view, reg, list_regex, not insertHere)
+        if(children and len(children) > 0):
+            reg = children[len(children) - 1]
+            row,_ =self.view.rowcol(reg.begin())
+        self.view.insert(edit,reg.end(),"\n" + indent)
+        # Move to end of line
+        row = row + 1
+        pt = self.view.text_point(row,0)
+        ln = self.view.line(pt)
+        self.view.sel().clear()
+        self.view.sel().add(ln.end())
 
 cbsline_info_regex = re.compile(r'^(\s*)(.*)\[\s*[0-9]*/[0-9]\s*\]\s*$')
 class OrgInsertCheckboxSummaryCommand(sublime_plugin.TextCommand):

@@ -1,0 +1,45 @@
+* 1.1.13
+** Spreadsheets Preview V2
+
+	WARNING: Super experimental, use at your own risk.
+
+
+ 	[[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][Spreadsheets In Org]]	
+
+	- Horizontal rules are now respected in row ids
+	- Cell highlight can help with understanding formulas
+	- Fixed a couple of bugs with cell indexing
+	- Calling execute on a cell with := will introduce a new formula 
+	  into the TBLFM and evaluate the table.
+	- = Should add a column expression
+
+    | a | b | c | d |  e   |
+    |---+---+---+---+------|
+    | a | b | 5 | 4 | :=$1 |
+    | 1 | 1 | 1 | 1 | 1    |
+    #+TBLFM: @3$5=vmean($1..$4)+sin(@3$1)::$4=$3+5::@2$5=$1
+
+    Still very poorly tested but improving.
+
+    Things that work:
+    - Evaluation of rows and columns with basic arithmetic
+    - vmean, vmax, vmin and a handful of other functions
+    - the basic range syntax seen above.
+    - respecting the header in column expressions
+    - filling in a cell with an expression and having it automatically be moved to tablefmt
+    - cell highlighting when editing expressions.
+    - horizontal separators are now respected as non cells.
+
+    Things that do NOT work:
+    - Automatically updating your expressions when you resize the table
+    - calc style output formatting (semi colon)
+    - Negative or other fancier ranges
+    - Named fields
+    - Visualizing columns
+
+    Right now evaluating a table is bound to the execute DWIM binding.
+
+
+    NOTE: This feature will never be completely compatible with ORG. Org supports the ability to execute
+          arbitrary lisp expressions on table cells. We aren't going that far. That said, I really appreciate
+          the basics of the spreadsheet feature in org and we should be able to support most of the basics with our own flair.

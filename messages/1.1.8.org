@@ -1,0 +1,9 @@
+* 1.1.8
+** Editing
+	- DWIM editing of numbered lists has improved slightly
+	  Fixed some bugs with lists at the end of a buffer
+	  or with a blank line above the list.
+    - DWIM editing of standard unordered lists (not checkbox)
+      is now supported properly.
+    - Indent and DeIndent somewhat work on lists (tabs vs spaces are
+      still a little problematic) 

@@ -1,0 +1,18 @@
+* 1.1.4
+** Editing
+	- Changed default keybinding. Capture is now Alt+o z to mirror neovintageous mode with Z
+		(it also did not work before due to other Alt+o c ... commands)
+** Stability
+	- Removed legacy automatic copy of settings files to User folder now that we are using
+	  the new dual pane settings mechanic. This was causing an assert on startup for 
+	  users on ST3.
+	- Active timestamps with ranges were not showing up in the agenda properly.
+	  This was due to how the timestamps were querried. Should now be fixed.
+	- Closed Scheduled timestamps would show up in the week view even after the scheduled date.
+	  this was a byproduct of the new scheduled behaviour and has been fixed. When closed
+	  the items will show up ONLY for the date they were scheduled. (They do not reflect)
+	  the date at which they were closed. In the future I hope to make that happen. NOTE:
+	  they do not show up in the day view at the moment. I will work to improve that in a future
+	  release.
+	- Toggling a task to done with a recurring timestamp will set the LAST_REPEAT and LOGBOOK
+	  entries properly now and will update the base timestamp.

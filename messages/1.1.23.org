@@ -1,0 +1,53 @@
+* 1.1.23
+** Configuration
+  - orgDirs - in 1.1.22 we added support for directory globbing. We have added a little more error handling in 1.1.23 to
+    detect single stars rather than double stars and to not throw in those cases.
+
+    #+BEGIN_EXAMPLE
+      D:\mypath\**\   - This is supported
+
+      D:\mypath\*\   - This is NOT supported
+    #+END_EXAMPLE
+
+** Source Blocks
+    - Improved handling of unsaved files when executing source blocks.
+      NOTE: Sublime WILL save the file for you if it has already been saved, or
+            error out.
+            [[https://github.com/ihdavids/orgextended_docs/issues/5][PlantUml Example Request]] 
+             
+*** GraphViz Blocks
+
+    - added engine (neato, dot, etc)
+    - added fmt (jpg, ps, png)	
+
+    #+BEGIN_SRC graphviz :fmt jpg :engine neato :file graphviz.jpg
+     digraph G {
+       a -> b;
+       a -> c;
+       c -> d
+     } 
+    #+END_SRC
+
+*** Ditaa Src Blocks
+    To use:
+    Add the path to ditaa.jar from sourceforge in your settings file:
+
+    #+BEGIN_EXAMPLE
+      "ditaa": "<pathto>/ditaa.jar",   
+    #+END_EXAMPLE
+
+    Create a source block with your diagram.
+    (Nope, we don't have an artist mode for sublime yet)
+
+    #+BEGIN_SRC ditaa :file ditaa.png
+    +--------+       +----------+
+    | Hello  | ----> | Hello2   |
+    +--------+       +----------+
+    #+END_SRC 
+
+    Execute the block and you should now have a diagram!
+
+ 
+ 
+  
+  

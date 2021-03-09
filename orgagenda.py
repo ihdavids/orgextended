@@ -29,8 +29,26 @@ TODO_VIEW   = "Org Todos"
 
 ViewMappings = {}
 
+
+def ReloadAllUnsavedBuffers():
+    sheets = sublime.active_window().sheets()
+    for sheet in sheets:
+        view = sheet.view()
+        if(view and util.isPotentialOrgFileOrBuffer(view)):
+            db.Get().FindInfo(view)
+
 def IsRawDate(ts):
     return isinstance(ts,datetime.date) or isinstance(ts,datetime.datetime)
+
+def EnsureDateTime(ts):
+    if(ts and not isinstance(ts,datetime.datetime)):
+        return datetime.datetime.combine(ts, datetime.datetime.min.time())
+    return ts
+
+def EnsureDate(ts):
+    if(isinstance(ts,datetime.datetime)):
+        return ts.date()
+    return ts
 
 def FindMappedView(view):
     if(view.name() in ViewMappings):
@@ -116,8 +134,16 @@ def IsTodo(n):
 def IsDone(n):
     return n.todo and n.todo in n.env.done_keys
 
+def HasChildTasks(n):
+    for c in n.children:
+        if(IsTodo(c)):
+            return True
+    return False
+
 def IsProjectTask(n):
-    return (IsTodo(n) and n.parent and (n.parent.is_root() or IsTodo(n.parent)))
+    if(not n or n.is_root()):
+        return False
+    return (IsTodo(n) and n.parent and not n.parent.is_root() and IsTodo(n.parent)) or (IsTodo(n) and n.parent and n.parent.is_root() and HasChildTasks(n))
 
 def IsBlockedProject(n):
     if(IsTodo(n) and n.num_children > 0):
@@ -164,7 +190,7 @@ def IsInMonth(n, now):
     if(not n):
         return (None,None)
     if(n):
-        timestamps = n.get_timestamps(active=True,point=True)
+        timestamps = n.get_timestamps(active=True,point=True,range=True)
         for t in timestamps:
             if(t.repeating):
                 next = t.next_repeat_from(now)
@@ -182,30 +208,53 @@ def IsInMonth(n, now):
     return (None,None)
 
 def IsToday(n, today):
-    timestamps = n.get_timestamps(active=True,point=True)
+    # 4 months of per day scheduling is the maximum 
+    # we are willing to loop to avoid crazy slow loops.
+    kMaxLoops = sets.GetInt("agendaMaxScheduledIterations", 120)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
-            next = t.next_repeat_from(today)
-            if IsTodaysDate(next, today):
-                return next
+            if(IsTodaysDate(t.start, today)):
+                return t
+            next = EnsureDateTime(t.start)
+            loopcount = 0
+            while(next <= EnsureDateTime(today) and loopcount <= kMaxLoops):
+                if IsTodaysDate(next, today):
+                    return next
+                next = t.next_repeat_from(next)
+                loopcount += 1
         else:
             if(t.has_overlap(today)):
                 return t
     if(n.scheduled):
         if(n.scheduled.repeating):
-            next = n.scheduled.next_repeat_from(today)
-            return IsTodaysDate(next, today)
+            next = n.scheduled.start
+            loopcount = 0
+            while(EnsureDateTime(next) <= EnsureDateTime(today) and loopcount <= kMaxLoops):
+                if IsTodaysDate(next, today):
+                    return next
+                next = n.scheduled.next_repeat_from(EnsureDateTime(next))
+                loopcount += 1
         else:
             return n.scheduled.after(today)
     if(n.deadline):
-        start = n.deadline.deadline_start
-        return start <= today
+        start = EnsureDateTime(n.deadline.deadline_start)
+        if start <= today:
+            return n.deadline
+        if(n.deadline.repeating):
+            next = n.deadline.start
+            loopcount = 0
+            while(EnsureDateTime(next) <= EnsureDateTime(today) and loopcount <= kMaxLoops):
+                if IsTodaysDate(next, today):
+                    return next
+                next = n.deadline.next_repeat_from(EnsureDateTime(next))
+                loopcount += 1
     return None
 
 def IsAllDay(n,today):
     if(not n):
         return None
-    timestamps = n.get_timestamps(active=True,point=True)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     for t in timestamps:
         if(t.repeating):
             dt = t.next_repeat_from(today)
@@ -225,6 +274,8 @@ def IsAllDay(n,today):
                 return n.scheduled
     if(n.deadline):
         dt = n.deadline.deadline_start
+        if(isinstance(dt,datetime.date)):
+            return True
         if(dt.hour == 0 and dt.minute == 0 and dt.second == 0 and dt.microsecond == 0):
             return today
     return None
@@ -232,7 +283,7 @@ def IsAllDay(n,today):
 def HasTimestamp(n):
     if(not n):
         return False
-    timestamps = n.get_timestamps(active=True,point=True)
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
     return n.scheduled or (timestamps and len(timestamps) > 0) or n.deadline
 
 def IsInHourBracket(s, e, hour):
@@ -248,8 +299,7 @@ def IsInHourBracket(s, e, hour):
 def IsInHour(n, hour, today):
     if(not n):
         return None
-
-    timestamps = n.get_timestamps(active=True, point=True)
+    timestamps = n.get_timestamps(active=True, point=True,range=True)
     if(timestamps):
         for t in timestamps:
             if(t.has_time()):
@@ -266,13 +316,13 @@ def IsInHour(n, hour, today):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from(today)
             return next.hour == hour
-        s = n.scheduled.start
-        e = n.scheduled.end
+        s = EnsureDateTime(n.scheduled.start)
+        e = EnsureDateTime(n.scheduled.end)
         if(IsInHourBracket(s,e,hour)):
             return n.scheduled
     if(n.deadline):
-        s = n.deadline.start
-        e = n.deadline.end
+        s = EnsureDateTime(n.deadline.start)
+        e = EnsureDateTime(n.deadline.end)
         if(IsInHourBracket(s,e,hour)):
             return n.deadline
     return None
@@ -311,7 +361,7 @@ def IsInHourAndMinuteBracket(s,e,hour,mstart,mend):
 def IsInHourAndMinute(n, hour, mstart, mend, today):
     if(not n):
         return None
-    timestamps = n.get_timestamps(active=True, point=True)
+    timestamps = n.get_timestamps(active=True, point=True,range=True)
     if(timestamps):
         for t in timestamps:
             if(t.has_time()):
@@ -328,15 +378,16 @@ def IsInHourAndMinute(n, hour, mstart, mend, today):
     if(n.scheduled and n.scheduled.has_time()):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from(today)
-            return next.hour == hour
+            if(next.hour == hour):
+                return next
         s = n.scheduled.start
         e = n.scheduled.end
         if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
             return n.scheduled
 
     if(n.deadline):
-        s = n.deadline.start
-        e = n.deadline.end
+        s = EnsureDateTime(n.deadline.start)
+        e = EnsureDateTime(n.deadline.end)
         if(IsInHourAndMinuteBracket(s,e,hour,mstart,mend)):
             return n.deadline
     return None
@@ -569,12 +620,20 @@ class AgendaBaseView:
         pass
 
 def IsBeforeNow(ts, now):
-    return ts and (not ts.has_time() or ts.start.time() < now.time())
-    #return n.scheduled and (not n.scheduled.has_time() or n.scheduled.start.time() < now.time())
+    if(isinstance(ts,orgdate.OrgDate)):
+        return ts and (not ts.has_time() or ts.start.time() < now.time())
+    elif(ts and isinstance(ts,datetime.datetime)):
+        return ts.time() < now.time()
+    else:
+        return False
 
 def IsAfterNow(ts, now):
-    return ts and ts.has_time() and ts.start.time() >= now.time()
-    #return n.scheduled and n.scheduled.has_time() and n.scheduled.start.time() >= now.time()
+    if(isinstance(ts,orgdate.OrgDate)):
+        return ts and ts.has_time() and ts.start.time() >= now.time()
+    elif(ts and isinstance(ts,datetime.datetime)):
+        return ts.time() >= now.time()
+    else:
+        return False
 
 # ============================================================ 
 class CalendarView(AgendaBaseView):
@@ -693,7 +752,7 @@ class WeekView(AgendaBaseView):
         daydata = []
         for entry in self.entries:
             n = entry['node']
-            timestamps = n.get_timestamps(active=True,point=True)
+            timestamps = n.get_timestamps(active=True,point=True,range=True)
             shouldContinue = False
             for t in timestamps:
                 if(t.start.day == date.day):
@@ -703,11 +762,11 @@ class WeekView(AgendaBaseView):
                     break
             if(shouldContinue):
                 continue
-            if(n.scheduled and n.scheduled.start.date() <= date.date()):
+            if(n.scheduled and (EnsureDate(n.scheduled.start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.scheduled.start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.scheduled
                 continue
-            if(n.deadline and n.deadline.deadline_start <= date and not IsDone(n)):
+            if(n.deadline and (EnsureDate(n.deadline.deadline_start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.deadline.deadline_start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.deadline
                 continue
@@ -918,13 +977,13 @@ class AgendaView(AgendaBaseView):
 
     def BuildDeadlineDisplay(self, node):
         if(node.deadline):
-            if(node.deadline.deadline_start <= self.now):
-                if(node.deadline.start.date() < self.now.date()):
+            if(EnsureDateTime(node.deadline.deadline_start) <= self.now):
+                if(EnsureDateTime(node.deadline.start).date() < self.now.date()):
                     return "D: Overdue"
-                elif(node.deadline.start.date() == self.now.date()):
+                elif(EnsureDateTime(node.deadline.start).date() == self.now.date()):
                     return "D: Due Today"
                 else:
-                    return "D:@" + str(node.deadline.start.date())
+                    return "D:@" + str(EnsureDateTime(node.deadline.start).date())
         else:
             return ""
 
@@ -1013,7 +1072,7 @@ class AgendaView(AgendaBaseView):
             ts = IsAllDay(n,self.now)
             if(ts):
                 self.MarkEntryAt(entry,ts)
-                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildHabitDisplay(n)))
+                view.insert(edit, view.size(), "{0:12} {1} {2:69} {3} {4}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
         rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and IsToday(node, self.now)
@@ -1061,7 +1120,8 @@ class LooseTasksView(TodoView):
         super(LooseTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
+        rc = IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
+        return rc
 
 
 # ================================================================================
@@ -1368,6 +1428,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         pos = None
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
+        ReloadAllUnsavedBuffers()
         views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         views = views[toShow]
         nameOfShow = toShow
@@ -1461,6 +1522,7 @@ class OrgAgendaGoToSplitCommand(sublime_plugin.TextCommand):
 class OrgTagFilteredTodoViewInternalCommand(sublime_plugin.TextCommand):
     def run(self,edit,tags):
         # TODO: add filtering to this and name it nicely
+        ReloadAllUnsavedBuffers()
         todo = TodoView(TODO_VIEW + " Filtered By: " + tags,tagfilter=tags)
         todo.DoRenderView(edit)
 
