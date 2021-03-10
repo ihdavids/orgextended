@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 RE_END = re.compile(r"^\s*\#\+(END|end)[:]")
 RE_DYN_BLOCK = re.compile(r"^\s*\#\+(BEGIN|begin)[:]\s+(?P<name>[^: ]+)\s*")
-RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)\s*")
+RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]+)\s+([^ ]+)")
 
 
 def IsDynamicBlock(view):
@@ -59,7 +59,7 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 				return
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			dynamic = ext.find_extension_modules('orgdynamic', ["insertdatetime", "clocktable"])
+			dynamic = ext.find_extension_modules('orgdynamic', ["insertdatetime", "clocktable", "columnview"])
 			line = view.substr(view.line(start))
 			m = RE_DYN_BLOCK.search(line)
 			if(not m):
@@ -90,9 +90,10 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 			# No bad formatting allowed!
 			n = db.Get().AtInView(view)
 			level = n.level
-			indent = "\n " * level + " "
+			indent = "\n"+ (" " * level) + " "
 			#outputs = output.split('\n')
 			output = indent.join(outputs)
+			print(output)
 			self.view.run_command("org_internal_replace", {"start": s, "end": e, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.on_replaced)})
 		else:
 			log.error("NOT in A DynamicBlock, nothing to run")

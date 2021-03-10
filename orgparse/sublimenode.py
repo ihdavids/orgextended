@@ -143,6 +143,31 @@ def create_region_from_item(self, view, item):
     rs = view.line(sp)
     return sublime.Region(rs.end(),r.end()) 
 
+@add_method(node.OrgBaseNode)
+def get_foldable_blocktype(self, view, row):
+    if(self.blocks):
+        for i in self.blocks:
+            if(i != None and row >= i[0] and row <= i[1]):
+                return self.create_region_from_item(view, i)
+    if(self.dynamicblocks):
+        for i in self.dynamicblocks:
+            if(i != None and row >= i[0] and row <= i[1]):
+                return self.create_region_from_item(view, i)
+    return None
+
+
+@add_method(node.OrgBaseNode)
+def get_foldable_drawertype(self, view, row):
+    if(self.property_drawer_location):
+        i = self.property_drawer_location
+        if(row >= i[0] and row <= i[1]):
+            return self.create_region_from_item(view, i)
+    if(self.drawers):
+        for d in self.drawers:
+            i = d['loc']
+            if(i != None and row >= i[0] and row <= i[1]):
+                return self.create_region_from_item(view, i)
+
 # For an item IN in the heading this will try to let
 # you fold it.
 @add_method(node.OrgBaseNode)
@@ -180,6 +205,11 @@ def is_item_folded(self, view, row):
 def is_foldable_item(self, view, row):
     return self.get_foldable_item_region(view, row) != None
 
+# Iterate over all foldable items and see if this row is
+# a foldable row in the document.
+@add_method(node.OrgBaseNode)
+def is_foldable_drawertype(self, view, row):
+    return self.get_foldable_drawertype(view, row) != None
 
 @add_method(node.OrgBaseNode)
 def fold_item(self, view, row):

@@ -274,7 +274,7 @@ class OrgInsertEffortCommand(sublime_plugin.TextCommand):
         if(d):
             node = db.Get().AtInView(self.view)
             if(node and node.level > 0):
-                UpdateProperty(self.view, node, "EFFORT", str(d), self.onDone)
+                UpdateProperty(self.view, node, "Effort", str(d), self.onDone)
         else:
             log.error("Could not generate effort, please use org duration formation for your estimate")
             view.set_status("Error: ", prop + "is not a valid effort, please use org duration formation 1y 1d 1h 1min")

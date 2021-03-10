@@ -58,7 +58,7 @@ class FileInfo:
         
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
-        self.org = loader.loads(bufferContents)
+        self.org = loader.loads(bufferContents,view.file_name() if view.file_name() else "<string>")
         self.org.setFile(self)
         # Keep track of last change count.
         self.change_count = view.change_count()
@@ -500,6 +500,19 @@ class OrgDb:
         if(not v or v[0] == None):
             return self.FindByCustomId(id)
         return v
+
+    def FindNodeByAnyId(self, id):
+        v = self.FindByAnyId(id)
+        print(str(v))
+        if(v and v[0]):
+            return v[0].At(v[1])
+        return None
+
+    def FindFileByFilename(self,filename):
+        for f in self.Files:
+            if(filename in f.filename):
+                return f
+        return None
 
     def FindByCustomId(self, id):
         if(id in self.customidmaps):
