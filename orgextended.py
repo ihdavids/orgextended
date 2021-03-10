@@ -119,7 +119,7 @@ class OrgCore(sublime_plugin.EventListener):
 
     def ShouldGlobalFold(self, view):
         file = db.Get().FindInfo(view.file_name())
-        return (not self.ShouldLocalFold(view)) and (file != None and type(file.AtInView(view)) is node.OrgRootNode)
+        return (not self.ShouldLocalFold(view)) and (file != None and type(file.AtInView(view,db.Get())) is node.OrgRootNode)
 
     def ShouldFoldLinks(self, view):
         return (not self.ShouldGlobalFold(view)) and folding.am_in_link(view)

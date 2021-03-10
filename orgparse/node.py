@@ -250,6 +250,7 @@ class OrgEnv(object):
         self._names = {}
         self.properties = []
         self.customids = {}
+        self.ids = {}
         self.NamedObjects = {}
 
     @property
@@ -1173,11 +1174,23 @@ class OrgNode(OrgBaseNode):
         self._repeated_tasks = []
         self._body_lines_start = None
         self._customid = None
+        self._id = None
+        self._table = None
 
     @property
     def customid(self):
         return self._customid
+    
+    @property
+    def id(self):
+        return self._id
 
+    # Location of the first table in the node
+    # Used for remote references to tables. (ID/CUSTOM_ID + first table)
+    @property
+    def table(self):
+        return self._table
+        
     @property
     def property_drawer_location(self):
         return self._property_drawer_location
@@ -1329,13 +1342,24 @@ class OrgNode(OrgBaseNode):
                 if(in_table):
                     in_table = False
                     end = self._start + at.offset
+                    name = ""
                     if(self.lastName):
-                        self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end)}
+                        name = self.lastName
+                        self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "name": self.lastName}
                         self.lastName = None
+                    if(None == self._table):
+                        self._table = {"type": "t", "loc": (start, end), "name": name}
             yield l
-                     
-
-
+        if(in_table):
+            in_table = False
+            end = self._start + at.offset
+            name = ""
+            if(self.lastName):
+                name = self.lastName
+                self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "name": self.lastName}
+                self.lastName = None
+            if(None == self._table):
+                self._table = {"type": "t", "loc": (start, end), "name": name}
 
     def _iparse_properties(self, ilines, at):
         self._properties = properties = {}
@@ -1358,6 +1382,9 @@ class OrgNode(OrgBaseNode):
                         if(key.lower() == "custom_id"):
                             self._customid = (val, at.offset)
                             self.env.customids[val] = (at.offset, self._start)
+                        if(key.lower() == "id"):
+                            self._id = (val, at.offset)
+                            self.env.ids[val] = (at.offset, self._start)
                         poff.update({key: at.offset})
             elif line.find(":PROPERTIES:") >= 0:
                 start = self._start + at.offset

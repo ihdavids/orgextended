@@ -110,8 +110,8 @@ class Resolver(AbstractLinkResolver):
             # The presence of a custom ID means we jump
             # using a different means
             if(cid):
-                #print("Found ID trying to jump to: " + cid)
-                db.Get().JumpToCustomId(cid)
+                #print("Internal Found ID trying to jump to: " + cid)
+                db.Get().JumpToAnyId(cid)
                 return True
             if(heading):
                 return self.tryMatchHeading(heading)

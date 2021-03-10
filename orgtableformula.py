@@ -22,6 +22,7 @@ import ast
 import operator as op
 import subprocess
 import platform
+import time
 
 random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
@@ -821,12 +822,8 @@ def CellIterator(table,cell):
     c = cell.c
     filter = cell.rowFilter
     if(None == filter):
-        print("FILTER WAS NONE")
         filter = NullFilter()
-    else:
-        print("HAVE FILTER")
     if(r == '*'):
-        print("HEIGHT: " + str(table.Height()))
         rrange = range(table.StartRow(),table.Height()+1)
     else:
         rrange = range(cell.GetRow(),cell.GetRow()+1)
@@ -836,7 +833,6 @@ def CellIterator(table,cell):
         crange = range(cell.GetCol(),cell.GetCol()+1)
     for r in rrange:
         if(table.ShouldIgnoreRow(r) or filter.filter(r)):
-            print("SKIPPING: " + str(r) + " " + table.GetCellText(r,2))
             continue
         for c in crange:
             cell = Cell(r,c,table)
@@ -1165,6 +1161,7 @@ def remote(name,cellRef):
     if(view):
         node = db.Get().AtInView(view)
         if(node):
+            # Look for named objects in the file.
             names = node.names
             if(names and name in names):
                 row = names[name]['row']
@@ -1183,6 +1180,26 @@ def remote(name,cellRef):
                 td = create_table(view,view.text_point(row,0))
                 text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
                 return text
+        # Okay, maybe this is a custom id or id, let try
+        file, row = db.Get().FindByAnyId(name)
+        if(file):
+            view = sublime.active_window().find_open_file(file.filename)
+            if(view == None):
+                view = sublime.active_window().open_file(file.filename, sublime.ENCODED_POSITION)
+                #while(view.is_loading()):
+                #    time.sleep(0.01)
+            if(view):
+                node = db.Get().At(view,row)
+                if(not node):
+                    db.Get().LoadS(view)
+                    node = db.Get().At(view,row)
+                if(node and node.table):
+                    td = create_table(view,view.text_point(node.table['loc'][0],0))
+                    r = cellRef.GetRow()
+                    c = cellRef.GetCol()
+                    text = td.GetCellText(r,c)
+                    return text
+        return "<UNK REF>"
 
 # ============================================================
 class RangeExprOnNonCells(simpev.InvalidExpression):
@@ -1241,7 +1258,7 @@ class TableDef(simpev.SimpleEval):
     def getcolcell(self,c,relative):
         return Cell('*',c,self,0,relative)
 
-    def getcell(self,r,c,rrelative,crelative):
+    def getcell(self,r,rrelative,c,crelative):
         return Cell(r,c,self,rrelative,crelative)
 
     def symbolOrCell(self,name):

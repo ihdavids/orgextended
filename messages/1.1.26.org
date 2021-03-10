@@ -1,0 +1,43 @@
+* 1.1.26
+** Source Blocks
+	New languages colored in source blocks:
+		- clojure
+		- bat|cmd
+		- org
+		- pascal
+		- actionscript
+		- applescript
+		- dtd
+		- haskell
+		- markdown|md
+		- groovy
+		- regexp
+		- ruby
+		- restructuredtext
+		- xsl
+		- scala
+		- hex
+		- erlang
+		- diff
+		- d
+		- css
+		- cmake
+		- asp
+		- json
+		- r 
+
+** Properties
+	- New Command: "Org Create Heading Id"
+	  This will add a UUID ID to the current heading.
+	- Db handling of ids reworked a little to support jumping to an ID or a CUSTOM_ID
+	- New Command: "Org Insert Effort"
+	  Must be org duration format. Will insert an effort property
+	  defaultEffortEstimateUnit - setting (defaults to d) can be used to set the default effort unit 
+
+** Spreadsheets Preview V11
+	- remote function can now take a custom id or id as per:
+	  [[https://lists.gnu.org/archive/html/emacs-orgmode/2010-01/msg00420.html][Remote Table References]] 
+	- Nodes now have a table property that lists the position of the first table in the node.
+    - It doesn't really work well because the existing table system requires a view, which means that we have to load the file
+      which cannot easily be done during the execution of a formula. This means you can get odd tab swaps if you have a remote reference
+      and the file is not opened. I will have to think about another way of handling this in the future.

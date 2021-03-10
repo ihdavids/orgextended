@@ -79,14 +79,16 @@ class FileInfo:
             f.write(str(item))
         f.close()
 
-    def ReloadIfChanged(self,view):
+    def ReloadIfChanged(self,view,db):
         if(self.HasChanged(view)):
             self.LoadS(view)
+            db.RebuildAllIdsForFile(self)
 
-    def FindInfoAndReloadIfChanged(self, view):
-        if(self.HasChanged(view)):
-            self.LoadS(view)
-        return self.FindInfo(view)
+    #def FindInfoAndReloadIfChanged(self, view, db):
+    #    if(self.HasChanged(view)):
+    #        self.LoadS(view)
+    #        db.RebuildAllIdsForFile(self)
+    #   return self.FindInfo(view)
 
     def HasChanged(self,view):
         return self.change_count < view.change_count()
@@ -94,8 +96,8 @@ class FileInfo:
     def At(self, row):
         return self.org.at(row)
 
-    def AtPt(self, view, pt):
-        self.ReloadIfChanged(view)
+    def AtPt(self, view, pt, db):
+        self.ReloadIfChanged(view, db)
         row,col = view.rowcol(pt)
         return self.org.at(row)
 
@@ -103,8 +105,8 @@ class FileInfo:
         row,col = view.rowcol(reg.begin())
         return self.org.at(row)
 
-    def AtInView(self, view):
-        self.ReloadIfChanged(view)
+    def AtInView(self, view, db):
+        self.ReloadIfChanged(view, db)
         (row,col) = view.curRowCol()
         return self.org.at(row)
 
@@ -138,7 +140,11 @@ class FileInfo:
             cur = cur.get_last_child()
         return cur
 
-
+class OrgFileId:
+    def __init__(self, file, id, index):
+        self.file  =file
+        self.id    = id
+        self.index = index
 
 class OrgDb:
     def __init__(self):
@@ -146,7 +152,9 @@ class OrgDb:
         self.Files    = []
         self.orgPaths = None
         self.customids    = []
-        self.customidmaps = []
+        self.customidmaps = {}
+        self.ids          = []
+        self.idmaps       = {}
         self.tags = set()
 
 
@@ -154,13 +162,33 @@ class OrgDb:
         for i in tags:
             self.tags.add(i)
 
-    def RebuildCustomIds(self):
+    def RebuildCustomIdsForFile(self,file):
+        for id in file.org.env.customids:
+            if(not id in self.customidmaps):
+                index = len(self.customids)
+                fid = OrgFileId(file,id,index)
+                self.customids.append(fid)
+                self.customidmaps[id] = fid
+
+    def RebuildIdsForFile(self,file):
+        for id in file.org.env.ids:
+            if(not id in self.idmaps):
+                index = len(self.ids)
+                fid = OrgFileId(file,id,index)
+                self.ids.append(fid)
+                self.idmaps[id] = fid
+
+    def RebuildAllIdsForFile(self,file):
+        self.RebuildIdsForFile(file)
+        self.RebuildCustomIdsForFile(file)
+
+    def RebuildIds(self):
+        self.ids          = []
+        self.idmaps       = {}
         self.customids    = []
-        self.customidmaps = []
+        self.customidmaps = {}
         for file in self.Files:
-            for id in file.org.env.customids:
-                self.customids.append(id)
-                self.customidmaps.append(file)    
+            self.RebuildAllIdsForFile(file)
 
     def LoadNew(self, fileOrView):
         if(fileOrView == None):
@@ -199,11 +227,11 @@ class OrgDb:
         fi = self.FindInfo(fileOrView)
         if(fi != None):
             fi.Reload()
-            self.RebuildCustomIds()
+            self.RebuildIds()
             return fi
         else:
             rv = self.LoadNew(fileOrView)
-            self.RebuildCustomIds()
+            self.RebuildIds()
             return rv
 
 
@@ -299,7 +327,7 @@ class OrgDb:
                     #x = sys.exc_info()
                     log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
         self.SortFiles()
-        self.RebuildCustomIds()
+        self.RebuildIds()
 
     def FindInfo(self, fileOrView):
         try:
@@ -311,14 +339,14 @@ class OrgDb:
             else:
                 f = self.LoadNew(fileOrView)
             if(f and util.isView(fileOrView)):
-                f.ReloadIfChanged(fileOrView)
+                f.ReloadIfChanged(fileOrView, self)
             return f
         except:
             try:
                 #log.debug("Trying to load file anew")
                 f = self.LoadNew(fileOrView)            
                 if(type(fileOrView) is sublime.View):
-                    f.ReloadIfChanged(fileOrView)
+                    f.ReloadIfChanged(fileOrView, self)
                 return f
             except:
                 log.warning("FAILED PARSING: \n  %s",traceback.format_exc())
@@ -342,7 +370,7 @@ class OrgDb:
 
     def AtPt(self, view, pt):
         file = self.FindInfo(view)
-        return file.AtPt(view, pt)
+        return file.AtPt(view, pt, self)
 
     def AtRegion(self, view, reg):
         file = self.FindInfo(view)
@@ -442,18 +470,51 @@ class OrgDb:
         if(file != None):
             path = "{0}:{1}".format(file.filename,at + 1)
         if(path):
-            #print("Found ID jumping to it: " + path)
+            #print("Found Custom ID jumping to it: " + path)
             sublime.active_window().open_file(path, sublime.ENCODED_POSITION)
+            return True
         else:
-            log.debug("Could not locate ID failed to jump there")
+            log.info("Could not locate Custom ID failed to jump there")
+            return False
+    
+    def JumpToId(self, id):
+        path = None
+        file, at = self.FindById(id)
+        if(file != None):
+            path = "{0}:{1}".format(file.filename,at + 1)
+        if(path):
+            #print("Found Normal ID jumping to it: " + path)
+            sublime.active_window().open_file(path, sublime.ENCODED_POSITION)
+            return True
+        else:
+            log.info("Could not locate ID failed to jump there")
+            return False
+
+    def JumpToAnyId(self, id):
+        if(not self.JumpToId(id)):
+            return self.JumpToCustomId(id)
+        return True
+
+    def FindByAnyId(self, id):
+        v = self.FindById(id)
+        if(not v or v[0] == None):
+            return self.FindByCustomId(id)
+        return v
 
     def FindByCustomId(self, id):
-        for i in range(0, len(self.customids)):
-            cid = self.customids[i]
-            if(cid == id):
-                file = orgDb.customidmaps[i]
-                at   = file.org.env.customids[id][1]
-                return (file, at)
+        if(id in self.customidmaps):
+            fid = self.customidmaps[id]
+            file = fid.file
+            at = file.org.env.customids[id][1]
+            return (file,at)
+        return (None, None)
+    
+    def FindById(self, id):
+        if(id in self.idmaps):
+            fid = self.idmaps[id]
+            file = fid.file
+            at = file.org.env.ids[id][1]
+            return (file,at)
         return (None, None)
 
 
@@ -476,7 +537,7 @@ class OrgReloadFileCommand(sublime_plugin.TextCommand):
         file = Get().FindInfo(self.view)
         if(file):
             file.LoadS(self.view)
-            orgDb.RebuildCustomIds()
+            orgDb.RebuildIds()
         else:
             log.debug("FAILED TO FIND FILE INFO?")
 
@@ -484,10 +545,11 @@ class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
     def on_done_st4(self,index,modifers):
         self.on_done(index)
     def on_done(self, index):
-        if(index < 0):
+        if(index < 0 or index >= len(orgDb.customids)):
             return
-        file = orgDb.customidmaps[index]
-        id   = orgDb.customids[index]
+        fid  = orgDb.customids[index]
+        file = fid.file
+        id   = fid.id
         at   = file.org.env.customids[id][1]
         path = "{0}:{1}".format(file.filename,at + 1)
         self.view.window().open_file(path, sublime.ENCODED_POSITION)
@@ -497,6 +559,25 @@ class OrgJumpToCustomIdCommand(sublime_plugin.TextCommand):
             self.view.window().show_quick_panel(orgDb.customids, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(orgDb.customids, self.on_done_st4, -1, -1)
+
+class OrgJumpToIdCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0 or index >= len(orgDb.ids)):
+            return
+        fid = orgDb.ids[index]
+        file = fid.file
+        id   = fid.id
+        at   = file.org.env.ids[id][1]
+        path = "{0}:{1}".format(file.filename,at + 1)
+        self.view.window().open_file(path, sublime.ENCODED_POSITION)
+
+    def run(self, edit):
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(orgDb.ids, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(orgDb.ids, self.on_done_st4, -1, -1)
 
 
 class OrgJumpToTodayCommand(sublime_plugin.TextCommand):

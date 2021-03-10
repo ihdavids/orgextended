@@ -86,6 +86,8 @@
     {"caption": "Org Copy Entity",             "command": "org_copy_entity"             },
     {"caption": "Org Copy Href",               "command": "org_copy_link_href"          },
     {"caption": "Org Sort List",               "command": "org_sort_list"               },
+    {"caption": "Org Create Heading Id",       "command": "org_create_heading_id"       },
+    {"caption": "Org Insert Effort",           "command": "org_insert_effort"           },
 
     // Agenda
     {"caption": "Org Agenda Goto",             "command": "org_agenda_go_to"            },
@@ -123,10 +125,13 @@
     {"caption": "Org Show Table Rows",         "command": "org_show_table_rows"               },
     {"caption": "Org Hide Table Rows",         "command": "org_hide_table_rows"               },
     {"caption": "Org Plot Table",              "command": "org_plot_table"                    },
-    //{"caption": "Org Test Thing",              "command": "org_show_item"  },
-    //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
+
+    // Internal Mechanics
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },
     {"caption": "Org Download Highligh Js",    "command": "org_download_highligh_js"          },
     {"caption": "Org Select Color Scheme",     "command": "org_select_existing_color_scheme"  },
     {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  },
 ]
+    //{"caption": "Org Test Thing",              "command": "org_show_item"  },
+    //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"  },
+    //{"caption": "Org Test Durations",          "command": "org_test_duration"                 },
