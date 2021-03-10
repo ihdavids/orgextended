@@ -304,16 +304,22 @@ class OrgDb:
                             sublime.active_window().active_view().set_status("Error: ","orgDirs only supports double star style directory wildcards! Anything else is not supported: " + str(orgPath))
                         log.error(" skipping orgDirs value: " + str(orgPath))
                         continue
-                    for path in Path(orgPath).glob(suffix):
-                        if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
-                            continue
-                        try:
-                            filename = str(path)
-                            file = FileInfo(filename,loader.load(filename), self.orgPaths)
-                            self.AddFileInfo(file)
-                        except Exception as e:
-                            #x = sys.exc_info()
-                            log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
+                    if not Path(orgPath).exists():
+                        log.warning('orgDir path {} does not exist!'.format(orgPath))
+                        continue
+                    try:
+                        for path in Path(orgPath).glob(suffix):
+                            if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
+                                continue
+                            try:
+                                filename = str(path)
+                                file = FileInfo(filename,loader.load(filename), self.orgPaths)
+                                self.AddFileInfo(file)
+                            except Exception as e:
+                                #x = sys.exc_info()
+                                log.warning("FAILED PARSING: %s\n  %s",str(path),traceback.format_exc())
+                    except Exception as e:
+                        log,logging.warning("ERROR globbing {}\n{}".format(orgPath, traceback.format_exc()))
         if(self.orgFiles):
             for orgFile in self.orgFiles:
                 path = orgFile.replace('\\','/')
