@@ -31,6 +31,11 @@
 		- json
 		- r 
 
+** Folding
+	- Block folding inside a block was driving me nuts
+	  I have changed it so you can only fold a dynamic block or a source block from its header
+	  If this bothers you, we can make this configurable, just let me know.
+
 ** Properties
    DEADLINE: <2021-03-09 Tue 20:55> 
    :PROPERTIES:
@@ -65,9 +70,9 @@
    [2021-03-09 Tue 11:00]
 
    Part of the reason for the tags, priorities and effort markers is to show the new column view
-   dynamic block. It is NOT fully functional yet. It has none of the summary functionality of the real
+   dynamic block. It is still in its infancy. It has none of the summary functionality of the real
    column view. It also only has a limited set of handlers. It can access properties and has the following
-   build in handlers:
+   built in handlers:
 
 
    - ALLTAGS	  All tags, including inherited ones.
@@ -98,4 +103,8 @@
    | ColumnView Dynamic Block | 1d     |      |                      | a     | 1.1.26.org |                      | 2021-03-09 Tue 11:00 | B        |
 	#+END:
 
-	
+
+	I am slowly driving towards being able to do this:
+	[[https://www.youtube.com/watch?v=5ViUBaarsbw][Gantt Charts in Org Mode]] 
+
+	I don't have column mode yet, but we will get something like it eventually.	
