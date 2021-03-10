@@ -287,6 +287,9 @@ class OrgDate(object):
 
     def format_clock_str(self):
         return OrgDate.format_as_clock(self._start, self._end)
+    
+    def format_datetime_str(self):
+        return OrgDate.format_datetime(self._start)
 
     @staticmethod
     def _to_date(date):

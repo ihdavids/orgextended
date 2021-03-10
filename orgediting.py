@@ -786,6 +786,8 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
 class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):
     def on_done(self, text):
         if(text):
+            # No spaces allowed in a custom id
+            text = text.replace(" ","-")
             node = db.Get().AtInView(self.view)
             if(node and not node.is_root()):
                props.UpdateProperty(self.view,node,"CUSTOM_ID",text,self.onDone)

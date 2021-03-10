@@ -82,7 +82,7 @@ class OrgTabCyclingCommand(sublime_plugin.TextCommand):
         
         if(folding.fold_local_cycle(self.view)):
             return
-        elif(file != None and type(file.AtInView(self.view)) is node.OrgRootNode):
+        elif(file != None and type(file.AtInView(self.view,db.Get())) is node.OrgRootNode):
             folding.fold_global_cycle(self.view)
             return
         elif(folding.am_in_link(self.view)):

@@ -136,10 +136,13 @@ def CreateLink(view):
            link = "[[file:{0}::{1}][{1}]]".format(view.file_name(),namet.group('target'))
         n = db.Get().AtInView(view)
         if(link == None and n and not n.is_root()):
-            # Have custom id?
-            p = n.get_property("CUSTOM_ID")
+            p  = n.get_property("ID")
+            cp = n.get_property("CUSTOM_ID")
             if(p):
                link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(),p,n.heading)
+            # Have custom id?
+            elif(cp):
+               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(),cp,n.heading)
             # Am near a heading?
             else:
                link = "[[file:{0}::*{1}][{1}]]".format(view.file_name(),n.heading)
@@ -180,11 +183,12 @@ class OrgOpenLinkCommand(sublime_plugin.TextCommand):
                 continue
             region = extract_link(view) #view.extract_scope(sel.end())
             content = self.extract_content(region)
-            resolver, content = self.resolve(content)
-            if content is None:
+            resolver, newcontent = self.resolve(content)
+            if newcontent is None:
+                log.error(" Could not resolve link:\n%s" % content)
                 sublime.error_message('Could not resolve link:\n%s' % content)
                 continue
-            resolver.execute(content)
+            resolver.execute(newcontent)
 
 class OrgCreateLinkCommand(sublime_plugin.TextCommand):
     def run(self, edit):

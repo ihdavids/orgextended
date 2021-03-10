@@ -179,10 +179,11 @@ def ShouldFoldLocalCycle(view):
             return True
         else:
             # This could be a property drawer. We want to fold that if so.
-            if(not type(fnode) is node.OrgRootNode and fnode.is_foldable_item(view, row)):
+            if(not type(fnode) is node.OrgRootNode and fnode.is_foldable_drawertype(view, row)):
                 return True
             else:
                 return False
+            pass
     return False
 
 # ,-> FOLDED -> CHILDREN -> SUBTREE --.

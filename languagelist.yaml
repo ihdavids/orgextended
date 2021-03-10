@@ -12,6 +12,7 @@
 - language: lua
 - language: js
   match: javascript|js
+- language: json
 - language: java
 - language: php
 - language: xml
@@ -21,9 +22,10 @@
   match: csharp|cs
 - language: powershell
 - language: plantuml
+  source: wsd
 - language: ditaa
 - language: graphviz
-  source: powershell
+  source: dot
 - language: lisp
   source: lisp
 - language: emacs-lisp
@@ -31,7 +33,7 @@
 - language: yaml
 - language: rust
 - language: sql
-- language: r
+- language: r(\s|$)
 - language: html
   text: html.basic
 - language: go
@@ -43,5 +45,39 @@
 - language: typescript
   match: typescript|ts
   source: ts
+- language: clojure
+- language: bat|cmd
+  source: dosbatch
+- language: org
+  text: orgmode
+- language: pascal
+- language: actionscript
+  source: actionscript.2
+- language: applescript
+- language: dtd
+  source: xml.dtd
+- language: haskell
+- language: (markdown|md)(\s|$)
+  text: html.markdown
+- language: groovy
+- language: regexp
+  source: regexp
+- language: ruby
+- language: restructuredtext
+  text: restructuredtext
+- language: xsl
+  text: xml.xsl 
+- language: scala
+- language: hex
+- language: erlang
+- language: diff
+- language: d(\s|$)
+- language: css
+- language: cmake
+- language: asp
+
+
+
+
 
 

@@ -1,0 +1,110 @@
+#+COLUMNS: %ITEM(Task) %Effort(Effort) %TODO(Todo) %DEADLINE(Deadline) %ALLTAGS(Tags) %FILE(Filename) %TIMESTAMP(Time) %TIMESTAMP_IA(Inactive) %PRIORITY(Priority)
+
+* 1.1.26                                                                  :a:
+** DONE Source Blocks
+   :PROPERTIES:
+     :EFFORT: 2d
+   :END:
+	New languages colored in source blocks:
+		- clojure
+		- bat|cmd
+		- org
+		- pascal
+		- actionscript
+		- applescript
+		- dtd
+		- haskell
+		- markdown|md
+		- groovy
+		- regexp
+		- ruby
+		- restructuredtext
+		- xsl
+		- scala
+		- hex
+		- erlang
+		- diff
+		- d
+		- css
+		- cmake
+		- asp
+		- json
+		- r 
+
+** Folding
+	- Block folding inside a block was driving me nuts
+	  I have changed it so you can only fold a dynamic block or a source block from its header
+	  If this bothers you, we can make this configurable, just let me know.
+
+** Properties
+   DEADLINE: <2021-03-09 Tue 20:55> 
+   :PROPERTIES:
+     :EFFORT: 2d
+   :END:
+
+	- New Command: "Org Create Heading Id"
+	  This will add a UUID ID to the current heading.
+	- Db handling of ids reworked a little to support jumping to an ID or a CUSTOM_ID
+	- New Command: "Org Insert Effort"
+	  Must be org duration format. Will insert an effort property
+	  defaultEffortEstimateUnit - setting (defaults to d) can be used to set the default effort unit 
+
+** Spreadsheets Preview V11                                               :tag:
+   :PROPERTIES:
+     :EFFORT: 4h
+   :END:
+    <2021-03-09 Tue 14:53> 
+
+	- remote function can now take a custom id or id as per:
+	  [[https://lists.gnu.org/archive/html/emacs-orgmode/2010-01/msg00420.html][Remote Table References]] 
+	- Nodes now have a table property that lists the position of the first table in the node.
+    - It doesn't really work well because the existing table system requires a view, which means that we have to load the file
+      which cannot easily be done during the execution of a formula. This means you can get odd tab swaps if you have a remote reference
+      and the file is not opened. I will have to think about another way of handling this in the future.
+
+
+** [#B] ColumnView Dynamic Block
+   :PROPERTIES:
+     :EFFORT: 1d
+   :END:
+   [2021-03-09 Tue 11:00]
+
+   Part of the reason for the tags, priorities and effort markers is to show the new column view
+   dynamic block. It is still in its infancy. It has none of the summary functionality of the real
+   column view. It also only has a limited set of handlers. It can access properties and has the following
+   built in handlers:
+
+
+   - ALLTAGS	  All tags, including inherited ones.
+   - CLOSED	    When was this entry closed?
+   - DEADLINE  	The deadline timestamp.
+   - FILE      	The filename the entry is located in.
+   - ITEM      	The headline of the entry.
+   - PRIORITY 	The priority of the entry, a string with a single letter.
+   - SCHEDULED 	The scheduling timestamp.
+   - TAGS     	The tags defined directly in the headline.
+   - TIMESTAMP 	The first keyword-less timestamp in the entry.
+   - TIMESTAMP_IA 	The first inactive timestamp in the entry.
+   - TODO         	The TODO keyword of the entry.
+
+   Parameters that work:
+
+   - hlines
+   - maxdepth
+   - id (local, global, ID value, file:)
+
+
+	#+BEGIN: columnview :maxdepth 2 :hlines nil :id global
+   | Task                     | Effort | Todo | Deadline             | Tags  | Filename   | Time                 | Inactive             | Priority |
+   | 1.1.26                   |        |      |                      | a     | 1.1.26.org |                      |                      |          |
+   | Source Blocks            | 2d     | DONE |                      | a     | 1.1.26.org |                      |                      |          |
+   | Properties               | 2d     |      | 2021-03-09 Tue 20:55 | a     | 1.1.26.org |                      |                      |          |
+   | Spreadsheets Preview V11 | 4h     |      |                      | tag a | 1.1.26.org | 2021-03-09 Tue 14:53 |                      |          |
+   | ColumnView Dynamic Block | 1d     |      |                      | a     | 1.1.26.org |                      | 2021-03-09 Tue 11:00 | B        |
+	#+END:
+
+
+	I am slowly driving towards being able to do this:
+	[[https://www.youtube.com/watch?v=5ViUBaarsbw][Gantt Charts in Org Mode]] 
+
+	I don't have column mode yet, but we will get something like it eventually.	

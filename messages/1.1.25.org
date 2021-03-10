@@ -35,7 +35,7 @@
 ** Spreadsheet Preview V10
   - boxes mode seems to work.
 
-    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:lines file:plot.png
+    #+PLOT: title:"Box" ind:2 deps:(3 4)  with:boxes file:plot.png
     |    Sede   |  Max   | H-index |  top  |
     |-----------+--------+---------+-------|
     | Sao Paolo |  71.00 |   11.50 |  13.5 |

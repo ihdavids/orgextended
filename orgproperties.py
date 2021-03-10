@@ -16,6 +16,8 @@ import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
+import OrgExtended.orgduration as dur
+import uuid
 #import yaml
 
 log = logging.getLogger(__name__)
@@ -83,6 +85,26 @@ def AddLogbook(view, node, key, value, onDone=None):
 
 
 RE_PROPERTY_EXTRACT = re.compile(r"^\s*:([a-zA-Z0-9_@-]+):\s*(.*)")
+def GetProperty(view, node, key):
+    if(not node or not node.property_drawer_location):
+        return False
+    start = node.property_drawer_location[0]
+    end   = node.property_drawer_location[1]
+    lkey = key.lower()
+    v = None
+    mrow = None
+    # Work backwards, want to find the latest incarnation of this
+    for row in range(end-1, start, -1):
+        line = view.getLine(row)
+        m = RE_PROPERTY_EXTRACT.search(line)
+        if(m != None):
+            k = m.group(1).strip()
+            v = m.group(2).strip()
+            if(k.lower() == lkey):
+                mrow = row
+                break
+    return v
+
 def UpdateProperty(view, node, key, value, onDone=None):
     def OnDrawer():
         # File is reloaded have to regrab node
@@ -222,3 +244,48 @@ class OrgInsertPropertyCommand(sublime_plugin.TextCommand):
         node = db.Get().AtInView(self.view)
         if(node and node.level > 0):
             UpdateProperty(self.view, node, self.pname, prop, self.onDone)
+
+class OrgInsertEffortCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        self.onDone=onDone
+        node = db.Get().AtInView(self.view)
+        if(node and node.level > 0):
+            v = GetProperty(self.view, node, "EFFORT")
+            if(not v):
+                v = ""
+            self.view.window().show_input_panel(
+                    "Effort:",
+                    v,
+                    self.createProperty, None, None)
+
+    def createProperty(self, prop):
+        if(not prop):
+            return
+        isint = False
+        try:
+            i = int(prop)
+            isint = True
+        except:
+            pass
+        if(isint):
+            inc = sets.Get("defaultEffortEstimateUnit","d")
+            prop = prop + inc
+        d = dur.OrgDuration.Parse(prop)
+        if(d):
+            node = db.Get().AtInView(self.view)
+            if(node and node.level > 0):
+                UpdateProperty(self.view, node, "Effort", str(d), self.onDone)
+        else:
+            log.error("Could not generate effort, please use org duration formation for your estimate")
+            view.set_status("Error: ", prop + "is not a valid effort, please use org duration formation 1y 1d 1h 1min")
+            evt.EmitIf(self.onDone)
+
+class OrgCreateHeadingIdCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        self.onDone=onDone
+        node = db.Get().AtInView(self.view)
+        if(node and node.level > 0):
+            v = GetProperty(self.view, node, "ID")
+            if(not v):
+                value = uuid.uuid4()
+                UpdateProperty(self.view, node, "ID", str(value), self.onDone)
