@@ -70,7 +70,7 @@
    :END:
    [2021-03-09 Tue 11:00]
 
-   Part of the reason for the tags, priorities and effort markers is to show the new column view
+   Part of the reason for the tags, priorities and effort markers in these release notes is to show the new column view
    dynamic block. It is still in its infancy. It has none of the summary functionality of the real
    column view. It also only has a limited set of handlers. It can access properties and has the following
    built in handlers:
