@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 RE_END = re.compile(r"^\s*\#\+(END|end)[:]")
 RE_DYN_BLOCK = re.compile(r"^\s*\#\+(BEGIN|begin)[:]\s+(?P<name>[^: ]+)\s*")
-RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]+)\s+([^ ]+)")
+RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]+)\s+(([^ ()]+)|([(][^)]+[)]))")
 
 
 def IsDynamicBlock(view):
@@ -67,7 +67,7 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 				return
 			fnname = m.group('name')
 			#log.debug("DYN NAME: " + fnname)
-			paramstr = line[len(m.group(0)):]
+			paramstr = " " + line[len(m.group(0)):]
 			params = {}
 			for m in RE_FN_MATCH.finditer(paramstr):
 				params[m.group(1)] = m.group(2)
