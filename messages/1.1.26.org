@@ -1,6 +1,8 @@
 #+COLUMNS: %ITEM(Task) %Effort(Effort) %TODO(Todo) %DEADLINE(Deadline) %ALLTAGS(Tags) %TIMESTAMP(Time) %TIMESTAMP_IA(Inactive) %PRIORITY(Priority)
 
 * 1.1.26                                                                  :a:
+** Configuration
+	- improvements to orgdir globbing / error handling / parsing thanks to Anti-Distinctlyminty 
 ** DONE Source Blocks
    :PROPERTIES:
      :EFFORT: 2d
