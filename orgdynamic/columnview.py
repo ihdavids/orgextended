@@ -17,17 +17,12 @@ def get_level(params):
 def handle_item(params,n,defs,output,depth,maxdepth):
 	if(maxdepth > 0 and depth > maxdepth):
 		return
-	if('hlines' in params):
-		v = params['hlines']
-		if(v == 't'):
-			output.append("|-")
-		elif(v != 'nil' and v != ""):
-			v = int(v)
-			if(depth <= v):
-				output.append("|-")
-	out = "|"
+	out = []
+	emptyCount = 0
 	for d in defs:
-		out += str(d.GetCellValue(n,params)) + "|"
+		v = str(d.GetCellValue(n,params)).strip()
+		emptyCount += 1 if v == "" else 0
+		out.append(v)
 	ok = True
 	if('exclude-tags' in params):
 		exclude = util.ToList(params['exclude-tags'])
@@ -35,7 +30,17 @@ def handle_item(params,n,defs,output,depth,maxdepth):
 			if(e in n.tags):
 				ok = False
 				break
+	if('skip-empty-rows' in params and params['skip-empty-rows'] != 'nil'):
+		ok = ok and emptyCount < (len(defs)-1)
 	if(ok):
+		if('hlines' in params):
+			v = params['hlines']
+			if(v == 't'):
+				output.append(["-"])
+			elif(v != 'nil' and v != ""):
+				v = int(v)
+				if(depth <= v):
+					output.append(["-"])
 		output.append(out)
 	for c in n.children:
 		handle_item(params,c,defs,output,depth+1,maxdepth)
@@ -229,11 +234,15 @@ def Execute(view, params):
 		handle_headings(defs,output)
 		# If we had a root, run over it and process it's children
 		# building up our output array.
+		outarrays = []
 		if(r):
 			for n in r.children:
-				handle_item(params,n,defs,output,1,maxdepth)
+				handle_item(params,n,defs,outarrays,1,maxdepth)
 	# Did we get some output? return it
-	if(len(output) > 0):
+	if(len(outarrays) > 0):
+		for o in outarrays:
+			out = "|" + '|'.join(o) + "|"
+			output.append(out)
 		return output
 	# Nope add a generic error so we know we failed getting output at all...
 	output.append("|NO COLUMNVIEW DATA|")

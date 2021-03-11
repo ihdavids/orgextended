@@ -1,4 +1,4 @@
-#+COLUMNS: %ITEM(Task) %Effort(Effort) %TODO(Todo) %DEADLINE(Deadline) %ALLTAGS(Tags) %FILE(Filename) %TIMESTAMP(Time) %TIMESTAMP_IA(Inactive) %PRIORITY(Priority)
+#+COLUMNS: %ITEM(Task) %Effort(Effort) %TODO(Todo) %DEADLINE(Deadline) %ALLTAGS(Tags) %TIMESTAMP(Time) %TIMESTAMP_IA(Inactive) %PRIORITY(Priority)
 
 * 1.1.26                                                                  :a:
 ** DONE Source Blocks
@@ -91,22 +91,29 @@
    - hlines
    - maxdepth
    - id (local, global, ID value, file:)
+   - indent
+   - skip-empty-rows
+   - exclude-tags
 
-*** ColumnView Beyond Max Depth
+   Parameters that do not yet work:
 
-	#+BEGIN: columnview  :hlines nil :id global :indent t :maxdepth 2 :exclude-tags (ExcludeMe )
-    | Task                       | Effort | Todo | Deadline             | Tags        | Filename   | Time                 | Inactive             | Priority |
-    | 1.1.26                     |        |      |                      | a           | 1.1.26.org |                      |                      |          |
-    | ..Source Blocks            | 2d     | DONE |                      | a           | 1.1.26.org |                      |                      |          |
-    | ..Folding                  |        |      |                      | a           | 1.1.26.org |                      |                      |          |
-    | ..Properties               | 2d     |      | 2021-03-09 Tue 20:55 | a           | 1.1.26.org |                      |                      |          |
-    | ..Spreadsheets Preview V11 | 4h     |      |                      | a tag       | 1.1.26.org | 2021-03-09 Tue 14:53 |                      |          |
-    | ..ColumnView Dynamic Block | 1d     |      |                      | a           | 1.1.26.org |                      | 2021-03-09 Tue 11:00 | B        |
-    | ..Excluded Because Of Tag  |        |      |                      | ExcludeMe a | 1.1.26.org |                      |                      |          |
+   - match
+
+	#+BEGIN: columnview  :hlines nil :id global :indent t :maxdepth 2 :skip-empty-rows t :exclude-tags (ExcludeMe)
+   | Task                       | Effort | Todo | Deadline             | Tags  | Time                 | Inactive             | Priority |
+   | 1.1.26                     |        |      |                      | a     |                      |                      |          |
+   | ..Source Blocks            | 2d     | DONE |                      | a     |                      |                      |          |
+   | ..Folding                  |        |      |                      | a     |                      |                      |          |
+   | ..Properties               | 2d     |      | 2021-03-09 Tue 20:55 | a     |                      |                      |          |
+   | ..Spreadsheets Preview V11 | 4h     |      |                      | a tag | 2021-03-09 Tue 14:53 |                      |          |
+   | ..ColumnView Dynamic Block | 1d     |      |                      | a     |                      | 2021-03-09 Tue 11:00 | B        |
 	#+END:
 
-** Excluded Because Of Tag                                                :ExcludeMe:
 	I am slowly driving towards being able to do this:
 	[[https://www.youtube.com/watch?v=5ViUBaarsbw][Gantt Charts in Org Mode]] 
 
 	I don't have column mode yet, but we will get something like it eventually.	
+
+*** ColumnView Beyond Max Depth
+** Excluded Because Of Tag                                                :ExcludeMe:
+* Empty
