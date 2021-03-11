@@ -231,6 +231,7 @@ def RelativeTo(view, filepath):
 def IncEnd(reg): 
     return sublime.Region(reg.begin(), reg.end() + 1)
 
+# Convert a list string: (a b c d) to an actual list
 spacesplit = re.compile(r"\s+")
 def ToIntList(val):
     t = val.replace('(',"").replace(")","")

@@ -16,6 +16,7 @@ import OrgExtended.pymitter as evt
 import OrgExtended.orginsertselected as ins
 import OrgExtended.simple_eval as simpev
 import OrgExtended.orgextension as ext
+import OrgExtended.orgparse.date as orgdate
 import math
 import random
 import ast
@@ -1131,7 +1132,21 @@ def mytime(dt):
     return dt.time()
 
 def mydate(dt):
-    return dt.date()
+    if(isinstance(dt,Cell)):
+        rc = orgdate.OrgDate.list_from_str(dt.GetText())
+        if(len(rc) == 1):
+            return rc[0]
+        return rc
+    if(isinstance(dt,str)):
+        rc = orgdate.OrgDate.list_from_str(dt)
+        if(len(rc) == 1):
+            return rc[0]
+        return rc
+    elif(isinstance(dt,datetime.datetime)):
+        return dt.date()
+    elif(isinstance(dt,datetime.date)):
+        return dt
+    return None
 
 def randomDigit(start, end):
     return random.randint(GetVal(start),GetVal(end))

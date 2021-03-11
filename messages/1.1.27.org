@@ -1,1 +1,14 @@
 * 1.1.27
+** Editing
+	- Org Insert Now Active
+	- Org Insert Now Inactive
+
+
+** Spreadsheet Preview V11
+
+	- date() function improved to auto convert strings and cells to OrgDate objects.
+
+	|           a            |           b            | c | d | e |
+	|------------------------+------------------------+---+---+---|
+	| <2021-03-10 Wed 22:25> | <2021-03-10 Wed 22:25> |   |   |   |
+    #+TBLFM:@2$2=date($-1)

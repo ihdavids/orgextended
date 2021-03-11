@@ -658,11 +658,22 @@ class OrgInsertTodayInactiveCommand(sublime_plugin.TextCommand):
         toInsert = orgdate.OrgDate.format_date(now, False)
         self.view.insert(edit,self.view.sel()[0].begin(), toInsert)
 
+class OrgInsertNowInactiveCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        now = datetime.datetime.now()
+        toInsert = orgdate.OrgDate.format_clock(now, False)
+        self.view.insert(edit,self.view.sel()[0].begin(), toInsert)
 
 class OrgInsertTodayActiveCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         now = datetime.datetime.now()
         toInsert = orgdate.OrgDate.format_date(now, True)
+        self.view.insert(edit,self.view.sel()[0].begin(), toInsert)
+
+class OrgInsertNowActiveCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        now = datetime.datetime.now()
+        toInsert = orgdate.OrgDate.format_clock(now, True)
         self.view.insert(edit,self.view.sel()[0].begin(), toInsert)
 
 class OrgInsertDateInactiveCommand(sublime_plugin.TextCommand):
