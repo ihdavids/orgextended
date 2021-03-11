@@ -1,6 +1,7 @@
 import sublime
 import OrgExtended.orgdb as db
 import OrgExtended.orgparse.date as d
+import OrgExtended.orgutil.util as util
 import re
 import os
 
@@ -27,7 +28,15 @@ def handle_item(params,n,defs,output,depth,maxdepth):
 	out = "|"
 	for d in defs:
 		out += str(d.GetCellValue(n,params)) + "|"
-	output.append(out)
+	ok = True
+	if('exclude-tags' in params):
+		exclude = util.ToList(params['exclude-tags'])
+		for e in exclude:
+			if(e in n.tags):
+				ok = False
+				break
+	if(ok):
+		output.append(out)
 	for c in n.children:
 		handle_item(params,c,defs,output,depth+1,maxdepth)
 

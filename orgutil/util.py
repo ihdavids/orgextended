@@ -231,4 +231,21 @@ def RelativeTo(view, filepath):
 def IncEnd(reg): 
     return sublime.Region(reg.begin(), reg.end() + 1)
 
+spacesplit = re.compile(r"\s+")
+def ToIntList(val):
+    t = val.replace('(',"").replace(")","")
+    ts = spacesplit.split(t)
+    vals = []
+    for x in ts:
+        if(x.strip() != ""):
+            vals.append(int(x.strip()))
+    return vals
 
+def ToList(val):
+    t = val.replace('(',"").replace(")","")
+    ts = spacesplit.split(t)
+    vals = []
+    for x in ts:
+        if(x.strip() != ""):
+            vals.append(x.strip())
+    return vals

@@ -100,9 +100,9 @@
     | ..Source Blocks            | 2d     | DONE |                      | a           | 1.1.26.org |                      |                      |          |
     | ..Folding                  |        |      |                      | a           | 1.1.26.org |                      |                      |          |
     | ..Properties               | 2d     |      | 2021-03-09 Tue 20:55 | a           | 1.1.26.org |                      |                      |          |
-    | ..Spreadsheets Preview V11 | 4h     |      |                      | tag a       | 1.1.26.org | 2021-03-09 Tue 14:53 |                      |          |
+    | ..Spreadsheets Preview V11 | 4h     |      |                      | a tag       | 1.1.26.org | 2021-03-09 Tue 14:53 |                      |          |
     | ..ColumnView Dynamic Block | 1d     |      |                      | a           | 1.1.26.org |                      | 2021-03-09 Tue 11:00 | B        |
-    | ..Excluded Because Of Tag  |        |      |                      | a ExcludeMe | 1.1.26.org |                      |                      |          |
+    | ..Excluded Because Of Tag  |        |      |                      | ExcludeMe a | 1.1.26.org |                      |                      |          |
 	#+END:
 
 ** Excluded Because Of Tag                                                :ExcludeMe:

@@ -103,12 +103,7 @@ def plot_build_data_file(table,params):
     usingVals = range(startCol, table.Width()+1)
     if('deps' in params):
         deps = params['deps']
-        t = deps.replace('(',"").replace(")","")
-        ts = re.split(r'\s+',t)
-        usingVals = []
-        for x in ts:
-            if(x.strip() != ""):
-                usingVals.append(int(x.strip()))
+        usingVals = util.ToIntList(deps)
 
     with open(datafile,"w") as f:
         for r in range(1,table.Height()+1):
