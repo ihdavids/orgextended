@@ -16,6 +16,8 @@
 	  <b
 	#+END_EXAMPLE
 
+	- Example blocks are now orgmode syntax inside the block.
+
 ** Spreadsheet Preview V11
 
 	- date() function improved to auto convert strings and cells to OrgDate objects.

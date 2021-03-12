@@ -73,13 +73,13 @@ def RandomString():
 # These just make life a little cleaner
 @add_method(sublime.View)
 def line_count(self):
-	return self.rowcol(self.size())[0] + 1
+    return self.rowcol(self.size())[0] + 1
 
 @add_method(sublime.View)
 def curRowCol(self):
     try:
         if(len(self.sel())>0):
-	       return self.rowcol(self.sel()[0].begin())
+           return self.rowcol(self.sel()[0].begin())
     except:
         pass
     return None
@@ -116,10 +116,10 @@ def endRow(self):
 
 @add_method(sublime.View)
 def isRegionFolded(self, region):
-	for i in self.folded_regions():
-		if i.contains(region):
-			return True
-	return False
+    for i in self.folded_regions():
+        if i.contains(region):
+            return True
+    return False
 
 @add_method(sublime.View)
 def getSourceScope(view):
