@@ -1,16 +1,37 @@
 * 1.1.28
 ** Spreadsheets Preview V12
+	Mostly quality of life improvements in this release.
+
 	- Turned off highlight updates during formula execution
 	  it was costing us during the update.
-	  
+	- Improved function table, symbol table and constants table construction.
+	  They are now lazy loaded and reused as much as possible for all tables
+	  reducing the costs associated with highlighting cells and navigation.
+	- In the interest of supporting only pay for what you use.
+	  Dynamic table extensions (user added functions) are reloaded ONCE when
+	  the tables are first constructed, if you are developing a function for
+	  table handling you can now turn on:
+	- Added abs function
 
+	  #+BEGIN_EXAMPLE
+	    "forceLoadExternalExtensions": True
+	  #+END_EXAMPLE 
+
+	  In your settings to dynamically reload your extension all the time.
+	  This reduces the cost of building the function table.
 
 	|  a   | d |
 	|------+---|
-	| 0.40 | 2 |
-	| 0.48 | 3 |
-	| 0.47 | 4 |
-	| 0.18 | 5 |
-	| 0.53 | 6 |
-	| 0.09 | 7 |
-    #+TBLFM:$1=rand();%.2f::$2=@#
+	| 0.22 | 2 |
+	| 0.34 | 3 |
+	| 0.86 | 4 |
+	| 0.41 | 5 |
+	| 0.01 | 6 |
+	| 0.64 | 7 |
+    #+TBLFM:$1=rand();%.2f::$2=abs(-@#)
+
+** Source Blocks
+	- gnuplot language added to syntax, to use install the GNU Plot package.
+
+** Folding
+	- Fold other trees - this is something I want for this release!

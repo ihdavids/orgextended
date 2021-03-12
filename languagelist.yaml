@@ -75,6 +75,7 @@
 - language: css
 - language: cmake
 - language: asp
+- language: gnuplot
 
 
 

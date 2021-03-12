@@ -51,6 +51,98 @@ def isTableFormula(view):
 def isAutoComputeRow(view):
     return None != RE_AUTOLINE.search(view.curLineText())
 
+opsTable = None
+def GetOps():
+    global opsTable
+    if(opsTable == None):
+        o = simpev.DEFAULT_OPERATORS.copy()
+        o[ast.Mult]  = safe_mult
+        o[ast.Add]   = safe_add
+        o[ast.Pow]   = safe_pow
+        o[ast.Sub]   = tsub
+        o[ast.Div]   = tdiv
+        o[ast.Mod]   = tmod
+        o[ast.Eq]    = teq
+        o[ast.NotEq] = tneq
+        o[ast.Gt]    = tgt
+        o[ast.Lt]    = tlt
+        o[ast.GtE]   = tge
+        o[ast.LtE]   = tle
+        o[ast.Not]   = tnot
+        o[ast.USub]  = tusub
+        o[ast.UAdd]  = tuadd
+        opsTable     = o
+    return opsTable
+
+constsTable = None
+def GetConsts():
+    global constsTable
+    if(constsTable == None):
+        n = simpev.DEFAULT_NAMES.copy()
+        n['pi']     = 3.1415926
+        n['t']      = True
+        n['true']   = True
+        n['True']   = True
+        n['false']  = False
+        n['False']  = False
+        n['nil']    = None
+        n['None']   = None
+        constsTable = n
+    return constsTable
+
+# These are table extensions you would like to add
+# for performance reasons we only reload them when you start sublime
+# you can however turn on forceLoadExternalExtensions to reload the
+# extension dynamically ALL THE TIME. do not leave that one though!
+def add_dynamic_functions(f):
+    exts = sets.Get("enableTableExtensions",None)
+    if(exts):
+        dynamic = ext.find_extension_modules('orgtable', [])
+        for k in dynamic.keys():
+            if(hasattr(dynamic[k],"Execute")):
+                f[k] = dynamic[k].Execute
+            else:
+                log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
+
+functionsTable = None
+def GetFunctions():
+    global functionsTable
+    reloadExtensions = sets.Get("forceLoadExternalExtensions",False)
+    if(functionsTable == None or reloadExtensions):
+        f = simpev.DEFAULT_FUNCTIONS.copy()
+        f['vmean'] = vmean
+        f['vmedian'] = vmedian
+        f['vmax'] = vmax
+        f['vmin'] = vmin
+        f['vsum'] = vsum
+        f['tan'] = tan
+        f['cos'] = cos
+        f['sin'] = sin
+        f['exp'] = exp
+        f['floor'] = myfloor
+        f['ceil'] = myceil
+        f['round'] = myround
+        f['trunc'] = mytrunc
+        f['remote'] = remote
+        f['now'] = mynow
+        f['year'] = myyear
+        f['day'] = myday
+        f['month'] = mymonth
+        f['hour'] = myhour
+        f['minute'] = myminute
+        f['second'] = mysecond
+        f['time'] = mytime
+        f['date'] = mydate
+        f['weekday'] = myweekday
+        f['yearday'] = myyearday
+        f['duration'] = myduration
+        f['randomf'] = randomFloat
+        f['random'] = randomDigit
+        f['abs'] = myabs
+        add_dynamic_functions(f)
+        functionsTable = f
+    return functionsTable
+
 class TableCache:
     def __init__(self):
         self.cachedTables = []
@@ -985,6 +1077,9 @@ def GetNum(i):
 #  Functions
 # ============================================================
 
+def myabs(a):
+    return abs(GetVal(a))
+
 def safe_mult(a, b):  # pylint: disable=invalid-name
     if hasattr(a, '__len__') and b * len(a) > MAX_STRING_LENGTH:
         raise IterableTooLong('Sorry, I will not evalute something that long.')
@@ -1328,103 +1423,34 @@ class TableDef(simpev.SimpleEval):
         for i in range(0,self.NumFormulas()):
             self.view.erase_regions("fmla_"+str(i))
 
-    def add_constants(self,n):
-        n['pi'] = 3.1415926
-        n['t'] = True
-        n['nil'] = None
-        n['true'] = True
-        n['false'] = False
 
     def add_functions(self,f):
-        f['vmean'] = vmean
-        f['vmedian'] = vmedian
-        f['vmax'] = vmax
-        f['vmin'] = vmin
-        f['vsum'] = vsum
-        f['tan'] = tan
-        f['cos'] = cos
-        f['sin'] = sin
-        f['exp'] = exp
-        f['floor'] = myfloor
-        f['ceil'] = myceil
-        f['round'] = myround
-        f['trunc'] = mytrunc
-        f['ridx'] = self.ridx
-        f['cidx'] = self.cidx
-        f['randomf'] = randomFloat
-        f['random'] = randomDigit
-        f['symorcell'] = self.symbolOrCell
-        f['getcell'] = self.getcell
+        f['ridx']       = self.ridx
+        f['cidx']       = self.cidx
+        f['symorcell']  = self.symbolOrCell
+        f['getcell']    = self.getcell
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
-        f['remote'] = remote
-        f['now'] = mynow
-        f['year'] = myyear
-        f['day'] = myday
-        f['month'] = mymonth
-        f['hour'] = myhour
-        f['minute'] = myminute
-        f['second'] = mysecond
-        f['time'] = mytime
-        f['date'] = mydate
-        f['weekday'] = myweekday
-        f['yearday'] = myyearday
-        f['duration'] = myduration
-        # abs
 
-    def add_dynamic_functions(self,f):
-        exts = sets.Get("enableTableExtensions",None)
-        if(exts):
-            dynamic = ext.find_extension_modules('orgtable', [])
-            for k in dynamic.keys():
-                if(hasattr(dynamic[k],"Execute")):
-                    f[k] = dynamic[k].Execute
-                else:
-                    log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
-    def add_operators(self,o):
-        o[ast.Mult] = safe_mult
-        o[ast.Add]  = safe_add
-        o[ast.Pow]  = safe_pow
-        o[ast.Sub] = tsub
-        o[ast.Div] = tdiv
-        o[ast.Mod] = tmod
-        o[ast.Eq] = teq
-        o[ast.NotEq] = tneq
-        o[ast.Gt] = tgt
-        o[ast.Lt] = tlt
-        o[ast.GtE] = tge
-        o[ast.LtE] = tle
-        o[ast.Not] = tnot
-        o[ast.USub] = tusub
-        o[ast.UAdd] = tuadd
-
-    #                     ast.In: lambda x, y: op.contains(y, x),
-    #                     ast.NotIn: lambda x, y: not op.contains(y, x),
-    #                     ast.Is: lambda x, y: x is y,
-    #                     ast.IsNot: lambda x, y: x is not y,
-    #                     }
 
     def __init__(self,view, start,end,linedef):
-        operators = simpev.DEFAULT_OPERATORS.copy()
+        names     = GetConsts().copy()
+        operators = GetOps().copy()
         operators[ast.FloorDiv] = self.range_expr
-        functions = simpev.DEFAULT_FUNCTIONS.copy()
-        names = simpev.DEFAULT_NAMES.copy()
-        self.add_operators(operators)
+        functions = GetFunctions().copy()
         self.add_functions(functions)
-        self.add_dynamic_functions(functions)
-        self.add_constants(names)
         super(TableDef,self).__init__(operators, functions, names)
-        self.curRow = 0
-        self.curCol = 0
-        self.start = start
-        self.end   = end
-        self.view  = view
+        self.curRow  = 0
+        self.curCol  = 0
+        self.start   = start
+        self.end     = end
+        self.view    = view
         self.linedef = linedef
         self.cellToFormula = None
-        self.accessList = []
-        self.consts = {}
-        self.emptyiszero = False
-        self.startCol = 1
+        self.accessList    = []
+        self.consts        = {}
+        self.emptyiszero   = False
+        self.startCol      = 1
 
     def RecalculateTableDimensions(self):
         res = recalculate_linedef(self.view,self.start)

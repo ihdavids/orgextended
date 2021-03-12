@@ -825,6 +825,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '{{beginsrc}}((gnuplot)\s*)'
+      captures:
+        1: constant.other orgmode.fence.sourceblock
+        2: orgmode.fence.sourceblock
+        3: keyword orgmode.fence.language
+        4: orgmode.fence.sourceblock
+      embed: scope:source.gnuplot
+      escape: '{{endsrc}}'
+      embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence.sourceblock
       # #+SOMETHING:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks

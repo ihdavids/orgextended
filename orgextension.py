@@ -71,7 +71,7 @@ def find_extension_modules(folder, builtins):
 			#       in the loadModCache.
 			fullfilename = os.path.join(path,filename)
 			lastMod = os.path.getmtime(fullfilename)
-			force = fullfilename not in lastModCache or lastMod > lastModCache[fullfilename]
+			force = fullfilename not in lastModCache or lastMod > lastModCache[fullfilename] or sets.Get("forceLoadExternalExtensions",False)
 			lastModCache[fullfilename] = lastMod
 			module = load_module("User", folder, filename, force)
 			moduleTable[filename.split('.')[0]] = module
