@@ -32,6 +32,15 @@ def isPotentialOrgFileOrBuffer(fileOrView):
         return isPotentialOrgFile(fileOrView)
     return False
 
+# The safest way to check if a string is numeric or not seems to be this way.
+# Seems super slow to me. I might right an RE for this in the future.
+def numberCheck(v):
+    try:
+        float(v)
+        return True
+    except:
+        return False
+
 def isView(fileOrView):
     return (type(fileOrView) is sublime.View)
 

@@ -177,7 +177,7 @@ def plot_write_table_data_to(params,table,f,r,c,first=False):
             f.write("#")
     else:
         f.write("\t")
-    if(not numberCheck(txt) and " " in txt or "\t" in txt):
+    if(not util.numberCheck(txt) and " " in txt or "\t" in txt):
         f.write("\""+ txt + "\"")
     else:
         f.write(txt)
@@ -470,8 +470,6 @@ def plot_table_command(table,view):
     print(o)
     #return o.split('\n') + e.split('\n')
 
-
-
 def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     # figure out what our separator is.
     # replace the separator with |
@@ -702,11 +700,10 @@ class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
         self.input = ins.OrgInput()
         self.input.run("WxH", None, evt.Make(self.OnDims))
 
-RE_TABLE_LINE = re.compile(r'\s*[|]')
-RE_TABLE_HLINE = re.compile(r'\s*[|][-][+-]*[|]')
-RE_FMT_LINE = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
-
-RE_TARGET = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))\s*$')
+RE_TABLE_LINE   = re.compile(r'\s*[|]')
+RE_TABLE_HLINE  = re.compile(r'\s*[|][-][+-]*[|]')
+RE_FMT_LINE     = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
+RE_TARGET       = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))\s*$')
 RE_NAMED_TARGET = re.compile(r'\s*[$](?P<name>[a-zA-Z][a-zA-Z0-9]+)')
 def formula_rowcol(expr,table):
     fields = expr.split('=')
@@ -749,21 +746,13 @@ def formula_rowcol(expr,table):
                 return [[cell.r,cell.c],fields[1],cell.rowFilter]
     return (None, None)
 
-def numberCheck(v):
-    try:
-        float(v)
-        return True
-    except:
-        return False
-
 def isNumeric(v):
     return v.lstrip('-').lstrip('+').isnumeric()
 
 def isFunc(v):
     return 'ridx()' in v or 'cidx()' in v
 
-# TODO: Make funciton cells work!
-RE_TARGET_A = re.compile(r'\s*(([@](?P<rowonly>((?P<rosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>((?P<cosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>(?P<rsign>[+-])?[0-9><#]+)[$](?P<col>((?P<csign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
+RE_TARGET_A  = re.compile(r'\s*(([@](?P<rowonly>((?P<rosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>((?P<cosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>(?P<rsign>[+-])?[0-9><#]+)[$](?P<col>((?P<csign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
 RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
 RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
@@ -839,15 +828,7 @@ def formula_sources(expr):
             matches.append([row,col])
     return matches
 
-#class EvalNoMethods(simpleeval.SimpleEval):
-#    def _eval_call(self, node):
-#        if isinstance(node.func, ast.Attribute):
-#            raise simpleeval.FeatureNotAvailable("No methods please, we're British")
-#        return super(EvalNoMethods, self)._eval_call(node)
-
-
-
-
+# ============================================================
 class Formula:
     def __init__(self,expr, reg, formatters, table):
         self.table = table
@@ -947,6 +928,12 @@ def RCIterator(table,r,c):
             yield [r,c]
 
 # ============================================================
+# This represents a cell REFERENCE in the table.
+# It has a reference to the table itself and looks
+# up the actual data dynamically WHEN ASKED TO!
+# That is important since the current target changes
+# and many cell references are RELATIVE to the current
+# target.
 class Cell:
     def __init__(self,r,c,table,rrelative=0,crelative=0,rowFilter=None):
         self.r = r
@@ -987,7 +974,7 @@ class Cell:
                 cnt = len(self.r.strip())
                 r = self.table.StartRow() + (cnt-1)
             else:
-                if(numberCheck(self.r)):
+                if(util.numberCheck(self.r)):
                     r = int(self.r)
         elif(self.r < 0 or self.rrelative):
             r = self.table.CurRow() + self.r
@@ -1015,7 +1002,7 @@ class Cell:
                 cnt = len(self.c.strip())
                 c = self.table.StartCol() + (cnt-1)
             else:
-                if(numberCheck(self.c)):
+                if(util.numberCheck(self.c)):
                     c = int(self.c)
         elif(self.c < 0 or self.crelative):
             c = self.table.CurCol() + self.c
@@ -1042,13 +1029,13 @@ class Cell:
 
     def GetVal(self):
         txt = self.GetText().strip()
-        if(numberCheck(txt)):
+        if(util.numberCheck(txt)):
             if('.' in txt):
                 return float(txt)
             return int(txt)
         if(txt.endswith("%")):
             t = txt[:-1]
-            if(numberCheck(t)):
+            if(util.numberCheck(t)):
                 f = float(t)
                 f = (f / 100.0)
                 print("PERCENT: " + str(f))
@@ -1057,7 +1044,7 @@ class Cell:
     
     def GetNum(self):
         txt = self.GetText().strip()
-        if(numberCheck(txt)):
+        if(util.numberCheck(txt)):
             if('.' in txt):
                 return float(txt)
             return int(txt)
@@ -1238,6 +1225,9 @@ def myyearday(dt):
 def mytime(dt):
     return dt.time()
 
+# Not currently used, the python if is forced on us due to the use
+# of the AST backend. I could convert from this to that with an RE
+# but I am not yet sure that's a good idea.
 def myif(test,a,b=None):
     v = GetVal(test)
     if(isinstance(v,str)):
@@ -1344,8 +1334,6 @@ def remote(name,cellRef):
 
 # ============================================================
 class RangeExprOnNonCells(simpev.InvalidExpression):
-    """ a name isn't defined. """
-
     def __init__(self,name,expression):
         self.name = name
         self.message = "both sides of a range expression must be a cell definition"
@@ -1353,22 +1341,23 @@ class RangeExprOnNonCells(simpev.InvalidExpression):
         # pylint: disable=bad-super-call
         super(RangeExprOnNonCells, self).__init__(self.message)
 
+# These filters are used for naming cells above or below a certain point.
+# The symbolOrCell system uses this when iterating to filter out cells that
+# do not belong.
 class NullFilter:
     def filter(self,x):
-        #print("N: " + str(x))
         return False
 class AboveFilter:
     def __init__(self,r):
         self.r = r
     def filter(self,x):
-        #print("A: " + str(x) + " >= " + str(self.r))
         return x >= self.r
 class BelowFilter:
     def __init__(self,r):
         self.r = r
     def filter(self,x):
-        #print("B: " + str(x) + " <= " + str(self.r))
         return x <= self.r
+
 # ============================================================
 class TableDef(simpev.SimpleEval):
     def range_expr(self,a,b):
@@ -1407,7 +1396,7 @@ class TableDef(simpev.SimpleEval):
             return self.nameToCell[name]
         if(name in self.consts):
             v = self.consts[name].strip()
-            if(numberCheck(v)):
+            if(util.numberCheck(v)):
                 if('.' in v):
                     return float(v)
                 else:
