@@ -1,4 +1,8 @@
 * 1.1.28
+** Image Links
+	- Fixed an assert that could happen when backing image was removed.
+	- Sublime will now show the non image icon as expected.
+	
 ** Spreadsheets Preview V12
 	Mostly quality of life improvements in this release.
 

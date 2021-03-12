@@ -269,7 +269,10 @@ class ImageHandler:
                 {}<img src="file://{}" class="centerImage" {}>
             '''
             img  = find_image_file(view, url)
-            size = ImageHandler.get_image_size(img)
+            if(img):
+                size = ImageHandler.get_image_size(img)
+            else:
+                size = (100,100,"png")
         else:
             log.debug("local file: " + url)
             FMT = '''
