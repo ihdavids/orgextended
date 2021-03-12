@@ -337,7 +337,6 @@ def plot_get_params(table,view):
     node = db.Get().At(view, row)
     if(node):
         plot = " " + node.get_comment('PLOT',"")[0]
-        #print(plot)
         ps     = re.split(r'\s+[a-zA-Z][a-zA-Z0-9]+[:]',plot) 
         ps = ps[1:]
         keys   = [m.group(0) for m in re.finditer(r'\s+[a-zA-Z][a-zA-Z0-9]+[:]',plot)]
@@ -371,7 +370,6 @@ def plot_get_params(table,view):
                 continue
             else:
                 params[k] = v
-    #print(str(params))
     return params
 
 RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*")
@@ -430,7 +428,6 @@ def plot_table_command(table,view):
     outpath    = os.path.dirname(output)
     sourcepath = os.path.dirname(view.file_name())
     commandLine = [plotcmd, "-c", ps['_gpltfile'] ]
-    #print(str(commandLine))
     try:
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -486,12 +483,9 @@ def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
     for k,d in possibles.items():
         s = sum(d) 
         mean = s / len(d)
-        #print("MEAN: " + str(mean) + " SEP: [" + k + "]")
         if(mean > 0):
             variance = math.sqrt(sum([ (x-mean)*(x-mean) for x in d ]) / len(d))
             vars[k] = variance
-    #print(str(vars))
-    #print(str(possibles))
     separator = min(vars, key=vars.get) 
     log.info("SEPARATOR CHOSEN: " + separator)
     data = ""
