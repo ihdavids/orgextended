@@ -1,1 +1,16 @@
 * 1.1.28
+** Spreadsheets Preview V12
+	- Turned off highlight updates during formula execution
+	  it was costing us during the update.
+	  
+
+
+	|  a   | d |
+	|------+---|
+	| 0.40 | 2 |
+	| 0.48 | 3 |
+	| 0.47 | 4 |
+	| 0.18 | 5 |
+	| 0.53 | 6 |
+	| 0.09 | 7 |
+    #+TBLFM:$1=rand();%.2f::$2=@#

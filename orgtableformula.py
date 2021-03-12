@@ -30,9 +30,13 @@ random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
 RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
 RE_AUTOLINE = re.compile(r"^\s*[|]\s*[#]\s*[|]")
+RE_AUTOCOMPUTE = re.compile(r"^\s*[|]\s*(?P<a>[#_$^*!/ ])\s*[|]")
+RE_END_BLOCK   = re.compile(r'^\s*[#][+](END|end)[:]\s*')
 MAX_STRING_LENGTH = 100000
 MAX_COMPREHENSION_LENGTH = 10000
 MAX_POWER = 4000000  # highest exponent
+
+highlightEnabled = True
 
 log = logging.getLogger(__name__)
 
@@ -1700,8 +1704,6 @@ def recalculate_linedef(view,row):
 # ====================================================================
 # CREATE TABLE
 # ====================================================================
-RE_AUTOCOMPUTE = re.compile(r"^\s*[|]\s*(?P<a>[#_$^*!/ ])\s*[|]")
-RE_END_BLOCK   = re.compile(r'^\s*[#][+](END|end)[:]\s*')
 def create_table(view, at=None):
     row = view.curRow()
     if(at != None):
@@ -1953,6 +1955,8 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
 
     def on_done(self):
+        global highlightEnabled
+        highlightEnabled = True
         evt.EmitIf(self.onDone)
 
     def on_formula_copy_done(self):
@@ -1963,6 +1967,8 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
         self.process_next()
 
     def run(self, edit,onDone=None,skipFormula=None):
+        global highlightEnabled
+        highlightEnabled = False
         self.onDone = onDone
         if(skipFormula):
             self.on_formula_copy_done()
@@ -2012,9 +2018,13 @@ class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(self.on_reformat,1)
 
     def on_done(self):
+        global highlightEnabled
+        highlightEnabled = True
         evt.EmitIf(self.onDone)
 
     def run(self,edit,onDone = None):
+        global highlightEnabled
+        highlightEnabled = False
         self.onDone = onDone
         global tableCache
         td = tableCache.GetTable(self.view)
@@ -2097,6 +2107,9 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         return None
 
     def on_selection_modified(self):
+        global highlightEnabled
+        if(not highlightEnabled):
+            return
         if(self.lastpt and self.lastpt == self.view.sel()[0].begin()):
             return
         self.lastpt = self.view.sel()[0].begin()
@@ -2153,6 +2166,9 @@ class TableEventListener(sublime_plugin.ViewEventListener):
                 if(isAutoComputeRow(self.view)):
                     self.view.run_command("org_table_auto_compute")
     def on_post_text_command(self, command_name, args= None):
+        global highlightEnabled
+        if(not highlightEnabled):
+            return
         if(hasattr(self,'preCell') and self.preCell != None):
             if('table_editor_move_row_up' == command_name):
                 # Also if pre was an hline
