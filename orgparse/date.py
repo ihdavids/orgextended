@@ -3,6 +3,7 @@ import re
 import dateutil.rrule as dr
 import dateutil.parser as dp
 import dateutil.relativedelta as drel
+import OrgExtended.orgduration as orgduration
 import calendar
 
 def total_seconds(td):
@@ -249,6 +250,28 @@ class OrgDate(object):
         self.repeat_rule = repeat_rule
         self.warn_rule = warn_rule
 
+    def __add__(self,o):
+        if(isinstance(o,int)):
+            d = orgduration.OrgDuration.ParseInt(o)
+            td = d.timedelta()
+            return OrgDate(self._start + td,self._end + td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
+        if(isinstance(o,orgduration.OrgDuration)):
+            td = o.timedelta()
+            return OrgDate(self._start + td,self._end + td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
+        return self 
+        pass
+    
+    def __sub__(self,o):
+        if(isinstance(o,int)):
+            d = orgduration.OrgDuration.ParseInt(o)
+            td = d.timedelta()
+            return OrgDate(self._start - td,self._end - td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
+        if(isinstance(o,orgduration.OrgDuration)):
+            td = o.timedelta()
+            return OrgDate(self._start - td,self._end - td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
+        return self 
+        pass
+
     @staticmethod
     def format_date(now, active):
         if(active):
@@ -262,6 +285,13 @@ class OrgDate(object):
             return now.strftime("<%Y-%m-%d %a %H:%M>")  
         else:
             return now.strftime("[%Y-%m-%d %a %H:%M]")  
+    
+    @staticmethod
+    def format_clock_with_time_range(s, e, active):
+        if(active):
+            return s.strftime("<%Y-%m-%d %a %H:%M-") + e.strftime("%H:%M>")
+        else:
+            return s.strftime("[%Y-%m-%d %a %H:%M-") + e.strftime("%H:%M>")
 
     @staticmethod
     def format_datetime(now):
@@ -274,16 +304,43 @@ class OrgDate(object):
         return "{0:02d}:{1:02d}".format(int(hours),int(minutes))    
 
     @staticmethod
-    def format_as_clock(start, end=None):
+    def format_dwim(start, end=None,active=False):
+        if(end):
+            if(isinstance(start, datetime.datetime)):
+                if(end.date() != start.date()):
+                    duration = end - start
+                    return "{0}--{1} => {2}".format(
+                        OrgDate.format_clock(start, active), 
+                        OrgDate.format_clock(end, active), 
+                        OrgDate.format_duration(duration))
+                else:
+                    return OrgDate.format_clock_with_time_range(start,end,active)
+            else:
+                if(end == start):
+                    return OrgDate.format_date(start,active)
+                else:
+                    duration = end - start
+                    return "{0}--{1} => {2}".format(
+                        OrgDate.format_date(start, active), 
+                        OrgDate.format_date(end, active), 
+                        OrgDate.format_duration(duration))
+        else:
+            if(isinstance(start, datetime.datetime)):
+                return OrgDate.format_clock(start, active)
+            else:
+                return OrgDate.format_date(start,active)
+
+    @staticmethod
+    def format_as_clock(start, end=None,active=False):
         if(end):
             duration = end - start
             return "{0}--{1} => {2}".format(
-                OrgDate.format_clock(start, False), 
-                OrgDate.format_clock(end, False), 
+                OrgDate.format_clock(start, active), 
+                OrgDate.format_clock(end, active), 
                 OrgDate.format_duration(duration))
         else:
             return "{0}--".format(
-                OrgDate.format_clock(start, False))
+                OrgDate.format_clock(start, active))
 
     def format_clock_str(self):
         return OrgDate.format_as_clock(self._start, self._end)
@@ -315,6 +372,10 @@ class OrgDate(object):
             return tuple(date.timetuple()[:6])
         elif isinstance(date, datetime.date):
             return tuple(date.timetuple()[:3])
+
+    def __str__(self):
+        # TODO: Handle recurrence in this!
+        return self.format_dwim(self._start, self._end, self._active)
 
     def __repr__(self):
         args = [

@@ -254,16 +254,15 @@ contexts:
           captures:
             1: orgmode.fence
           pop: true
+
     - match: '(\s*\#\+(BEGIN_EXAMPLE|begin_example)\s*)'
       captures:
-        1: orgmode.fence
-      push:
-        - meta_scope: constant.other orgmode.raw.block
-        - meta_content_scope: markup.raw.block orgmode.raw.block
-        - match: '(\s*\#\+(END_EXAMPLE|end_example)\s*)'
-          captures:
-            1: orgmode.fence
-          pop: true
+        1: constant.other orgmode.fence
+      embed: scope:text.orgmode
+      escape: '(\s*\#\+(END_EXAMPLE|end_example)\s*)'
+      embed_scope: markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence
     {{INSERT_LANGUAGES_HERE}}
       # #+SOMETHING:
       # But not a dynamic block
@@ -289,14 +288,11 @@ contexts:
         2: orgmode.fence.dynamicblock.begin
         3: keyword orgmode.fence.dynamicblock.name
         4: variable.parameter orgmode.fence.dynamicblock.params
-      push:
-        - meta_scope: orgmode.raw.block.dynamicblock
-        - meta_content_scope: markup.raw.block orgmode.raw.block
-        - match: '(^\s*\#\+END:\s*|\#\+end:\s*)'
-          captures:
-            1: constant.other orgmode.fence.dynamicblock.end
-          pop: true
-        #- include: scope:source.js
+      embed: scope:text.orgmode
+      escape: '(^\s*\#\+END:\s*|\#\+end:\s*)'
+      embed_scope: markup.raw.block orgmode.raw.block.dynamicblock
+      escape_captures:
+        1: constant.other orgmode.fence.dynamicblock.end
   code:
     - meta_scope: text
     - match: \s*\[/code\]

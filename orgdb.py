@@ -74,7 +74,7 @@ class FileInfo:
         return len(self.org) - 1
 
     def Save(self):
-        f = open(self.filename,"w+")
+        f = open(self.filename,"w+",encoding="utf-8")
         for item in self.org:
             f.write(str(item))
         f.close()

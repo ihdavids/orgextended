@@ -54,6 +54,20 @@ class OrgDuration:
 			r += str(mins) + "mins"
 		return r.strip()
 
+	def timedelta(self):
+		y     = int(self.mins / 525600.0)
+		days  = math.fmod(self.mins,525600.0)
+		d     = int(days / 1440.0)
+		hours = math.fmod(days,1440.0)
+		h     = int(hours/60.0)
+		mins  = int(math.fmod(hours,60))
+		td = datetime.timedelta(days=d+(y*365),hours=h,minutes=mins)
+		return td
+
+	@staticmethod
+	def FromTimedelta(td: datetime.timedelta):
+		return OrgDuration(td.days*1440 + (td.seconds/60.0))
+
 	@staticmethod
 	def Parse(txt: str):
 		m = RE_DURATION_PARSER.search(txt)
@@ -82,6 +96,13 @@ class OrgDuration:
 				mtot += float(secs)*0.01666667
 			return OrgDuration(mtot)
 		return None
+
+
+	@staticmethod
+	def ParseInt(d: int):
+		# Let the user determine default meaning d is the default
+		mtot = float(d)*1440
+		return OrgDuration(mtot)
 
 
 # ================================================================================

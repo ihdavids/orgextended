@@ -1,14 +1,49 @@
-* 1.1.27
-** Editing
-	- Org Insert Now Active
-	- Org Insert Now Inactive
 
+
+* 1.1.27
+** Archiving
+	- Fixed a bug where ARCHIVE_TIME was missing a colon at the front when inserted.
+	- Switched archiving to save as utf-8 by default to avoid some of the unicode problems I have been running into.
+
+** Editing
+	- Org Insert Now Active     - Inserts right now as an active datetime 
+	- Org Insert Now Inactive   - Inserts right now as an inactive datetime
+	- Org Insert Date Active    - Pops up the date picker to insert an active datetime
+	- Org Insert Date Inactive  - Pops up the date picker to insert an inactive datetime
+
+	- Dynamic Block Snippet:
+	#+BEGIN_EXAMPLE
+	  <b
+	#+END_EXAMPLE
 
 ** Spreadsheet Preview V11
 
 	- date() function improved to auto convert strings and cells to OrgDate objects.
+	- duration() added to handle columnview duration syntax. This is compatible with adding to dates.
+	- if statements work although they do not follow the calc style, here we are diverging a little at the moment
+	  due to the fact that our backend is really python ast. "If" is a keyword, I can't easily use it like a function without playing
+	  some games I am not sure I am ready to do.
+	- percentages can be treated like numbers much like they can in orgmode
 
-	|           a            |           b            | c | d | e |
-	|------------------------+------------------------+---+---+---|
-	| <2021-03-10 Wed 22:25> | <2021-03-10 Wed 22:25> |   |   |   |
-    #+TBLFM:@2$2=date($-1)
+	|           a            |           b            | c  |           d            | e  | f  |  g  |  h   |
+	|------------------------+------------------------+----+------------------------+----+----+-----+------|
+	| <2021-03-10 Wed 22:25> | <2021-03-09 Tue 22:25> | 5d | <2021-03-15 Mon 22:25> | 5d | 50 | 20% | 10.0 |
+    #+TBLFM:@2$2=date($-1)-1::@2$4=date(@2$1)+duration($-1)::@2$5=$3 if True else 5::@2$9=$-2*$-1
+
+** Columnview
+	- Empty properties still make a row in the column view (allowing you to setup additional rows for calculations)
+	- Table format blocks can live after the end marker on a dynamic block. This is not org standard but it lets us
+	  build formulas for generated tables which can be really handy on clock tables and columnviews (building timesheets and project plans)
+	- Org syntax is turned on inside a dynamic block now allowing tables to be highlighted inside the block.
+
+    #+COLUMNS: %ITEM(Task) %Effort(Effort) %TESTING(Testing)
+	#+BEGIN: columnview
+   | Task                    | Effort | Testing |
+   | 1.1.27                  |        |         |
+   | Archiving               |        |         |
+   | Editing                 |        |         |
+   | Spreadsheet Preview V11 |        |         |
+   | Columnview              |        |         |
+	#+END:	
+   #+TBLFM:@2$9=5
+	

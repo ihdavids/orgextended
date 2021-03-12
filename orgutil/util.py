@@ -77,7 +77,9 @@ def line_count(self):
 
 @add_method(sublime.View)
 def curRowCol(self):
-	return self.rowcol(self.sel()[0].begin())
+    if(len(self.sel())>0):
+	   return self.rowcol(self.sel()[0].begin())
+    return None
 
 @add_method(sublime.View)
 def curRow(self):

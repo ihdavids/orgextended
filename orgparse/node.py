@@ -1637,14 +1637,14 @@ class OrgNode(OrgBaseNode):
                 self._lines.insert(i+1, "{0} :END:".format(" " * self._level))
             # Find property drawer and add this property
             offset = self._property_drawer_location[0] - self._start + 1
-            self._lines.insert(offset, "{0} {1}: {2}".format(" " * self.level,key,val))
+            self._lines.insert(offset, "{0} :{1}: {2}".format(" " * self.level,key,val))
             self._property_drawer_location = (self._property_drawer_location[0], self._property_drawer_location[1] + 1)
         # We have this property, if it has changed
         # Modify it.
         else:
             offset = self._property_offsets[key]
             self._properties[key] = val
-            self._lines[offset] = "{0}  {1}:{2}\n".format(" " * self._level,key,val)
+            self._lines[offset] = "{0}  :{1}:{2}\n".format(" " * self._level,key,val)
 
 
     def get_property(self, key, val=None):

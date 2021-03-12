@@ -17,6 +17,7 @@ import OrgExtended.orginsertselected as ins
 import OrgExtended.simple_eval as simpev
 import OrgExtended.orgextension as ext
 import OrgExtended.orgparse.date as orgdate
+import OrgExtended.orgduration as orgduration
 import math
 import random
 import ast
@@ -949,6 +950,13 @@ class Cell:
             if('.' in txt):
                 return float(txt)
             return int(txt)
+        if(txt.endswith("%")):
+            t = txt[:-1]
+            if(numberCheck(t)):
+                f = float(t)
+                f = (f / 100.0)
+                print("PERCENT: " + str(f))
+                return f
         return txt
     
     def GetNum(self):
@@ -1131,6 +1139,30 @@ def myyearday(dt):
 def mytime(dt):
     return dt.time()
 
+def myif(test,a,b=None):
+    v = GetVal(test)
+    if(isinstance(v,str)):
+        if(v.strip() != ""):
+            return a
+        else:
+            return b
+    elif(isinstance(v,int)):
+        if(v):
+            return a
+        else:
+            return b
+    else:
+        if(test):
+            return a
+        return b
+
+def myduration(dt):
+    if(isinstance(dt,Cell)):
+        return orgduration.OrgDuration.Parse(dt.GetText())
+    if(isinstance(dt,str)):
+        return orgduration.OrgDuration.Parse(dt)
+    return dt
+
 def mydate(dt):
     if(isinstance(dt,Cell)):
         rc = orgdate.OrgDate.list_from_str(dt.GetText())
@@ -1274,8 +1306,6 @@ class TableDef(simpev.SimpleEval):
     def symbolOrCell(self,name):
         if name in self.nameToCell:
             return self.nameToCell[name]
-        # TODO: Look up cell names FIRST
-        #       but only once we have the advanced features
         if(name in self.consts):
             v = self.consts[name].strip()
             if(numberCheck(v)):
@@ -1285,14 +1315,6 @@ class TableDef(simpev.SimpleEval):
                     return int(v)
             return v
 
-    def add_cell_names(self,names,start,end,linedef):
-        pass
-        #for r in range(1,(end+2)-start):
-        #    names["r"+str(r)] = Cell(r,'*',self)
-        #    for c in range(1,len(linedef)):
-        #        names["c"+str(c)] = Cell('*',c,self)
-        #        names["r"+str(r)+"c"+str(c)] = Cell(r,c,self)
-        #print(str(names))
     def ClearAllRegions(self):
         for r in range(1,(self.end+2)-self.start):
             self.view.erase_regions("cell_"+str(r))
@@ -1304,6 +1326,11 @@ class TableDef(simpev.SimpleEval):
 
     def add_constants(self,n):
         n['pi'] = 3.1415926
+        n['t'] = True
+        n['nil'] = None
+        n['true'] = True
+        n['false'] = False
+
     def add_functions(self,f):
         f['vmean'] = vmean
         f['vmedian'] = vmedian
@@ -1338,8 +1365,8 @@ class TableDef(simpev.SimpleEval):
         f['date'] = mydate
         f['weekday'] = myweekday
         f['yearday'] = myyearday
+        f['duration'] = myduration
         # abs
-        # now
 
     def add_dynamic_functions(self,f):
         exts = sets.Get("enableTableExtensions",None)
@@ -1382,7 +1409,6 @@ class TableDef(simpev.SimpleEval):
         self.add_functions(functions)
         self.add_dynamic_functions(functions)
         self.add_constants(names)
-        self.add_cell_names(names,start,end,linedef)
         super(TableDef,self).__init__(operators, functions, names)
         self.curRow = 0
         self.curCol = 0
@@ -1516,10 +1542,13 @@ class TableDef(simpev.SimpleEval):
         return len(self.linedef)-1
 
     def CursorToCell(self):
-        row,col = self.view.curRowCol()
-        r = self.RowToCellRow(row)
-        c = self.FindCellColFromCol(col)
-        return [r,c]
+        rc = self.view.curRowCol()
+        if(rc):
+            row,col = rc
+            r = self.RowToCellRow(row)
+            c = self.FindCellColFromCol(col)
+            return [r,c]
+        return None
 
     def CellToFormula(self, cell):
         r,c = cell
@@ -1672,6 +1701,7 @@ def recalculate_linedef(view,row):
 # CREATE TABLE
 # ====================================================================
 RE_AUTOCOMPUTE = re.compile(r"^\s*[|]\s*(?P<a>[#_$^*!/ ])\s*[|]")
+RE_END_BLOCK   = re.compile(r'^\s*[#][+](END|end)[:]\s*')
 def create_table(view, at=None):
     row = view.curRow()
     if(at != None):
@@ -1690,7 +1720,7 @@ def create_table(view, at=None):
     for r in range(row-1,0,-1):
         pt = view.text_point(r, 0)
         line = view.substr(view.line(pt))
-        if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line)):
+        if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line) or RE_END_BLOCK.search(line)):
             continue
         row = r+1
         break
@@ -1779,9 +1809,11 @@ def create_table(view, at=None):
             lastRow = rowNum - 1
             break
         else:
+            endb = RE_END_BLOCK.search(line)
+            print(str(endb))
             # We keep going for blank lines allowing #TBLFM lines with spaces to
-            # be okay.
-            if(line.strip() == ""):
+            # be okay OR tables inside dynamic blocks (RE above)
+            if(line.strip() == "" or endb):
                 if(lastRow == 0):
                     spacesRow = r
                     end = r-1
