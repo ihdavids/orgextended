@@ -1332,34 +1332,38 @@ class OrgNode(OrgBaseNode):
     def _iparse_tables(self, ilines, at):
         in_table = False
         start = None
+        localStart = None
         for l in ilines:
             m = RE_TABLE_MATCH.match(l)
             if(m):
                 if(not start):
-                    start = self._start + at.offset
+                    localStart = at.offset
+                    start = self._start + localStart
                 in_table = True
             else:
                 if(in_table):
                     in_table = False
-                    end = self._start + at.offset
+                    localEnd = at.offset
+                    end = self._start + localEnd
                     name = ""
                     if(self.lastName):
                         name = self.lastName
-                        self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "name": self.lastName}
+                        self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "nodeoff": (localStart,localEnd), "name": self.lastName}
                         self.lastName = None
                     if(None == self._table):
-                        self._table = {"type": "t", "loc": (start, end), "name": name}
+                        self._table = {"type": "t", "loc": (start, end), "nodeoff": (localStart,localEnd),"name": name}
             yield l
         if(in_table):
             in_table = False
-            end = self._start + at.offset
+            localEnd = at.offset
+            end = self._start + localEnd
             name = ""
             if(self.lastName):
                 name = self.lastName
-                self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "name": self.lastName}
+                self.env.NamedObjects[self.lastName] = {"type": "t", "loc": (start, end), "nodeoff": (localStart,localEnd), "name": self.lastName}
                 self.lastName = None
             if(None == self._table):
-                self._table = {"type": "t", "loc": (start, end), "name": name}
+                self._table = {"type": "t", "loc": (start, end), "nodeoff": (localStart,localEnd), "name": name}
 
     def _iparse_properties(self, ilines, at):
         self._properties = properties = {}

@@ -54,6 +54,16 @@ def fold_content(view):
     else:
         log.warning("Could not locate file in DB for folding")
 
+def fold_all_but_my_tree(view):
+    node = db.Get().AtInView(view)
+    if(node):
+        node.unfold(view)
+        while(node and node.parent):
+            for c in node.parent.children:
+                if(c != node):
+                    c.fold(view)
+            node = node.parent
+
 def fold_all(view):
     file = db.Get().FindInfo(view)
     if(file):
@@ -103,6 +113,11 @@ def onLoad(view):
             fold_showall(view)
         fold_all_links(view)
         # showeverything is implicit
+
+
+class OrgFoldAllButMeCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        fold_all_but_my_tree(self.view)
 
 class OrgFoldAllCommand(sublime_plugin.TextCommand):
     def run(self, edit):

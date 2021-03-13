@@ -274,6 +274,7 @@
     { "keys": [" ", "m", "e"],       "command": "org_select_entity",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "y", "s"],       "command": "org_copy_subtree",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "y", "e"],       "command": "org_copy_entity",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "f", "o"],       "command": "org_fold_all_but_me",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     // ORG AGENDA
     { "keys": [" ", "o", "a"],       "command": "org_agenda_custom_view",        "context": [{"key": "vi_command_mode_aware"}]  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },

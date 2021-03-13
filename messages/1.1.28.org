@@ -42,16 +42,18 @@
 
 	- Added abs function
 
-	  |  a   | d |
-	  |------+---|
-	  | 0.35 | 2 |
-	  | 0.41 | 3 |
-	  | 0.07 | 4 |
-	  | 0.79 | 5 |
-	  | 0.48 | 6 |
-	  | 0.43 | 7 |
-      #+TBLFM:$1=rand();%.2f::$2=abs(-@#)
+	  |  a   | d |    |
+	  |------+---+----|
+	  | 0.50 | 2 | 51 |
+	  | 0.46 | 3 | 56 |
+	  | 0.19 | 4 |  2 |
+	  | 0.02 | 5 |  3 |
+	  | 0.49 | 6 |  4 |
+	  | 0.64 | 7 |  5 |
+    #+TBLFM:$1=rand();%.2f::$2=abs(-@#)::$3=remote("my-table-test",$2)
 
+    - Improved remote() function, it no longer requires you to open a view / tab although
+      the file has to have been parsed so should be in your orgDirs / orgFile list.
     - Added the ability to add dynamic symbols as well as functions.
 
       To use add a python file in your User folder like so:
@@ -70,4 +72,4 @@
 	- gnuplot language added to syntax, to use install the GNU Plot package.
 
 ** Folding
-	- Fold other trees - this is something I want for this release!
+	- "Org Fold Others" - New command that folds all other headings but the immediate part of the tree you are on.

@@ -1041,22 +1041,13 @@ def remote(name,cellRef):
         # Okay, maybe this is a custom id or id, let try
         file, row = db.Get().FindByAnyId(name)
         if(file):
-            view = sublime.active_window().find_open_file(file.filename)
-            if(view == None):
-                view = sublime.active_window().open_file(file.filename, sublime.ENCODED_POSITION)
-                #while(view.is_loading()):
-                #    time.sleep(0.01)
-            if(view):
-                node = db.Get().At(view,row)
-                if(not node):
-                    db.Get().LoadS(view)
-                    node = db.Get().At(view,row)
-                if(node and node.table):
-                    td = create_table(view,view.text_point(node.table['loc'][0],0))
-                    r = cellRef.GetRow()
-                    c = cellRef.GetCol()
-                    text = td.GetCellText(r,c)
-                    return text
+            node = file.At(row)
+            if(node and node.table):
+                td = create_table_from_node(node, node.table['nodeoff'][0])
+                r = cellRef.GetRow()
+                c = cellRef.GetCol()
+                text = td.GetCellText(r,c)
+                return text
         return "<UNK REF>"
 
 # ============================================================
@@ -1203,14 +1194,22 @@ class TableDef(simpev.SimpleEval):
 
     def GetCellText(self,r,c):
         self.accessList.append([r,c])
-        reg = self.FindCellRegion(r,c)
-        if(reg):
-            text = self.view.substr(reg)
-            if(self.emptyiszero and text.strip() == ""):
+        if(isinstance(self.view,sublime.View)):
+            reg = self.FindCellRegion(r,c)
+            if(reg):
+                text = self.view.substr(reg)
+                if(self.emptyiszero and text.strip() == ""):
+                    return "0"
+                return text
+            if(self.emptyiszero):
                 return "0"
-            return text
-        if(self.emptyiszero):
-            return "0"
+        else:
+            row,cs,ce = self.FindCellNodeRegion(r,c)
+            text = self.view._lines[row]
+            cell = text[cs+1:ce].strip()
+            if(self.emptyiszero and cell == ""):
+                return "0"
+            return cell
         return ""
     def FindCellRegion(self,r,c):
         if(not r in self.lineToRow):
@@ -1219,6 +1218,15 @@ class TableDef(simpev.SimpleEval):
         #row = self.start + (r-1)       # 1 is zero
         colstart = self.linedef[c-1] 
         colend   = self.linedef[c]
+        return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
+    def FindCellNodeRegion(self,r,c):
+        if(not r in self.lineToRow):
+            return None
+        row = self.lineToRow[r]
+        #row = self.start + (r-1)       # 1 is zero
+        colstart = self.linedef[c-1] 
+        colend   = self.linedef[c]
+        return (row,colstart,colend)
         return sublime.Region(self.view.text_point(row,colstart+1),self.view.text_point(row,colend)) 
     def HighlightCells(self, cells,color):
         for cell in cells:
@@ -1436,12 +1444,19 @@ def find_formula(view):
         else:
             return None
 def recalculate_linedef(view,row):
-    pt = view.text_point(row, 0)
-    line = view.substr(view.line(pt))
-    linedef = None
-    if(not RE_TABLE_HLINE.search(line) and RE_TABLE_LINE.search(line)):
-        linedef = findOccurrences(line,'|')
-    return linedef
+    if(isinstance(view,sublime.View)):
+        pt = view.text_point(row, 0)
+        line = view.substr(view.line(pt))
+        linedef = None
+        if(not RE_TABLE_HLINE.search(line) and RE_TABLE_LINE.search(line)):
+            linedef = findOccurrences(line,'|')
+        return linedef
+    else:
+        line = view._lines[row]
+        linedef = None
+        if(not RE_TABLE_HLINE.search(line) and RE_TABLE_LINE.search(line)):
+            linedef = findOccurrences(line,'|')
+        return linedef
 
 # ====================================================================
 # CREATE TABLE
@@ -1554,7 +1569,6 @@ def create_table(view, at=None):
             break
         else:
             endb = RE_END_BLOCK.search(line)
-            print(str(endb))
             # We keep going for blank lines allowing #TBLFM lines with spaces to
             # be okay OR tables inside dynamic blocks (RE above)
             if(line.strip() == "" or endb):
@@ -1651,6 +1665,205 @@ def create_table(view, at=None):
     # 
     return td
 
+# CREATE TABLE FROM NODE
+# Figure out a way to get rid of this duplication!
+# ====================================================================
+def create_table_from_node(node, row):
+    start_row = row
+    last_row  = len(node._lines)
+    end = last_row
+    start = row
+    linedef = None
+    formula = None
+    hlines = []
+    lineToRow = {}
+    endHeader = 1
+    formulaRow = None
+    formulaLine = None
+    for r in range(row-1,0,-1):
+        line = node._lines[r]
+        if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line) or RE_END_BLOCK.search(line)):
+            continue
+        row = r+1
+        break
+    start = row
+    rowNum = 0
+    lastRow = 0
+    spacesRow = 0
+    isAdvanced = False
+    autoCompute = []
+    namesRowsAbove = []
+    namesRowsBelow = []
+    colNames       = []
+    parameters     = []
+    ignore = []
+    ignoreRows = {}
+    for r in range(row,last_row):
+        rowNum += 1
+        line = node._lines[r]
+        m = RE_FMT_LINE.search(line)
+        # Found a table hline. These don't get counted
+        if(RE_TABLE_HLINE.search(line)):
+            hlines.append(r)
+            rowNum -= 1
+            if(endHeader == 1):
+                endHeader = (r - start) + 1
+            continue
+        # Found a table line match and continue
+        elif(RE_TABLE_LINE.search(line)):
+            if(None == linedef):
+                linedef = findOccurrences(line,'|')
+            # Is this an advanced table? If so we have to handle things
+            # in a special way!
+            mm = RE_AUTOCOMPUTE.search(line) 
+            if(mm):
+                char = mm.group('a')
+                if(char != ' '):
+                    isAdvanced = True
+                # Name row
+                if(char == '!'):
+                    ignoreRows[rowNum] = r
+                    ignore.append((rowNum,r))
+                    colNames.append((rowNum,r))
+                    pass
+                # Auto compute row
+                elif(char == "#"):
+                    autoCompute.append(rowNum)
+                # compute row
+                elif(char == "*"):
+                    pass
+                # Skip row
+                elif(char == "/"):
+                    ignoreRows[rowNum] = r
+                    ignore.append((rowNum,r))
+                    pass
+                # Name below
+                elif(char == "_"):
+                    ignoreRows[rowNum] = r
+                    namesRowsBelow.append((rowNum,r))
+                    ignore.append((rowNum,r))
+                    pass
+                # Name above
+                elif(char == "^"):
+                    ignoreRows[rowNum] = r
+                    namesRowsAbove.append((rowNum,r))
+                    ignore.append((rowNum,r))
+                    pass
+                elif(char == "$"):
+                    ignoreRows[rowNum] = r
+                    parameters.append((rowNum,r))
+                    ignore.append((rowNum,r))
+                else:
+                    ignoreRows[rowNum] = r
+                    ignore.append((rowNum,r))
+                    pass
+                lineToRow[rowNum] = r
+            else:
+                lineToRow[rowNum] = r
+            continue
+        # Found a formula break!
+        elif(m):
+            end = r-1
+            formula = m.group('expr').split('::')
+            formulaRow = r
+            formulaLine = line
+            lastRow = rowNum - 1
+            break
+        else:
+            endb = RE_END_BLOCK.search(line)
+            # We keep going for blank lines allowing #TBLFM lines with spaces to
+            # be okay OR tables inside dynamic blocks (RE above)
+            if(line.strip() == "" or endb):
+                if(lastRow == 0):
+                    spacesRow = r
+                    end = r-1
+                    lastRow = rowNum - 1
+                continue
+            else:
+                if(lastRow == 0):
+                    end = r-1
+                    lastRow = rowNum - 1
+            break
+    for r in range(row,0,-1):
+        line = node._lines[r]
+        if(RE_TABLE_LINE.search(line)):
+            continue
+        else:
+            start = r+1
+            break
+    td = TableDef(node, start, end, linedef)
+    td.hlines = hlines
+    td.startRow = endHeader
+    td.spacesRow = spacesRow
+    #td.linedef = linedef
+    td.formulas = []
+    td.formulaRow    = formulaRow
+    td.formulaLine   = formulaLine
+    td.lineToRow     = lineToRow
+    td.rowCount      = lastRow
+    td.autoCompute   = autoCompute
+    td.nameRowsAbove = namesRowsAbove
+    td.nameRowsBelow = namesRowsBelow
+    td.colNames      = colNames
+    if(isAdvanced):
+        td.ignore        = ignore
+        td.ignoreRows    = ignoreRows
+    else:
+        td.ignore     = []
+        td.ignoreRows = {}
+    if(isAdvanced):
+        td.startCol = 2
+        td.BuildNameMap()
+    if(td):
+        if(node):
+            constants = node.list_comment('CONSTANTS',[])
+            consts = {}
+            if(constants and len(constants) > 0):
+                for con in constants:
+                    cs = con.split('=')
+                    if(len(cs) == 2):
+                        name = cs[0].strip()
+                        val  = cs[1].strip()
+                        consts[name] = val
+            props = node.properties
+            if(props and len(props) > 0):
+                for k,v in props.items():
+                    consts['PROP_'+k] = v
+            td.consts = consts
+        if(parameters and len(parameters) > 0):
+            for prow in parameters:
+                for c in range(2,td.Width()):
+                    txt = td.GetCellText(prow[0],c).strip()
+                    if('=' in txt):
+                        ps = txt.split(' ')
+                        if(len(ps) < 1):
+                            continue
+                        for p in ps:
+                            pp = p.split('=')
+                            if(len(pp) == 2):
+                                td.consts[pp[0].strip()] = pp[1].strip()
+    if(formula):
+        sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
+        first = sre.match(formulaLine)
+        if(first):
+            lastend = len(first.group(0))
+            xline = sre.sub('',formulaLine)
+            las = xline.split('::')
+            index = 0
+            for fm in formula:
+                formatters = fm.split(';')
+                if(len(formatters) > 1):
+                    fm = formatters[0]
+                    formatters = formatters[1]
+                else:
+                    formatters = ""
+                fend = lastend+len(las[index])
+                td.formulas.append(Formula(fm, None,formatters,td))
+                index += 1
+                lastend = fend + 2
+        td.BuildCellToFormulaMap()
+    # 
+    return td
 
 def SingleFormulaIterator(table,i):
     cellIterator = table.FormulaTargetCellIterator(i) 

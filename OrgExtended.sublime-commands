@@ -39,6 +39,7 @@
     {"caption": "Org Change DeIndent",         "command": "org_change_de_indent"        },
     {"caption": "Org Reload File",             "command": "org_reload_file"             },
     {"caption": "Org Fold Thing",              "command": "org_fold_thing"              },
+    {"caption": "Org Fold Others",             "command": "org_fold_all_but_me"         },
     {"caption": "Org Move Heading Up",         "command": "org_move_heading_up"         },
     {"caption": "Org Move Heading Down",       "command": "org_move_heading_down"       },
     {"caption": "Org Open Link",               "command": "org_open_link"               },
