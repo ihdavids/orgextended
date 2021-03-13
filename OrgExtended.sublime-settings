@@ -218,5 +218,23 @@
     // "PandocPath": "C:\Program Files\Pandoc\pandoc.exe",
     // "PandocStyle": "blocky",
 
+    // Turning this on allows you to write table functions and symbol
+    // extensions in: Packages/User/orgtable/myfunction.py 
+    //
+    // These can be used in the TBLFM expressions on tables.
+    // These are turned OFF by default and can be enabled
+    // by you when you want to add your own extensions.
+    //"enableTableExtensions": true,
+
+    // By default extensions are lazy loaded the first time you encounter a table
+    // when writing an extension this can become tedious fast as it means you have to
+    // reload sublime to test your changes. Turn this on and sublime will forcibly reload
+    // extensions every time it goes to execute them.
+    //"forceLoadExternalExtensions": true,
+
+    // Turning this on will turn on a lot of additional logging to help diagnose problems
+    // during debugging. Do not enable unless you really want that.
+    // You will need to restart sublime to get this.
+    // "enableDebugLogging": true, 
 
 }

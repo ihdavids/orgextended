@@ -1,13 +1,31 @@
 * 1.1.28
+** Dynamicblocks
+	- Params structure is now a PList class and has:
+		- Get(name,default) :: Returns the parameter as a string value
+		- GetInt(name,default) :: Returns the parameter as an int value
+		- GetFloat(name,default) :: Returns the parameter as a float value
+		- GetList(name,default) :: Returns the parameter as a list of strings
+		- GetIntList(name,default) :: Returns the parameter as a list of ints
+
+		Plists now support double quotes "" and () brackets delimiting parameter values.
+
 ** Image Links
 	- Fixed an assert that could happen when backing image was removed.
 	- Sublime will now show the non image icon as expected.
-	
+
+	- ORG_ATTR comments on image links with plists specifying image dimensions
+	  are now respected in inline sublime visualization of an image.	
+
+	#+BEGIN_EXAMPLE
+    #+ORG_ATTR: :width 700
+	#+END_EXAMPLE
+
 ** Spreadsheets Preview V12
 	Mostly quality of life improvements in this release.
-
+	
+	- Table cache works across files properly now.
 	- Turned off highlight updates during formula execution
-	  it was costing us during the update.
+	  it was costing us during the update needlessly.
 	- Improved function table, symbol table and constants table construction.
 	  They are now lazy loaded and reused as much as possible for all tables
 	  reducing the costs associated with highlighting cells and navigation.
@@ -15,8 +33,6 @@
 	  Dynamic table extensions (user added functions) are reloaded ONCE when
 	  the tables are first constructed, if you are developing a function for
 	  table handling you can now turn on:
-	- Added abs function
-
 	  #+BEGIN_EXAMPLE
 	    "forceLoadExternalExtensions": True
 	  #+END_EXAMPLE 
@@ -24,15 +40,31 @@
 	  In your settings to dynamically reload your extension all the time.
 	  This reduces the cost of building the function table.
 
-	|  a   | d |
-	|------+---|
-	| 0.22 | 2 |
-	| 0.34 | 3 |
-	| 0.86 | 4 |
-	| 0.41 | 5 |
-	| 0.01 | 6 |
-	| 0.64 | 7 |
-    #+TBLFM:$1=rand();%.2f::$2=abs(-@#)
+	- Added abs function
+
+	  |  a   | d |
+	  |------+---|
+	  | 0.35 | 2 |
+	  | 0.41 | 3 |
+	  | 0.07 | 4 |
+	  | 0.79 | 5 |
+	  | 0.48 | 6 |
+	  | 0.43 | 7 |
+      #+TBLFM:$1=rand();%.2f::$2=abs(-@#)
+
+    - Added the ability to add dynamic symbols as well as functions.
+
+      To use add a python file in your User folder like so:
+      #+BEGIN_EXAMPLE
+    	.../Packages/User/orgtable/mysymbols.py
+      #+END_EXAMPLE
+
+      And add the symbols you would like exposed for use in your tables.
+      #+BEGIN_SRC python
+        def AddSymbols(symbolTable):
+        	symbolTable['pi'] = 3.14159268
+        	symbolTable['c']  = 299792458
+      #+END_SRC
 
 ** Source Blocks
 	- gnuplot language added to syntax, to use install the GNU Plot package.

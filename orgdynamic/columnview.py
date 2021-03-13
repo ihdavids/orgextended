@@ -7,9 +7,7 @@ import os
 
 
 def get_level(params):
-	level = 2
-	if('maxlevel' in params):
-		level = int(params['maxlevel'])
+	level = params.GetInt('maxlevel',2)
 	if(level < 2):
 		level = 2
 	return level
@@ -24,23 +22,21 @@ def handle_item(params,n,defs,output,depth,maxdepth):
 		emptyCount += 1 if v == "" else 0
 		out.append(v)
 	ok = True
-	if('exclude-tags' in params):
-		exclude = util.ToList(params['exclude-tags'])
-		for e in exclude:
-			if(e in n.tags):
-				ok = False
-				break
-	if('skip-empty-rows' in params and params['skip-empty-rows'] != 'nil'):
+	exclude = params.GetList('exclude-tags',[])
+	for e in exclude:
+		if(e in n.tags):
+			ok = False
+			break
+	if(params.Get('skip-empty-rows','nil') != 'nil'):
 		ok = ok and emptyCount < (len(defs)-1)
 	if(ok):
-		if('hlines' in params):
-			v = params['hlines']
-			if(v == 't'):
+		v = params.Get('hlines','nil')
+		if(v == 't'):
+			output.append(["-"])
+		elif(v != 'nil' and v != ""):
+			v = int(v)
+			if(depth <= v):
 				output.append(["-"])
-			elif(v != 'nil' and v != ""):
-				v = int(v)
-				if(depth <= v):
-					output.append(["-"])
 		output.append(out)
 	for c in n.children:
 		handle_item(params,c,defs,output,depth+1,maxdepth)
@@ -67,10 +63,8 @@ class ColumnHandler:
 class ItemHandler(ColumnHandler):
 	def GetCellValue(self,n,params):
 		indent = ""
-		if('indent' in params):
-			idt = params['indent']
-			if(idt and idt == 't'):
-				indent = '..' * (n.level-1)
+		if(params.Get('indent','') == 't'):
+			indent = '..' * (n.level-1)
 		return indent + n.heading
 
 class DeadlineHandler(ColumnHandler):
@@ -187,16 +181,11 @@ def get_column_definitions(f):
 	return h
 
 def Execute(view, params):
-	maxdepth = 0
-	id = "global"
-	# How far down the tree do we allow?
-	print("MAX: " + str(params))
-	if('maxdepth' in params):
-		maxdepth = int(params['maxdepth'])
 	# This is the most crucial parameter it defines how
 	# we will process nodes.
-	if('id' in params):
-		id = params['id']
+	id = params.Get('id',"global")
+	# How far down the tree do we allow?
+	maxdepth = params.GetInt('maxdepth',0)
 	# We accumulate output in here line by line for insertion
 	# into the main buffer.
 	output = []

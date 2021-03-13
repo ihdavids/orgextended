@@ -6,8 +6,11 @@ import urllib.request
 import OrgExtended.asettings as sets 
 import uuid
 import re
+import logging
 
 from OrgExtended.orgutil.addmethod import *
+
+log = logging.getLogger(__name__)
 
 def isPotentialOrgFile(filename):
     if(not filename):
@@ -31,6 +34,58 @@ def isPotentialOrgFileOrBuffer(fileOrView):
     elif(type(fileOrView) is str):
         return isPotentialOrgFile(fileOrView)
     return False
+
+RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]+)\s+(([^ ()\"]+)|([(][^)]+[)])|([\"][^\"]+[\"]))")
+class PList:
+    def __init__(self,plist):
+        self.params = plist
+
+    def Get(self, name, defaultValue):
+        if(name in self.params):
+            v = self.params[name].strip()
+            if(v.startswith("\"")):
+                v = v[1:]
+            if(v.endswith("\"")):
+                v = v[:-1]
+            return v
+        return defaultValue
+
+    def GetInt(self,name,defaultValue):
+        v = self.Get(name,defaultValue)
+        try:
+            return int(v)
+        except:
+            return defaultValue
+
+    def GetFloat(self,name,defaultValue):
+        v = self.Get(name,defaultValue)
+        try:
+            return float(v)
+        except:
+            return defaultValue
+
+    def GetList(self,name,defaultValue):
+        v = self.Get(name,defaultValue)
+        return ToList(v) 
+
+    def GetIntList(self,name,defaultValue):
+        v = self.Get(name,defaultValue)
+        return ToIntList(v) 
+
+    @staticmethod
+    def plistParse(data):
+        if(isinstance(data,list)):
+            data = " ".join(data)
+        paramstr = " " + data
+        params = {}
+        for m in RE_FN_MATCH.finditer(paramstr):
+            params[m.group(1)] = m.group(2)
+        return params
+
+    @staticmethod
+    def createPList(data):
+        params = PList.plistParse(data)
+        return PList(params)
 
 # The safest way to check if a string is numeric or not seems to be this way.
 # Seems super slow to me. I might right an RE for this in the future.
@@ -264,3 +319,10 @@ def ToList(val):
         if(x.strip() != ""):
             vals.append(x.strip())
     return vals
+
+
+def TEST(NAME,GOT,T,ERR):
+    if(T != GOT):
+        log.error(" [FAILED] " + NAME + " " + str(ERR) + " WANTED: " + str(T) + " GOT: " + str(GOT))
+    else:
+        log.info(" [PASSED] " + NAME)

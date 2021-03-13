@@ -67,10 +67,7 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 				return
 			fnname = m.group('name')
 			#log.debug("DYN NAME: " + fnname)
-			paramstr = " " + line[len(m.group(0)):]
-			params = {}
-			for m in RE_FN_MATCH.finditer(paramstr):
-				params[m.group(1)] = m.group(2)
+			params = util.PList.createPList(line[len(m.group(0)):])
 			# Now find me that function!
 			if(fnname not in dynamic):
 				log.error("Function not found in dynamic folder! Cannot execute!")

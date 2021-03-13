@@ -228,6 +228,18 @@ class ImageHandler:
 
     @staticmethod
     def show_image(region, view, max_width=1024):
+        width = -1
+        height = -1
+        node = db.Get().AtRegion(view,region)
+        if(node):
+            attr = node.get_comment("ORG_ATTR",None)
+            if(attr):
+                params = util.PList.createPList(attr)
+                try:
+                    width = int(params.Get('width',-1))
+                    height = int(params.Get('height',-1))
+                except:
+                    log.error("Could not extract width and height from plist / ORG_ATTR comment")
         # If we already have this image then exit out
         if view.id() in ImageHandler.Phantoms and str(region) in ImageHandler.Phantoms[view.id()]:
             return
@@ -271,6 +283,10 @@ class ImageHandler:
             img  = find_image_file(view, url)
             if(img):
                 size = ImageHandler.get_image_size(img)
+                if(width > 0):
+                    size = [width, size[1], size[2]]
+                if(height > 0):
+                    size = [size[0], height, size[2]]
             else:
                 size = (100,100,"png")
         else:
@@ -281,6 +297,10 @@ class ImageHandler:
             img  = find_image_file(view, url)
             log.debug("local file2: " + url)
             size = ImageHandler.get_image_size(img)
+            if(width > 0):
+                size = [width, size[1], size[2]]
+            if(height > 0):
+                size = [size[0], height, size[2]]
         if not size:
             return
         w, h, t = size

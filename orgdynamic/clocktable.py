@@ -45,18 +45,14 @@ def handle_subtree(view, params, level):
 	return output
 
 def get_level(params):
-	level = 2
-	if('maxlevel' in params):
-		level = int(params['maxlevel'])
+	level = params.GetInt('maxlevel',2)
 	if(level < 2):
 		level = 2
 	return level
 
 def Execute(view, params):
-	print(str(params))
 	level = get_level(params)
-	if(not 'scope' in params or params['scope'] == 'subtree'):
-		#print("SUBTREE")
+	if(params.Get('scope','subtree') == 'subtree'):
 		return handle_subtree(view, params, level)
 	else:
 		print(params['scope'] + " is not implemented")

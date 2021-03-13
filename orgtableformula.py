@@ -75,10 +75,24 @@ def GetOps():
         opsTable     = o
     return opsTable
 
+def add_dynamic_symbols(s):
+    exts = sets.Get("enableTableExtensions",None)
+    if(exts):
+        dynamic = ext.find_extension_modules('orgtable', [])
+        for k in dynamic.keys():
+            if(hasattr(dynamic[k],"AddSymbols")):
+                try:
+                    dynamic[k].AddSymbols(s)
+                except:
+                    log.error("Failed to add symbols from: " + str(k) + "\n" + traceback.format_exc())
+            else:
+                if(not hasattr(dynamic[k],"Execute")):
+                    log.warning("Dynamic table module does not have method AddSymbols, cannot use: " + k)
 constsTable = None
 def GetConsts():
     global constsTable
-    if(constsTable == None):
+    reloadExtensions = sets.Get("forceLoadExternalExtensions",False)
+    if(constsTable == None or reloadExtensions):
         n = simpev.DEFAULT_NAMES.copy()
         n['pi']     = 3.1415926
         n['t']      = True
@@ -88,6 +102,7 @@ def GetConsts():
         n['False']  = False
         n['nil']    = None
         n['None']   = None
+        add_dynamic_symbols(n)
         constsTable = n
     return constsTable
 
@@ -103,7 +118,9 @@ def add_dynamic_functions(f):
             if(hasattr(dynamic[k],"Execute")):
                 f[k] = dynamic[k].Execute
             else:
-                log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
+                if(not hasattr(dynamic[k],"AddSymbols")):
+                    log.warning("Dynamic table module does not have method Execute, cannot use: " + k)
+
 
 functionsTable = None
 def GetFunctions():
@@ -146,17 +163,27 @@ def GetFunctions():
 
 class TableCache:
     def __init__(self):
-        self.cachedTables = []
+        self.cachedTables = {}
         self.change_count = -1
 
+    def _ViewName(self,view):
+        name = view.file_name()
+        if(not name):
+            name = "view_" + view.id()
+        return name
+
     def _FindTable(self,row,view):
+        name = self._ViewName(view)
+        if(not name in self.cachedTables):
+            self.cachedTables[name] = []
+        cache = self.cachedTables[name]
         if(self.change_count >= view.change_count()):
-            for t in self.cachedTables:
+            for t in cache:
                 if row >= t[0][0] and row <= t[0][1]:
                     return t[1]
         else:
             self.change_count = view.change_count()
-            self.cachedTables = []
+            self.cachedTables[name] = []
         return None
 
     def GetTable(self,view,at=None):
@@ -166,7 +193,8 @@ class TableCache:
         td = self._FindTable(row,view)
         if(not td):
             td = create_table(view,at)
-            self.cachedTables.append(((td.start,td.end),td))
+            name = self._ViewName(view)
+            self.cachedTables[name].append(((td.start,td.end),td))
         return td
 
 tableCache = TableCache()

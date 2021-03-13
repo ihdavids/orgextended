@@ -57,6 +57,7 @@ def plugin_loaded():
     # This is the same pattern that neovintageous uses and I think
     # it is a reasonably decent mechanism
     _DEBUG = bool(os.getenv('SUBLIME_ORGEXTENDED_DEBUG'))
+    _DEBUG = _DEBUG or sets.Get("enableDebugLogging",False)
     #_DEBUG = True
     if _DEBUG:
         logger = logging.getLogger('OrgExtended')

@@ -324,3 +324,6 @@ def plot_table_command(table,view):
         view.run_command("org_internal_replace", {"start": table.resultsRegion.begin(), "end": table.resultsRegion.end(), "text": o})
     print(o)
     #return o.split('\n') + e.split('\n')
+
+
+
