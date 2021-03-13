@@ -21,14 +21,12 @@ def WrapEnd(cmd):
 	return "@enduml"
 
 # Actually do the work, return an array of output.
-def Execute(cmd):
+def Execute(cmd,sets):
 	jarfile = sets.Get("plantuml",None)
 	if(jarfile == None):
 		print("ERROR: cannot find plantuml jar file. Please setup the plantuml key in your settings file")
 		return ["ERROR - missing plantuml.jar file"]
-	output = "diagram.png"
-	if(cmd.params and "file" in cmd.params):
-		output = cmd.params["file"]
+	cmd.output = cmd.params.Get('file',"diagram.png")
 	outpath     = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
 	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
@@ -49,13 +47,13 @@ def Execute(cmd):
 	(o,e) = popen.communicate()
 	
 	convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
-	destFile    = os.path.join(sourcepath,output)
+	destFile    = os.path.join(sourcepath,cmd.output)
 	copyfile(convertFile, destFile)
 	#print(str(os.path.basename(cmd.sourcefile)))
 	#print(str(os.path.splitext(cmd.filename)))
 	#print(str(os.path.splitext(cmd.sourcefile)))
-	destFile = os.path.relpath(destFile, sourcepath)
-	o = "[[file:" + destFile + "]]" + o
+	#destFile = os.path.relpath(destFile, sourcepath)
+	#o = "[[file:" + destFile + "]]" + o
 	return o.split('\n') + e.split('\n')
 
 

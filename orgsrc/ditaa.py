@@ -17,14 +17,12 @@ def Extension(cmd):
 	return ".ditaa"
 
 # Actually do the work, return an array of output.
-def Execute(cmd):
+def Execute(cmd,sets):
 	jarfile = sets.Get("ditaa",None)
 	if(jarfile == None):
 		print("ERROR: cannot find ditaa jar file. Please setup the ditaa key in your settings file")
 		return ["ERROR - missing ditaa.jar file"]
-	output = "diagram.png"
-	if(cmd.params and "file" in cmd.params):
-		output = cmd.params["file"]
+	cmd.output = cmd.params.Get('file','diagram.png')
 	outpath     = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
 	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
@@ -45,14 +43,15 @@ def Execute(cmd):
 	(o,e) = popen.communicate()
 	
 	convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
-	destFile    = os.path.join(sourcepath,output)
+	destFile    = os.path.join(sourcepath,cmd.output)
 	copyfile(convertFile, destFile)
 	#print(str(os.path.basename(cmd.sourcefile)))
 	#print(str(os.path.splitext(cmd.filename)))
 	#print(str(os.path.splitext(cmd.sourcefile)))
-	destFile = os.path.relpath(destFile, sourcepath)
+	#destFile = os.path.relpath(destFile, sourcepath)
 	out = o
-	o = "[[file:" + destFile + "]]"
+	o = ""
+	#o = "[[file:" + destFile + "]]"
 	if("error" in out or "failed" in out or "Failed" in out or "Error" in out or "not" in out):
 		o = o +out
 	return o.split('\n') + e.split('\n')

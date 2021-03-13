@@ -151,12 +151,12 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 					end = rw
 					break
 			if(not end):
-				log.debug("Could not locate #+END_SRC tag")
+				log.error("Could not locate #+END_SRC tag")
 				return
 
 			# Okay now we have a start and end to build a region out of.
 			# time to run a command and try to get the output.
-			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python"])
+			extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
 			line = view.substr(view.line(start))
 			m = RE_SRC_BLOCK.search(line)
 			if(not m):
@@ -164,10 +164,11 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				return
 			fnname = m.group('name')
 			#log.debug("SRC NAME: " + fnname)
-			paramstr = line[len(m.group(0)):]
-			params = {}
-			for m in RE_FN_MATCH.finditer(paramstr):
-				params[m.group(1)] = m.group(2)
+			params = util.PList.createPList(line[len(m.group(0)):])
+			#paramstr = line[len(m.group(0)):]
+			#params = {}
+			#for m in RE_FN_MATCH.finditer(paramstr):
+			#	params[m.group(1)] = m.group(2)
 			# Now find me that function!
 			if(fnname not in extensions):
 				log.error("Function not found in src folder! Cannot execute!")
@@ -203,6 +204,8 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			if(hasattr(self.curmod,"Execute")):
 				# Okay now time to replace the contents of the block
 				self.source = view.substr(self.region)
+				if(hasattr(self.curmod,"PreProcessSourceFile")):
+					self.curmod.PreProcessSourceFile(self)
 				if(hasattr(self.curmod,"Extension")):
 					tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
 					try:
@@ -214,13 +217,26 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 						if(hasattr(self.curmod,"WrapEnd")):
 							tmp.write(("\n" + self.curmod.WrapEnd(self)).encode("ascii"))
 						tmp.close()	
-						self.outputs = self.curmod.Execute(self)
+						self.outputs = self.curmod.Execute(self,sets)
 					finally:
 						#os.unlink(tmp.name)
 						pass
 				else:
 					self.filename = None
 					self.outputs = self.curmod.Execute(self)
+				self.outputs = list(filter(None, self.outputs)) 
+				if(self.params and self.params.Get('file',None)):
+					print("HERE1")
+					out = self.params.Get('file',None)
+					if(hasattr(self,'output') and self.output):
+						out = self.output
+						print("HERE2: " + out)
+					if(out):
+						print("HERE3: " + out)
+						sourcepath = os.path.dirname(self.sourcefile)
+						destFile    = os.path.join(sourcepath,out)
+						destFile = os.path.relpath(destFile, sourcepath)
+						self.outputs.append("[[file:" + destFile + "]]")
 				log.debug("OUTPUT: " + str(self.outputs))
 			else:
 				log.error("No execute in module, abort")

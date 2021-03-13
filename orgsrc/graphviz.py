@@ -16,21 +16,16 @@ def Extension(cmd):
 	return ".dot"
 
 # Actually do the work, return an array of output.
-def Execute(cmd):
+def Execute(cmd,sets):
 	exe = sets.Get("graphviz",None)
 	if(exe == None):
 		print("ERROR: cannot find graphviz executable file. Please setup the graphviz key in your settings file")
 		return ["ERROR - missing graphviz executable file"]
 	output = "diagram"
-	format = "png"
-	engine = "default"
-	if(cmd.params and "fmt" in cmd.params):
-		format = cmd.params['fmt']
-	if(cmd.params and "engine" in cmd.params):
-		engine = cmd.params['engine']
+	format = cmd.params.Get('fmt',"png")
+	engine = cmd.params.Get('engine',"default")
 	output = output + "." + format
-	if(cmd.params and "file" in cmd.params):
-		output = cmd.params["file"]
+	cmd.output = cmd.params.Get('file',output)
 
 	if(engine != "default"):
 		if(platform.system() == "Windows"):
@@ -39,9 +34,9 @@ def Execute(cmd):
 		exe = os.path.join(os.path.dirname(exe),engine)
 	outpath     = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
-	destFile    = os.path.join(sourcepath,output)
+	destFile    = os.path.join(sourcepath,cmd.output)
 	commandLine = [exe, "-T" + format, cmd.filename, "-o", destFile]
-	print(str(commandLine))
+	#print(str(commandLine))
 	#commandLine = [r"java", "-jar", jarfile, "-help"]
 	try:
 		startupinfo = subprocess.STARTUPINFO()
@@ -61,8 +56,8 @@ def Execute(cmd):
 	#print(str(os.path.basename(cmd.sourcefile)))
 	#print(str(os.path.splitext(cmd.filename)))
 	#print(str(os.path.splitext(cmd.sourcefile)))
-	destFile = os.path.relpath(destFile, sourcepath)
-	o = "[[file:" + destFile + "]]" + o
+	#destFile = os.path.relpath(destFile, sourcepath)
+	#o = "[[file:" + destFile + "]]" + o
 	return o.split('\n') + e.split('\n')
 
 

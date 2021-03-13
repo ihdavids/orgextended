@@ -1,1 +1,70 @@
 * 1.1.29
+
+   Core Idea: Add GNU Plot Script Blocks
+
+   - [x] Add a syntax for gnu plot script blocks if one does not already exist
+   - [x] Add a src handler to execute these script blocks.
+
+
+   Here is some gnu plot code that draws a sine wave.
+   #+BEGIN_SRC gnuplot :file gantt-table.png
+    # We don't need a key (or legend) for this simple graph.
+    set key off
+ 
+    # Set the title for the graph.
+    set title "Sine against Phase"
+  
+    # We want the graph to cover a full sine wave.
+    set xrange [0:6.28]
+  
+    # Set the label for the X axis.
+    set xlabel "Phase (radians)"
+  
+    # Draw a horizontal centreline.
+    set xzeroaxis
+  
+    # Pure sine wave amplitude ranges from +1 to -1.
+    set yrange [-1:1]
+  
+    # No tick-marks are needed for the Y-axis .
+    unset ytics
+  
+    # Plot the curve.
+    plot sin(x) 
+   #+END_SRC
+
+  #+RESULTS:
+  [[file:gantt-table.png]]
+
+  - Params for src blocks have been converted to use the new PList system added in 1.1.28
+  - Source Blocks now have a PreProcessSourceFile() method that allows for injection of file and other paramters into the source block.
+
+   #+BEGIN_SRC gnuplot :var DATA=gantt-table :file gantt-table.png
+    OneMonth = strptime("%m","2")
+    timeformat = "%Y-%m-%d"
+    T(N) = timecolumn(N,timeformat)
+
+    set xdata time
+    set format x "%b\n'%y"
+    set xtics OneMonth nomirror
+    set xtics scale 2, 0.5
+    set mxtics 4
+
+    skiptorow=4
+    set yrange [(skiptorow-2):] reverse
+    set ytics nomirror
+
+    unset key
+    set title "{/=15 GANTT Chart Example}"
+    set grid x y
+    set border 3
+    set style arrow 1 nohead filled size screen 0.02, 15 fixed lt 3 lw 8
+
+    plot DATA using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+   #+END_SRC
+
+** Powershell Block Execute Bug
+	- this was using the OrgExtended package dir as it's cwd
+	  which was causing problems when running as a package. FIXED.
+
+     

@@ -358,6 +358,24 @@ class OrgPlotTableCommand(sublime_plugin.TextCommand):
         self.onDone = onDone
         self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
 
+# Grab the function table and dump a table of all the functions and their doc strings.
+# Build a table of that information.
+class OrgDocTableCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        td = create_table(self.view)
+        out = ""
+        for k,v in td.functions.items():
+            if(k == "ridx" or k == "cidx" or k == "symorcell" or k == "getcell" or k == "getcolcell" or k == "getrowcell"):
+                continue
+            if(not v.__doc__):
+                out += "  - " + k + " :: " +  "Not Yet Documented \n"
+            else:
+                out += "  - " + k + " :: " + str(v.__doc__).replace("\n","\n      ") + "\n"
+        out += "----------------------NAMES--------------------------------\n"
+        for k,v in td.names.items():
+            out += "  - " + k + " :: " +  str(v) + " \n"
+        self.view.insert(edit,self.view.line(self.view.size()).begin(),out)
+
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
     def OnFile(self, filename=None):
@@ -911,18 +929,21 @@ def myceil(num):
     return num 
 
 def myround(num):
+    """Round to the nearest integer"""
     v = GetNum(num)
     if(isinstance(v,float)):
         return round(v,0)
     return num 
 
 def mytrunc(num):
+    """Round down to the nearest int"""
     v = GetNum(num)
     if(isinstance(v,float)):
         return int(v)
     return num 
 
 def mynow():
+    """Returns the current date time"""
     return datetime.datetime.now()
 
 def myyear(dt):
@@ -941,6 +962,7 @@ def myminute(dt):
     return dt.minute
 
 def mysecond(dt):
+    """Get the seconds value from a datetime datetime.time().second"""
     return dt.second
 
 def myweekday(dt):
@@ -950,6 +972,7 @@ def myyearday(dt):
     return dt.timetuple().tm_yday
 
 def mytime(dt):
+    """Return the current time from a datetime object time(datetime)"""
     return dt.time()
 
 # Not currently used, the python if is forced on us due to the use
@@ -1141,12 +1164,12 @@ class TableDef(simpev.SimpleEval):
 
 
     def __init__(self,view, start,end,linedef):
-        names     = GetConsts().copy()
-        operators = GetOps().copy()
-        operators[ast.FloorDiv] = self.range_expr
-        functions = GetFunctions().copy()
-        self.add_functions(functions)
-        super(TableDef,self).__init__(operators, functions, names)
+        self.names     = GetConsts().copy()
+        self.operators = GetOps().copy()
+        self.operators[ast.FloorDiv] = self.range_expr
+        self.functions = GetFunctions().copy()
+        self.add_functions(self.functions)
+        super(TableDef,self).__init__(self.operators, self.functions, self.names)
         self.curRow  = 0
         self.curCol  = 0
         self.start   = start

@@ -8,7 +8,7 @@ import re
 
 
 # Actually do the work, return an array of output.
-def Execute(cmd):
+def Execute(cmd, sets):
 	# create file-like string to capture output
 	codeOut = io.StringIO()
 	codeErr = io.StringIO()
