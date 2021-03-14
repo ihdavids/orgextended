@@ -1188,6 +1188,8 @@ class TableDef(simpev.SimpleEval):
     def ClearAllRegions(self):
         for r in range(1,(self.end+2)-self.start):
             self.view.erase_regions("cell_"+str(r))
+            if(not self.linedef):
+                continue
             for c in range(1,len(self.linedef)):
                 self.view.erase_regions("cell__"+str(c))
                 self.view.erase_regions("cell_"+str(r)+"_"+str(c))
