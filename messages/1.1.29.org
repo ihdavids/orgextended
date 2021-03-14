@@ -1,5 +1,8 @@
 * 1.1.29
 
+   #+PROPERTY: header-args:R  :session *R*
+   #+PROPERTY: header-args    :results silent
+
    Core Idea: Add GNU Plot Script Blocks
 
    - [x] Add a syntax for gnu plot script blocks if one does not already exist
@@ -39,6 +42,24 @@
   - Params for src blocks have been converted to use the new PList system added in 1.1.28
   - Source Blocks now have a PreProcessSourceFile() method that allows for injection of file and other paramters into the source block.
 
+  - GNU Plot is the first module to start implementing the data source mechanism:
+    This generates a line by feeding the data in my-table into gnu plot using babel like
+    mechanics.
+
+  #+NAME: my-table
+  | 1 | 2 |
+  | 2 | 3 |
+  | 3 | 4 |
+
+   #+BEGIN_SRC gnuplot :var DATA=my-table :file my-table.png
+    plot "$DATA" using 1:2 with lines title "hello"
+   #+END_SRC
+
+  #+RESULTS:
+  [[file:my-table.png]] 
+
+
+
    #+BEGIN_SRC gnuplot :var DATA=gantt-table :file gantt-table.png
     OneMonth = strptime("%m","2")
     timeformat = "%Y-%m-%d"
@@ -60,7 +81,7 @@
     set border 3
     set style arrow 1 nohead filled size screen 0.02, 15 fixed lt 3 lw 8
 
-    plot DATA using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+    plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
    #+END_SRC
 
 ** Powershell Block Execute Bug

@@ -452,14 +452,15 @@ RE_TARGET       = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonl
 RE_NAMED_TARGET = re.compile(r'\s*[$](?P<name>[a-zA-Z][a-zA-Z0-9]+)')
 def formula_rowcol(expr,table):
     fields = expr.split('=')
-    if(len(fields) != 2):
-        return (None, None)
+    if(len(fields) < 2):
+        return (None, None, None)
     target = fields[0]
+    formula = "=".join(fields[1:]) if len(fields[1:]) > 1 else fields[1]
     targets = target.split('..')
     if(len(targets)==2):
         r1 = formula_rowcol(targets[0] + "=",table)
         r2 = formula_rowcol(targets[1] + "=",table)
-        return [r1[0] + r2[0],fields[1]]
+        return [r1[0] + r2[0],formula]
     m = RE_TARGET.search(target)
     if(m):
         row = m.group('row')
@@ -470,26 +471,26 @@ def formula_rowcol(expr,table):
                 if(isNumeric(row)):
                     row = int(row)
                 col = '*'
-                return [[row,col],fields[1],None]
+                return [[row,col],formula,None]
             else:
                 col = m.group('colonly')
                 if(isNumeric(col)):
                     col = int(col)
                 row = '*'
-                return [[row,col],fields[1],None]
+                return [[row,col],formula,None]
         else:
             if(isNumeric(row)):
                 row = int(row)
             if(isNumeric(col)):
                 col = int(col)
-            return [[row,col],fields[1],None]
+            return [[row,col],formula,None]
     else:
         mn = RE_NAMED_TARGET.search(target)
         if(mn):
             cell = table.symbolOrCell(mn.group('name').strip())
             if(isinstance(cell,Cell)):
-                return [[cell.r,cell.c],fields[1],cell.rowFilter]
-    return (None, None)
+                return [[cell.r,cell.c],formula,cell.rowFilter]
+    return (None, None, None)
 
 def isNumeric(v):
     return v.lstrip('-').lstrip('+').isnumeric()
@@ -521,30 +522,30 @@ def replace_cell_references(expr):
                     rs = m.group('rosign')
                     rs = '1' if rs else '0'
                     if(isNumeric(row) or isFunc(row)):
-                        expr = RE_TARGET_A.sub('getrowcell(' + str(row) + ',' + rs + ')' + end,expr,1)
+                        expr = RE_TARGET_A.sub(' getrowcell(' + str(row) + ',' + rs + ') ' + end,expr,1)
                     else:
-                        expr = RE_TARGET_A.sub('getrowcell(\'' + str(row) + '\''+","+rs+')' + end,expr,1)
+                        expr = RE_TARGET_A.sub(' getrowcell(\'' + str(row) + '\''+","+rs+') ' + end,expr,1)
                 else:
                     col = m.group('colonly')
                     cs = m.group('cosign')
                     cs = '1' if cs else '0'
                     if(isNumeric(col) or isFunc(col)):
-                        expr = RE_TARGET_A.sub('getcolcell(' + str(col) + ',' + cs + ')' + end,expr,1)
+                        expr = RE_TARGET_A.sub(' getcolcell(' + str(col) + ',' + cs + ') ' + end,expr,1)
                     else:
-                        expr = RE_TARGET_A.sub('getcolcell(\'' + str(col) + '\'' +","+cs+ ')' + end,expr,1)
+                        expr = RE_TARGET_A.sub(' getcolcell(\'' + str(col) + '\'' +","+cs+ ') ' + end,expr,1)
             else:
                 rowmarkers = '' if not isNumeric(row) or isFunc(row) else '\''
                 colmarkers = '' if not isNumeric(col) or isFunc(col) else '\''
                 cs = '1' if cs else '0'
                 rs = '1' if rs else '0'
-                expr = RE_TARGET_A.sub('getcell(' + rowmarkers + str(row) + rowmarkers + "," + rs + "," + colmarkers + str(col) + colmarkers + "," + cs + ")" + end,expr,1)
+                expr = RE_TARGET_A.sub(' getcell(' + rowmarkers + str(row) + rowmarkers + "," + rs + "," + colmarkers + str(col) + colmarkers + "," + cs + ") " + end,expr,1)
         else:
             break
     while(True):
         m = RE_SYMBOL_OR_CELL_NAME.search(expr)
         if(m):
             name = m.group('name')
-            expr = RE_SYMBOL_OR_CELL_NAME.sub('symorcell(\'' + name + '\')',expr,1)
+            expr = RE_SYMBOL_OR_CELL_NAME.sub(' symorcell(\'' + name + '\') ',expr,1)
         else:
             break
     #print("EXP: " + str(expr))
@@ -783,7 +784,6 @@ class Cell:
             if(util.numberCheck(t)):
                 f = float(t)
                 f = (f / 100.0)
-                print("PERCENT: " + str(f))
                 return f
         return txt
     
@@ -793,6 +793,12 @@ class Cell:
             if('.' in txt):
                 return float(txt)
             return int(txt)
+        if(txt.endswith("%")):
+            t = txt[:-1]
+            if(util.numberCheck(t)):
+                f = float(t)
+                f = (f / 100.0)
+                return f
         return 0
 
 def GetVal(i):
@@ -1037,7 +1043,8 @@ def cos(cell):
 def exp(cell):
     return math.exp(GetNum(cell))
 
-def remote(name,cellRef):
+def lookup_named_table_in_file(name):
+    td = None
     view = sublime.active_window().active_view()
     if(view):
         node = db.Get().AtInView(view)
@@ -1059,19 +1066,32 @@ def remote(name,cellRef):
                         row = r
                         break
                 td = create_table(view,view.text_point(row,0))
-                text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
-                return text
-        # Okay, maybe this is a custom id or id, let try
-        file, row = db.Get().FindByAnyId(name)
-        if(file):
-            node = file.At(row)
-            if(node and node.table):
-                td = create_table_from_node(node, node.table['nodeoff'][0])
-                r = cellRef.GetRow()
-                c = cellRef.GetCol()
-                text = td.GetCellText(r,c)
-                return text
-        return "<UNK REF>"
+    return td
+
+def lookup_table_from_id(name):
+    td = None
+    file, row = db.Get().FindByAnyId(name)
+    if(file):
+        node = file.At(row)
+        if(node and node.table):
+            td = create_table_from_node(node, node.table['nodeoff'][0])
+    return td
+
+def lookup_table_from_namedobject(name):
+    # First search for a named table from the ID
+    td = lookup_named_table_in_file(name)
+    if(not td):
+        # Okay use the custom ID rule to try to get the
+        # table.
+        td = lookup_table_from_id(name)
+    return td
+
+def remote(name,cellRef):
+    td = lookup_table_from_namedobject(name)
+    if(td):
+        text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
+        return text
+    return "<UNK REF>"
 
 # ============================================================
 class RangeExprOnNonCells(simpev.InvalidExpression):
@@ -1113,6 +1133,12 @@ class TableDef(simpev.SimpleEval):
                 raise RangeExprOnNonCells("End cells must be wild of same type", "range expression is invalid")
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
+
+    def ForEachRow(self):
+        return range(1,self.Height() + 1)
+    
+    def ForEachCol(self):
+        return range(1,self.Width() + 1)
 
     def ShouldIgnoreRow(self,row):
         return row in self.ignoreRows

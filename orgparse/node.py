@@ -177,9 +177,10 @@ def parse_property(line):
         prop_key = match.group(1)
         prop_val = match.group(2)
         if prop_key == 'Effort':
-            (h, m) = prop_val.split(":", 2)
-            if h.isdigit() and m.isdigit():
-                prop_val = int(h) * 60 + int(m)
+            if(':' in prop_val):
+                (h, m) = prop_val.split(":", 2)
+                if h.isdigit() and m.isdigit():
+                    prop_val = int(h) * 60 + int(m)
     return (prop_key, prop_val)
 
 RE_PROP = re.compile(r'^\s*:(.*?):\s*(.*?)\s*$')

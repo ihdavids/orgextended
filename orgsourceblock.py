@@ -21,6 +21,7 @@ import OrgExtended.orglinks as links
 import OrgExtended.orgclocking as clocking
 import OrgExtended.orgextension as ext
 import OrgExtended.pymitter as evt
+import OrgExtended.orgtableformula as tbl
 import importlib
 import tempfile
 
@@ -51,13 +52,68 @@ def ProcessPotentialFileOrgOutput(cmd):
 	cmd.outputs = list(filter(None, cmd.outputs)) 
 	if(cmd.params and cmd.params.Get('file',None)):
 		out = cmd.params.Get('file',None)
-		if(hasattr(self,'output') and self.output):
-			out = self.output
+		if(hasattr(cmd,'output') and cmd.output):
+			out = cmd.output
 		if(out):
-			sourcepath = os.path.dirname(self.sourcefile)
+			sourcepath = os.path.dirname(cmd.sourcefile)
 			destFile    = os.path.join(sourcepath,out)
 			destFile = os.path.relpath(destFile, sourcepath)
-			self.outputs.append("[[file:" + destFile + "]]")
+			cmd.outputs.append("[[file:" + destFile + "]]")
+
+
+def BuildFullParamList(cmd,language,cmdArgs):
+	# First Add from global settings
+	# First Add from PROPERTIES
+	plist = util.PList.createPList("")
+	view = sublime.active_window().active_view()
+	if(view):
+		plist.AddFromPList(sets.Get('babel-args',None))
+		plist.AddFromPList(sets.Get('babel-args-'+language,None))
+		node = db.Get().AtInView(view)
+		if(node):
+			prop = node.get_comment('PROPERTY',None)
+			if(prop):
+				# Here we have to sort through them to find generic or language specific versions
+				print("PROPS: " + str(prop))
+				pass	
+			pname = 'header-args:' + language
+			if('header-args' in node.properties):
+				plist.AddFromPList(node.properties['header-args'])
+			if(pname in node.properties):
+				plist.AddFromPList(node.properties[pname])
+			if('var' in node.properties):
+				plist.Add(node.properties['var'])
+	plist.AddFromPList(cmdArgs)
+	cmd.params = plist
+
+def GetGeneratorForRow(table,params,r):
+	for c in range(1,table.Width()+1):
+		yield table.GetCellText(r,c)
+
+def GetGeneratorForTable(table,params):
+	for r in range(1,table.Height()+1):
+		yield GetGeneratorForRow(table,params,r)
+
+# We want to first build up the full list of vars
+# from options, comments, properties and everything else
+#
+# Then any var we want to post process them so they become
+# data sources that reference their various potential
+# locations.
+def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
+	BuildFullParamList(cmd,language,cmdArgs)
+	var = cmd.params.GetDict('var',None)
+	if(var):
+		for k in var:
+			n = var[k]
+			if(not util.numberCheck(n)):
+				td = tbl.lookup_table_from_namedobject(n)
+				print("FOUND TABLE FOR: " + n)
+				if(td):
+					print("REPLACING TABKE")
+					#var[k] = GetGeneratorForTable(td,cmd.params)
+					var[k] = td
+		cmd.params.Replace('var',var)
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def OnDone(self):
@@ -177,7 +233,8 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				return
 			fnname = m.group('name')
 			#log.debug("SRC NAME: " + fnname)
-			params = util.PList.createPList(line[len(m.group(0)):])
+			pdata = line[len(m.group(0)):]
+			ProcessPossibleSourceObjects(self,fnname,pdata)
 			#paramstr = line[len(m.group(0)):]
 			#params = {}
 			#for m in RE_FN_MATCH.finditer(paramstr):
@@ -188,7 +245,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				return
 
 			# Start setting up our execution state.
-			self.params   = params
+			#self.params   = params
 			self.curmod   = extensions[fnname]
 			self.startRow = row + 1
 			self.endRow   = end

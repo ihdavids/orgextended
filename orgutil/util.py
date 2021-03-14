@@ -68,11 +68,15 @@ class PList:
 
     def GetList(self,name,defaultValue):
         v = self.Get(name,defaultValue)
-        return ToList(v) 
+        if(not isinstance(v,list)):
+            return ToList(v) 
+        return v
 
     def GetIntList(self,name,defaultValue):
         v = self.Get(name,defaultValue)
-        return ToIntList(v) 
+        if(not isinstance(v,list)):
+            return ToIntList(v) 
+        return v
 
     def GetDict(self,name,defaultValue):
         out = {}
@@ -91,6 +95,35 @@ class PList:
                 return out
         return defaultValue
 
+    def Add(self,key,val):
+        PList.addToParam(self.params,key,val)
+    
+    def Replace(self,key,val):
+        self.params[key] = val
+
+    def AddFromPList(self,strData):
+        if(None == strData):
+            return
+        d = PList.plistParse(strData)
+        for k in d:
+            self.params[k] = d[k]
+
+    @staticmethod
+    def addToParam(params,key,val):
+        val = val.strip()
+        if(val.startswith("\"")):
+            val = val[1:]
+        if(val.endswith("\"")):
+            val = val[:-1]
+        if(key in params):
+            v = params[key]
+            if(isinstance(v,str)):
+                params[key] = []
+                params[key].append(v)
+            params[key].append(val)
+        else:
+            params[key] = val
+
     @staticmethod
     def plistParse(data):
         if(isinstance(data,list)):
@@ -100,19 +133,7 @@ class PList:
         for m in RE_FN_MATCH.finditer(paramstr):
             key = m.group(1)
             val = m.group(2)
-            val = val.strip()
-            if(val.startswith("\"")):
-                val = val[1:]
-            if(val.endswith("\"")):
-                val = val[:-1]
-            if(key in params):
-                v = params[key]
-                if(isinstance(v,str)):
-                    params[key] = []
-                    params[key].append(v)
-                params[key].append(val)
-            else:
-                params[key] = val
+            PList.addToParam(params,key,val)
         return params
 
     @staticmethod

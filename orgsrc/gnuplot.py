@@ -7,6 +7,8 @@ import logging
 import subprocess, os
 import threading, time, signal
 from shutil import move
+import types
+import OrgExtended.orgtableformula as fml
 
 # GNU Plot Babel Mode
 
@@ -32,6 +34,33 @@ def GetTerminalFromOutputFile(filename):
 
 def PreProcessSourceFile(cmd):
     filename = cmd.params.Get('file',None)
+    var = cmd.params.Get('var',None)
+    if(var):
+        out = ""
+        for k in var:
+            v = var[k]
+            print("AAA: " + k + repr(type(var[k])))
+            if(isinstance(v,types.GeneratorType)):
+                out += "$" + str(k) + " << EOD\n"
+                maing = var[k]
+                for rowg in maing:
+                    first = True
+                    for v in rowg:
+                        out += ('\t' if not first else "") + str(v)
+                        first = False
+                    out += '\n'
+                out += "EOD\n"
+            if(isinstance(v,fml.TableDef)):
+                out += "$" + str(k) + " << EOD\n"
+                for r in v.ForEachRow():
+                    first = True
+                    for c in v.ForEachCol():
+                        txt = v.GetCellText(r,c)
+                        out += ('\t' if not first else "") + txt
+                        first = False
+                    out += '\n'
+                out += "EOD\n"
+        cmd.source = out + cmd.source
     if(filename):
         out = GetTerminalFromOutputFile(filename)
         cmd.output = filename
