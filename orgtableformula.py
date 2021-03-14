@@ -1085,7 +1085,7 @@ def lookup_table_from_id(name):
             td = create_table_from_node(node, node.table['nodeoff'][0])
     return td
 
-def lookup_table_from_namedobject(name):
+def LookupTableFromNamedObject(name):
     # First search for a named table from the ID
     td = lookup_named_table_in_file(name)
     if(not td):
@@ -1099,7 +1099,7 @@ def remote(name,cellRef):
        table-name only works local to a file while custom-id or id will look up the first table
        in a heading marked with that id.
     """
-    td = lookup_table_from_namedobject(name)
+    td = LookupTableFromNamedObject(name)
     if(td):
         text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
         return text

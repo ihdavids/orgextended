@@ -107,10 +107,11 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
 		for k in var:
 			n = var[k]
 			if(not util.numberCheck(n)):
-				td = tbl.lookup_table_from_namedobject(n)
-				print("FOUND TABLE FOR: " + n)
+				td = tbl.LookupTableFromNamedObject(n)
 				if(td):
-					print("REPLACING TABKE")
+					# I think it's better to just pass through the table here.
+					# Each language may want to do something very different and abstracting away
+					# What the data source actually is may actually be a disservice
 					#var[k] = GetGeneratorForTable(td,cmd.params)
 					var[k] = td
 		cmd.params.Replace('var',var)
@@ -119,7 +120,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def OnDone(self):
 		evt.EmitIf(self.onDone)
 
-	def on_replaced(self):
+	def OnReplaced(self):
 		if(hasattr(self.curmod,"PostExecute")):
 			self.curmod.PostExecute(self)
 
@@ -128,13 +129,13 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 		else:
 			self.OnDone()
 
-	def end_results(self,rw):
+	def EndResults(self,rw):
 		self.endResults     = rw
 		self.resultsStartPt = self.view.text_point(self.startResults+1,0)
 		self.resultsEndPt   = self.view.text_point(self.endResults,0)
 		self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
 
-	def find_results(self,edit):
+	def FindResults(self,edit):
 		row              = self.endRow+1
 		fileEndRow,_     = self.view.rowcol(self.view.size())
 		inResults        = False
@@ -149,7 +150,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			# A new heading ends the results.
 			if(RE_HEADING.search(line)):
 				if(inResults):
-					self.end_results(rw)
+					self.EndResults(rw)
 					return True
 				else:
 					break
@@ -160,17 +161,17 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				inBlock = True
 				continue
 			if(inResults and not inBlock and not inPropertyDrawer and inResults and RE_IS_BLANK_LINE.search(line)):
-				self.end_results(rw)
+				self.EndResults(rw)
 				return True
 			if(inPropertyDrawer and RE_END_PROPERTY_DRAWER.search(line)):
-				self.end_results(rw)
+				self.EndResults(rw)
 				return True
 			if(inBlock and RE_END_BLOCK.search(line)):
-				self.end_results(rw)
+				self.EndResults(rw)
 				return True
 		# We just hit the end of the file.
 		if(inResults):
-			self.end_results(fileEndRow)
+			self.EndResults(fileEndRow)
 			return True
 		# We hit the end of the file and didn't find a results tag.
 		# We need to make one.
@@ -191,7 +192,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
 			return True
 
-	def on_warning_saved(self):
+	def OnWarningSaved(self):
 		if(self.view.is_dirty()):
 			self.view.set_status("Error: ","Failed to save the view. ABORT, cannot execute source block since it is dirty")
 			log.error("Failed to save the view. ABORT, cannot execute source code")
@@ -262,13 +263,13 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			if(view.is_dirty()):
 				log.warning("Your source file has unsaved changes. We cannot run source modifications without saving the buffer.")
 				view.run_command("save", {"async": False})
-				sublime.set_timeout(self.on_warning_saved,1)
+				sublime.set_timeout(self.OnWarningSaved,1)
 				return
 
 			# We need to find and or buid a results block
 			# so we can replace it with the results.
 			# ORG is super flexible about this, we are NOT!
-			self.find_results(edit)
+			self.FindResults(edit)
 
 			# Run the "writer"
 			if(hasattr(self.curmod,"Execute")):
@@ -306,6 +307,6 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			indent = "\n " * level + " "
 			#outputs = output.split('\n')
 			output = indent.join(self.outputs).rstrip()
-			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.on_replaced)})
+			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
 		else:
 			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
