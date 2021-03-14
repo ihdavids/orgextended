@@ -9,6 +9,9 @@ import threading, time, signal
 from shutil import move
 import types
 import OrgExtended.orgtableformula as fml
+import OrgExtended.orgparse.date as odate
+import traceback
+import datetime
 
 # GNU Plot Babel Mode
 
@@ -32,6 +35,26 @@ def GetTerminalFromOutputFile(filename):
             out += 'set term postscript \n'
     return out
 
+
+def FormatDateTime(now):
+    if(isinstance(now,datetime.datetime)):
+        return now.strftime("%Y-%m-%d %H:%M")  
+    else:
+        return now.strftime("%Y-%m-%d")  
+
+def FormatText(txt):
+    txt = txt.strip()
+    try:
+        rc = odate.OrgDate.list_from_str(txt)
+        if(len(rc) > 0):
+            return FormatDateTime(rc[0].start).strip()
+    except:
+        #print("FAILED FORMAT: " + str(traceback.format_exc()))
+        pass
+    if(" " in txt):
+        txt = "\"" + txt + "\""
+    return txt
+
 def PreProcessSourceFile(cmd):
     filename = cmd.params.Get('file',None)
     var = cmd.params.Get('var',None)
@@ -39,24 +62,13 @@ def PreProcessSourceFile(cmd):
         out = ""
         for k in var:
             v = var[k]
-            print("AAA: " + k + repr(type(var[k])))
-            if(isinstance(v,types.GeneratorType)):
-                out += "$" + str(k) + " << EOD\n"
-                maing = var[k]
-                for rowg in maing:
-                    first = True
-                    for v in rowg:
-                        out += ('\t' if not first else "") + str(v)
-                        first = False
-                    out += '\n'
-                out += "EOD\n"
             if(isinstance(v,fml.TableDef)):
                 out += "$" + str(k) + " << EOD\n"
                 for r in v.ForEachRow():
                     first = True
                     for c in v.ForEachCol():
                         txt = v.GetCellText(r,c)
-                        out += ('\t' if not first else "") + txt
+                        out += ('\t' if not first else "") + FormatText(txt)
                         first = False
                     out += '\n'
                 out += "EOD\n"

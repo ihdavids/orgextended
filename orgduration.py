@@ -55,7 +55,6 @@ class OrgDuration:
         return r.strip()
     
     def __sub__(self,o):
-        print("SUB")
         if(isinstance(o,int)):
             d = OrgDuration.ParseInt(o)
             mins = self.mins - d.mins

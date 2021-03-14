@@ -2,13 +2,13 @@ import sublime
 import sublime_plugin
 import datetime
 import re
-from pathlib import Path
+#from pathlib import Path
 import os
-import fnmatch
-import OrgExtended.orgparse.node as node
+#import fnmatch
+#import OrgExtended.orgparse.node as node
 import OrgExtended.orgutil.util as util
 import logging
-import sys
+#import sys
 import traceback 
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
@@ -1017,6 +1017,9 @@ def myduration(dt):
 def mydate(dt):
     if(isinstance(dt,Cell)):
         rc = orgdate.OrgDate.list_from_str(dt.GetText())
+        if(len(rc) == 0):
+            log.debug("ERROR: date function failed to parse date?")
+            traceback.print_stack()
         if(len(rc) == 1):
             return rc[0]
         return rc
@@ -1051,7 +1054,7 @@ def cos(cell):
 def exp(cell):
     return math.exp(GetNum(cell))
 
-def lookup_named_table_in_file(name):
+def LookupNamedTableInFile(name):
     td = None
     view = sublime.active_window().active_view()
     if(view):
@@ -1076,7 +1079,7 @@ def lookup_named_table_in_file(name):
                 td = create_table(view,view.text_point(row,0))
     return td
 
-def lookup_table_from_id(name):
+def LookupTableFromId(name):
     td = None
     file, row = db.Get().FindByAnyId(name)
     if(file):
@@ -1087,11 +1090,11 @@ def lookup_table_from_id(name):
 
 def LookupTableFromNamedObject(name):
     # First search for a named table from the ID
-    td = lookup_named_table_in_file(name)
+    td = LookupNamedTableInFile(name)
     if(not td):
         # Okay use the custom ID rule to try to get the
         # table.
-        td = lookup_table_from_id(name)
+        td = LookupTableFromId(name)
     return td
 
 def remote(name,cellRef):
@@ -1622,11 +1625,12 @@ def create_table(view, at=None):
             continue
         # Found a formula break!
         elif(m):
-            end = r-1
             formula = m.group('expr').split('::')
             formulaRow = r
             formulaLine = line
-            lastRow = rowNum - 1
+            if(lastRow == 0):
+                end = r-1
+                lastRow = rowNum - 1
             break
         else:
             endb = RE_END_BLOCK.search(line)
@@ -1824,11 +1828,12 @@ def create_table_from_node(node, row):
             continue
         # Found a formula break!
         elif(m):
-            end = r-1
             formula = m.group('expr').split('::')
             formulaRow = r
             formulaLine = line
-            lastRow = rowNum - 1
+            if(lastRow == 0):
+                end = r-1
+                lastRow = rowNum - 1
             break
         else:
             endb = RE_END_BLOCK.search(line)
@@ -1837,8 +1842,9 @@ def create_table_from_node(node, row):
             if(line.strip() == "" or endb):
                 if(lastRow == 0):
                     spacesRow = r
-                    end = r-1
-                    lastRow = rowNum - 1
+                    if(lastRow == 0):
+                        end = r-1
+                        lastRow = rowNum - 1
                 continue
             else:
                 if(lastRow == 0):

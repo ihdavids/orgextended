@@ -47,11 +47,11 @@
     set border 3
     set style arrow 1 nohead filled size screen 0.02, 15 fixed lt 3 lw 8
 
-    plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+    plot "$DATA" using (T(3)) : ($0) : (T(4)-T(3)) : (0.0) : yticlabel(1) with vector as 1 
    #+END_SRC
 
   #+RESULTS:
-  plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
-                                                ^
-  "c:\users\ihdav\appdata\local\temp\tmp7repl9.gplt" line 30: x range is invalid
+  plot "$DATA" using (T(3)) : ($0) : (T(4)-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+                                                                                         ^
+  "c:\users\ihdav\appdata\local\temp\tmpa4rsie.gplt" line 29: x range is invalid
   [[file:gantt-table.png]]

@@ -295,8 +295,11 @@ class OrgDate(object):
 
     @staticmethod
     def format_datetime(now):
-        return now.strftime("%Y-%m-%d %a %H:%M")  
-
+        if(isinstance(now,datetime.datetime)):
+            return now.strftime("%Y-%m-%d %a %H:%M")  
+        else:
+            return now.strftime("%Y-%m-%d %a")  
+    
     @staticmethod
     def format_duration(d):
         hours   = d.seconds/3600
