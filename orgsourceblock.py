@@ -46,6 +46,19 @@ def IsSourceFence(view,row):
 	line = view.getLine(row)
 	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
 
+
+def ProcessPotentialFileOrgOutput(cmd):
+	cmd.outputs = list(filter(None, cmd.outputs)) 
+	if(cmd.params and cmd.params.Get('file',None)):
+		out = cmd.params.Get('file',None)
+		if(hasattr(self,'output') and self.output):
+			out = self.output
+		if(out):
+			sourcepath = os.path.dirname(self.sourcefile)
+			destFile    = os.path.join(sourcepath,out)
+			destFile = os.path.relpath(destFile, sourcepath)
+			self.outputs.append("[[file:" + destFile + "]]")
+
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def OnDone(self):
 		evt.EmitIf(self.onDone)
@@ -224,19 +237,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				else:
 					self.filename = None
 					self.outputs = self.curmod.Execute(self)
-				self.outputs = list(filter(None, self.outputs)) 
-				if(self.params and self.params.Get('file',None)):
-					print("HERE1")
-					out = self.params.Get('file',None)
-					if(hasattr(self,'output') and self.output):
-						out = self.output
-						print("HERE2: " + out)
-					if(out):
-						print("HERE3: " + out)
-						sourcepath = os.path.dirname(self.sourcefile)
-						destFile    = os.path.join(sourcepath,out)
-						destFile = os.path.relpath(destFile, sourcepath)
-						self.outputs.append("[[file:" + destFile + "]]")
+				ProcessPotentialFileOrgOutput(self)
 				log.debug("OUTPUT: " + str(self.outputs))
 			else:
 				log.error("No execute in module, abort")

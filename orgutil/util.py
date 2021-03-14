@@ -41,12 +41,14 @@ class PList:
         self.params = plist
 
     def Get(self, name, defaultValue):
-        if(name in self.params):
-            v = self.params[name].strip()
-            if(v.startswith("\"")):
-                v = v[1:]
-            if(v.endswith("\"")):
-                v = v[:-1]
+        if(name in self.params and self.params[name]):
+            v = self.params[name]
+            if(isinstance(v,str)):
+                v = v.strip()
+                if(v.startswith("\"")):
+                    v = v[1:]
+                if(v.endswith("\"")):
+                    v = v[:-1]
             return v
         return defaultValue
 
@@ -72,6 +74,23 @@ class PList:
         v = self.Get(name,defaultValue)
         return ToIntList(v) 
 
+    def GetDict(self,name,defaultValue):
+        out = {}
+        v = self.Get(name,defaultValue)
+        if(isinstance(v,str)):
+            vs = v.split('=')
+            if(len(vs) == 2):
+                out[vs[0].strip()] = vs[1].strip()
+                return out
+        if(isinstance(v,list)):
+            for i in v:
+                vs = i.split('=')
+                if(len(vs) == 2):
+                    out[vs[0].strip()] = vs[1].strip()
+            if(len(out) > 0):
+                return out
+        return defaultValue
+
     @staticmethod
     def plistParse(data):
         if(isinstance(data,list)):
@@ -79,7 +98,21 @@ class PList:
         paramstr = " " + data
         params = {}
         for m in RE_FN_MATCH.finditer(paramstr):
-            params[m.group(1)] = m.group(2)
+            key = m.group(1)
+            val = m.group(2)
+            val = val.strip()
+            if(val.startswith("\"")):
+                val = val[1:]
+            if(val.endswith("\"")):
+                val = val[:-1]
+            if(key in params):
+                v = params[key]
+                if(isinstance(v,str)):
+                    params[key] = []
+                    params[key].append(v)
+                params[key].append(val)
+            else:
+                params[key] = val
         return params
 
     @staticmethod

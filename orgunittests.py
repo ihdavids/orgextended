@@ -57,3 +57,9 @@ class OrgPlistTestCommand(sublime_plugin.TextCommand):
         p = util.PList.createPList(":param \"Hello World\" :param2 \"Yet Again\"")
         util.TEST("plist string1",p.Get('param',None),"Hello World","List string 1 test")
         util.TEST("plist string1",p.Get('param2',None),"Yet Again","List string 1 test")
+
+        p = util.PList.createPList(":var a=b :var c=d :var e=f :other hello")
+        util.TEST("plist list dict",p.Get('var',None),['a=b','c=d','e=f'],"List dict test 1")
+        util.TEST("plist dict",p.GetDict('var',None),{'a':'b','c':'d','e':'f'},"Dict test 1")
+        util.TEST("plist dict other",p.Get('other',None),"hello","Dict other test 1")
+
