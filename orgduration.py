@@ -59,16 +59,16 @@ class OrgDuration:
         if(isinstance(o,int)):
             d = OrgDuration.ParseInt(o)
             mins = self.mins - d.mins
-            d.mins = mins
+            d.mins = abs(mins)
             return d
         if(isinstance(o,float)):
             d = OrgDuration.ParseFloat(o)
             mins = self.mins - d.mins
-            d.mins = mins
+            d.mins = abs(mins)
             return d
         if(isinstance(o,OrgDuration)):
             d = OrgDuration.ParseInt(1)
-            d.mins = self.mins - o.mins
+            d.mins = abs(self.mins - o.mins)
             return d
         return self 
     

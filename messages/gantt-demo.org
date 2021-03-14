@@ -1,0 +1,57 @@
+
+#+COLUMNS: %ITEM(Task) %Effort(Effort) %START(Start) %END(End) %RESPONSIBLE(Responsible) %SPENT(Spent) %PROGRESS(Progress) %PROJECTED(Projected) %OVERUNDER(Over_Under)
+
+* Task 1
+   :PROPERTIES:
+     :Effort: 1d
+   :END:
+* Task 2
+   :PROPERTIES:
+     :Effort: 3d
+   :END:
+* Task 3
+   :PROPERTIES:
+     :Effort: 4d
+   :END:
+* Gantt Demo                                                              :Skip:
+  
+  #+NAME: gantt-table
+  #+BEGIN: columnview :exclude-tags (Skip)
+  |  Task  | Effort |      Start       |       End        | Responsible | Spent | Progress | Projected | Over_Under |
+  |--------+--------+------------------+------------------+-------------+-------+----------+-----------+------------|
+  | Task 1 | 1d     | <2021-03-13 Sat> | <2021-03-14 Sun> | Ian         |     1 | 40%      |       2.5 | 1d 12h     |
+  | Task 2 | 3d     | <2021-03-15 Mon> | <2021-03-18 Thu> | Joe         |     2 | 10%      |      20.0 | 17d        |
+  | Task 3 | 4d     | <2021-03-18 Thu> | <2021-03-22 Mon> | Sam         |     1 | 50%      |       2.0 | 2d         |
+  #+END:
+  #+TBLFM:$4=date($-1)+duration($-2) if "$-1"!="" else ""::$8=$-2/$-1 if $-1 > 0 else ""::$9=duration($2) - $-1 if $-1>0 else ""
+
+
+   #+BEGIN_SRC gnuplot :var DATA=gantt-table :file gantt-table.png
+    OneMonth = strptime("%m","2")
+    timeformat = "%Y-%m-%d"
+    T(N) = timecolumn(N,timeformat)
+
+    set xdata time
+    set format x "%b\n'%y"
+    set xtics OneMonth nomirror
+    set xtics scale 2, 0.5
+    set mxtics 4
+
+    skiptorow=4
+    set yrange [(skiptorow-2):] reverse
+    set ytics nomirror
+
+    unset key
+    set title "{/=15 GANTT Chart Example}"
+    set grid x y
+    set border 3
+    set style arrow 1 nohead filled size screen 0.02, 15 fixed lt 3 lw 8
+
+    plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+   #+END_SRC
+
+  #+RESULTS:
+  plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
+                                                ^
+  "c:\users\ihdav\appdata\local\temp\tmp7repl9.gplt" line 30: x range is invalid
+  [[file:gantt-table.png]]
