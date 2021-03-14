@@ -1,18 +1,16 @@
-import sublime
-import OrgExtended.orgdb as db
-import OrgExtended.orgparse.date as d
-import OrgExtended.orgutil.util as util
-import re
 import os
+import re
+
+import OrgExtended.orgdb as db
 
 
-def get_level(params):
+def GetLevel(params):
 	level = params.GetInt('maxlevel',2)
 	if(level < 2):
 		level = 2
 	return level
 
-def handle_item(params,n,defs,output,depth,maxdepth):
+def HandleItem(params,n,defs,output,depth,maxdepth):
 	if(maxdepth > 0 and depth > maxdepth):
 		return
 	out = []
@@ -39,9 +37,9 @@ def handle_item(params,n,defs,output,depth,maxdepth):
 				output.append(["-"])
 		output.append(out)
 	for c in n.children:
-		handle_item(params,c,defs,output,depth+1,maxdepth)
+		HandleItem(params,c,defs,output,depth+1,maxdepth)
 
-def handle_headings(defs,output):
+def HandleHeadings(defs,output):
 	out = "|"
 	for d in defs:
 		out += d.Heading() + "|"
@@ -157,7 +155,7 @@ special_registry = {
 
 #%[WIDTH]PROPERTY[(TITLE)][{SUMMARY-TYPE}]
 RE_PARSER = re.compile(r"[%](?P<width>[0-9]+)?(?P<prop>[a-zA-Z][a-zA-Z0-9_-]+)([(](?P<heading>([a-zA-Z0-9 +-]|\s)+)[)])?(?P<summary>[^ ())]+)?")
-def get_column_definitions(f):
+def GetColumnDefinitions(f):
 	columns = f.org.list_comment("COLUMNS",[r"%70ITEM(Task)",r"%17Effort(Effort)"])
 	h = []
 	for item in columns:
@@ -193,7 +191,7 @@ def Execute(view, params):
 	# Look it up in the DB. This will also reload it if it is dirty.
 	file = db.Get().FindInfo(view)
 	if(file):
-		defs = get_column_definitions(file)
+		defs = GetColumnDefinitions(file)
 		r = file.org
 		# Local we search up till we find the node parent that is not the root
 		if(id == 'local'):
@@ -210,23 +208,20 @@ def Execute(view, params):
 			files = id.split(':')
 			file = db.Get().FindFileByFilename(files[1].strip())
 			r = file.org
-			pass
 		# Operate on a node marked with an ID or CUSTOM_ID
 		# ONLY if found in the DB.
 		else:
 			r = db.Get().FindNodeByAnyId(id)
-			print(str(r))
-			pass
 
 		# Output the headings of our table based on the fields and handlers
 		# we found in our COLUMNS definition.
-		handle_headings(defs,output)
+		HandleHeadings(defs,output)
 		# If we had a root, run over it and process it's children
 		# building up our output array.
 		outarrays = []
 		if(r):
 			for n in r.children:
-				handle_item(params,n,defs,outarrays,1,maxdepth)
+				HandleItem(params,n,defs,outarrays,1,maxdepth)
 	# Did we get some output? return it
 	if(len(outarrays) > 0):
 		for o in outarrays:

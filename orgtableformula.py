@@ -881,6 +881,7 @@ def tuadd(a):
     return + GetVal(a)
 
 def vmean(rng):
+    """Computes the average value of a column or row. Takes a range of cells"""
     n = 0
     s = 0
     for i in rng:
@@ -892,13 +893,16 @@ def vmean(rng):
     return 0
 
 def vsum(rng):
+    """Computes the sum of a range of cells"""
     s = 0
     for i in rng:
         s += GetNum(i)
     return s
 
 def vmedian(rng):
+    """Computes the median (middle) value of a sorted range of cells"""
     data = list(rng)
+    data.sort()
     dl = len(data)
     v = math.floor(dl/2)
     if(v*2 != dl):
@@ -907,6 +911,7 @@ def vmedian(rng):
         return (GetNum(data[v]) + GetNum(data[v+1]))/2.0
 
 def vmax(rng):
+    """Computes the max value of a range of cells"""
     m = -999999999
     for i in rng:
         num = GetNum(i)
@@ -915,6 +920,7 @@ def vmax(rng):
     return m
 
 def vmin(rng):
+    """Computes the minimum value of a range of cells"""
     m = 999999999
     for i in rng:
         num = GetNum(i)
@@ -1026,9 +1032,11 @@ def mydate(dt):
     return None
 
 def randomDigit(start, end):
+    """Returns a random value in a range specified start..end"""
     return random.randint(GetVal(start),GetVal(end))
 
 def randomFloat():
+    """Returns a random value from 0..1"""
     return random.randint(0,1000000)/1000000.0
 
 def tan(cell):
@@ -1087,6 +1095,10 @@ def lookup_table_from_namedobject(name):
     return td
 
 def remote(name,cellRef):
+    """remote('table-name OR custom-id-value',cellRef) returns a cell from a remote table.
+       table-name only works local to a file while custom-id or id will look up the first table
+       in a heading marked with that id.
+    """
     td = lookup_table_from_namedobject(name)
     if(td):
         text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
