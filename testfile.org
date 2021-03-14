@@ -14,10 +14,23 @@ Custom TODO cycling is understood.
 #+PRIORITIES: 1 2 3 4 5
 #+HTML_STYLE: refined
 
+#+AUTHOR: AUTHORS NAME
+
+#+TITLE: This is the title
+#+LANGUAGE: LANGUaGE OF THING
+#+DATE: DATE OF WRITE
+
+#+EMAIL: EMAIL OF THING
+
+
+
 * Introduction
   This is a simple test file that tries to demonstrate some
   of the syntax highlighting and allows me to play with things.
+
+ 
 * Basic Headings and tags  :TAG1:TAG2:
+
   To start I am only supporting 7 levels of headers.
   This seems sufficient for my needs. Tags are supported
 ** Heading 2
@@ -68,7 +81,7 @@ Custom TODO cycling is understood.
   - Definition1 :: This is what it means
   - Definition2 :: This is what that means
 
-* NOTE Checkboxes [1/3]
+* NOTE Checkboxes [33%]
   Colored but not updated yet! I need Ctrl-c Ctrl-c style updating.
   That will come, just not yet.
 
@@ -80,6 +93,9 @@ Custom TODO cycling is understood.
       - [x] sub3
 
 * NOTE Links
+
+  [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#33da3712-51b7-485c-b69d-f54dd266543f][ID Creation]] 
+  [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#My-Custom-Id][Custom Id]] 
 
 	There is support for basic org links a la orgmode style.
 
@@ -141,10 +157,10 @@ Custom TODO cycling is understood.
 
 
 	#+BEGIN_SRC python
-    def function(a):
-	  print("hello world")
+    def func(a):
+        print("hello world")
+    func('hi')
 	#+END_SRC
-
 
 	#+BEGIN_SRC cpp
 	class MyClass
@@ -173,7 +189,44 @@ Custom TODO cycling is understood.
 	</mytag>
 	#+end_src
 
+  #+BEGIN_SRC plantuml
+    a -> b
+    b -> c
+  #+END_SRC
+
+  #+BEGIN_SRC graphviz
+  diagram G {
+    a -> b;
+    b -> c;
+  }
+  #+END_SRC
+
+  #+BEGIN_SRC bat
+    REM Comment line
+    @echo off
+    hi=%1
+  #+END_SRC
+
+  #+BEGIN_SRC regexp
+    \s+(?P<name>[a-z])\s+
+  #+END_SRC 
+
+  #+BEGIN_SRC org
+  * Heading
+  :PROPERTIES:
+  :END:
+  #+END_SRC 
+
+ #+BEGIN_SRC md
+### Markdown
+    But rules have to be followed here so things have to be right aligned in the block.
+```cpp
+    printf("");
+```
+ #+END_SRC 
+
 * NOTE Bold Italics Underline
+
     *bold*
     /italic/
     _underline_
@@ -215,10 +268,10 @@ Custom TODO cycling is understood.
    coloring options in the grammar.
 ** TODO [#A] Top priority
    A body for this work item
-*** TODO [#B] Second priority
+*** NEXT [#B] Second priority
 **** TODO [#C] Third priorty item
 ***** TODO [#D] Third priorty item
-****** TODO [#E] Third priorty item
+****** BLOCKED [#E] Third priorty item
 
 * This has no priorities
 
@@ -263,6 +316,7 @@ Custom TODO cycling is understood.
 
 * Dynamic Blocks
   We will have to handle these differently than regular dynamic blocks
+  
   #+BEGIN: insertdatetime
   If you run this, this text will be replaced with the current datetime
   #+END:
@@ -290,7 +344,52 @@ Custom TODO cycling is understood.
   | Hello      | World |
   | Some Table |       |
 
-* TODO Tomorrow
-  SCHEDULED: <2021-02-01 Mon 10:00> 
-* TODO Today
-  SCHEDULED: <2021-01-31 Sun 09:25> 
+
+* ID Creation
+  :PROPERTIES:
+    :ID: 33da3712-51b7-485c-b69d-f54dd266543f
+  :END:
+
+* Custom IDs
+  :PROPERTIES:
+    :CUSTOM_ID: My-Custom-Id
+  :END:
+
+* Table Remote Test
+
+  | a         | b | c | d | e |
+  | <UNK REF> |   |   |   |   |
+  #+TBLFM:@2$1=remote("my-table-test",@2$2)
+* Test Time Info
+  :PROPERTIES:
+    :CUSTOM_ID: my-custom-id
+  :END:
+** TODO Tomorrow
+   <2021-02-16 Thu 16:00-17:00> 
+   :PROPERTIES:
+     :CLOCK: [2021-02-12 Fri 17:20]--[2021-02-12 Fri 17:21] => 00:01
+     :CLOCK: [2021-02-12 Fri 17:29]--[2021-02-12 Fri 17:29] => 00:00
+     :CLOCK: [2021-02-12 Fri 17:29]--[2021-02-12 Fri 17:29] => 00:00
+   :END:
+** TODO Today
+   SCHEDULED: <2021-02-10 Wed 16:49> 
+ 
+   #+BEGIN_SRC bash
+    # This is a comment 
+    if [ ]
+    print()
+   #+END_SRC
+ 
+ # This is a comment block
+** TODO Deadline
+   Testing if this works
+ 
+** TODO Test Recurrence
+   <2021-02-16 Tue 14:10-15:10 +1d>
+ 
+** TODO Rec Active
+    <2021-02-15 Wed 14:40 +1d> 
+ 
+
+* Effort
+
