@@ -1,15 +1,23 @@
 * 1.1.29
-
-   #+PROPERTY: header-args:R  :session *R*
-   #+PROPERTY: header-args    :results silent
-
    Core Idea: Add GNU Plot Script Blocks
 
    - [x] Add a syntax for gnu plot script blocks if one does not already exist
    - [x] Add a src handler to execute these script blocks.
+** Spreadsheets Preview V13
 
+    - Fixed a bug with TBLFM appearing after a END marker on dynamic blocks
+    - Fixed a bug with if statements and equals signs in TBLFM blocks
+    - Fixed a bug with tables where it would look up the properties on the root node of the file.
+      this would cause an assert.
 
-   Here is some gnu plot code that draws a sine wave.
+** GNU Plot Script Block
+
+   We now have a GNU Plot script block and source handler.
+   We have a very limited set of source hanlders.
+
+   Here is some gnu plot code that draws a sine wave if executed and
+   gnuplot can be found in your settings file. The requirements are the
+   same as those for table plotting.
    #+BEGIN_SRC gnuplot :file gantt-table.png
     # We don't need a key (or legend) for this simple graph.
     set key off
@@ -43,8 +51,9 @@
   - Source Blocks now have a PreProcessSourceFile() method that allows for injection of file and other paramters into the source block.
 
   - GNU Plot is the first module to start implementing the data source mechanism:
-    This generates a line by feeding the data in my-table into gnu plot using babel like
-    mechanics.
+    The following example generates a graphed line line by feeding the data in my-table into gnu plot using babel like
+    mechanics. NOTE: Babel is in its infancy in our system. We have source handlers for python, powershell, gnuplot, ditaa, plantuml, graphviz and that is it.
+    ONLY GNU Plot can read from tables at this time. This will change.
 
   #+NAME: my-table
   | 1 | 2 |
@@ -59,33 +68,7 @@
   [[file:my-table.png]] 
 
 
-
-   #+BEGIN_SRC gnuplot :var DATA=gantt-table :file gantt-table.png
-    OneMonth = strptime("%m","2")
-    timeformat = "%Y-%m-%d"
-    T(N) = timecolumn(N,timeformat)
-
-    set xdata time
-    set format x "%b\n'%y"
-    set xtics OneMonth nomirror
-    set xtics scale 2, 0.5
-    set mxtics 4
-
-    skiptorow=4
-    set yrange [(skiptorow-2):] reverse
-    set ytics nomirror
-
-    unset key
-    set title "{/=15 GANTT Chart Example}"
-    set grid x y
-    set border 3
-    set style arrow 1 nohead filled size screen 0.02, 15 fixed lt 3 lw 8
-
-    plot "$DATA" using (T(3)) : ($0) : (T(4))-T(3)) : (0.0) : yticlabel(1) with vector as 1 
-   #+END_SRC
-
 ** Powershell Block Execute Bug
 	- this was using the OrgExtended package dir as it's cwd
 	  which was causing problems when running as a package. FIXED.
 
-     

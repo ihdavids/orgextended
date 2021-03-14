@@ -1690,10 +1690,11 @@ def create_table(view, at=None):
                         name = cs[0].strip()
                         val  = cs[1].strip()
                         consts[name] = val
-            props = node.properties
-            if(props and len(props) > 0):
-                for k,v in props.items():
-                    consts['PROP_'+k] = v
+            if(hasattr(node,'properties')):
+                props = node.properties
+                if(props and len(props) > 0):
+                    for k,v in props.items():
+                        consts['PROP_'+k] = v
             td.consts = consts
         if(parameters and len(parameters) > 0):
             for prow in parameters:
@@ -1892,10 +1893,11 @@ def create_table_from_node(node, row):
                         name = cs[0].strip()
                         val  = cs[1].strip()
                         consts[name] = val
-            props = node.properties
-            if(props and len(props) > 0):
-                for k,v in props.items():
-                    consts['PROP_'+k] = v
+            if(hasattr(node,'properties')):
+                props = node.properties
+                if(props and len(props) > 0):
+                    for k,v in props.items():
+                        consts['PROP_'+k] = v
             td.consts = consts
         if(parameters and len(parameters) > 0):
             for prow in parameters:
