@@ -1,0 +1,3 @@
+* 1.1.30
+** Spreadsheet Preview V14
+	- added bool() method to convert string cells to boolean value explicitly

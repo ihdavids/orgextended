@@ -94,7 +94,7 @@ def GetConsts():
     reloadExtensions = sets.Get("forceLoadExternalExtensions",False)
     if(constsTable == None or reloadExtensions):
         n = simpev.DEFAULT_NAMES.copy()
-        n['pi']     = 3.1415926
+        n['pi']     = 3.1415926535897932385
         n['t']      = True
         n['true']   = True
         n['True']   = True
@@ -157,6 +157,7 @@ def GetFunctions():
         f['randomf'] = randomFloat
         f['random'] = randomDigit
         f['abs'] = myabs
+        f['bool'] = mybool
         add_dynamic_functions(f)
         functionsTable = f
     return functionsTable
@@ -927,6 +928,13 @@ def vmin(rng):
         if(num < m):
             m = num
     return m
+
+def mybool(num):
+    v = GetVal(num)
+    l = v.lower()
+    if(l == "true" or l == "t"):
+        return True
+    return False
 
 def myfloor(num):
     v = GetNum(num)
