@@ -12,3 +12,4 @@
 	- Added Org Execute All Tables - scans the whole file for tables and executes all of them.
 	- Improved all date functions handling of datestrings
 	- Fixed double digit row index parsing, @10$2 was failing to parse properly sometimes.
+	- Fixed a bug with vmedian where it would sometimes not compute the median!
