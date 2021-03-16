@@ -13,3 +13,9 @@
 	- Improved all date functions handling of datestrings
 	- Fixed double digit row index parsing, @10$2 was failing to parse properly sometimes.
 	- Fixed a bug with vmedian where it would sometimes not compute the median!
+
+	- More docs including a little view of the new highlight in action in a unit test capture: (at the bottom of the tables doc)
+	[[https://github.com/ihdavids/orgextended_docs/blob/master/tables.org][Tables]]	
+
+	- New documentation on adding the emacs constants.el to your table experience in docs
+	[[https://github.com/ihdavids/orgextended_docs/blob/master/mathconstants.org][Math Constants]]
