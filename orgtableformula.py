@@ -466,7 +466,7 @@ def formula_rowcol(expr,table):
     if(len(targets)==2):
         r1 = formula_rowcol(targets[0] + "=",table)
         r2 = formula_rowcol(targets[1] + "=",table)
-        return [r1[0] + r2[0],formula]
+        return [r1[0] + r2[0],formula,None]
     m = RE_TARGET.search(target)
     if(m):
         row = m.group('row')
@@ -509,7 +509,7 @@ RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
 RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
 def replace_cell_references(expr):
-    print("EXPS: " + str(expr))
+    #print("EXPS: " + str(expr))
     while(True):
         expr = RE_ROW_TOKEN.sub('ridx()',expr)
         expr = RE_COL_TOKEN.sub('cidx()',expr)
@@ -554,7 +554,7 @@ def replace_cell_references(expr):
             expr = RE_SYMBOL_OR_CELL_NAME.sub(' symorcell(\'' + name + '\') ',expr,1)
         else:
             break
-    print("EXP: " + str(expr))
+    #print("EXP: " + str(expr))
     return expr
 
 def formula_sources(expr):
@@ -855,7 +855,9 @@ def safe_add(a, b):  # pylint: disable=invalid-name
         if len(a) + len(b) > MAX_STRING_LENGTH:
             raise IterableTooLong("Sorry, adding those two together would"
                                   " make something too long.")
-    return GetVal(a) + GetVal(b)
+    a = GetVal(a)
+    b = GetVal(b)
+    return a + b
 
 def tsub(a, b):  # pylint: disable=invalid-name
     return GetVal(a) - GetVal(b)
@@ -915,13 +917,19 @@ def vsum(rng):
 def vmedian(rng):
     """Computes the median (middle) value of a sorted range of cells"""
     data = list(rng)
+    for i in range(0,len(data)):
+        data[i] = GetVal(data[i])
     data.sort()
     dl = len(data)
     v = math.floor(dl/2)
+    if(dl == 1):
+        return data[0]
     if(v*2 != dl):
-        return GetNum(data[v+1])
+        return data[v]
     else:
-        return (GetNum(data[v]) + GetNum(data[v+1]))/2.0
+        if(v <= 0):
+            return data[0]
+        return (GetNum(data[v-1]) + GetNum(data[v]))/2.0
 
 def vmax(rng):
     """Computes the max value of a range of cells"""
@@ -1077,7 +1085,6 @@ def myminute(dt):
 def mysecond(dt):
     """Get the seconds value from a datetime - datetime.time().second"""
     dt = GetTime(dt)
-    print("RETURNING: " + str(dt.second))
     return dt.second
 
 def myweekday(dt):
@@ -2128,7 +2135,6 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
 
     def on_formula_copy_done(self):
         if(None != self.at):
-            print("SETTING AT: " + str(self.at))
             self.view.sel().clear()
             self.view.sel().add(self.at)
         # Working on formula handling
