@@ -161,6 +161,16 @@
     | 1 | 2 | 3 | 4 |      4 | PASSED |
     #+TBLFM:@2$5=$<::@3$5=$<<::@4$5=$<<<::@2$6=passed($-1==1)::@3$6=passed($-1==2)::@4$6=passed($-1==3)::@5$5=$>>>::@5$6=passed($-1==4)
 
+    Row relative copy
+    | a  |   b    | c  |   d    | e |
+    |----+--------+----+--------+---|
+    |  1 | 2      |  3 | 4      | 5 |
+    |  1 | 2      |  3 | 4      | 5 |
+    |  5 | 4      |  3 | 2      | 1 |
+    |  5 | 4      |  3 | 2      | 1 |
+    | 15 | PASSED | 15 | PASSED |   |
+    #+TBLFM:@3=@<::@4=@>>::@6$1=vsum(@4$1..@4$5)::@6$2=passed($1==15)::@6$3=vsum(@3$1..@3$5)::@6$4=passed($-1==15)
+
 ** Range Source and Targets
    Using block ranges to specify destination
 
