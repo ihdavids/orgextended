@@ -1,4 +1,6 @@
 * Table Tests
+   These are the core unit tests for our tables.
+   When making changes to table systems you should run these.
 
 ** Straight column copy test
    Copy from A => B and check that it worked
