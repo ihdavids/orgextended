@@ -130,6 +130,7 @@
     {"caption": "Org Show Table Rows",         "command": "org_show_table_rows"               },
     {"caption": "Org Hide Table Rows",         "command": "org_hide_table_rows"               },
     {"caption": "Org Plot Table",              "command": "org_plot_table"                    },
+    {"caption": "Org Execute All Tables",      "command": "org_execute_all_tables"  },
 
     // Internal Mechanics
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },

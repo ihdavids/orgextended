@@ -41,8 +41,10 @@ highlightEnabled = True
 
 log = logging.getLogger(__name__)
 
-def isTable(view):
-    names = view.scope_name(view.sel()[0].end())
+def isTable(view,at=None):
+    if(at == None):
+        at = view.sel()[0].end()
+    names = view.scope_name(at)
     return 'orgmode.table' in names
 
 def isTableFormula(view):
@@ -158,6 +160,9 @@ def GetFunctions():
         f['random'] = randomDigit
         f['abs'] = myabs
         f['bool'] = mybool
+        f['int'] = myint
+        f['float'] = myfloat
+        f['highlight'] = myhighlight
         add_dynamic_functions(f)
         functionsTable = f
     return functionsTable
@@ -499,12 +504,12 @@ def isNumeric(v):
 def isFunc(v):
     return 'ridx()' in v or 'cidx()' in v
 
-RE_TARGET_A  = re.compile(r'\s*(([@](?P<rowonly>((?P<rosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>((?P<cosign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\))))|([@](?P<row>(?P<rsign>[+-])?[0-9><#]+)[$](?P<col>((?P<csign>[+-])?[0-9><#]+)|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
+RE_TARGET_A  = re.compile(r'\s*(([@](?P<row>(?P<rsign>[+-])?([0-9]+)|([>]+)|([<]+)|[#])[$](?P<col>((?P<csign>[+-])?([0-9]+)|([>]+)|([<]+)|[#])|(ridx\(\))|(cidx\(\))))|([@](?P<rowonly>((?P<rosign>[+-])?([0-9]+)|([>]+)|([<]+)|[#])|(ridx\(\))|(cidx\(\))))|([$](?P<colonly>((?P<cosign>[+-])?([0-9]+)|([>]+)|([<]+)|[#])|(ridx\(\))|(cidx\(\)))))(?P<end>[^@$]|$)')
 RE_ROW_TOKEN = re.compile(r'[@][#]')
 RE_COL_TOKEN = re.compile(r'[$][#]')
 RE_SYMBOL_OR_CELL_NAME = re.compile(r'[$](?P<name>[a-zA-Z][a-zA-Z0-9_-]*)')
 def replace_cell_references(expr):
-    #print("EXPS: " + str(expr))
+    print("EXPS: " + str(expr))
     while(True):
         expr = RE_ROW_TOKEN.sub('ridx()',expr)
         expr = RE_COL_TOKEN.sub('cidx()',expr)
@@ -549,7 +554,7 @@ def replace_cell_references(expr):
             expr = RE_SYMBOL_OR_CELL_NAME.sub(' symorcell(\'' + name + '\') ',expr,1)
         else:
             break
-    #print("EXP: " + str(expr))
+    print("EXP: " + str(expr))
     return expr
 
 def formula_sources(expr):
@@ -786,6 +791,11 @@ class Cell:
                 f = float(t)
                 f = (f / 100.0)
                 return f
+        l = txt.lower()
+        if(l == "true" or l == "t"):
+            return True
+        if(l == "false"):
+            return False
         return txt
     
     def GetNum(self):
@@ -832,10 +842,12 @@ def safe_mult(a, b):  # pylint: disable=invalid-name
     return a * b
 
 def safe_pow(a, b):  # pylint: disable=invalid-name
+    a = GetVal(a)
+    b = GetVal(b)
     if abs(a) > MAX_POWER or abs(b) > MAX_POWER:
         raise NumberTooHigh("Sorry! I don't want to evaluate {0} ** {1}"
                             .format(a, b))
-    return GetVal(a) ** GetVal(b)
+    return a ** b
 
 
 def safe_add(a, b):  # pylint: disable=invalid-name
@@ -931,10 +943,72 @@ def vmin(rng):
 
 def mybool(num):
     v = GetVal(num)
-    l = v.lower()
-    if(l == "true" or l == "t"):
+    if(isinstance(v,str)):
+        l = v.lower()
+        if(l == "true" or l == "t"):
+            return True
+    if(v):
         return True
     return False
+
+def myint(num):
+    v = GetVal(num)
+    try:
+        return int(v)
+    except:
+        return 0
+
+def myfloat(num):
+    v = GetVal(num)
+    try:
+        return float(v)
+    except:
+        return 0.0
+
+def ClearAllOldCellHighlights():
+    colors = ["green","red","orang","whit","black","purpl","yellow","cyan","blu"]
+    for color in colors:
+        hname = "myhighlight_" + color
+        if color == "whit":
+            style = "region.foreground"
+        style = "region." + color + "ish"
+        sublime.active_window().active_view().add_regions(hname,[],style,"",sublime.DRAW_NO_OUTLINE)
+def ClearRegionFromOldHighlights(table,reg,newcolor):
+    colors = ["green","red","orang","whit","black","purpl","yellow","cyan","blu"]
+    for color in colors:
+        if(color == newcolor):
+            continue
+        hname = "myhighlight_" + color
+        regs = sublime.active_window().active_view().get_regions(hname)
+        if(reg in regs):
+            regs.remove(reg)
+            style = "region." + color + "ish"
+            if color == "whit":
+                style = "region.foreground"
+            sublime.active_window().active_view().add_regions(hname,regs,style,"",sublime.DRAW_NO_OUTLINE)
+
+def postedithighlight(table,r,c,color,value):
+    color = color.strip()
+    if color.endswith("e"):
+        color = color[:-1]
+    style = "region." + color + "ish"
+    if color == "whit":
+        style = "region.foreground"
+    reg = table.FindCellRegion(r,c)
+    hname = "myhighlight_" + color
+    regs = sublime.active_window().active_view().get_regions(hname)
+    if(not reg in regs):
+        regs.append(reg)
+        ClearRegionFromOldHighlights(table,reg,color)
+    sublime.active_window().active_view().add_regions(hname,regs,style,"",sublime.DRAW_NO_OUTLINE)
+def myhighlight(cell,color,value=""):
+    """highlight(cell,color,text) highlights a cell to one of: green,red,orange,white,black,purple,yellow,cyan and returns the text specified"""
+    #sublime.active_window().active_view().add_regions("myhighlight",[],"","",sublime.DRAW_SOLID_UNDERLINE)
+    a = cell.GetRow()
+    b = cell.GetCol()
+    cell.table.SetPostExecuteHook(lambda table,x=cell.GetRow(),y=cell.GetCol(),c=color,v=value: postedithighlight(table,x,y,c,v))
+    return value
+
 
 def myfloor(num):
     v = GetNum(num)
@@ -962,33 +1036,56 @@ def mytrunc(num):
         return int(v)
     return num 
 
+def GetTime(dt):
+    if(isinstance(dt,Cell)):
+        dt = mydate(dt)
+    if(isinstance(dt,list) and len(dt) > 0):
+        dt = dt[0]
+    if(isinstance(dt,orgdate.OrgDate)):
+        dt = dt.start
+    return dt
+
 def mynow():
     """Returns the current date time"""
-    return datetime.datetime.now()
+    return orgdate.OrgDate(datetime.datetime.now())
 
 def myyear(dt):
+    """Get the year value from a datetime  - datetime.time().year"""
+    dt = GetTime(dt)
     return dt.year
 
 def myday(dt):
+    """Get the day value from a datetime  - datetime.time().day"""
+    dt = GetTime(dt)
     return dt.day
 
 def mymonth(dt):
+    """Get the month value from a datetime - datetime.time().month"""
+    dt = GetTime(dt)
     return dt.month
 
 def myhour(dt):
+    """Get the hours value from a datetime - datetime.time().hour"""
+    dt = GetTime(dt)
     return dt.hour
 
 def myminute(dt):
+    """Get the minutes value from a datetime - datetime.time().minute"""
+    dt = GetTime(dt)
     return dt.minute
 
 def mysecond(dt):
-    """Get the seconds value from a datetime datetime.time().second"""
+    """Get the seconds value from a datetime - datetime.time().second"""
+    dt = GetTime(dt)
+    print("RETURNING: " + str(dt.second))
     return dt.second
 
 def myweekday(dt):
+    dt = GetTime(dt)
     return dt.date().weekday()
 
 def myyearday(dt):
+    dt = GetTime(dt)
     return dt.timetuple().tm_yday
 
 def mytime(dt):
@@ -1026,7 +1123,7 @@ def mydate(dt):
     if(isinstance(dt,Cell)):
         rc = orgdate.OrgDate.list_from_str(dt.GetText())
         if(len(rc) == 0):
-            log.debug("ERROR: date function failed to parse date?")
+            log.debug("ERROR: date function failed to parse date? " + str(dt.GetText()))
             traceback.print_stack()
         if(len(rc) == 1):
             return rc[0]
@@ -1142,6 +1239,13 @@ class BelowFilter:
     def filter(self,x):
         return x <= self.r
 
+def checkPassed(txt):
+    txt = GetVal(txt)
+    if(isinstance(txt,str)):
+        txt = txt.strip()
+        return txt != "<ERR>" and txt != "<UNK REF>"
+    return txt
+
 # ============================================================
 class TableDef(simpev.SimpleEval):
     def range_expr(self,a,b):
@@ -1156,6 +1260,17 @@ class TableDef(simpev.SimpleEval):
                 raise RangeExprOnNonCells("End cells must be wild of same type", "range expression is invalid")
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
+
+    def mypassed(table,test,cell=None):
+        if(not cell):
+            cell = Cell(table.CurRow(),table.CurCol(),table)
+        if(checkPassed(test)):
+            return myhighlight(cell,"green","PASSED")
+        else:
+            return myhighlight(cell,"red","FAILED")
+
+    def SetPostExecuteHook(self,fun):
+        self.postExecute.append(fun)
 
     def ForEachRow(self):
         return range(1,self.Height() + 1)
@@ -1212,6 +1327,7 @@ class TableDef(simpev.SimpleEval):
         f['getcell']    = self.getcell
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
+        f['passed']     = self.mypassed
 
 
     def __init__(self,view, start,end,linedef):
@@ -1323,7 +1439,10 @@ class TableDef(simpev.SimpleEval):
 
     def CursorToFormula(self):
         fm = self.formulaLine
-        row,col = self.view.curRowCol()
+        rc = self.view.curRowCol()
+        if(not rc): 
+            return None
+        row,col = rc
         if(row != self.formulaRow):
             return None
         segs = fm.split('::')
@@ -1386,6 +1505,7 @@ class TableDef(simpev.SimpleEval):
         return None
 
     def HighlightFormula(self, i):
+        self.PreExecute()
         it = SingleFormulaIterator(self,i)
         for n in it:
             r,c,val,reg = n
@@ -1397,6 +1517,7 @@ class TableDef(simpev.SimpleEval):
             self.HighlightCells(self.accessList,1)
             self.HighlightCells([[r,c]],2)
         self.HighlightFormulaRegion(i)
+        self.PostExecute()
 
     def GetFormula(self,i):
         return self.formulas[i]
@@ -1477,6 +1598,13 @@ class TableDef(simpev.SimpleEval):
                 if(not txt == "" and txt[0].isalpha()):
                     f = BelowFilter(r)
                     self.nameToCell[txt] = Cell('*', c, self, rowFilter = f)
+
+    def PreExecute(self):
+        self.postExecute = []
+
+    def PostExecute(self):
+        for fun in self.postExecute:
+            fun(self)
 
     def Execute(self, i):
         self.accessList = []
@@ -1991,24 +2119,61 @@ class OrgExecuteTableCommand(sublime_plugin.TextCommand):
     def on_done(self):
         global highlightEnabled
         highlightEnabled = True
+        self.td.PostExecute()
+        if(None != self.origCur):
+            self.view.sel().clear()
+            self.view.sel().add(self.origCur)
         evt.EmitIf(self.onDone)
 
     def on_formula_copy_done(self):
+        if(None != self.at):
+            print("SETTING AT: " + str(self.at))
+            self.view.sel().clear()
+            self.view.sel().add(self.at)
         # Working on formula handling
         self.td = create_table(self.view)
         self.td.ClearAllRegions()
+        self.td.PreExecute()
         self.it = FormulaIterator(self.td)
         self.process_next()
 
-    def run(self, edit,onDone=None,skipFormula=None):
+    def run(self, edit,onDone=None,skipFormula=None,at=None,clearHighlights=True):
         global highlightEnabled
         highlightEnabled = False
+        self.at = at
+        if(self.view.sel()):
+            self.origCur = self.view.sel()[0]
+        if(clearHighlights):
+            ClearAllOldCellHighlights()
         self.onDone = onDone
         if(skipFormula):
             self.on_formula_copy_done()
         else:
-            self.view.run_command('org_fill_in_formula_from_cell',{"onDone": evt.Make(self.on_formula_copy_done)})
+            self.view.run_command('org_fill_in_formula_from_cell',{"onDone": evt.Make(self.on_formula_copy_done), "at": at,"clearHighlights":clearHighlights})
         #td.HighlightFormula(i)
+
+
+# ================================================================================
+class OrgExecuteAllTablesCommand(sublime_plugin.TextCommand):
+
+    def continueRun(self):
+        for r in range(self.cur,self.last_row):
+            self.cur = r
+            pt = self.view.text_point(r,1)
+            if(not self.inTable and isTable(self.view,pt)):
+                self.view.run_command('org_execute_table',{"at":pt,"onDone":evt.Make(self.continueRun),"clearHighlights":False})
+                self.inTable = True
+                break
+            elif(self.inTable and not isTable(self.view,pt)):
+                self.inTable = False
+
+    def run(self,edit,at=None):
+        global tableCache
+        self.last_row = self.view.endRow()
+        self.cur = 0
+        self.inTable = False
+        self.continueRun()
+
 
 # ================================================================================
 class OrgClearTableRegionsCommand(sublime_plugin.TextCommand):
@@ -2103,12 +2268,31 @@ class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):
                 else:
                     td.AddNewFormula(formula)
         if(self.onDone):
+            if(None != self.origCur):
+                self.view.sel().clear()
+                self.view.sel().add(self.origCur)
             evt.EmitIf(self.onDone)
         else:
-            self.view.run_command('org_execute_table',{'skipFormula': True})
+            self.view.run_command('org_execute_table',{'skipFormula': True,'at': self.at})
 
-    def run(self,edit,onDone=None):
+    def run(self,edit,onDone=None,at=None,clearHighlights=True):
         self.onDone = onDone
+        self.origCur = None
+        self.at = at
+        if(self.view.sel()):
+            self.origCur = self.view.sel()[0]
+        if(None != at):
+            self.view.sel().clear()
+            self.view.sel().add(at)
+        if(clearHighlights):
+            ClearAllOldCellHighlights()
+        if(isTable(self.view)):
+            while(not isTable(self.view) or isTableFormula(self.view)):
+                # Cannot align on the table formula line
+                row = self.view.curRow()
+                pt = self.view.text_point(row-1,0)
+                self.view.sel().clear()
+                self.view.sel().add(pt)
         self.view.run_command('table_editor_align')
         sublime.set_timeout(self.on_reformat,1)
 
