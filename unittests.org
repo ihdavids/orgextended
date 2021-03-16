@@ -3,19 +3,19 @@
 ** Straight column copy test
 |  a   |  b   |   c    |
 |------+------+--------|
-| 0.40 |  0.4 | PASSED |
-| 0.39 | 0.39 | PASSED |
-| 0.30 |  0.3 | PASSED |
-| 0.44 | 0.44 | PASSED |
+| 0.58 | 0.58 | PASSED |
+| 0.61 | 0.61 | PASSED |
+| 0.76 | 0.76 | PASSED |
+| 0.79 | 0.79 | PASSED |
 #+TBLFM:$1=rand();%.2f::$2=$1::$3=passed($1==$2,$3)
 
 ** Relative column copy test
 |  a   |  b   |   c    |
 |------+------+--------|
-| 0.43 | 0.43 | PASSED |
-| 0.21 | 0.21 | PASSED |
-| 0.06 | 0.06 | PASSED |
-| 0.45 | 0.45 | PASSED |
+| 0.08 | 0.08 | PASSED |
+| 0.39 | 0.39 | PASSED |
+| 0.92 | 0.92 | PASSED |
+| 0.78 | 0.78 | PASSED |
 #+TBLFM:$1=rand();%.2f::$2=$-1::$3=passed($-2 == $-1)
 
 ** Simple Boolean Comparisons
@@ -90,32 +90,40 @@
 | 2*pi     |          | sin(2*pi) | -0.0   | PASSED |
 | 0        |          | cos(0)    | 1.0    | PASSED |
 | pi       |          | tan(pi)   | -0.0   | PASSED |
-#+TBLFM:@2$4=abs($1)::@2$5=passed($-1==1)::@3$4=ceil($1)::@3$5=passed($-1==2)::@4$4=floor($1)::@4$5=passed($-1==1)::@5$4=int($1)::@5$5=passed($-1==1)::@6$4=bool($1)::@6$5=passed($-1==False)::@7$4=float($1)::@7$5=passed($-1==1.0)::@8$4=round($1)::@8$5=passed($-1==2.0)::@9$4=trunc($1)::@9$5=passed($-1==1)::@10$4=round(sin(2*pi))::@10$5=passed($-1==0)::@11$4=cos(0)::@11$5=passed($-1==1.0)::@12$4=round(tan(pi))::@12$5=passed($-1==0)
+|          |          | exp(2)    | 7.39   | PASSED |
+#+TBLFM:@2$4=abs($1)::@2$5=passed($-1==1)::@3$4=ceil($1)::@3$5=passed($-1==2)::@4$4=floor($1)::@4$5=passed($-1==1)::@5$4=int($1)::@5$5=passed($-1==1)::@6$4=bool($1)::@6$5=passed($-1==False)::@7$4=float($1)::@7$5=passed($-1==1.0)::@8$4=round($1)::@8$5=passed($-1==2.0)::@9$4=trunc($1)::@9$5=passed($-1==1)::@10$4=round(sin(2*pi))::@10$5=passed($-1==0)::@11$4=cos(0)::@11$5=passed($-1==1.0)::@12$4=round(tan(pi))::@12$5=passed($-1==0)::@13$4=exp(2);%.2f::@13$5=passed($-1==7.39)
 
 
 ** DateTime Functions
-| s1                     | s2 | desc    | result                 | ok     |
-| <2021-03-15 Mon 17:57> |    | now     | <2021-03-15 Mon 18:12> | PASSED |
-|                        |    | minute  | 57                     | PASSED |
-|                        |    | hour    | 17                     | PASSED |
-|                        |    | day     | 15                     | PASSED |
-|                        |    | year    | 2021                   | PASSED |
-|                        |    | month   | 3                      | PASSED |
-|                        |    | time    | <ERR>                  |        |
-|                        |    | date    | <2021-03-15 Mon 17:57> | PASSED |
-| <2021-03-16 Tue 17:57> |    | weekday | 1                      | PASSED |
-|                        |    | yearday | 75                     | FAILED |
-#+TBLFM:@2$4=now()::@2$5=passed(minute(date($-1))==minute(now()))::@3$4=minute(date(@2$1))::@3$5=passed($-1==57)::@4$4=hour(@2$1)::@4$5=passed($-1==17)::@5$4=day(@2$1)::@5$5=passed($-1==15)::@6$4=year(@2$1)::@6$5=passed($-1==2021)::@7$4=month(@2$1)::@7$5=passed($-1==3)::@8$4=time(@2$1)::@9$4=date(@2$1)::@9$5=passed($-1==@2$1)::@10$4=weekday(date(@10$1))::@11$4=yearday(@10$1)::@11$5=passed($-1==75)::@10$5=passed($-1==1)
+#+NAME: date-time-test
+|           s1           | s2 |   desc   |         result         |   ok   |
+|------------------------+----+----------+------------------------+--------|
+| <2021-03-15 Mon 17:57> |    | now      | <2021-03-15 Mon 18:19> | PASSED |
+|                        |    | minute   | 57                     | PASSED |
+|                        |    | hour     | 17                     | PASSED |
+|                        |    | day      | 15                     | PASSED |
+|                        |    | year     | 2021                   | PASSED |
+|                        |    | month    | 3                      | PASSED |
+|                        |    | time     | 17:57:00               | PASSED |
+|                        |    | date     | <2021-03-15 Mon 17:57> | PASSED |
+| <2021-03-16 Tue 17:57> |    | weekday  | 1                      | PASSED |
+|                        |    | yearday  | 75                     | PASSED |
+| 3d                     |    | duration | 3d                     | PASSED |
+#+TBLFM:@2$4=now()::@2$5=passed(minute(date($-1))==minute(now()))::@3$4=minute(date(@2$1))::@3$5=passed($-1==57)::@4$4=hour(@2$1)::@4$5=passed($-1==17)::@5$4=day(@2$1)::@5$5=passed($-1==15)::@6$4=year(@2$1)::@6$5=passed($-1==2021)::@7$4=month(@2$1)::@7$5=passed($-1==3)::@8$4=time(@2$1)::@9$4=date(@2$1)::@9$5=passed($-1==@2$1)::@10$4=weekday(date(@10$1))::@11$4=yearday(@10$1)::@11$5=passed($-1==75)::@10$5=passed($-1==1)::@8$5=passed($-1=="17:57:00")::@12$4=duration(@12$1)::@12$5=passed($-1=="3d")
         f['vmean'] = vmean
         f['vmedian'] = vmedian
         f['vmax'] = vmax
         f['vmin'] = vmin
         f['vsum'] = vsum
         f['exp'] = exp
-        f['remote'] = remote
-        f['weekday'] = myweekday
-        f['yearday'] = myyearday
-        f['duration'] = myduration
+
+** Remote References
+Extract a result from somewhere else and use it in this table.
+| result                 | ok     |
+| <2021-03-15 Mon 17:57> | PASSED |
+#+TBLFM:@2$1=remote("date-time-test",@2$1)::@2$2=passed(minute($-1)==57)
+
+
 ** TODO Side Relative References
 ** TODO Range Source and Targets
 ** TODO Advanced Table Syntax

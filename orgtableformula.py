@@ -1090,6 +1090,7 @@ def myyearday(dt):
 
 def mytime(dt):
     """Return the current time from a datetime object time(datetime)"""
+    dt = GetTime(dt)
     return dt.time()
 
 # Not currently used, the python if is forced on us due to the use
