@@ -2,12 +2,20 @@
 	Core Idea: Testing pass on tables to ensure what is there is relatively usable.
 
 ** Spreadsheet Preview V14
-	- added bool(cell) int(cell) float(cell) methods to convert string cells to boolean, ints and floats explicitly if desired
+	- added:
+		- bool(cell)
+		- int(cell)
+		- float(cell) 
+		to convert string cells to boolean, ints and floats explicitly if desired
+
 	- added highlight(cell,color,text) which highlights a cell a specific color for you
-	- added passed(test) that will highlight a target cell green or red and write PASSED or FAILED into the cell for unit testing purposes.
+	- added passed(test) that will highlight a target cell
+	  green or red and write PASSED or FAILED into the cell. We are using this for unit testing at the moment.
+
 	- added unit tests org file for tables.
 	- Execute table now restores the cursor after the evaluation of the table improving usability.
-	- Fixed assert when cursor was on a formula during table formula execution due to call to table_editor_align requiring the cursor be in the table
+	- Fixed assert when cursor was on a formula during table formula execution due to call 
+	  to table_editor_align requiring the cursor be in the table
 	- Fixed a bug with <= not evaluating properly next to a cell name ($1<=$2 would fail)
 	- Added Org Execute All Tables - scans the whole file for tables and executes all of them.
 	- Improved all date functions handling of datestrings
@@ -18,4 +26,7 @@
 	[[https://github.com/ihdavids/orgextended_docs/blob/master/tables.org][Tables]]	
 
 	- New documentation on adding the emacs constants.el to your table experience in docs
-	[[https://github.com/ihdavids/orgextended_docs/blob/master/mathconstants.org][Math Constants]]
+	[[https://github.com/ihdavids/orgextended_docs/blob/master/mathconstants.org][Math Constants]] 
+
+** GNU Plot
+	- Calling "Org Plot Table" on the #+PLOT: header rather than the table would cause problems.

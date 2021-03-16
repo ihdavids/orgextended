@@ -355,13 +355,28 @@ class OrgShowTableRowsCommand(sublime_plugin.TextCommand):
 
 class OrgPlotTableCommand(sublime_plugin.TextCommand):
     def OnDone(self):
+        if(None != self.origCur):
+            self.view.sel().clear()
+            self.view.sel().add(self.origCur)
         evt.EmitIf(self.onDone)
 
     def run(self, edit, onDone=None):
+        self.onDone = onDone
+        if(self.view.sel()):
+            self.origCur = self.view.sel()[0]
+        row = self.view.curRow()
+        line = self.view.getLine(row)
+        if("#+PLOT:" in line):
+            pt = self.view.text_point(row,0)
+            while(not isTable(self.view,pt)):
+                row += 1
+                pt = self.view.text_point(row,0)
+            self.origCur = pt
+            self.view.sel().clear()
+            self.view.sel().add(self.origCur)
         self.td = create_table(self.view)
         orgplot.plot_table_command(self.td,self.view) 
         self.edit = edit
-        self.onDone = onDone
         self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
 
 # Grab the function table and dump a table of all the functions and their doc strings.
