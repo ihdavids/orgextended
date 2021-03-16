@@ -10,3 +10,5 @@
 	- Fixed assert when cursor was on a formula during table formula execution due to call to table_editor_align requiring the cursor be in the table
 	- Fixed a bug with <= not evaluating properly next to a cell name ($1<=$2 would fail)
 	- Added Org Execute All Tables - scans the whole file for tables and executes all of them.
+	- Improved all date functions handling of datestrings
+	- Fixed double digit row index parsing, @10$2 was failing to parse properly sometimes.

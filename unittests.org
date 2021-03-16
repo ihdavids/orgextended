@@ -110,16 +110,22 @@
 |                        |    | yearday  | 75                     | PASSED |
 | 3d                     |    | duration | 3d                     | PASSED |
 #+TBLFM:@2$4=now()::@2$5=passed(minute(date($-1))==minute(now()))::@3$4=minute(date(@2$1))::@3$5=passed($-1==57)::@4$4=hour(@2$1)::@4$5=passed($-1==17)::@5$4=day(@2$1)::@5$5=passed($-1==15)::@6$4=year(@2$1)::@6$5=passed($-1==2021)::@7$4=month(@2$1)::@7$5=passed($-1==3)::@8$4=time(@2$1)::@9$4=date(@2$1)::@9$5=passed($-1==@2$1)::@10$4=weekday(date(@10$1))::@11$4=yearday(@10$1)::@11$5=passed($-1==75)::@10$5=passed($-1==1)::@8$5=passed($-1=="17:57:00")::@12$4=duration(@12$1)::@12$5=passed($-1=="3d")
-        f['vmean'] = vmean
-        f['vmedian'] = vmedian
-        f['vmax'] = vmax
-        f['vmin'] = vmin
-        f['vsum'] = vsum
-        f['exp'] = exp
+
+** Range Functions
+| a | b | c | d | e |   desc   | result |   ok   |
+|---+---+---+---+---+----------+--------+--------|
+| 1 | 2 | 3 | 4 | 5 | vsum row | 15     | PASSED |
+| 2 |   |   |   |   | vsum col | 15     | PASSED |
+| 3 |   |   |   |   | vmean    | 3.0    | PASSED |
+| 4 |   |   |   |   | vmax     | 5      | PASSED |
+| 5 |   |   |   |   | vmin     | 1      | PASSED |
+|   |   |   |   |   | vmedian  | <ERR>  | FAILED |
+#+TBLFM:@2$7=vsum($1..$5)::@2$8=passed($-1==15)::@3$7=vsum(@2$1..@6$1)::@3$8=passed($-1==15)::@4$7=vmean(@2$1..@2$5)::@4$8=passed($-1==3.0)::@5$7=vmax(@2$1..@2$5)::@5$8=passed($-1==5)::@6$7=vmin(@2$1..@2$5)::@6$8=passed($-1==1)::@7$7=vmedian(@2$1..@2$5)::@7$8=passed($-1==3)
 
 ** Remote References
 Extract a result from somewhere else and use it in this table.
-| result                 | ok     |
+|         result         |   ok   |
+|------------------------+--------|
 | <2021-03-15 Mon 17:57> | PASSED |
 #+TBLFM:@2$1=remote("date-time-test",@2$1)::@2$2=passed(minute($-1)==57)
 
