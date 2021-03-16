@@ -27,35 +27,24 @@ def Execute(cmd,sets):
 		print("ERROR: cannot find plantuml jar file. Please setup the plantuml key in your settings file")
 		return ["ERROR - missing plantuml.jar file"]
 	cmd.output = cmd.params.Get('file',"diagram.png")
-	outpath     = os.path.dirname(cmd.filename)
+	outpath    = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
-	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
 	commandLine = [r"java", "-jar", jarfile, cmd.filename]
-	print(str(commandLine))
-	#commandLine = [r"java", "-jar", jarfile, "-help"]
 	try:
 		startupinfo = subprocess.STARTUPINFO()
 		startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 	except:
 		startupinfo = None
-	# cwd=working_dir, env=my_env,
-	os.makedirs(os.path.dirname(destFile), exist_ok=True)
 	cwd = os.path.join(sublime.packages_path(),"User") 
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-	#popen.wait()
 	(o,e) = popen.communicate()
 	
 	convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
-	destFile    = os.path.join(sourcepath,cmd.output)
+	destFile    = os.path.normpath(os.path.join(sourcepath,cmd.output))
+	os.makedirs(os.path.dirname(destFile), exist_ok=True)
 	copyfile(convertFile, destFile)
-	#print(str(os.path.basename(cmd.sourcefile)))
-	#print(str(os.path.splitext(cmd.filename)))
-	#print(str(os.path.splitext(cmd.sourcefile)))
-	#destFile = os.path.relpath(destFile, sourcepath)
-	#o = "[[file:" + destFile + "]]" + o
 	return o.split('\n') + e.split('\n')
-
 
 # Run after results are in the buffer. We can do whatever
 # Is needed to the buffer post execute here.
