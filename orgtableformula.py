@@ -26,6 +26,7 @@ import operator as op
 import subprocess
 import platform
 import time
+import json
 
 random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
@@ -416,6 +417,39 @@ class OrgDocTableCommand(sublime_plugin.TextCommand):
             out += "  - " + k + " :: " +  str(v) + " \n"
         self.view.insert(edit,self.view.line(self.view.size()).begin(),out)
 
+def sortMessages(x):
+    r = x
+    xs = x.split('.')
+    if(len(xs) <= 1):
+        return 0
+    m = 1
+    c = 0
+    for i in range(len(xs)-1,-1,-1):
+        x = xs[i]
+        c = c+(int(x)*m)
+        m *= 100
+    return c
+
+class OrgBuildDevDocsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        mpath = os.path.join(sublime.packages_path(),"OrgExtended","messages.json")
+        wpath = os.path.join(sublime.packages_path(),"OrgExtended","worklog.org")
+        with open(wpath,"w") as out:
+            with open(mpath) as f: 
+                msgs = json.load(f)
+                ks = msgs.keys()
+                ks = list(ks)
+                ks = sorted(ks, key=sortMessages, reverse=True)
+                for n in ks:
+                    name = n + ".org"
+                    p = os.path.join(sublime.packages_path(),"OrgExtended","messages",name)
+                    if(not os.path.exists(p)):
+                        continue
+                    print(str(n)) 
+                    with open(p) as mf:
+                        for line in mf:
+                            out.write(line)
+        pass
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
     def OnFile(self, filename=None):
