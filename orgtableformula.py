@@ -141,6 +141,12 @@ def GetFunctions():
         f['atan'] = atan
         f['acos'] = acos
         f['asin'] = asin
+        f['tanh'] = tanh
+        f['cosh'] = cosh
+        f['sinh'] = sinh
+        f['atanh'] = atanh
+        f['acosh'] = acosh
+        f['asinh'] = asinh
         f['degrees'] = degrees
         f['radians'] = radians
         f['exp'] = exp
@@ -852,6 +858,7 @@ def GetNum(i):
 # ============================================================
 
 def myabs(a):
+    """Convert value to a positive value"""
     return abs(GetVal(a))
 
 def safe_mult(a, b):  # pylint: disable=invalid-name
@@ -975,6 +982,7 @@ def vmin(rng):
     return m
 
 def mybool(num):
+    """Explicitly convert value to a boolean value if possible"""
     v = GetVal(num)
     if(isinstance(v,str)):
         l = v.lower()
@@ -1219,6 +1227,30 @@ def asin(cell):
 def acos(cell):
     """Return the arc cosine of x radians."""
     return math.acos(GetNum(cell))
+
+def tanh(cell):
+    """Return the hyperbolic tangent of x."""
+    return math.tanh(GetNum(cell))
+
+def sinh(cell):
+    """Return the hyperbolic sine of x."""
+    return math.sinh(GetNum(cell))
+
+def cosh(cell):
+    """Return the hyperbolic cosine of x."""
+    return math.cosh(GetNum(cell))
+
+def atanh(cell):
+    """Return the inverse hyperbolic tangent of x."""
+    return math.atanh(GetNum(cell))
+
+def asinh(cell):
+    """Return the inverse hyperbolic sine of x."""
+    return math.asinh(GetNum(cell))
+
+def acosh(cell):
+    """Return the inverse hyperbolic cosine of x."""
+    return math.acosh(GetNum(cell))
 
 def exp(cell):
     """Return e raised to the power x, where e = 2.718281"""

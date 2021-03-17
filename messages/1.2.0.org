@@ -1,10 +1,19 @@
 * 1.2.0
 	Core Idea: I am considering the spreadsheet feature out of preview now.
                most of the core org features with spreadsheets are now supported.
+               While there are a ton of functions yet to support to have calc equivalence
+               I believe what we have is a pretty good line in the sand to say we have something
+               some usable.
 
 ** Spreadsheets Beta
   More core functions
 
+  - tanh
+  - cosh
+  - sinh
+  - atanh
+  - acosh
+  - asinh
   - atan
   - acos
   - asin
