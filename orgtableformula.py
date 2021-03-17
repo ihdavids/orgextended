@@ -401,7 +401,10 @@ class OrgDocTableCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         td = create_table(self.view)
         out = ""
-        for k,v in td.functions.items():
+        keys = list(td.functions.keys())
+        keys.sort()
+        for k in keys:
+            v = td.functions[k]
             if(k == "ridx" or k == "cidx" or k == "symorcell" or k == "getcell" or k == "getcolcell" or k == "getrowcell"):
                 continue
             if(not v.__doc__):
