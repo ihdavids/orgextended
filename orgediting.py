@@ -557,7 +557,13 @@ class OrgMoveHeadingDownCommand(sublime_plugin.TextCommand):
                 nodetext = self.view.substr(reg)
                 sp    = self.view.text_point(targetNode.start_row, 0)
                 treg   = sublime.Region(sp, sp)
+                endline = self.view.line(self.view.size())
 
+                if(curNode.is_last_node() and curNode.end_row >= self.view.endRow()):
+                    line = self.view.substr(self.view.line(self.view.text_point(self.view.endRow(),0)))
+                    isEmpty = line.strip() == ""
+                    if(not isEmpty):
+                        nodetext = nodetext + "\n"
                 self.view.erase(edit,reg)
                 self.view.insert(edit,sp,nodetext)
 

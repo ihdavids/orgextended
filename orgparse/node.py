@@ -414,6 +414,9 @@ class OrgBaseNode(Sequence):
             end = i
         return end
 
+    def is_last_node(self):
+        return (self.get_sibling_down() == None or self.get_sibling_down() == self)
+
     def get_comment(self, key, defaultVal):
         if( key in self._special_comments):
             return self._special_comments[key]
