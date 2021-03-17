@@ -769,7 +769,7 @@ class OrgInsertClosedCommand(sublime_plugin.TextCommand):
 # ================================================================================
 RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
-    def on_done(self, text):
+    def OnDone(self, text):
         if(not text):
             return
         node = db.Get().AtInView(self.view)
@@ -787,11 +787,22 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
                 log.debug("Tag already part of node")
                 evt.EmitIf(self.onDone)
 
-    def run(self, edit, onDone = None):
+    def run(self, edit, text=None, onDone=None):
         self.onDone = onDone
-        self.input = insSel.OrgInput()
-        self.input.run("Tag:",db.Get().tags,evt.Make(self.on_done))
+        self.text = text.strip() if text != None else text
+        if(self.text != None and self.text != ""):
+            self.OnDone(self.text)
+        else:
+            self.input = insSel.OrgInput()
+            self.input.run("Tag:",db.Get().tags,evt.Make(self.OnDone))
 
+# ================================================================================
+class OrgInsertArchiveTagCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.view.run_command("org_insert_tag",{"onDone": evt.Make(self.OnDone), "text": "ARCHIVE"})
 
 # ================================================================================
 class OrgInsertCustomIdCommand(sublime_plugin.TextCommand):

@@ -1591,6 +1591,12 @@ class OrgNode(OrgBaseNode):
     def _get_tags(self, inher=False):
         tags = set(self._tags)
         if inher:
+            globalTags = self.list_comment("FILETAGS",[])
+            for t in globalTags:
+                if(t):
+                    t = t.strip()
+                    if(t != ""):
+                        tags.add(t)
             parent = self.get_parent()
             if parent:
                 return tags | parent._get_tags(inher=True)

@@ -149,7 +149,7 @@ class NotificationSystem(threading.Thread):
 	def TodayCheck(self, n, file):
 		try:
 			now = datetime.now()
-			return (agenda.IsTodo(n) and agenda.IsToday(n, now))
+			return (agenda.IsTodo(n) and not agenda.IsDone(n) and not agenda.IsArchived(n) and agenda.IsToday(n, now))
 		except:
 			if(n):
 				log.error("NOTIFICATIONS FAILED TO PARSE: " + str(n.heading))

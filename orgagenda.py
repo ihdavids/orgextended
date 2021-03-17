@@ -134,6 +134,9 @@ def IsTodo(n):
 def IsDone(n):
     return n.todo and n.todo in n.env.done_keys
 
+def IsArchived(n):
+    return "ARCHIVE" in n.tags
+
 def HasChildTasks(n):
     for c in n.children:
         if(IsTodo(c)):
@@ -671,7 +674,7 @@ class CalendarView(AgendaBaseView):
                 self.AddRepeating(ts)
 
     def FilterEntry(self, n, filename):
-        return (not self.onlyTasks or (IsTodo(n) and not IsDone(n))) and not IsProject(n) and HasTimestamp(n)
+        return (not self.onlyTasks or (IsTodo(n) and not IsDone(n) and not IsArchived(n))) and not IsProject(n) and HasTimestamp(n)
 
 def bystartdate(a, b):
     if a.scheduled.start > b.scheduled.start:
@@ -762,11 +765,11 @@ class WeekView(AgendaBaseView):
                     break
             if(shouldContinue):
                 continue
-            if(n.scheduled and (EnsureDate(n.scheduled.start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.scheduled.start) == EnsureDate(date))):
+            if(n.scheduled and (EnsureDate(n.scheduled.start) < EnsureDate(date) and not IsDone(n) and not IsArchived(n) or EnsureDate(n.scheduled.start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.scheduled
                 continue
-            if(n.deadline and (EnsureDate(n.deadline.deadline_start) < EnsureDate(date) and not IsDone(n) or EnsureDate(n.deadline.deadline_start) == EnsureDate(date))):
+            if(n.deadline and (EnsureDate(n.deadline.deadline_start) < EnsureDate(date) and not IsDone(n) and not IsArchived(n) or EnsureDate(n.deadline.deadline_start) == EnsureDate(date))):
                 daydata.append(entry)
                 entry['ts'] = n.deadline
                 continue
@@ -801,7 +804,7 @@ class WeekView(AgendaBaseView):
                     s = self.view.text_point(row,lastMatchStart)
                     e = self.view.text_point(row,self.startOffset + (hour-dayStart)*self.cellSize + minSlot)
                     reg = sublime.Region(s, e)
-                    if(IsDone(lastMatch)):
+                    if(IsDone(lastMatch) or IsArchived(lastMatch)):
                         style = "orgagenda.week.done." + str(doneMatchCount)
                         doneMatchCount = (doneMatchCount + 1) % 2
                         self.MarkEntryAtRegion(lastMatchEntry,reg)
@@ -1075,7 +1078,7 @@ class AgendaView(AgendaBaseView):
                 view.insert(edit, view.size(), "{0:12} {1} {2:69} {3} {4}\n".format(filename, n.todo if n.todo else "", n.heading, self.BuildDeadlineDisplay(n), self.BuildHabitDisplay(n)))
 
     def FilterEntry(self, node, file):
-        rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and IsToday(node, self.now)
+        rc = (not self.onlyTasks or IsTodo(node)) and not IsDone(node) and not IsArchived(node) and IsToday(node, self.now)
         return rc
 
 RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')

@@ -138,7 +138,17 @@ def GetFunctions():
         f['tan'] = tan
         f['cos'] = cos
         f['sin'] = sin
+        f['atan'] = atan
+        f['acos'] = acos
+        f['asin'] = asin
+        f['degrees'] = degrees
+        f['radians'] = radians
         f['exp'] = exp
+        f['sqrt'] = sqrt
+        f['pow'] = pow
+        f['log'] = log
+        f['log10'] = log10
+        f['log2'] = log2
         f['floor'] = myfloor
         f['ceil'] = myceil
         f['round'] = myround
@@ -975,6 +985,7 @@ def mybool(num):
     return False
 
 def myint(num):
+    """Force a value to an integer"""
     v = GetVal(num)
     try:
         return int(v)
@@ -982,6 +993,7 @@ def myint(num):
         return 0
 
 def myfloat(num):
+    """Force a value to a float"""
     v = GetVal(num)
     try:
         return float(v)
@@ -1034,12 +1046,14 @@ def myhighlight(cell,color,value=""):
 
 
 def myfloor(num):
+    """Force a value to the previous integer"""
     v = GetNum(num)
     if(isinstance(v,float)):
         return math.floor(v)
     return num 
 
 def myceil(num):
+    """Force a value to the next integer"""
     v = GetNum(num)
     if(isinstance(v,float)):
         return math.ceil(v)
@@ -1103,10 +1117,12 @@ def mysecond(dt):
     return dt.second
 
 def myweekday(dt):
+    """Get an index for the day of the week where monday is 0"""
     dt = GetTime(dt)
     return dt.date().weekday()
 
 def myyearday(dt):
+    """Get the numerical day of the year where jan 1 is 1"""
     dt = GetTime(dt)
     return dt.timetuple().tm_yday
 
@@ -1136,6 +1152,7 @@ def myif(test,a,b=None):
         return b
 
 def myduration(dt):
+    """Convert to a timespan value"""
     if(isinstance(dt,Cell)):
         return orgduration.OrgDuration.Parse(dt.GetText())
     if(isinstance(dt,str)):
@@ -1143,6 +1160,7 @@ def myduration(dt):
     return dt
 
 def mydate(dt):
+    """Convert string to a date value"""
     if(isinstance(dt,Cell)):
         rc = orgdate.OrgDate.list_from_str(dt.GetText())
         if(len(rc) == 0):
@@ -1170,17 +1188,61 @@ def randomFloat():
     """Returns a random value from 0..1"""
     return random.randint(0,1000000)/1000000.0
 
+def degrees(cell):
+    """Convert from radians to degress"""
+    return math.degrees(GetNum(cell))
+
+def radians(cell):
+    """Convert from degrees to radians"""
+    return math.radians(GetNum(cell))
+
 def tan(cell):
+    """Return the tangent of x radians."""
     return math.tan(GetNum(cell))
 
 def sin(cell):
+    """Return the sine of x radians."""
     return math.sin(GetNum(cell))
 
 def cos(cell):
+    """Return the cosine of x radians."""
     return math.cos(GetNum(cell))
 
+def atan(cell):
+    """Return the arc tangent of x radians."""
+    return math.atan(GetNum(cell))
+
+def asin(cell):
+    """Return the arc sine of x radians."""
+    return math.asin(GetNum(cell))
+
+def acos(cell):
+    """Return the arc cosine of x radians."""
+    return math.acos(GetNum(cell))
+
 def exp(cell):
+    """Return e raised to the power x, where e = 2.718281"""
     return math.exp(GetNum(cell))
+
+def pow(x,y):
+    """Return x raised to the power y"""
+    return math.pow(GetNum(x),GetNum(y))
+
+def log(x):
+    """Return the natural logarithm of x (to base e)."""
+    return math.log(x)
+
+def log10(x):
+    """Return the base-10 logarithm of x."""
+    return math.log10(x)
+
+def log2(x):
+    """Return the base-2 logarithm of x."""
+    return math.log2(x)
+
+def sqrt(x):
+    """Return the square root of x."""
+    return math.sqrt(x)
 
 def LookupNamedTableInFile(name):
     td = None
