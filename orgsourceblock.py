@@ -294,7 +294,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 						pass
 				else:
 					self.filename = None
-					self.outputs = self.curmod.Execute(self)
+					self.outputs = self.curmod.Execute(self,sets)
 				ProcessPotentialFileOrgOutput(self)
 				log.debug("OUTPUT: " + str(self.outputs))
 			else:

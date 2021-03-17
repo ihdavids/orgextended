@@ -1,1 +1,18 @@
 * 1.2.1
+
+	Core Idea: More language handlers supporting table data sources. 
+
+	Python now supports tables as data sources. Still not interpretation of the output data yet.
+	
+	#+NAME: p-data
+	| a | b | c | d | e |
+	|---+---+---+---+---|
+	| 1 | 2 | 3 | 4 | 5 |
+	| 6 | 7 | 8 | 9 | 0 |
+
+	#+BEGIN_SRC python :var DATA=p-data
+	  print(str(DATA))
+	#+END_SRC
+
+    #+RESULTS:
+    [['a', 'b', 'c', 'd', 'e'], [1, 2, 3, 4, 5], [6, 7, 8, 9, 0]]
