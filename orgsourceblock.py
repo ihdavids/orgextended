@@ -84,7 +84,8 @@ def BuildFullParamList(cmd,language,cmdArgs):
 			if(pname in node.properties):
 				plist.AddFromPList(node.properties[pname])
 			if('var' in node.properties):
-				plist.Add(node.properties['var'])
+				vs = node.properties['var'].strip()
+				plist.Add('var',vs)
 	plist.AddFromPList(cmdArgs)
 	cmd.params = plist
 

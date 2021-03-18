@@ -11,8 +11,19 @@
 
    #+RESULTS:
    hello world
-   
-   
+  
+** Property
+  :PROPERTIES:
+  :header-args:python:    :var x=5
+  :var: x=10
+  :END: 
+  
+  #+BEGIN_SRC python 
+  	print(x)   
+  #+END_SRC 
+
+   #+RESULTS:
+   5
    
    
    
