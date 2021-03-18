@@ -75,7 +75,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
 			prop = node.get_comment('PROPERTY',None)
 			if(prop):
 				# Here we have to sort through them to find generic or language specific versions
-				print("PROPS: " + str(prop))
+				#print("PROPS: " + str(prop))
 				pass	
 			pname = 'header-args:' + language
 			if('header-args' in node.properties):
@@ -286,7 +286,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 					tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
 					try:
 						self.filename = tmp.name
-						print(tmp.name)
+						#print(tmp.name)
 						if(hasattr(self.curmod,"WrapStart")):
 							tmp.write((self.curmod.WrapStart(self) + "\n").encode("ascii"))
 						tmp.write(self.source.encode('ascii'))

@@ -3,7 +3,7 @@
 	Just like 1.2.0 was focused on supporting tables 1.3.0 has a focus on better
 	babel support.
 
-	Core Idea for 1.2.1: More language handlers supporting table data sources. 
+	Core Idea for 1.2.1: Input - More language handlers supporting table and list data sources.
 
 	This is a fairly simple first step into the world of babel. The GNU Plot handler
 	paved the way for this we are just adding the same support to the other handlers.
@@ -12,8 +12,23 @@
 	As this matures we will document how to add your own language handlers as well
 	as extend the list of supported languages.
 
+	There is still more to do with input. This gets us 30% of the way to handling input sources.
+	We still have to improve our plist handle spaces a little better and then handle the various
+	ways that variables can be set for handlers vs the local mechanism. We also need to handle
+	source blocks being the source of data for other source blocks. We are going to hold off on that
+	until we have a slightly better handle on the various execution types for source blocks.
+
+** PlantUML
+	- Thanks to Antidistinctlyminty for improving file handling in the plantuml source block handler.
+	  The module not respects the :file tag properly. This was actually fixed in the 1.2.0 release but
+	  went unmentioned.
+
 ** Lists
 	- fixed a bug with unordered list sorting including source blocks.	
+
+** Source Block Output Formatting
+	- In preparation for working on output formatting in a future release (for babel)
+	  we have tweaked the output formatting to respect indents a little better when executing source blocks.
 
 ** Python	
 	Python now supports tables as data sources. True babel execution
@@ -31,7 +46,18 @@
 	#+END_SRC
 
     #+RESULTS:
-  [['a', 'b', 'c', 'd', 'e'], [1, 2, 3, 4, 5], [6, 7, 8, 9, 0]]
+    [['a', 'b', 'c', 'd', 'e'], [1, 2, 3, 4, 5], [6, 7, 8, 9, 0]]
+
+
+    Basic variables are also somewhat operational.
+
+	#+BEGIN_SRC python :var DATA=5
+	  print(str(DATA))
+	#+END_SRC
+
+   #+RESULTS:
+   5
+   
  
 ** Powershell
     #+BEGIN_SRC powershell :var DATA=p-data
@@ -86,7 +112,7 @@
    ['b', 'a', 'c']
     
    #+BEGIN_SRC powershell :var DATA=n-data
-      ,$DATA 
+     ,$DATA
    #+END_SRC
 
    #+RESULTS:

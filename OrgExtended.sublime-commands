@@ -139,7 +139,7 @@
     {"caption": "Org Select Color Scheme",     "command": "org_select_existing_color_scheme"  },
     {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  },
     
-    {"caption": "Org Output Dev Docs",         "command": "org_build_dev_docs"                },
+    {"caption": "Org Show Worklog",            "command": "org_build_dev_docs"                },
     //{"caption": "Org Output Table Docs",       "command": "org_doc_table"                     },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"         },
     //{"caption": "Org Test Thing",              "command": "org_show_item"                     },

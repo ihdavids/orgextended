@@ -432,23 +432,24 @@ def sortMessages(x):
 
 class OrgBuildDevDocsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        mpath = os.path.join(sublime.packages_path(),"OrgExtended","messages.json")
-        wpath = os.path.join(sublime.packages_path(),"OrgExtended","worklog.org")
-        with open(wpath,"w") as out:
-            with open(mpath) as f: 
-                msgs = json.load(f)
-                ks = msgs.keys()
-                ks = list(ks)
-                ks = sorted(ks, key=sortMessages, reverse=True)
-                for n in ks:
-                    name = n + ".org"
-                    p = os.path.join(sublime.packages_path(),"OrgExtended","messages",name)
-                    if(not os.path.exists(p)):
-                        continue
-                    print(str(n)) 
-                    with open(p) as mf:
-                        for line in mf:
-                            out.write(line)
+        view = sublime.active_window().new_file()
+        view.set_syntax_file("Packages/OrgExtended/OrgExtended.sublime-syntax")
+        messData = sublime.load_resource("Packages/OrgExtended/messages.json")
+        msgs = json.loads(messData)
+        ks = msgs.keys()
+        ks = list(ks)
+        ks = sorted(ks, key=sortMessages, reverse=True)
+        for n in ks:
+            name = n + ".org"
+            pdata = None
+            try:
+                pdata = sublime.load_resource("Packages/OrgExtended/messages/" + name)
+            except:
+                pass
+            if(not pdata):
+                continue
+            pdata = pdata.replace("\r","")
+            view.insert(edit,view.size(),"\n" + pdata + "\n")
         pass
 
 class OrgImportTableFromCsvCommand(sublime_plugin.TextCommand):
