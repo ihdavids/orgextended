@@ -397,9 +397,9 @@ class OrgSortListCommand(sublime_plugin.TextCommand):
         wasNumbered = False
         if(numberedlist.isNumberedLine(self.view)):
             wasNumbered = True
-            things = numberedlist.getListAtPoint(self.view)
+            things = numberedlist.getListAtPointForSorting(self.view)
         elif(checkbox.isUnorderedList(self.view.getLine(self.view.curRow()))):
-            things = checkbox.getListAtPoint(self.view)
+            things = checkbox.getListAtPointForSorting(self.view)
         if(not things):
             log.error(" Could not sort at point")
             return

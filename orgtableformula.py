@@ -1335,7 +1335,9 @@ def LookupNamedTableInFile(name):
                     else:
                         row = r
                         break
-                td = create_table(view,view.text_point(row,0))
+                pt = view.text_point(row,0)
+                if(isTable(view, pt)):
+                    td = create_table(view,pt)
     return td
 
 def LookupTableFromId(name):

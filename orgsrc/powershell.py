@@ -6,8 +6,52 @@ import re
 import logging
 import subprocess, os
 import threading, time, signal
+import OrgExtended.orgtableformula as fml
+import OrgExtended.orgparse.date as odate
+import OrgExtended.orgutil.util as util
+import OrgExtended.orglist as lst
 
 # Python Babel Mode
+
+def FormatText(txt):
+    if(isinstance(txt,str)):
+        txt = txt.strip()
+        return "'" + txt + "'"
+    return txt
+
+def PreProcessSourceFile(cmd):
+    var = cmd.params.Get('var',None)
+    if(var):
+        out = ""
+        for k in var:
+            v = var[k]
+            if(isinstance(v,fml.TableDef)):
+                out += "$" + str(k) + " = @("
+                fr = True
+                for r in v.ForEachRow():
+                    first = True
+                    out += '(' if fr else ",("
+                    fr = False
+                    for c in v.ForEachCol():
+                        txt = fml.Cell(r,c,v).GetVal()
+                        out += (',' if not first else "") + str(FormatText(txt))
+                        first = False
+                    out += ')'
+                out += ")\n"
+            elif(isinstance(v,lst.ListData)):
+                out += "$" + str(k) + " = @("
+                first = True
+                for txt in v:
+                    out += (',' if not first else "") + str(FormatText(txt))
+                    first = False
+                out += ")\n"
+            elif(isinstance(v,int) or isinstance(v,float) or (isinstance(v,str) and util.numberCheck(v))):
+                out += "$" + str(k) + " = " + str(v) + "\n"
+            elif(isinstance(v,str)):
+                out += "$" + str(k) + " = \'" + str(v) + "\'\n"
+        cmd.source = out + cmd.source
+
+
 def Extension(cmd):
 	return ".ps1"
 

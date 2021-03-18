@@ -4,7 +4,9 @@ import sys
 import io
 import re
 import OrgExtended.orgtableformula as fml
+import OrgExtended.orglist as lst
 import OrgExtended.orgparse.date as odate
+import OrgExtended.orgutil.util as util
 
 # Python Babel Mode
 def FormatText(txt):
@@ -32,6 +34,17 @@ def PreProcessSourceFile(cmd):
                         first = False
                     out += ']'
                 out += "]\n"
+            elif(isinstance(v,lst.ListData)):
+                out += str(k) + " = [\n"
+                first = True
+                for txt in v:
+                    out += (',' if not first else "") + str(FormatText(txt))
+                    first = False
+                out += "]\n"
+            elif(isinstance(v,int) or isinstance(v,float) or (isinstance(v,str) and util.numberCheck(v))):
+                out += str(k) + " = " + str(v) + "\n"
+            elif(isinstance(v,str)):
+                out += str(k) + " = \'" + str(v) + "\'\n"
         cmd.source = out + cmd.source
 
 # Actually do the work, return an array of output.

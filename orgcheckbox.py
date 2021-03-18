@@ -86,7 +86,8 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False, rec
         line = view.line(point)
         content = view.substr(line)
         summary = get_summary(view, line)
-        if summary and content.lstrip().startswith("*"):
+        lc = content.lstrip()
+        if summary and lc.startswith("*") or lc.startswith('#'):
              break
         if cre.search(content):
             cur_indent = len(get_indent(view, content))
@@ -314,6 +315,7 @@ class OrgInsertCheckboxCommand(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(ln.end())
 
+
 uline_info_regex = re.compile(r'^(\s*)([-+]) .*$')
 def isUnorderedList(line):
     return uline_info_regex.match(line)
@@ -321,9 +323,10 @@ def isUnorderedList(line):
 
 RE_THING = re.compile(r'^\s*[+-](\s\[[ xX-]\])?\s(?P<data>.*)$')
 RE_NOTHEADERS = re.compile(r'^\s*[\#|0-9]')
-def getListAtPoint(view):
+
+
+def getListAtPointForSorting(view):
     parent = view.findParentByIndent(view.curLine(),RE_NOTHEADERS, RE_THING)
-    #print(str(parent))
     if(None != parent):
         prow, _ = view.rowcol(parent.begin())
         list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')
@@ -347,7 +350,39 @@ def getListAtPoint(view):
             things[len(things)-1][0][1] = srow+1
         return things
     return None
-
+ 
+def getListAtPoint(view,pt=None):
+    if(pt):
+        line = view.line(pt)
+    else:
+        line = view.curLine()
+    parent = view.findParentByIndent(line,RE_NOTHEADERS, RE_THING)
+    if(None != parent):
+        prow, _ = view.rowcol(parent.begin())
+        list_regex   = re.compile(r'\s*(([-+]\s\[)|[^#*|+-])')
+        children = find_children(view, parent, list_regex, True)
+        sortby = view.getLine(prow)
+        m = RE_THING.search(sortby)
+        if(m):
+            sortby = m.group('data')
+        things = []
+        lastAppend = False
+        for c in children:
+            srow, _ = view.rowcol(c.begin())
+            if(lastAppend and len(things) > 0):
+                things[len(things)-1][0][1] = srow 
+            lastAppend = False
+            sortby = view.getLine(srow)
+            m = RE_THING.search(sortby)
+            if(m):
+                sortby = m.group('data')
+                things.append([[srow,0],sortby])
+                lastAppend = True
+        if(len(things) > 0):
+            srow, _ = view.rowcol(children[len(children)-1].end())
+            things[len(things)-1][0][1] = srow+1
+        return things
+    return None
 
 class OrgInsertUnorderedListCommand(sublime_plugin.TextCommand):
     def run(self, edit,insertHere=True):

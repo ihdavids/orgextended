@@ -22,6 +22,7 @@ import OrgExtended.orgclocking as clocking
 import OrgExtended.orgextension as ext
 import OrgExtended.pymitter as evt
 import OrgExtended.orgtableformula as tbl
+import OrgExtended.orglist as lst
 import importlib
 import tempfile
 
@@ -114,6 +115,10 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
 					# What the data source actually is may actually be a disservice
 					#var[k] = GetGeneratorForTable(td,cmd.params)
 					var[k] = td
+				else:
+					l = lst.LookupNamedListInFile(n)
+					if(l):
+						var[k] = l
 		cmd.params.Replace('var',var)
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
@@ -304,7 +309,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			# No bad formatting allowed!
 			n = db.Get().AtInView(view)
 			level = n.level
-			indent = "\n " * level + " "
+			indent = "\n"+ (" " * level) + " "
 			#outputs = output.split('\n')
 			output = indent.join(self.outputs).rstrip()
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
