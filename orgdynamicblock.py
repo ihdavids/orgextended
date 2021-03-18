@@ -21,6 +21,7 @@ import OrgExtended.orglinks as links
 import OrgExtended.orgclocking as clocking
 import OrgExtended.orgextension as ext
 import OrgExtended.pymitter as evt
+from   OrgExtended.orgplist import *
 import importlib
 
 log = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ class OrgExecuteDynamicBlockCommand(sublime_plugin.TextCommand):
 				return
 			fnname = m.group('name')
 			#log.debug("DYN NAME: " + fnname)
-			params = util.PList.createPList(line[len(m.group(0)):])
+			params = PList.createPList(line[len(m.group(0)):])
 			# Now find me that function!
 			if(fnname not in dynamic):
 				log.error("Function not found in dynamic folder! Cannot execute!")

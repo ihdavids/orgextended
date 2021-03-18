@@ -36,6 +36,7 @@ import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
 import OrgExtended.pymitter as evt
+from   OrgExtended.orgplist import *
 
 try:
     import importlib
@@ -234,7 +235,7 @@ class ImageHandler:
         if(node):
             attr = node.get_comment("ORG_ATTR",None)
             if(attr):
-                params = util.PList.createPList(attr)
+                params = PList.createPList(attr)
                 try:
                     width = int(params.Get('width',-1))
                     height = int(params.Get('height',-1))

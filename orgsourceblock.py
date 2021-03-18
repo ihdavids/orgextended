@@ -23,6 +23,7 @@ import OrgExtended.orgextension as ext
 import OrgExtended.pymitter as evt
 import OrgExtended.orgtableformula as tbl
 import OrgExtended.orglist as lst
+from   OrgExtended.orgplist import *
 import importlib
 import tempfile
 
@@ -65,7 +66,7 @@ def ProcessPotentialFileOrgOutput(cmd):
 def BuildFullParamList(cmd,language,cmdArgs):
 	# First Add from global settings
 	# First Add from PROPERTIES
-	plist = util.PList.createPList("")
+	plist = PList.createPList("")
 	view = sublime.active_window().active_view()
 	if(view):
 		plist.AddFromPList(sets.Get('babel-args',None))

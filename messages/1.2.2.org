@@ -1,3 +1,19 @@
 * 1.2.2
 ** Worklog
 	- "Org Show Worklog" will generate our worklog to a new buffer
+
+** Babel PList Params
+	Quotes work for variables in plists
+	
+	#+BEGIN_SRC python :var x="hello world"
+	print(x)	  
+	#+END_SRC
+
+   #+RESULTS:
+   hello world
+   
+   
+   
+   
+   
+   
