@@ -6,12 +6,12 @@
 	Drawer formatter will wrap output in a drawer
 
    #+BEGIN_SRC python :results drawer verbatim :var x=5
-     print("Hello World This Is Tabular?")
+     print("Hello World")
      print(x)
    #+END_SRC
 
    #+RESULTS:
    :RESULTS:
-   : Hello World This Is Tabular?
+   : Hello World
    : 5
    :END:

@@ -1,33 +1,50 @@
-#+FILETAGS: :Peter:Boss:Secret:
+// The filetags comment lets you tag all headings in a file with a tag.
+#+FILETAGS: :Ian:Tagged:
+
+// The startup comment controls how the file is displayed on startup
+// Some common options are: 
+// overview content  showall showeverything - These control how startup folding is handled.
+// noinlineimages inlineimages              - These let you have the system show images inline in the document by default
+// logdone                                  - This tells the system to add a log message when you close a task.
 #+STARTUP: content logdone
 
-Custom TODO cycling is understood.
+// The TODO cycle of a task can be the default, set in your settings file or set
+// here in a comment on a per file basis.
 //#+TODO: A B C | D E
 
-// While this basic heading works
-// If you add your own extension you need
+
+// The ARCHIVE comment lets you control how headings are archived from this file.
+// You can do this globally from your settings file OR you can do it on a per file basis.
+//
+// While this basic heading works if you add your own extension you need
 // to add to validOrgExtensions in the sublime-settings
 // file. Otherwise the DB will not know about your file extension
-// and will reject the archive file.
+// and will reject the archive file when you go to archive your data.
 #+ARCHIVE: %s_archive::* Archive
+
+
+// Priorities are another type of tag you can add to a heading.
+// You can set your own priority list using a comment like so.
 // While these are supported they are not highlighted like A B C D E are
+// I hope some day we can support syntax extensions to make this possible.
 #+PRIORITIES: 1 2 3 4 5
+
+// This comment is for html export.
 #+HTML_STYLE: refined
 
-#+AUTHOR: AUTHORS NAME
-
-#+TITLE: This is the title
-#+LANGUAGE: LANGUaGE OF THING
-#+DATE: DATE OF WRITE
-
-#+EMAIL: EMAIL OF THING
-
-
+// These are some basic comments that can show up during export and
+// can be useful in some types of documents.
+#+AUTHOR:   Ian Davids
+#+TITLE:    Org Mode Test File
+#+LANGUAGE: en
+#+DATE:     March 20 2018
+#+EMAIL:    myemail@mydomain.com
 
 * Introduction
-  This is a simple test file that tries to demonstrate some
-  of the syntax highlighting and allows me to play with things.
+  This is a simple test file that has a bunch of the core Org Extended features in it.
+  Org is huge and adding all of the features in org to a single file would be a very very large document.
 
+  This is however a little playground of some of the more common aspects of Org.
  
 * Basic Headings and tags  :TAG1:TAG2:
 
