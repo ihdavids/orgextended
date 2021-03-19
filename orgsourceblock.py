@@ -51,7 +51,7 @@ def IsSourceFence(view,row):
 
 
 def ProcessPotentialFileOrgOutput(cmd):
-	cmd.outputs = list(filter(None, cmd.outputs)) 
+	outputs = list(filter(None, cmd.outputs)) 
 	if(cmd.params and cmd.params.Get('file',None)):
 		out = cmd.params.Get('file',None)
 		if(hasattr(cmd,'output') and cmd.output):
@@ -60,7 +60,8 @@ def ProcessPotentialFileOrgOutput(cmd):
 			sourcepath = os.path.dirname(cmd.sourcefile)
 			destFile    = os.path.join(sourcepath,out)
 			destFile = os.path.relpath(destFile, sourcepath)
-			cmd.outputs.append("[[file:" + destFile + "]]")
+			outputs.append("[[file:" + destFile + "]]")
+			return outputs
 
 
 def BuildFullParamList(cmd,language,cmdArgs):
@@ -73,13 +74,17 @@ def BuildFullParamList(cmd,language,cmdArgs):
 		plist.AddFromPList(sets.Get('babel-args-'+language,None))
 		node = db.Get().AtInView(view)
 		if(node):
-			prop = node.get_comment('PROPERTY',None)
-			if(prop):
-				# Here we have to sort through them to find generic or language specific versions
-				#print("PROPS: " + str(prop))
-				pass	
+			props = node.get_comment('PROPERTY',None)
+			if(props):
+				for prop in props:
+					prop = prop.strip()
+					if(prop.startswith('header-args:' + language + ":")):
+						plist.AddFromPList(prop.replace('header-args:'+language+":",""))
+					elif(prop.startswith('header-args:')):
+						plist.AddFromPList(prop.replace('header-args:',""))
 			pname = 'header-args:' + language
 			if('header-args' in node.properties):
+				#print(str(node.properties['header-args']))
 				plist.AddFromPList(node.properties['header-args'])
 			if(pname in node.properties):
 				plist.AddFromPList(node.properties[pname])
@@ -88,6 +93,18 @@ def BuildFullParamList(cmd,language,cmdArgs):
 				plist.Add('var',vs)
 	plist.AddFromPList(cmdArgs)
 	cmd.params = plist
+
+def SetupOutputHandler(cmd):
+	res = cmd.params.Get('results',['raw','output','verbatim'])
+	if(cmd.params.Has('file')):
+		cmd.outHandler = FileHandler(cmd,cmd.params)
+		return
+	if('table' in res):
+		cmd.outHandler = TableHandler(cmd,cmd.params)
+		return
+	# Verbatim is the default
+	else:
+		cmd.outHandler = RawHandler(cmd,cmd.params)
 
 def GetGeneratorForRow(table,params,r):
 	for c in range(1,table.Width()+1):
@@ -123,18 +140,91 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
 						var[k] = l
 		cmd.params.Replace('var',var)
 
+class ResultsHandler:
+	def __init__(self, cmd, params):
+		self.params = params
+		self.cmd    = cmd
+	def SetIndent(self,level):
+		self.level = level
+	def GetIndent(self):
+		return (" " * self.level) + " "
+	def FormatOutput(self, output):
+		pass
+	def PostProcess(self, view, outPos, onDone):
+		onDone()
+
+class RawHandler(ResultsHandler):
+	def __init__(self,cmd,params):
+		super(RawHandler,self).__init__(cmd,params)
+
+	def GetIndent(self):
+		return (" " * self.level) + " : "
+
+	def FormatOutput(self, output):
+		indent = "\n"+ self.GetIndent()
+		be = len(output)-1
+		for i in range(len(output)-1,0,-1):
+			if(output[i].strip() == ""):
+				be = i
+			else:
+				break
+		if(be > 0):
+			output = output[0:be]
+		output = indent.join(output).rstrip()
+		output = output.lstrip()
+		return ": " + output
+
+class FileHandler(ResultsHandler):
+	def __init__(self,cmd, params):
+		super(FileHandler,self).__init__(cmd,params)
+
+	def GetIndent(self):
+		return (" " * self.level) + " "
+
+	def FormatOutput(self, output):
+		out = ProcessPotentialFileOrgOutput(self.cmd)
+		indent = "\n"+ self.GetIndent()
+		output = indent.join(out).rstrip()
+		return output.lstrip()
+
+
+class TableHandler(ResultsHandler):
+	def __init__(self,cmd,params):
+		super(TableHandler,self).__init__(cmd,params)
+
+	def FormatOutput(self, output):
+		indent = "\n"+ self.GetIndent()
+		output = indent.join(output).rstrip()
+		output,self.isTable = tbl.TableConversion(self.level,output)
+		output = output.lstrip()
+		return output
+
+	def PostProcess(self, view, outPos, onDone):
+		view.sel().clear()
+		view.sel().add(outPos)
+		view.run_command("table_editor_align")
+		sublime.set_timeout(onDone,1)
+
+
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 	def OnDone(self):
 		evt.EmitIf(self.onDone)
 
-	def OnReplaced(self):
-		if(hasattr(self.curmod,"PostExecute")):
-			self.curmod.PostExecute(self)
+	def OnPostProcess(self):
+		self.curPt = self.view.sel()[0]
+		self.outHandler.PostProcess(self.view, self.resultsTxtStart, self.OnPostPostProcess)
 
+	def OnPostPostProcess(self):
 		if(hasattr(self.curmod,"GeneratesImages") and self.curmod.GeneratesImages(self)):
 			self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
 		else:
 			self.OnDone()
+
+	def OnReplaced(self):
+		if(hasattr(self.curmod,"PostExecute")):
+			self.curmod.PostExecute(self)
+		self.OnPostProcess()
+
 
 	def EndResults(self,rw):
 		self.endResults     = rw
@@ -243,6 +333,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			#log.debug("SRC NAME: " + fnname)
 			pdata = line[len(m.group(0)):]
 			ProcessPossibleSourceObjects(self,fnname,pdata)
+			SetupOutputHandler(self)
 			#paramstr = line[len(m.group(0)):]
 			#params = {}
 			#for m in RE_FN_MATCH.finditer(paramstr):
@@ -302,7 +393,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				else:
 					self.filename = None
 					self.outputs = self.curmod.Execute(self,sets)
-				ProcessPotentialFileOrgOutput(self)
+				#ProcessPotentialFileOrgOutput(self)
 				log.debug("OUTPUT: " + str(self.outputs))
 			else:
 				log.error("No execute in module, abort")
@@ -310,10 +401,16 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			# Reformat adding indents to each line!
 			# No bad formatting allowed!
 			n = db.Get().AtInView(view)
-			level = n.level
-			indent = "\n"+ (" " * level) + " "
-			#outputs = output.split('\n')
-			output = indent.join(self.outputs).rstrip()
-			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
+			self.level = n.level
+			#indent = "\n"+ (" " * self.level) + " "
+			##outputs = output.split('\n')
+			#output = indent.join(self.outputs).rstrip()
+			#output,self.isTable = tbl.TableConversion(self.level,output)
+			#output = output.lstrip()
+			self.outHandler.SetIndent(n.level)
+			output = self.outHandler.FormatOutput(self.outputs)
+			## Keep track of this so we know where we are inserting the text.
+			self.resultsTxtStart = self.resultsStartPt + self.level + 1
+			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * self.level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
 		else:
 			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")

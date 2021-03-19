@@ -27,6 +27,7 @@ import subprocess
 import platform
 import time
 import json
+import ast
 
 random.seed()
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
@@ -153,9 +154,9 @@ def GetFunctions():
         f['exp'] = exp
         f['sqrt'] = sqrt
         f['pow'] = pow
-        f['log'] = log
-        f['log10'] = log10
-        f['log2'] = log2
+        f['log'] = mylog
+        f['log10'] = mylog10
+        f['log2'] = mylog2
         f['floor'] = myfloor
         f['ceil'] = myceil
         f['round'] = myround
@@ -222,11 +223,31 @@ class TableCache:
 
 tableCache = TableCache()
 
-
-def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
+def TableConversion(indentDepth,data):
     # figure out what our separator is.
     # replace the separator with |
-    indent = (" " * indentDepth) + " "
+    indent = ""
+    if(indentDepth > 0):
+        indent = (" " * indentDepth) + " "
+    try:
+        # Try AST and see if we can parse it that way.
+        # This if for things like: [[a,b,c],[1,2,3],[4,5,6]]
+        l = ast.literal_eval(data)
+        d = ""
+        if(isinstance(l,list)):
+            for r in l:
+                if (isinstance(r,list)):
+                    d += indent + "|"
+                    for c in r:
+                        d += str(c) + "|"
+                else:
+                    d += "|" + str(r) + "|"
+                d += "\n"
+            return (d, True)
+    except:
+        # It is okay if we fail.
+        pass
+    # Nope use the heuristic processing way.
     lines = data.split('\n')
     separator = ','
     possibles = {",": [], ";": [], "\t": [], " ": []}
@@ -242,13 +263,22 @@ def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
         if(mean > 0):
             variance = math.sqrt(sum([ (x-mean)*(x-mean) for x in d ]) / len(d))
             vars[k] = variance
+    #print(str(vars))
     separator = min(vars, key=vars.get) 
+    # We prefer comma if the variance is the same for the min and comma.
+    if(separator != ',' and ',' in vars and vars[','] == vars[separator]):
+        separator = ','
     log.info("SEPARATOR CHOSEN: " + separator)
     data = ""
     for l in lines:
         if(l.strip() == ""):
             continue
         data += indent + '|' + l.strip().replace(separator,'|') + '|\n'
+    return (data, True)
+
+
+def insert_file_data(indentDepth, data, view, edit, onDone=None, replace=False):
+    data,_ = TableConversion(indentDepth, data)
     if(replace):
         view.run_command("org_internal_replace", {"start": view.sel()[0].begin(), "end": view.sel()[0].end(), "text": data, "onDone": onDone})
     else:
@@ -1298,15 +1328,15 @@ def pow(x,y):
     """Return x raised to the power y"""
     return math.pow(GetNum(x),GetNum(y))
 
-def log(x):
+def mylog(x):
     """Return the natural logarithm of x (to base e)."""
     return math.log(x)
 
-def log10(x):
+def mylog10(x):
     """Return the base-10 logarithm of x."""
     return math.log10(x)
 
-def log2(x):
+def mylog2(x):
     """Return the base-2 logarithm of x."""
     return math.log2(x)
 

@@ -1,30 +1,115 @@
-* 1.2.2
+* 1.2.2 - Improving Babel Input
 ** Worklog
-	- "Org Show Worklog" will generate our worklog to a new buffer
+    - "Org Show Worklog" will generate our worklog to a new buffer
 
 ** Babel PList Params
-	Quotes work for variables in plists
-	
-	#+BEGIN_SRC python :var x="hello world"
-	print(x)	  
-	#+END_SRC
+    Quotes work for variables in plists
+    
+    #+BEGIN_SRC python :var x="hello world"
+    print(x)      
+    #+END_SRC
 
    #+RESULTS:
    hello world
   
-** Property
+** Property Parameters
+    All of the following are now possible sources of variables
+    In a parameter block, including the local fence variable
+
+    This required fixing the properties parser to understand multiple semi colons
+    in a variable list.
+
   :PROPERTIES:
+  :header-args:           :var g=global
   :header-args:python:    :var x=5
-  :var: x=10
+  :var: v=10
   :END: 
+
+  #+PROPERTY: header-args: :var y=11
+  #+PROPERTY: header-args:python: :var z=12
   
-  #+BEGIN_SRC python 
-  	print(x)   
+  #+BEGIN_SRC python :var p=42
+    print(v)   
+    print(x)   
+    print(y)   
+    print(z)
+    print(p)
+    print(g)
   #+END_SRC 
 
    #+RESULTS:
+   10
    5
+   11
+   12
+   42
+   global
    
+** Output As Table
+    I have started working on output handling. Right now things are pretty manual. 
+
+    Things that work:
+
+    :results table - This will try to format your output as a table
+    :results verbatim - This will output things in verbatim format
+    :file - The presence of a file parameter will cause the system to output a link to the file.
+            This does not work for script output yet only for ditaa, plantuml and graphviz modules that naturally want to output to a file.
+
+    Things that do not work:
+    :file - for script blocks, that is comming
+    :results - auto detection of tables
+    :results - value
+    a bunch of other stuff...
+
+    #+NAME: in-table
+    | a | b | c | d | e |
+    | 1 | 2 | 3 | 4 | 5 |
+    | 6 | 7 | 8 | 9 | 0 |
    
-   
-   
+   #+BEGIN_SRC powershell :var DATA=in-table
+     $DATA | %{"$_"}
+   #+END_SRC
+
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   | 6 | 7 | 8 | 9 | 0 |
+
+   #+BEGIN_SRC python :var DATA=in-table :results table
+     print(str(DATA))
+   #+END_SRC
+
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   | 6 | 7 | 8 | 9 | 0 |
+
+
+   #+BEGIN_SRC python :results verbatim
+     print("Hello World This Is Tablular?")
+   #+END_SRC
+
+   #+RESULTS:
+   : Hello World This Is Tablular?
+
+
+   #+BEGIN_SRC plantuml :file out.png
+     a -> b
+     b -> c
+   #+END_SRC
+
+   #+RESULTS:
+   [[file:out.png]]
+
+
+
+
+
+
+
+
+
+
+
+
+

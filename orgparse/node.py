@@ -175,7 +175,7 @@ def parse_property(line):
     match = RE_PROP.search(line)
     if match:
         prop_key = match.group(1)
-        prop_val = match.group(2)
+        prop_val = match.group(2).strip()
         if prop_key == 'Effort':
             if(':' in prop_val):
                 (h, m) = prop_val.split(":", 2)
@@ -183,7 +183,7 @@ def parse_property(line):
                     prop_val = int(h) * 60 + int(m)
     return (prop_key, prop_val)
 
-RE_PROP = re.compile(r'^\s*:(.*?):\s*(.*?)\s*$')
+RE_PROP = re.compile(r'^\s*:([^ ]+):((\s|[a-zA-Z0-9\"_-]).*?)\s*$')
 
 def parse_comment(line):
     """

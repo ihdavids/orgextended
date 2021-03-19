@@ -82,6 +82,9 @@ class PList:
 
     def Add(self,key,val):
         PList.addToParam(self.params,key,val)
+
+    def Has(self,key):
+        return key in self.params
     
     def Replace(self,key,val):
         self.params[key] = val
@@ -91,7 +94,7 @@ class PList:
             return
         d = PList.plistParse(strData)
         for k in d:
-            self.params[k] = d[k]
+            self.addToParam(self.params,k,d[k])
 
     @staticmethod
     def addToParam(params,key,val):
@@ -118,8 +121,6 @@ class PList:
         for m in RE_FN_MATCH.finditer(paramstr):
             key = m.group(1)
             val = m.group(2)
-            print("K: " +  str(key))
-            print("V: " + str(val))
             PList.addToParam(params,key,val)
         return params
 
