@@ -1,0 +1,2 @@
+* 1.2.3
+	Core Idea - Better output support and results controls
