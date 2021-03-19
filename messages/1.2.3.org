@@ -1,2 +1,17 @@
 * 1.2.3
 	Core Idea - Better output support and results controls
+
+** Output Formatting
+
+	Drawer formatter will wrap output in a drawer
+
+   #+BEGIN_SRC python :results drawer verbatim :var x=5
+     print("Hello World This Is Tabular?")
+     print(x)
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   : Hello World This Is Tabular?
+   : 5
+   :END:

@@ -13,7 +13,7 @@ from OrgExtended.orgutil.addmethod import *
 log = logging.getLogger(__name__)
 
 
-RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]*)\s+(([a-zA-Z][a-zA-Z0-9]*\s*[=]\s*[\"][^\"]+[\"])|([^ ()\"]+)|([(][^)]+[)])|([\"][^\"]+[\"]))")
+RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]*)\s+(([a-zA-Z][a-zA-Z0-9]*\s*[=]\s*[\"][^\"]+[\"])|((([ ](?!:))|[^ ()\"])+)|([(][^)]+[)])|([\"][^\"]+[\"]))")
 class PList:
     def __init__(self,plist):
         self.params = plist

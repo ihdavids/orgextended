@@ -106,6 +106,15 @@ def SetupOutputHandler(cmd):
 	else:
 		cmd.outHandler = RawHandler(cmd,cmd.params)
 
+def SetupOutputFormatter(cmd):
+	res = cmd.params.Get('results',['raw','output','verbatim'])
+	if('drawer' in res):
+		cmd.outFormatter = DrawerFormatter(cmd)
+		return
+	# Raw is the default
+	else:
+		cmd.outFormatter = ResultsFormatter(cmd)
+
 def GetGeneratorForRow(table,params,r):
 	for c in range(1,table.Width()+1):
 		yield table.GetCellText(r,c)
@@ -139,6 +148,24 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
 					if(l):
 						var[k] = l
 		cmd.params.Replace('var',var)
+
+class ResultsFormatter:
+	def __init__(self,cmd):
+		self.cmd = cmd
+	def SetIndent(self,level):
+		self.level = level
+	def GetIndent(self):
+		return (" " * self.level) + " "
+	def FormatOutput(self,output):
+		return output
+
+class DrawerFormatter(ResultsFormatter):
+	def __init__(self,cmd):
+		super(DrawerFormatter,self).__init__(cmd)
+
+	def FormatOutput(self,output):
+		output = ":RESULTS:\n" + self.GetIndent() + output + "\n" + self.GetIndent() + ":END:"
+		return output
 
 class ResultsHandler:
 	def __init__(self, cmd, params):
@@ -261,10 +288,10 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				self.EndResults(rw)
 				return True
 			if(inPropertyDrawer and RE_END_PROPERTY_DRAWER.search(line)):
-				self.EndResults(rw)
+				self.EndResults(rw+1)
 				return True
 			if(inBlock and RE_END_BLOCK.search(line)):
-				self.EndResults(rw)
+				self.EndResults(rw+1)
 				return True
 		# We just hit the end of the file.
 		if(inResults):
@@ -334,6 +361,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			pdata = line[len(m.group(0)):]
 			ProcessPossibleSourceObjects(self,fnname,pdata)
 			SetupOutputHandler(self)
+			SetupOutputFormatter(self)
 			#paramstr = line[len(m.group(0)):]
 			#params = {}
 			#for m in RE_FN_MATCH.finditer(paramstr):
@@ -408,7 +436,9 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			#output,self.isTable = tbl.TableConversion(self.level,output)
 			#output = output.lstrip()
 			self.outHandler.SetIndent(n.level)
+			self.outFormatter.SetIndent(n.level)
 			output = self.outHandler.FormatOutput(self.outputs)
+			output = self.outFormatter.FormatOutput(output)
 			## Keep track of this so we know where we are inserting the text.
 			self.resultsTxtStart = self.resultsStartPt + self.level + 1
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * self.level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
