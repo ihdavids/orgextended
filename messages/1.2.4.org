@@ -1,0 +1,3 @@
+* 1.2.4
+
+	Core Idea: Value vs Output execution
