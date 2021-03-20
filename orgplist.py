@@ -4,6 +4,7 @@ import os
 import base64
 import urllib.request
 import OrgExtended.asettings as sets 
+import OrgExtended.orgutil.util as util
 import uuid
 import re
 import logging
@@ -54,13 +55,13 @@ class PList:
     def GetList(self,name,defaultValue):
         v = self.Get(name,defaultValue)
         if(not isinstance(v,list)):
-            return ToList(v) 
+            return util.ToList(v) 
         return v
 
     def GetIntList(self,name,defaultValue):
         v = self.Get(name,defaultValue)
         if(not isinstance(v,list)):
-            return ToIntList(v) 
+            return util.ToIntList(v) 
         return v
 
     def GetDict(self,name,defaultValue):

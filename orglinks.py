@@ -262,7 +262,8 @@ class ImageHandler:
                 ImageHandler.Cache[url] = local_filename
                 ImageHandler.save_cache()
             size = ImageHandler.get_image_size(local_filename)
-            if size:
+            ttype = None
+            if None != size:
                 w, h, ttype = size
                 if ttype and ttype == 'svg':
                     view.erase_phantoms(str(region))
@@ -321,8 +322,11 @@ class ImageHandler:
 
     @staticmethod
     def hide_image(region, view):
-        view.erase_phantoms(str(region))
-        ImageHandler.Phantoms[view.id()].remove(str(region))
+        try:
+            view.erase_phantoms(str(region))
+            ImageHandler.Phantoms[view.id()].remove(str(region))
+        except:
+            pass
 
     @staticmethod
     def show_image_at(view, max_width=1024):
@@ -384,6 +388,7 @@ class ImageHandler:
         """
         Determine the image type of img and return its size.
         """
+        print("IMG: " + img)
         with open(img, 'rb') as f:
             head = f.read(24)
             ttype = None

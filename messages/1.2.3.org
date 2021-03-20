@@ -1,6 +1,11 @@
 * 1.2.3
 	Core Idea - Better output support and results controls
 
+** Test File
+  To help new users we now have an:
+
+  "Org Show Testfile" command that will quickly create a testfile for a user to play with.
+
 ** Output Formatting
 
 	Drawer formatter will wrap output in a drawer

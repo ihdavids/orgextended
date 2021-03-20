@@ -1,3 +1,7 @@
+// We start with some of the more well known file level comments.
+// NOTE: There are many more comments than these.
+//       this is just some of the more common ones.
+
 // The filetags comment lets you tag all headings in a file with a tag.
 #+FILETAGS: :Ian:Tagged:
 
@@ -45,35 +49,85 @@
   Org is huge and adding all of the features in org to a single file would be a very very large document.
 
   This is however a little playground of some of the more common aspects of Org.
- 
-* Basic Headings and tags  :TAG1:TAG2:
 
-  To start I am only supporting 7 levels of headers.
-  This seems sufficient for my needs. Tags are supported
+  If all you do is look at this file you are missing out on a LOT of orgmode features.
+  You should look at:
+
+  - Keybindings - This will give you some overview of the bits we have bound for ease of use.
+  - Commands    - Typing "Org" in to the command panel is a quick way to browse the available commands.
+                  <hopefully we will eventually support a self documenting command to let the commands speak for themselves" 
+  - Documentation - orgextended_docs is a repo full of orgmode files to help you learn about orgmode. Its not the best, but what I have had time to write.
+  - Worklog - Sometimes it can be handy to paruse our worklog to look at what I have been working on recently. "Org Show Worklog" will bring that up for you.
+ 
+* Basic Headings
+
+  A heading or node in org mode is similar to a heading in markdown. Markdown uses # to denote a heading, org uses stars.
+  The more stars, the deeper the sub heading.
+
+  I am only supporting 7 levels of headings.
+  Sub headings simply nest inside the parent heading.
+
+  Org has commands to help you add and remove headings, move them around, change their indent and jump around.
+
 ** Heading 2
-*** Heading 3 :TAG3:
+*** Heading 3
 **** Heading 4
 ***** Heading 5
-****** Heading 6 :TAG4:
+****** Heading 6
 
-* NOTE Notes and phone messages :OTHERTAGS:
-  I have not found a good way to make the normal TODO states dynamic
-  as supported in org mode, so you get the states I like and care about.
-  Feel free to add and PR your additional states.
-** PHONE Phone messages
-   Some text in here
-*** MEETING Meetings
+* Tags                                                                    :TAG1:TAG2:
+  Tags are a means of filtering your headings in this file or across all your files.
+  Tags are meta data that you can attach to your headings. The tags apply to a heading and all
+  sub headings.
 
-* Property blocks are colored
+** This heading will have TAG1 and TAG2 on it. :OTHERTAGS:
+   BUT this heading will be the only heading with the OTHERTAGS tag applied.
+
+* TODO States
+  States are a means of turning a regular heading into a task. Org has the concept that TODO lists
+  can, should and do appear all over your notes. For that reason orgmode has the ability to find those
+  todos and present them in various agenda views. TODO's flow through states. Those states are defined by you.
+
+  I have not found a good way to make syntax highlighting extensible SO as a compromise, while the active todo
+  states ARE configurable (see the comment #+TODO above) the syntax highlighting of those states is limited to the
+  states that I have setup.
+
+  I am often adding new states. I have several closed states like:
+
+  *** NOTE This marks this as a note
+  *** PHONE This marks this as notes from a telephone call.
+  *** MEETING This marks this as notes from a meeting.
+
+* Drawers
+  :MYDRAWER:
+  Anything can go in here
+  :END:
+
+  One of the features of org is the concept of a drawer. A drawer is a generic section that can contain any meta data.
+  Drawers get auto folded away to avoid clutter unless you are editing them. 
+
+* Properties and the LogBook
   :PROPERTIES:
   :ORDERED:  t
   :END:
   :LOGBOOK:
   - This is a line
   :END:
-  For clocking we need a property drawer concept so here is a start.
+  
+  Properties are a special drawer. The contain key/value pairs that are often accessible by other subsystems in org mode.
+  As an example a common use of the property drawer is to store Effort which is used by column view to estimate the epected effort of tasks.
+  Another example might be variables and constants used in tables, or enabling features for checkboxes and other systems.
 
-* NOTE orgmode (vs true orgmode compat) bits
+  In addition to the property drawer, another common drawer is the LOGBOOK. The logbook is where clocking information tends to get stored
+  when you are tracking the time spent on tasks. OR It can be used to store notes related to closing out a task.
+
+  One special use of the property drawer is to add an ID or CUSTOM_ID field (IDs should be guids while CUSTOM IDs are yours to generate as long as they are unique)
+  These can be used to reference a heading in your org files.
+
+  - "Org Create Heading Id" - will generate an ID (guid) for you.
+  - "Org Insert CustomId"   - will prompt you to insert your own custom id.
+
+* orgmode (vs true orgmode compat) bits
   These items are NOT true org mode things but come
   from the previous ST2 orgmode package. I felt they were worth
   supporting and have kept them. I do not think being purist is
@@ -84,13 +138,18 @@
 
 	-> For Follow Up
 	=> For Follow Up
-* NOTE Lists
+
+* Lists
+  Orgmode has support for 5 types of lists:
+
+  + Plus unordered list
+  + More stuff
 
   - Basic unordered list
   - More stuff
 
-  + Plus unordered list
-  + More stuff
+  - [ ] Checkbox lists
+  - [ ] More stuff
 
   1. Numbered list
   2. More stuff
@@ -98,9 +157,16 @@
   - Definition1 :: This is what it means
   - Definition2 :: This is what that means
 
-* NOTE Checkboxes [33%]
-  Colored but not updated yet! I need Ctrl-c Ctrl-c style updating.
-  That will come, just not yet.
+  The ctrl + enter do what I mean editing feature allows you to quickly build lists of this type.
+  We support sorting and nested lists.
+
+* Checkboxes [33%]
+  
+  Checkboxes deserve their own section.
+  The do what I mean toggle command also works on checkboxes
+
+  Summary boxes [/] and [%] are auto updated when you toggle
+  a checkbox. Summary boxes also work on the heading (see above.) 
 
   - [ ] Checkbox
   - [x] Blocked checkbox
@@ -109,69 +175,137 @@
       - [ ] sub2
       - [x] sub3
 
-* NOTE Links
+* Links
 
-  [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#33da3712-51b7-485c-b69d-f54dd266543f][ID Creation]] 
-  [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#My-Custom-Id][Custom Id]] 
+  Links in org mode are complex. Our link handler still needs some work but will hopefully improve over time.
+  Our link handler supports the concept of a protocol. You can write your own protocol handlers.
 
-	There is support for basic org links a la orgmode style.
+  http: is a built in protocol, so is file: by default the system assumes that a link references a file.
+  Links can have a descript or not:
 
-	[[https://reg.ca][Reg Ca]] Org link
+  - [[testfile.org]]
+  - [[testfile.org][TestFile]]
 
+  The system aggressively tries to fold the link if a description is present. In Emacs, Emacs would hide ALL of the link bits only showing the target
+  making it look like a hyperlink on a website. We can't quite do that in sublime, but we try our best.
+  
   NOTE: Folding is not perfect but I find folding the actual ref itself
         is a reasonable compromise.
 
-  Pressing enter on the link will try to do the right thing.
-  [[file:./docs/links.org::#a-unique-id][Custom Id Link]]
+  - [[https://reg.ca][Reg Ca]] Org link
 
-  This is a link to a target internal to an org file
-  [[Target1][Link To Target1]]
-  [[testfile.org::Target1][Link To Target1]]
+  Links can be followed simply by pressing enter on the link.
+  This makes orgmode something like a mini wiki. 
 
-  Links to headings
-  [[file:testfile.org::*Scheduling][Scheduling]]
-  [[file:*Scheduling][Scheduling]]
+*** IDs and CUSTOM_IDs
+  Links can also reference an ID or CUSTOM_ID:
 
-  Links to named objects
-  [[MyNamedObject][Link to Named Object]]
-  [[testfile.org::MyNamedObject][Link to Named Object]]
+   #+BEGIN_EXAMPLE
+    <URL>::#<ID>
+   #+END_EXAMPLE
 
-* NOTE Scheduling
+  - [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#33da3712-51b7-485c-b69d-f54dd266543f][ID Creation]] 
+  - [[file:C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\testfile.org::#My-Custom-Id][Custom Id]] 
 
-  These are colored and parsed by the system
-  but not yet integrated fully.
+*** Anchors or Internal Targets
 
-  SCHEDULED: <2020-05-25 Thu 10:50 +1d>
-  CLOSED: [2020-05-25 Mon]
-  DEADLINE: <2020-05-25 Tue>
+  Another form of targetting is linking to an internal anchor.
+  This is a link to a target internal to this org file.
+  A good HTML exporter should turn that target into a propper anchor in the file.
 
-* NOTE Navigation
+  #+BEGIN_EXAMPLE
+    <URL>::<TARGET>
+  #+END_EXAMPLE
+
+  - [[Target1][Link To Target1]]
+  - [[testfile.org::Target1][Link To Target1]]
+  
+  Org has the ability to "name" an object like a table. Names are assigned using the name comment:
+  #+BEGIN_EXAMPLE
+    #+NAME: my-name
+  #+END_EXAMPLE
+
+  These links behave just like file anchors or targets:
+  #+BEGIN_EXAMPLE
+    <URL>::<NAME>
+  #+END_EXAMPLE
+
+  - [[MyNamedObject][Link to Named Object]]
+  - [[testfile.org::MyNamedObject][Link to Named Object]]
+
+*** Targetting Headings
+  Headings are also targettable. Here you use ::* as a means of indicating the header is your target.
+  #+BEGIN_EXAMPLE
+    <FILE>::*<HEADING>
+  #+END_EXAMPLE
+
+  - [[file:testfile.org::*Scheduling][Scheduling]]
+
+*** An Anchor for target practice.
+  Here is a target so we can link to it from the Link To Target above.
+  <<Target1>>
+
+* Scheduling
+
+  There are 4 important timestamps that can appear in any heading.
+  These first 3 should always appear right after the heading:
+
+  SCHEDULED: <2020-05-25 Thu 10:50 +1d> - This is when you want to START on a task
+  CLOSED: [2020-05-25 Mon]              - When enabled this will track when you closed the task (moved to a done state)
+  DEADLINE: <2020-05-25 Tue>            - This is when the task should be "done by" or closed.
+
+  Scheduled and Deadline are used by the agenda to track open tasks. There is 1 more type of timestamp used by the agenda
+  which is simply the active timestamp: <2021-03-19 Fri 13:23> 
+
+  An active timestamp means it gets picked up by the agena as the datetime of an appointment (rather than a task)
+  Inactive timestamps do not get considered by the agenda: [2021-03-19 Fri 13:24] 
+
+  Timestamps are complex beasts in org. They can have warnings -2d, recurrence +1w or span some time 12:00-13:45
+  For more information please see the org manual.
+
+* Navigation
 
   Ctrl arrow key travels up and down the tree of headings
-  Jump in file.
 
-* NOTE Refile, Copy
+  - "Org Jump In File" gives you a quick way to jump around in a file. (NOTE symbols work as well but sometimes the indent is helpful)
+  - "Org Jump To Today" and "Org Jump To CustomId" are quick ways of jumping to headings with CUSTOM_ID tags (today is a special CUSTOM ID)
 
-  I have commands for this but not bound well yet
-  I am currently missing archiving.
+* Archive, Refile, Copy
 
-* NOTE Control Tags
-   Most of these are not supported by the backend yet.
-   Where possible I WILL Support them and document them
+  There are commands for archiving, refiling and copying headings around.
+
+  - "Org Archive Subtree" - will copy the subtree to this files archive target.
+  - "Org Refile" - will attempt to let you refile the current heading somewhere in your orgDir.
+  - "Org Copy Entity" "Org Copy Subtree" also try to let you copy around headings as needed.
+
+* Capture
+  
+  One of the biggest features I can't do without is the quick capture keybindings and templates.
+  I have a system for this in place. 
+
+  Capture templates are snippets! You have to define them!
+  You define some snippets and then add capture entries into your settings file. Once you have done this
+  You can quick capture from anywhere into the apropriate org target. 
+
+* Control Comments
+
+  As seen above there are a lot of control comments. Many of them are poorly documented at this time.
    
    #+PRIORITIES: A B C
    #+TITLE: Orgmode example file
    
-* TODO Src Block
-	Working on supporting a variety of source code block styles.
-	Hopefully I can support some of the babel engine as well eventually
+* Src Block
 
-	With the way org works the OrgExtended.sublime-color-scheme has to own your
-	ENTIRE color scheme. You can override any of it by providing your own sublime color scheme.
+  Org Babel Mode or Org Source Blocks are one of the cornerstones of Org Mode. Org Mode WAS the original Jupyter notebooks.
+  Right now in our implementation we only have a very small number of actual source handlers for executing code. 
+  (powershell, python, ditaa, plantuml, graphviz) Hopefully that will grow.
 
-	I have cheated here and pulled form the Monokai Extended tmTheme (I always found that language, theme confusing when it is a color scheme not theme)
-	I find monokai a bit jarring so I may provide several schemes eventually, we will see
+  We will also document how to add your own handlers going forward.
 
+  That said we support quite a long list of language highlighting options for the moment. The list of languages we can highlight can be found
+  in languagelist.yaml. That list is used to generate the syntax. If you would like a language added to the list please let me know. (or fire me a PR)
+
+  Here are some examples:
 
 	#+BEGIN_SRC python
     def func(a):
@@ -242,7 +376,83 @@
 ```
  #+END_SRC 
 
-* NOTE Bold Italics Underline
+** Babel
+
+  The tower of babel or babelfish is the inspiration for the name of this feature in Emacs. This feature has its roots in:
+
+  - Literate Programming
+  - Reproducible Research
+
+  That said, babel can be used for a LOT of other things. From generating diagrams in documents and presentations to 
+  development / visualizing some gathered data.
+
+  With babel a named data table, variable definition or list can act as input for a source block.
+
+   #+NAME: in-table
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   | 6 | 7 | 8 | 9 | 0 |
+   
+   #+BEGIN_SRC powershell :var DATA=in-table
+     $DATA | %{"$_"}
+   #+END_SRC
+
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   | 6 | 7 | 8 | 9 | 0 |
+
+   #+BEGIN_SRC python :var DATA=in-table :results table
+     print(str(DATA))
+   #+END_SRC
+
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   | 6 | 7 | 8 | 9 | 0 |
+
+*** Graphing
+
+  If you have the right tools installed and in your path, this includes things like graphs of data:
+
+    #+BEGIN_SRC graphviz :file images/graphviz.png
+     digraph G {
+       a -> b;
+       a -> c;
+       c -> d;
+     } 
+    #+END_SRC
+
+    #+RESULTS:
+    [[file:images\graphviz.png]]
+
+    Diagrams using plantuml or ditaa.
+
+    #+BEGIN_SRC plantuml :file images/plantuml.png
+      Bob -> Sally : Says Hi
+      Sally -> Bob : Says Hi
+    #+END_SRC
+
+    #+RESULTS:
+    [[file:images\plantuml.png]]
+
+    Or Graphs using GNU Plot
+
+    #+PLOT: title:"Lines" ind:2 deps:(3 4)  with:lines file:images/plot.png
+    |    Sede   |  Max   | H-index |  top  |
+    |-----------+--------+---------+-------|
+    | Sao Paolo |  71.00 |   11.50 |  13.5 |
+    | Stockholm | 134.19 |   14.33 | 16.33 |
+    | Leeds     | 165.77 |   19.68 | 21.68 |
+    | Morelia   | 257.56 |   17.67 | 19.67 |
+    | Chile     | 257.72 |   21.39 | 23.39 |
+    #+TBLFM:$4=$3+2.0
+
+    #+RESULTS:
+
+* Bold Italics Underline
+
+  Being a document interchange format org mode has support for the usual formatting suspects:
 
     *bold*
     /italic/
@@ -251,10 +461,9 @@
     ~code~
     =verbatim=
 
+* Example, Verse, Quote, Center
 
-* NOTE Example, Verse, Quote, Center
-	I use these a bunch to delineate a block of text I care about
-	in my notes. I am going to keep these for now.
+  Org also has support for quite a few simple example quote or verse blocks
 
     #+begin_example
     This is an example of something
@@ -273,14 +482,16 @@
     A verse of poetry
     #+END_CENTER
 
-* NOTE Capture
-  One of the biggest features I can't do without is the quick capture keybindings and templates.
-  I have a system for this in place. It will probably change as I discover what I like here.
-  I have a little template engine that is expanding as I discover what I need. It is NOTE quite like org
-  as we are workingin sublime here.
+    Some of these have snippets to help in creating them:
+
+    #+BEGIN_EXAMPLE
+      <s 
+      <e
+    #+END_EXAMPLE
+
 
 * NOTE [#TOP] Priorities
-   General priority tags work
+   General user defined priority tags work
    but a, b, c, d, e have independent
    coloring options in the grammar.
 ** TODO [#A] Top priority
@@ -290,25 +501,22 @@
 ***** TODO [#D] Third priorty item
 ****** BLOCKED [#E] Third priorty item
 
-* This has no priorities
-
 * Inline Images
   Links can be used to show images or open
   up an image viewer if followed.
 
-  Run: OrgShowImage on this link
-  #+CAPTION: This is a caption for this image
+  Run: "Org Show Image: on this link
+  Notice that this link is an HTML link, org can download and cache images locally for display purposes.
+  This will have problems for redirects, git lfs or other complex links.
+
+  #+CAPTION:   This is a caption for this image
   #+ATTR_HTML: :width 200
-  [[file:./images/orgstart.gif]]
+  [[https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/orgstart.gif]]
 
 * Table Editor
-  Eventually we will probably have to own table editing
-  (At least if I want full support for expressions, which I do.)
-
-  However, for now, the Sublime Table Editor plugin
-  is pretty much full basic table editing support. It just needs
-  a little tweaking to get working, I have just made it a dependency
-  and embedded it into our generic tab cycling for now.
+  At the moment I am using the Table Editor plugin for my table navigation, creation and manipulation.
+  The Alt and Shift + Alt plus arrow keys in a table will move rows and columns around and add them. Also "Alt+o t -"
+  will insert a hline below your cursor.
 
   #+CAPTION: This is a table caption
   |   Heading 1    | Heading 2 | Heading 3 |
@@ -318,95 +526,160 @@
   |----------------+-----------+-----------|
   | Something else |         5 |         6 |
 
-* Clocking
-  #+BEGIN: clocktable :scope subtree :level 2
-  |Heading|Time|
-  |-
-  |A|B|
-  #+END:
-** Clocking
-   :PROPERTIES:
-    CLOCK: [2020-03-31 Tue 16:28]--[2020-03-31 Tue 16:29] => 00:01
-    CLOCK: [2020-03-31 Tue 20:39]--[2020-03-31 Tue 20:55] => 00:16
-   :END:
-   We can clock in and out now.
+
+  However, this is just the begining. Tables can act like spreadsheets! 
+
+  | a | b |
+  | 1 | 5 |
+  #+TBLFM:@2$2=$1*5
+
+  Here 2,2 (b) is filled in by taking 2,1 and multiplying it by 5.
+  There are a whole gamut of features, expressions, plotting and other table machinations available
+  and that is best left for the docs.
 
 * Dynamic Blocks
-  We will have to handle these differently than regular dynamic blocks
+
+  Dynamic Blocks are kind of like source blocks (listed above) but for generic code snippets. Emacs
+  makes these really really powerful since you can define new code snippets and functions ANYWHERE in the editor.
+
+  Sublime cannot do that, so instead we use a sub folder with python snippets in your User folder.
+  There are also a couple of built in blocks that we will talk about later. We have a test one that is always present:
+  called insertdatetime. Execute this block by pressing <space> c c or Alt + o + c + c and it will replace the block contents
+  with the current date and time.
   
   #+BEGIN: insertdatetime
   If you run this, this text will be replaced with the current datetime
   #+END:
 
-  #+BEGIN: clocktable :scope subtree :level 2
-  This is a dynamic block
+** Clocking
+   Another built in dynamic block that can be really handy is the clock table.
+   If you are preparing invoices and want to know how long you spent on various tasks, the clock table can be pretty handy.
+ 
+   Clocking is a built in org function. It uses a central data file in your User folder and a timestamp in your property drawer to track
+   how long you have spent on a task.
+ 
+   - "Org Clock In"  - Starts the clock on a task.
+   - "Org Clock Out" - Stops the clock
+ 
+   Running the table below will generate a table with your clocked data:
+ 
+   #+BEGIN: clocktable :scope subtree :level 2
+   |Heading|Time|
+   |-
+   |A|B|
+   #+END:
+ 
+   NOTE Clocking and the column view mode in emacs (which we don't fully support yet) go hand in hand as effort estimate vs actual time spent.
+
+*** A task with some time invested
+    :PROPERTIES:
+     CLOCK: [2020-03-31 Tue 16:28]--[2020-03-31 Tue 16:29] => 00:01
+     CLOCK: [2020-03-31 Tue 20:39]--[2020-03-31 Tue 20:55] => 00:16
+    :END:
+ 
+** Column View
+
+  Column mode in Emacs lets you look at your document headings as if they were a table and visualize the
+  properties (of your choosing) in the various headings as columns in a table. We don't yet have support for this
+  mode in sublime! But we will eventually.
+
+  For now, we have a piece of this... The columnview dynamic block
+
+  This table was NOT generated from this file. Columnview uses a configuration comment that looks something like so:
+
+  #+COLUMNS: %ITEM(Task) %Effort(Effort) %TODO(Todo) %DEADLINE(Deadline) %ALLTAGS(Tags) %TIMESTAMP(Time) %TIMESTAMP_IA(Inactive) %PRIORITY(Priority)
+
+  Some of these specify the heading, some properties (Like the Effort entry) Some of them DEADLINE details etc.
+  More information can be found in our little gantt chart demo:
+
+  [[https://github.com/ihdavids/orgextended_docs/blob/master/learning_gantt_example.org][Gantt Demo]]
+
+  Or in the Org Manual:
+
+  [[https://orgmode.org/manual/Capturing-column-view.html#Capturing-column-view][Column View]] 
+
+  #+BEGIN: columnview  :hlines nil :id global :indent t :maxdepth 2 :skip-empty-rows t :exclude-tags (ExcludeMe)
+   | Task                       | Effort | Todo | Deadline             | Tags  | Time                 | Inactive             | Priority |
+   | 1.1.26                     |        |      |                      | a     |                      |                      |          |
+   | ..Source Blocks            | 2d     | DONE |                      | a     |                      |                      |          |
+   | ..Folding                  |        |      |                      | a     |                      |                      |          |
+   | ..Properties               | 2d     |      | 2021-03-09 Tue 20:55 | a     |                      |                      |          |
+   | ..Spreadsheets Preview V11 | 4h     |      |                      | a tag | 2021-03-09 Tue 14:53 |                      |          |
+   | ..ColumnView Dynamic Block | 1d     |      |                      | a     |                      | 2021-03-09 Tue 11:00 | B        |
   #+END:
 
-  1. Not in the list below
-* Numbered Lists
-  1. Carrots
-  2. Beets
-  3. Rhubarb
-     1. Pie
-     2. Crumble
-     3. Is there something here?
-  4. Yogurt
-     1. Greek
-  5. Cheese
-  6. Goats Milk
-
 * Named Object Target
+
+  Object in orgmode can have a name. This is here so we have something to target from the links example above.
 
   #+NAME: MyNamedObject
   | Hello      | World |
   | Some Table |       |
 
 
-* ID Creation
+* ID Target Example
   :PROPERTIES:
     :ID: 33da3712-51b7-485c-b69d-f54dd266543f
   :END:
+
+  Headings can have a generated ID. This is here so we have something to target in the links example above.
 
 * Custom IDs
   :PROPERTIES:
     :CUSTOM_ID: My-Custom-Id
   :END:
 
+  Headings can have a custom ID. This is here so we have something to target in the links example above.
+
 * Table Remote Test
 
-  | a         | b | c | d | e |
-  | <UNK REF> |   |   |   |   |
-  #+TBLFM:@2$1=remote("my-table-test",@2$2)
-* Test Time Info
+  One of the interesting abilities that comes along with tables is the ability to reference data in other tables.
+  Here is an example of referencing the data in the table above in Named Object Target.
+
+  | a          | b | c | d | e |
+  | Some Table |   |   |   |   |
+  #+TBLFM:@2$1=remote("MyNamedObject",@2$1)
+
+* Time Data
   :PROPERTIES:
     :CUSTOM_ID: my-custom-id
   :END:
-** TODO Tomorrow
+  These are some common time values used in testing the agenda.
+  The dates and times will be out of date. Replace these with your own
+  to test the agenda.
+
+  There are some todos and some non todos. Both can appear in the agenda when active.
+
+** TODO Time range
    <2021-02-16 Thu 16:00-17:00> 
-   :PROPERTIES:
-     :CLOCK: [2021-02-12 Fri 17:20]--[2021-02-12 Fri 17:21] => 00:01
-     :CLOCK: [2021-02-12 Fri 17:29]--[2021-02-12 Fri 17:29] => 00:00
-     :CLOCK: [2021-02-12 Fri 17:29]--[2021-02-12 Fri 17:29] => 00:00
-   :END:
-** TODO Today
+
+** TODO Scheduled Date
    SCHEDULED: <2021-02-10 Wed 16:49> 
  
-   #+BEGIN_SRC bash
-    # This is a comment 
-    if [ ]
-    print()
-   #+END_SRC
- 
- # This is a comment block
-** TODO Deadline
-   Testing if this works
+** TODO Deadline Date w Warning
+   SCHEDULED: <2021-02-10 Wed 16:49 -2d> 
  
 ** TODO Test Recurrence
    <2021-02-16 Tue 14:10-15:10 +1d>
  
-** TODO Rec Active
+** TODO Recurring Active
     <2021-02-15 Wed 14:40 +1d> 
  
+** Time range
+   <2021-02-16 Thu 16:00-17:00> 
 
-* Effort
+** Scheduled Date
+   SCHEDULED: <2021-02-10 Wed 16:49> 
+ 
+** Deadline Date w Warning
+   SCHEDULED: <2021-02-10 Wed 16:49 -2d> 
+ 
+** Test Recurrence
+   <2021-02-16 Tue 14:10-15:10 +1d>
+ 
+** Recurring Active
+    <2021-02-15 Wed 14:40 +1d> 
+
+** TODO Recurring BUT ARCHIVED                                            :ARCHIVED:
+    <2021-02-15 Wed 14:40 +1d> 
 

@@ -138,8 +138,12 @@
     {"caption": "Org Download Highligh Js",    "command": "org_download_highligh_js"          },
     {"caption": "Org Select Color Scheme",     "command": "org_select_existing_color_scheme"  },
     {"caption": "Org Create Color Scheme From Active",     "command": "org_create_color_scheme_from_active"  },
-    
+   
+    // Resources 
     {"caption": "Org Show Worklog",            "command": "org_build_dev_docs"                },
+    {"caption": "Org Show TestFile",           "command": "org_show_testfile"                 },
+
+    // Internal Maintenance Commands
     //{"caption": "Org Output Table Docs",       "command": "org_doc_table"                     },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"         },
     //{"caption": "Org Test Thing",              "command": "org_show_item"                     },
