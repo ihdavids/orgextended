@@ -1,31 +1,21 @@
+import ast
+import logging
+import os
+import re
+import tempfile
+import traceback 
+
+import OrgExtended.orgdb as db
+import OrgExtended.orgextension as ext
+import OrgExtended.orglist as lst
+import OrgExtended.orgtableformula as tbl
+import OrgExtended.orgutil.util as util
+import OrgExtended.pymitter as evt
 import sublime
 import sublime_plugin
-import datetime
-import re
-from pathlib import Path
-import os
-import fnmatch
-import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
-import OrgExtended.orgutil.util as util
-import OrgExtended.orgutil.navigation as nav
-import OrgExtended.orgutil.template as templateEngine
-import logging
-import sys
-import traceback 
-import OrgExtended.orgfolding as folding
-import OrgExtended.orgdb as db
-import OrgExtended.asettings as sets
-import OrgExtended.orgcapture as capture
-import OrgExtended.orglinks as links
-import OrgExtended.orgclocking as clocking
-import OrgExtended.orgextension as ext
-import OrgExtended.pymitter as evt
-import OrgExtended.orgtableformula as tbl
-import OrgExtended.orglist as lst
 from   OrgExtended.orgplist import *
-import importlib
-import tempfile
+
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +29,8 @@ RE_END_PROPERTY_DRAWER = re.compile(r"^\s*[:](END|end)[:]\s*$")
 RE_BLOCK = re.compile(r"^\s*\#\+(BEGIN_|begin_)[a-zA-Z]+\s+")
 RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
+RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee][Ss]?)|([Ff][Aa][Ii][Ll])|([Ee][Rr][Rr][Oo][Rr][Ss]?)\b")
+
 
 def IsSourceBlock(view):
 	at = view.sel()[0]
@@ -50,18 +42,25 @@ def IsSourceFence(view,row):
 	return RE_SRC_BLOCK.search(line) or RE_END.search(line)
 
 
+def HasFailure(output):
+	os = " ".join(output)
+	return RE_FAIL.search(os)
+
 def ProcessPotentialFileOrgOutput(cmd):
 	outputs = list(filter(None, cmd.outputs)) 
 	if(cmd.params and cmd.params.Get('file',None)):
 		out = cmd.params.Get('file',None)
 		if(hasattr(cmd,'output') and cmd.output):
-			out = cmd.output
+			if(not out or HasFailure(cmd.output)):
+				out = cmd.output
 		if(out):
 			sourcepath = os.path.dirname(cmd.sourcefile)
 			destFile    = os.path.join(sourcepath,out)
 			destFile = os.path.relpath(destFile, sourcepath)
+			if(out and not HasFailure(outputs)):
+				outputs = []
 			outputs.append("[[file:" + destFile + "]]")
-			return outputs
+			return outputs,destFile
 
 
 def BuildFullParamList(cmd,language,cmdArgs):
@@ -94,32 +93,40 @@ def BuildFullParamList(cmd,language,cmdArgs):
 	plist.AddFromPList(cmdArgs)
 	cmd.params = plist
 
-def SetupOutputHandler(cmd):
+def CheckResultsFor(cmd,val):
+	res = cmd.params.Get('results',[])
+	return (val in res)
+
+def SetupOutputHandler(cmd,skipFile = False):
 	res = cmd.params.Get('results',['raw','output','verbatim'])
-	if(cmd.params.Has('file')):
-		cmd.outHandler = FileHandler(cmd,cmd.params)
-		return
-	if('table' in res):
-		cmd.outHandler = TableHandler(cmd,cmd.params)
-		return
+	if(not skipFile and cmd.params.Has('file')):
+		return FileHandler(cmd,cmd.params)
+	elif('table' in res or 'vector' in res):
+		return TableHandler(cmd,cmd.params)
+	elif('raw' in res):
+		return RawHandler(cmd,cmd.params)
+	elif('list' in res):
+		return ListHandler(cmd,cmd.params)
 	# Verbatim is the default
+	# Scalar is also allowed for this
 	else:
-		cmd.outHandler = RawHandler(cmd,cmd.params)
+		return TextHandler(cmd,cmd.params)
 
 def SetupOutputFormatter(cmd):
 	res = cmd.params.Get('results',['raw','output','verbatim'])
 	if('drawer' in res):
-		cmd.outFormatter = DrawerFormatter(cmd)
-		return
+		return DrawerFormatter(cmd)
 	elif('code' in res):
-		cmd.outFormatter = CodeFormatter(cmd)
-		return
+		return CodeFormatter(cmd)
 	elif('org' in res):
-		cmd.outFormatter = OrgFormatter(cmd)
-		return
+		return OrgFormatter(cmd)
+	elif('html' in res):
+		return HtmlFormatter(cmd)
+	elif('latex' in res):
+		return LatexFormatter(cmd)
 	# Raw is the default
 	else:
-		cmd.outFormatter = None
+		return None
 
 def GetGeneratorForRow(table,params,r):
 	for c in range(1,table.Width()+1):
@@ -181,6 +188,22 @@ class CodeFormatter(ResultsFormatter):
 		output = "#+begin_src "+self.cmd.language+"\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
 		return output
 
+class HtmlFormatter(ResultsFormatter):
+	def __init__(self,cmd):
+		super(HtmlFormatter,self).__init__(cmd)
+
+	def FormatOutput(self,output):
+		output = "#+begin_export html\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
+		return output
+
+class LatexFormatter(ResultsFormatter):
+	def __init__(self,cmd):
+		super(LatexFormatter,self).__init__(cmd)
+
+	def FormatOutput(self,output):
+		output = "#+begin_export latex\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
+		return output
+
 class OrgFormatter(ResultsFormatter):
 	def __init__(self,cmd):
 		super(OrgFormatter,self).__init__(cmd)
@@ -196,17 +219,22 @@ class ResultsHandler:
 	def SetIndent(self,level):
 		self.level = level
 	def GetIndent(self):
-		return (" " * self.level) + " "
+		if(self.level == 0):
+			return ""
+		else:
+			return (" " * self.level) + " "
 	def FormatOutput(self, output):
 		pass
 	def PostProcess(self, view, outPos, onDone):
 		onDone()
 
-class RawHandler(ResultsHandler):
+class TextHandler(ResultsHandler):
 	def __init__(self,cmd,params):
-		super(RawHandler,self).__init__(cmd,params)
+		super(TextHandler,self).__init__(cmd,params)
 
 	def GetIndent(self):
+		if(self.level == 0):
+			return ""
 		if(not self.cmd.outFormatter):
 			return (" " * self.level) + " : "
 		else:
@@ -229,17 +257,90 @@ class RawHandler(ResultsHandler):
 		else:
 			return output
 
+class ListHandler(ResultsHandler):
+	def __init__(self,cmd,params):
+		super(ListHandler,self).__init__(cmd,params)
+
+	def GetIndent(self):
+		if(self.level == 0):
+			return "- "
+		if(not self.cmd.outFormatter):
+			return (" " * self.level) + " - "
+		else:
+			return (" " * self.level) + " "
+
+	def FormatOutput(self, output):
+		indent = "\n"+ self.GetIndent()
+		# Strip whitespace from the end of this.
+		be = len(output)-1
+		for i in range(len(output)-1,0,-1):
+			if(output[i].strip() == ""):
+				be = i
+			else:
+				break
+		if(be > 0):
+			output = output[0:be]
+		# Try to convert AST to list.
+		for i in range(0,len(output)):
+			try:
+				l = ast.literal_eval(output[i])
+				if(isinstance(l,list)):
+					del output[i]
+					for r in reversed(l):
+						output.insert(i,str(r))
+			except:
+				#print("EXCEPTION")
+				#print(traceback.format_exc())
+				pass
+		output = indent.join(output).rstrip()
+		output = output.lstrip()
+		if(not self.cmd.outFormatter):
+			return "- " + output
+		else:
+			return output
+
+class RawHandler(ResultsHandler):
+	def __init__(self,cmd,params):
+		super(RawHandler,self).__init__(cmd,params)
+
+	def FormatOutput(self, output):
+		indent = "\n"+ self.GetIndent()
+		be = len(output)-1
+		for i in range(len(output)-1,0,-1):
+			if(output[i].strip() == ""):
+				be = i
+			else:
+				break
+		if(be > 0):
+			output = output[0:be]
+		output = indent.join(output).rstrip()
+		output = output.lstrip()
+		return output
 
 class FileHandler(ResultsHandler):
 	def __init__(self,cmd, params):
 		super(FileHandler,self).__init__(cmd,params)
 
-	def GetIndent(self):
-		return (" " * self.level) + " "
-
 	def FormatOutput(self, output):
-		out = ProcessPotentialFileOrgOutput(self.cmd)
+		out,fname = ProcessPotentialFileOrgOutput(self.cmd)
 		indent = "\n"+ self.GetIndent()
+		rawoutput = output
+		if(not hasattr(self.cmd.curmod,"GeneratesImages") or not self.cmd.curmod.GeneratesImages(self)):
+			dn = os.path.dirname(fname)
+			p = os.path.dirname(self.cmd.sourcefile)
+			fp = os.path.join(p,dn)
+			if(fp.strip() != ""):
+				os.makedirs(fp, exist_ok=True)
+			ffname = os.path.join(p,fname)
+			with open(ffname,'w') as f:
+				# We setup an output handler for the file.
+				outHandler = SetupOutputHandler(self.cmd, True)
+				outHandler.SetIndent(0)
+				rawoutput = outHandler.FormatOutput(rawoutput)
+				f.write(rawoutput)
+			# TODO Modify file attribs of generated file.
+			#st = os.stat(fname)
+			#os.chmod(fname, st.st_mode | stat.S_IEXEC)
 		output = indent.join(out).rstrip()
 		return output.lstrip()
 
@@ -390,8 +491,8 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			pdata = line[len(m.group(0)):]
 			self.language = fnname
 			ProcessPossibleSourceObjects(self,fnname,pdata)
-			SetupOutputHandler(self)
-			SetupOutputFormatter(self)
+			self.outHandler = SetupOutputHandler(self)
+			self.outFormatter = SetupOutputFormatter(self)
 			#paramstr = line[len(m.group(0)):]
 			#params = {}
 			#for m in RE_FN_MATCH.finditer(paramstr):
@@ -473,6 +574,19 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				output = self.outFormatter.FormatOutput(output)
 			## Keep track of this so we know where we are inserting the text.
 			self.resultsTxtStart = self.resultsStartPt + self.level + 1
-			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * self.level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})
+			formattedOutput = (" " * self.level + " ") + output+"\n"
+			if(CheckResultsFor(self,'silent')):
+				# We only echo to the console in silent mode.
+				print(formattedOutput)
+				self.OnReplaced()
+			# Add after other text
+			elif(CheckResultsFor(self,'append')):
+				self.view.run_command("org_internal_replace", {"start": self.resultsEndPt, "end": self.resultsEndPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+			# Add before other text
+			elif(CheckResultsFor(self,'prepend')):
+				self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsStartPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+			# Replace mode
+			else:
+				self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
 		else:
 			log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")

@@ -9,22 +9,46 @@
   To help new users we now have an:
 
   "Org Show Testfile" command that will quickly create a testfile for a user to play with.
+** Babel Preview Output Handlers
+  List Handler
 
-** Output Formatting
+   #+BEGIN_SRC python :results list
+     print(str([1,2,3,4,5]))
+   #+END_SRC
+
+   #+RESULTS:
+   - 1
+   - 2
+   - 3
+   - 4
+   - 5
+
+   File Handler With a List
+   
+   #+BEGIN_SRC python :results list :file out.py
+     print(str([1,2,3,4,5]))
+   #+END_SRC
+
+   #+RESULTS:
+   [[file:out.py]] 
+
+
+** Babel Preview Output Formatting
+  These wrap the output in a formatting block of some sort.
 
 *** Drawer Formatter
    will wrap output in a drawer
 
-   #+BEGIN_SRC python :results drawer verbatim :var x=5
+   #+BEGIN_SRC python :results drawer verbatim:var x=5
      print("Hello World")
      print(x)
    #+END_SRC
 
    #+RESULTS:
-   :results:
-   Hello World
-   5
-   :end:
+    :results:
+    Hello World
+    5
+    :end:
 
 *** Code Formatter
     will generate a code block with the output:
@@ -34,10 +58,10 @@
    #+END_SRC
 
    #+RESULTS:
-   #+begin_src python
-   [1, 2, 3, 4, 5]
-   #+end_src
-   
+    #+begin_src python
+    [1, 2, 3, 4, 5]
+    #+end_src
+
 *** Org Mode Formatter
     will generate a code block specific to org
 
@@ -46,6 +70,45 @@
    #+END_SRC
 
    #+RESULTS:
-   #+begin_src org
-   #+COMMENT: org data here
-   #+end_src
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+
+*** Append Prepend Silent Replace
+
+   #+BEGIN_SRC python :results org append
+     print("#+COMMENT: org data here")
+   #+END_SRC
+
+   #+RESULTS:
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+   
+
+   #+BEGIN_SRC python :results org prepend
+     print("#+COMMENT: org data here")
+   #+END_SRC
+
+   #+RESULTS:
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+    #+begin_src org
+    #+COMMENT: org data here
+    #+end_src
+   
+   #+BEGIN_SRC python :results org silent
+     print("#+COMMENT: org data here")
+   #+END_SRC
+
+    #+RESULTS:
