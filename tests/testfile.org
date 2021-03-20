@@ -598,7 +598,7 @@
 
   [[https://orgmode.org/manual/Capturing-column-view.html#Capturing-column-view][Column View]] 
 
-  #+BEGIN: columnview  :hlines nil :id global :indent t :maxdepth 2 :skip-empty-rows t :exclude-tags (ExcludeMe)
+  #+BEGIN: columnview  :hlines nil :id global :indent t :maxdepth 2 :exclude-tags (ExcludeMe)
    | Task                       | Effort | Todo | Deadline             | Tags  | Time                 | Inactive             | Priority |
    | 1.1.26                     |        |      |                      | a     |                      |                      |          |
    | ..Source Blocks            | 2d     | DONE |                      | a     |                      |                      |          |
