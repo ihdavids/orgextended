@@ -111,9 +111,15 @@ def SetupOutputFormatter(cmd):
 	if('drawer' in res):
 		cmd.outFormatter = DrawerFormatter(cmd)
 		return
+	elif('code' in res):
+		cmd.outFormatter = CodeFormatter(cmd)
+		return
+	elif('org' in res):
+		cmd.outFormatter = OrgFormatter(cmd)
+		return
 	# Raw is the default
 	else:
-		cmd.outFormatter = ResultsFormatter(cmd)
+		cmd.outFormatter = None
 
 def GetGeneratorForRow(table,params,r):
 	for c in range(1,table.Width()+1):
@@ -164,7 +170,23 @@ class DrawerFormatter(ResultsFormatter):
 		super(DrawerFormatter,self).__init__(cmd)
 
 	def FormatOutput(self,output):
-		output = ":RESULTS:\n" + self.GetIndent() + output + "\n" + self.GetIndent() + ":END:"
+		output = ":results:\n" + self.GetIndent() + output + "\n" + self.GetIndent() + ":end:"
+		return output
+
+class CodeFormatter(ResultsFormatter):
+	def __init__(self,cmd):
+		super(CodeFormatter,self).__init__(cmd)
+
+	def FormatOutput(self,output):
+		output = "#+begin_src "+self.cmd.language+"\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
+		return output
+
+class OrgFormatter(ResultsFormatter):
+	def __init__(self,cmd):
+		super(OrgFormatter,self).__init__(cmd)
+
+	def FormatOutput(self,output):
+		output = "#+begin_src org\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
 		return output
 
 class ResultsHandler:
@@ -185,7 +207,10 @@ class RawHandler(ResultsHandler):
 		super(RawHandler,self).__init__(cmd,params)
 
 	def GetIndent(self):
-		return (" " * self.level) + " : "
+		if(not self.cmd.outFormatter):
+			return (" " * self.level) + " : "
+		else:
+			return (" " * self.level) + " "
 
 	def FormatOutput(self, output):
 		indent = "\n"+ self.GetIndent()
@@ -199,7 +224,11 @@ class RawHandler(ResultsHandler):
 			output = output[0:be]
 		output = indent.join(output).rstrip()
 		output = output.lstrip()
-		return ": " + output
+		if(not self.cmd.outFormatter):
+			return ": " + output
+		else:
+			return output
+
 
 class FileHandler(ResultsHandler):
 	def __init__(self,cmd, params):
@@ -359,6 +388,7 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			fnname = m.group('name')
 			#log.debug("SRC NAME: " + fnname)
 			pdata = line[len(m.group(0)):]
+			self.language = fnname
 			ProcessPossibleSourceObjects(self,fnname,pdata)
 			SetupOutputHandler(self)
 			SetupOutputFormatter(self)
@@ -436,9 +466,11 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			#output,self.isTable = tbl.TableConversion(self.level,output)
 			#output = output.lstrip()
 			self.outHandler.SetIndent(n.level)
-			self.outFormatter.SetIndent(n.level)
+			if(self.outFormatter):
+				self.outFormatter.SetIndent(n.level)
 			output = self.outHandler.FormatOutput(self.outputs)
-			output = self.outFormatter.FormatOutput(output)
+			if(self.outFormatter):
+				output = self.outFormatter.FormatOutput(output)
 			## Keep track of this so we know where we are inserting the text.
 			self.resultsTxtStart = self.resultsStartPt + self.level + 1
 			self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": (" " * self.level + " ") + output+"\n","onDone": evt.Make(self.OnReplaced)})

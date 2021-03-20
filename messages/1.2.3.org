@@ -1,6 +1,10 @@
 * 1.2.3
 	Core Idea - Better output support and results controls
 
+** Column View
+  - Fixed a small regression introduced in plists in some of the earlier babel work.
+    This was impacting columnview
+
 ** Test File
   To help new users we now have an:
 
@@ -8,7 +12,8 @@
 
 ** Output Formatting
 
-	Drawer formatter will wrap output in a drawer
+*** Drawer Formatter
+   will wrap output in a drawer
 
    #+BEGIN_SRC python :results drawer verbatim :var x=5
      print("Hello World")
@@ -16,7 +21,31 @@
    #+END_SRC
 
    #+RESULTS:
-   :RESULTS:
-   : Hello World
-   : 5
-   :END:
+   :results:
+   Hello World
+   5
+   :end:
+
+*** Code Formatter
+    will generate a code block with the output:
+
+   #+BEGIN_SRC python :results code
+     print(str([1,2,3,4,5]))
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_src python
+   [1, 2, 3, 4, 5]
+   #+end_src
+   
+*** Org Mode Formatter
+    will generate a code block specific to org
+
+   #+BEGIN_SRC python :results org
+     print("#+COMMENT: org data here")
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_src org
+   #+COMMENT: org data here
+   #+end_src
