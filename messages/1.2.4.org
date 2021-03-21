@@ -1,3 +1,36 @@
 * 1.2.4
 
 	Core Idea: Value vs Output execution
+
+** Column View
+  - Fixed a problem where the columnview dynamic block was grabbing its column definitions
+    from the current node. This would cause column view to use the default definition.
+
+	 #+COLUMNS: %TODO(To do) %ITEM(Task) %TAGS(Tags) %Effort(effort)
+   #+BEGIN: columnview :id global :indent t
+   | TODO | Task          | Tags | effort |
+   |      | 1.2.4         |      |        |
+   | DONE | ..Column View |      |        |
+   #+END:
+
+** Value Type Execution
+
+  Acts like a function, the return statement of the code is returned.
+
+  #+BEGIN_SRC python :results value
+      print("Hello world")
+      print("Hello world2")
+      if 5 < 10:
+        print("hi")
+      return 11
+  #+END_SRC
+   #+RESULTS:
+   : 11
+    
+   #+BEGIN_SRC powershell :results value
+     Write-Host "Hello World"
+     return 10
+   #+END_SRC
+   #+RESULTS:
+   : Hello World
+   : 10

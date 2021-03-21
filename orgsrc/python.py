@@ -15,7 +15,17 @@ def FormatText(txt):
         return "'" + txt + "'"
     return txt
 
+def HandleValue(cmd):
+    if(cmd.CheckResultsFor('value')):
+        out = "def OrgExtendedPythonWrapperFunction():\n"
+        outs = cmd.source.split('\n')
+        for o in outs:
+            out += "    " + o + "\n"
+        out += "\n\norgExtendedPythonReturnVar = OrgExtendedPythonWrapperFunction()\n"
+        cmd.source = out
+
 def PreProcessSourceFile(cmd):
+    HandleValue(cmd)
     var = cmd.params.Get('var',None)
     if(var):
         out = ""
@@ -47,6 +57,7 @@ def PreProcessSourceFile(cmd):
                 out += str(k) + " = \'" + str(v) + "\'\n"
         cmd.source = out + cmd.source
 
+
 # Actually do the work, return an array of output.
 def Execute(cmd, sets):
     # create file-like string to capture output
@@ -58,11 +69,16 @@ def Execute(cmd, sets):
     oldErr     = sys.stderr
     sys.stdout = codeOut
     sys.stderr = codeErr
+    ret = None
+    loc = {}
+    loc['orgExtendedPythonReturnVar'] = None
+    globs = globals()
     try:
-        code = re.sub(r"^(\s+)(.*)$",
-            lambda m: re.sub("^" + " "*len(m.group(1)),"",m.group(2),flags=re.MULTILINE)
-            ,code,flags=re.MULTILINE|re.DOTALL)
-        exec(code)
+        if(not cmd.CheckResultsFor('value')):
+            code = re.sub(r"^(\s+)(.*)$",
+                    lambda m: re.sub("^" + " "*len(m.group(1)),"",m.group(2),flags=re.MULTILINE)
+                    ,code,flags=re.MULTILINE|re.DOTALL)
+        exec(code,globs,loc)
     except Exception as ex:
         # If we throw during the run we need to catch it
         # and try to handle it here.
@@ -76,14 +92,16 @@ def Execute(cmd, sets):
     sys.stdout = oldOut
     sys.stderr = oldErr
 
-    #print("DONE EXECUTING")
     e = codeErr.getvalue()
     #print("error:\n%s\n" % e)
     o = codeOut.getvalue()
     #print("output:\n%s" % o)
     codeOut.close()
     codeErr.close()
-    return o.split('\n') + e.split('\n')
+    if(cmd.CheckResultsFor('value')):
+        return [ str(loc['orgExtendedPythonReturnVar']) ]
+    else:
+        return o.split('\n') + e.split('\n')
 
 
 # Run after results are in the buffer. We can do whatever

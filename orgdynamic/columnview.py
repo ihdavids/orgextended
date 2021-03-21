@@ -155,8 +155,8 @@ special_registry = {
 
 #%[WIDTH]PROPERTY[(TITLE)][{SUMMARY-TYPE}]
 RE_PARSER = re.compile(r"[%](?P<width>[0-9]+)?(?P<prop>[a-zA-Z][a-zA-Z0-9_-]+)([(](?P<heading>([a-zA-Z0-9 +-]|\s)+)[)])?(?P<summary>[^ ())]+)?")
-def GetColumnDefinitions(f):
-	columns = f.org.list_comment("COLUMNS",[r"%70ITEM(Task)",r"%17Effort(Effort)"])
+def GetColumnDefinitions(f,node):
+	columns = node.list_comment("COLUMNS",[r"%70ITEM(Task)",r"%17Effort(Effort)"])
 	h = []
 	for item in columns:
 		m = RE_PARSER.search(item)
@@ -191,11 +191,11 @@ def Execute(view, params):
 	# Look it up in the DB. This will also reload it if it is dirty.
 	file = db.Get().FindInfo(view)
 	if(file):
-		defs = GetColumnDefinitions(file)
+		node = db.Get().AtInView(view)
+		defs = GetColumnDefinitions(file,node)
 		r = file.org
 		# Local we search up till we find the node parent that is not the root
 		if(id == 'local'):
-			node = db.Get().AtInView(view)
 			if(node):
 				while(node and node.parent and node.parent.parent):
 					node = node.parent

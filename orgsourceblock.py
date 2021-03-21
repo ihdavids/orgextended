@@ -93,9 +93,6 @@ def BuildFullParamList(cmd,language,cmdArgs):
 	plist.AddFromPList(cmdArgs)
 	cmd.params = plist
 
-def CheckResultsFor(cmd,val):
-	res = cmd.params.Get('results',[])
-	return (val in res)
 
 def SetupOutputHandler(cmd,skipFile = False):
 	res = cmd.params.Get('results',['raw','output','verbatim'])
@@ -364,6 +361,11 @@ class TableHandler(ResultsHandler):
 
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
+
+	def CheckResultsFor(self,val):
+		res = self.params.Get('results',[])
+		return (val in res)
+
 	def OnDone(self):
 		evt.EmitIf(self.onDone)
 
@@ -487,23 +489,18 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 				log.error("FAILED TO PARSE SOURCE BLOCK: " + line)
 				return
 			fnname = m.group('name')
-			#log.debug("SRC NAME: " + fnname)
+			log.debug("SRC NAME: " + fnname)
 			pdata = line[len(m.group(0)):]
 			self.language = fnname
 			ProcessPossibleSourceObjects(self,fnname,pdata)
-			self.outHandler = SetupOutputHandler(self)
+			self.outHandler   = SetupOutputHandler(self)
 			self.outFormatter = SetupOutputFormatter(self)
-			#paramstr = line[len(m.group(0)):]
-			#params = {}
-			#for m in RE_FN_MATCH.finditer(paramstr):
-			#	params[m.group(1)] = m.group(2)
 			# Now find me that function!
 			if(fnname not in extensions):
 				log.error("Function not found in src folder! Cannot execute!")
 				return
 
 			# Start setting up our execution state.
-			#self.params   = params
 			self.curmod   = extensions[fnname]
 			self.startRow = row + 1
 			self.endRow   = end
@@ -538,7 +535,6 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 					tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
 					try:
 						self.filename = tmp.name
-						#print(tmp.name)
 						if(hasattr(self.curmod,"WrapStart")):
 							tmp.write((self.curmod.WrapStart(self) + "\n").encode("ascii"))
 						tmp.write(self.source.encode('ascii'))
@@ -546,13 +542,13 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 							tmp.write(("\n" + self.curmod.WrapEnd(self)).encode("ascii"))
 						tmp.close()	
 						self.outputs = self.curmod.Execute(self,sets)
+					except:
+						log.debug(" " + traceback.format_exc())
 					finally:
-						#os.unlink(tmp.name)
 						pass
 				else:
 					self.filename = None
 					self.outputs = self.curmod.Execute(self,sets)
-				#ProcessPotentialFileOrgOutput(self)
 				log.debug("OUTPUT: " + str(self.outputs))
 			else:
 				log.error("No execute in module, abort")
@@ -561,11 +557,6 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			# No bad formatting allowed!
 			n = db.Get().AtInView(view)
 			self.level = n.level
-			#indent = "\n"+ (" " * self.level) + " "
-			##outputs = output.split('\n')
-			#output = indent.join(self.outputs).rstrip()
-			#output,self.isTable = tbl.TableConversion(self.level,output)
-			#output = output.lstrip()
 			self.outHandler.SetIndent(n.level)
 			if(self.outFormatter):
 				self.outFormatter.SetIndent(n.level)
@@ -575,15 +566,15 @@ class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
 			## Keep track of this so we know where we are inserting the text.
 			self.resultsTxtStart = self.resultsStartPt + self.level + 1
 			formattedOutput = (" " * self.level + " ") + output+"\n"
-			if(CheckResultsFor(self,'silent')):
+			if(self.CheckResultsFor('silent')):
 				# We only echo to the console in silent mode.
 				print(formattedOutput)
 				self.OnReplaced()
 			# Add after other text
-			elif(CheckResultsFor(self,'append')):
+			elif(self.CheckResultsFor('append')):
 				self.view.run_command("org_internal_replace", {"start": self.resultsEndPt, "end": self.resultsEndPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
 			# Add before other text
-			elif(CheckResultsFor(self,'prepend')):
+			elif(self.CheckResultsFor('prepend')):
 				self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsStartPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
 			# Replace mode
 			else:

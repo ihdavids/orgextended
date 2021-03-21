@@ -16,7 +16,7 @@ import datetime
 
 
 RE_TARGETS = re.compile(r'<<(?P<target>[^>]+)>>')
-RE_COMMENT = re.compile(r'^\s*[#][+](?P<name>[A-Za-z][A-Za-z0-9_]+)[:]\s+(?P<val>.*)$')
+RE_COMMENT = re.compile(r'^\s*[#][+](?P<name>[A-Za-z][A-Za-z0-9_]+)[:]\s*(?P<val>.*)$')
 RE_TABLE_MATCH = re.compile(r"^\s*\|")
 
 class OffsetIter:
