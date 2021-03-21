@@ -178,6 +178,9 @@ class OrgOpenLinkCommand(sublime_plugin.TextCommand):
         wanted_resolvers = sets.Get("linkResolvers", DEFAULT_LINK_RESOLVERS)
         self.resolvers   = [available_resolvers[name].Resolver(self.view) for name in wanted_resolvers]
 
+        # This is goofy. File loads get resolve called that calls extract.
+        # extact may launch the file into sublime. IF we return a path
+        # sublime will call start on the file.
         view = self.view
         for sel in view.sel():
             if not self.is_valid_scope(sel):

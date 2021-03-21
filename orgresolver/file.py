@@ -78,22 +78,29 @@ class Resolver(AbstractLinkResolver):
         self.force_load_patterns = get(FORCE_LOAD_SETTING, FORCE_LOAD_DEFAULT)
 
     def file_is_excluded(self, filepath):
+        self.settings      = sublime.load_settings('OrgExtended.sublime-settings')
         basename = os.path.basename(filepath)
-        for pattern in self.force_load_patterns:
-            if fnmatch(basename, pattern):
-                #print('found in force_load_patterns')
+        if(isinstance(self.force_load_patterns,str)):
+            self.force_load_patterns = self.force_load_patterns.split(',')
+        for flpattern in self.force_load_patterns:
+            if fnmatch(basename, flpattern):
+                #print('found in force_load_patterns: ' + flpattern + " " + basename)
                 return False
-        return True
-
         folder_exclude_patterns = self.settings.get('folder_exclude_patterns')
-        if basename in folder_exclude_patterns:
-            #print('found in folder_exclude_patterns')
-            return True
-        file_exclude_patterns = self.settings.get('file_exclude_patterns')
-        for pattern in file_exclude_patterns:
-            if fnmatch(basename, pattern):
-                #print('found in file_exclude_patterns')
+        if(folder_exclude_patterns):
+            if(isinstance(folder_exclude_patterns,str)):
+                folder_exclude_patterns = folder_exclude_patterns.split(',')
+            if basename in folder_exclude_patterns:
+                #print('found in folder_exclude_patterns')
                 return True
+        file_exclude_patterns = self.settings.get('file_exclude_patterns')
+        if(file_exclude_patterns):
+            if(isinstance(file_exclude_patterns,str)):
+                file_exclude_patterns = file_exclude_patterns.split(',')
+            for pattern in file_exclude_patterns:
+                if fnmatch(basename, pattern):
+                    #print('found in file_exclude_patterns: ' + str(basename))
+                    return True
         return False
 
     def expand_path(self, filepath):
@@ -139,7 +146,7 @@ class Resolver(AbstractLinkResolver):
                 return True
         #print("NO TEXT MATCH")
         drive, filepath = os.path.splitdrive(filepath)
-        if not filepath.startswith('/'):  # If filepath is relative...
+        if not filepath.startswith('/') and not filepath.startswith('\\'):  # If filepath is relative...
             cwd = os.path.dirname(self.view.file_name())
             testfile = os.path.join(cwd, filepath)
             if os.path.exists(testfile):  # See if it exists here...
@@ -151,11 +158,12 @@ class Resolver(AbstractLinkResolver):
                 filepath += ':%s' % row
             if col:
                 filepath += ':%s' % col
+            #print("Opening file: " + filepath)
             self.view.window().open_file(filepath, sublime.ENCODED_POSITION)
             return True
         else:
             #print('file_is_excluded: ' + filepath)
-            pass
+            return filepath
 
         return None
 

@@ -2,6 +2,14 @@
 
 	Core Idea: Value vs Output execution
 
+** Links Improvements
+   By default most file links will be loaded within sublime.
+   If there is a file type you want launched outside of sublime use:
+
+   #+BEGIN_EXAMPLE
+     "file_exclude_pattern": ["*.pdf"],
+   #+END_EXAMPLE
+
 ** Column View
   - Fixed a problem where the columnview dynamic block was grabbing its column definitions
     from the current node. This would cause column view to use the default definition.
@@ -32,5 +40,8 @@
      return 10
    #+END_SRC
    #+RESULTS:
-   : Hello World
    : 10
+
+** Chainging Execution
+
+  A src block should be able to reference another src block
