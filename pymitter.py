@@ -349,6 +349,9 @@ def EmitIf(onDone):
     if(onDone):
         eventEmitter.emit(onDone)
 
+def EmitIfParams(onDone,**kwargs):
+    if(onDone):
+        eventEmitter.emit(onDone,kwargs)
 
 import OrgExtended.orgutil.util as util
 

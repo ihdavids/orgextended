@@ -44,4 +44,44 @@
 
 ** Chainging Execution
 
-  A src block should be able to reference another src block
+  A src block should be able to reference another src block as an input.
+  This is a REALLY early version of this. Only tables work at the moment.
+
+  There are a couple of challenges here:
+
+  - Things move as other items execute, I haven't fully solved that yet.
+  - Right now I ALWAYS execute the target source block, I need to improve that going forward.
+  - Errors in the chain are not handled very well yet.
+
+  #+NAME: tbl-source
+  | a | b | c | d | e |
+  | 1 | 2 | 3 | 4 | 5 |
+
+  This source block uses the output from the table above
+
+  #+NAME: python-src
+  #+BEGIN_SRC python :results table :var DATA=tbl-source
+   print(DATA)
+  #+END_SRC
+
+  #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+
+
+   This source block uses the output from python-src as an input
+
+   #+BEGIN_SRC python :results table :var DATA=python-src
+    print(DATA) 
+   #+END_SRC
+
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+
+
+
+
+
+
+
