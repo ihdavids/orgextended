@@ -758,7 +758,7 @@ class WeekView(AgendaBaseView):
             timestamps = n.get_timestamps(active=True,point=True,range=True)
             shouldContinue = False
             for t in timestamps:
-                if(t.start.day == date.day):
+                if(t.start.day == date.day and t.start.month == date.month and t.start.year == date.year):
                     daydata.append(entry)
                     entry['ts'] = t
                     shouldContinue = True

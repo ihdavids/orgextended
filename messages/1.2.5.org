@@ -1,6 +1,12 @@
 * 1.2.5
 	Core Idea: Better Chaining Support
 
+** Agenda - WeekView
+  - Bugfix: The weekview could show things last month but in the current week erroneously.
+
+
+** PlantUML
+  - Fixed a regression in the parameter handling for plantuml.
 
 ** Handling Drawers in Chained Sources
 
@@ -112,6 +118,8 @@
    #+END_SRC
 
    #+RESULTS:
+   
+   
    
    
    
