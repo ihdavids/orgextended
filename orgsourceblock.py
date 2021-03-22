@@ -421,10 +421,14 @@ class TableHandler(ResultsHandler):
         return output
 
     def PostProcess(self, view, outPos, onDone):
-        view.sel().clear()
-        view.sel().add(outPos)
-        view.run_command("table_editor_align")
-        sublime.set_timeout(onDone,1)
+        if(not self.cmd.CheckResultsFor('silent') and None == self.cmd.silent):
+            view.sel().clear()
+            view.sel().add(outPos)
+            view.run_command("table_editor_align")
+            sublime.set_timeout(onDone,1)
+        else:
+            sublime.set_timeout(onDone,1)
+
 
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
@@ -654,12 +658,16 @@ class OrgExecuteSourceBlock:
         # but not from the buffer
         if('preFormat' in otherParams):
             preFormat = otherParams['preFormat']
-            preFormat = preFormat.split('\n')
+            preFormat1 = preFormat.split('\n')
+            preFormat = []
+            for l in preFormat1:
+                preFormat.append(l.strip())
             if(lst.isListLine(preFormat[0])):
                 l = lst.ListData.CreateListFromList(preFormat)
                 var[fn['key']] = l
             elif(tbl.isTableLine(preFormat[0])):
-                pass
+                td = tbl.create_table_from_node(preFormat,0)
+                var[fn['key']] = td
             else:
                 t = TextDef.CreateTextFromText(preFormat)
                 l = "\n".join(t.lines)

@@ -2030,7 +2030,13 @@ def create_table(view, at=None):
 # ====================================================================
 def create_table_from_node(node, row):
     start_row = row
-    last_row  = len(node._lines)
+    lineData = None
+    if(isinstance(node,list)):
+        lineData = node
+        node = None
+    else:
+        lineData = node._lines
+    last_row  = len(lineData)
     end = last_row
     start = row
     linedef = None
@@ -2041,7 +2047,7 @@ def create_table_from_node(node, row):
     formulaRow = None
     formulaLine = None
     for r in range(row-1,0,-1):
-        line = node._lines[r]
+        line = lineData[r]
         if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line) or RE_END_BLOCK.search(line)):
             continue
         row = r+1
@@ -2060,7 +2066,7 @@ def create_table_from_node(node, row):
     ignoreRows = {}
     for r in range(row,last_row):
         rowNum += 1
-        line = node._lines[r]
+        line = lineData[r]
         m = RE_FMT_LINE.search(line)
         # Found a table hline. These don't get counted
         if(RE_TABLE_HLINE.search(line)):
@@ -2147,7 +2153,7 @@ def create_table_from_node(node, row):
                     lastRow = rowNum - 1
             break
     for r in range(row,0,-1):
-        line = node._lines[r]
+        line = lineData[r]
         if(RE_TABLE_LINE.search(line)):
             continue
         else:

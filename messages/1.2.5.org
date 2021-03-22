@@ -84,18 +84,38 @@
 ** Silent Exec 
 
    #+NAME: ps-src
-   #+BEGIN_SRC powershell :results value list silent :var DATA=lst-source
+   #+BEGIN_SRC powershell :results output list silent :var DATA=lst-source
 	  $DATA
    #+END_SRC
 
 
-   #+BEGIN_SRC python :results drawer :var DATA=ps-src
+   #+BEGIN_SRC python :results drawer list :var DATA=ps-src
      print(DATA)
    #+END_SRC
 
    #+RESULTS:
    :results:
-   ['a b c']
+   - a
+   - b
+   - c
    :end:
+
+
+  #+NAME: python-src2
+  #+BEGIN_SRC python :results table silent :var DATA=tbl-source
+   print(DATA)
+  #+END_SRC
+
+
+   #+BEGIN_SRC python :results table :var DATA=python-src2
+    print(DATA) 
+   #+END_SRC
+
+   #+RESULTS:
+   
+   
+   
+   
+   
 
 
