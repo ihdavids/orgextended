@@ -1,2 +1,37 @@
 * 1.2.5
 	Core Idea: Better Chaining Support
+
+
+** Handling Drawers in Chained Sources
+
+  #+NAME: tbl-source
+  | a | b | c | d | e |
+  | 1 | 2 | 3 | 4 | 5 |
+
+  This source block uses the output from the table above
+
+  #+NAME: python-src
+  #+BEGIN_SRC python :results drawer table :var DATA=tbl-source
+   print(DATA)
+  #+END_SRC
+
+  #+RESULTS:
+  :results:
+  | a | b | c | d | e |
+  | 1 | 2 | 3 | 4 | 5 |
+
+  :end:
+
+
+   This source block uses the output from python-src as an input
+
+   #+BEGIN_SRC python :results table :var DATA=python-src
+    print(DATA) 
+   #+END_SRC
+
+   #+RESULTS:
+  | a | b | c | d | e |
+  | 1 | 2 | 3 | 4 | 5 |
+
+
+

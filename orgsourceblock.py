@@ -209,7 +209,7 @@ class ResultsFormatter:
     def GetIndent(self):
         return (" " * self.level) + " "
     def FormatOutput(self,output):
-        return output
+        return (output,0)
 
 class DrawerFormatter(ResultsFormatter):
     def __init__(self,cmd):
@@ -217,7 +217,7 @@ class DrawerFormatter(ResultsFormatter):
 
     def FormatOutput(self,output):
         output = ":results:\n" + self.GetIndent() + output + "\n" + self.GetIndent() + ":end:"
-        return output
+        return (output,1)
 
 class CodeFormatter(ResultsFormatter):
     def __init__(self,cmd):
@@ -225,7 +225,7 @@ class CodeFormatter(ResultsFormatter):
 
     def FormatOutput(self,output):
         output = "#+begin_src "+self.cmd.language+"\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
-        return output
+        return (output,1)
 
 class HtmlFormatter(ResultsFormatter):
     def __init__(self,cmd):
@@ -233,7 +233,7 @@ class HtmlFormatter(ResultsFormatter):
 
     def FormatOutput(self,output):
         output = "#+begin_export html\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
-        return output
+        return (output,1)
 
 class LatexFormatter(ResultsFormatter):
     def __init__(self,cmd):
@@ -241,7 +241,7 @@ class LatexFormatter(ResultsFormatter):
 
     def FormatOutput(self,output):
         output = "#+begin_export latex\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
-        return output
+        return (output,1)
 
 class OrgFormatter(ResultsFormatter):
     def __init__(self,cmd):
@@ -249,7 +249,7 @@ class OrgFormatter(ResultsFormatter):
 
     def FormatOutput(self,output):
         output = "#+begin_src org\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
-        return output
+        return (output,1)
 
 class ResultsHandler:
     def __init__(self, cmd, params):
@@ -420,7 +420,7 @@ class OrgExecuteSourceBlock:
 
     def OnDone(self):
         evt.EmitIf(self.onDone)
-        evt.EmitIfParams(self.onDoneResultsPos,results=self.resultsTxtStart,name=self.onDoneFnName)
+        evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
 
     def OnPostProcess(self):
         self.curPt = self.view.sel()[0]
@@ -594,7 +594,7 @@ class OrgExecuteSourceBlock:
             else:
                 self.Execute()
     def OnDoneFunction(self,otherParams=None):
-        results = otherParams['results']
+        #results = otherParams['results']
         name    = otherParams['name']
         #print("DONE: " + str(results))
         #print("DONE2: " + str(name))
@@ -604,9 +604,15 @@ class OrgExecuteSourceBlock:
         fn = self.sourcefns[name]
         # Our goal is determine what is at results location
         # convert it and insert it into var.
-        if(tbl.isTable(self.view,results)):
-            td = tbl.create_table(self.view, results)
-            var[fn['key']] = td
+        if('pos' in otherParams):
+            pos = otherParams['pos']
+            if(tbl.isTable(self.view,pos)):
+                td = tbl.create_table(self.view, pos)
+                var[fn['key']] = td
+            else:
+                l = lst.IfListExtract(self.view, pos)
+                if(l):
+                    var[fn['key']] = l
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
         if(self.deferedSources <= 0):
@@ -654,10 +660,15 @@ class OrgExecuteSourceBlock:
                 self.outFormatter.SetIndent(n.level)
             #print("VVV: " + str(self.outputs))
             output = self.outHandler.FormatOutput(self.outputs)
-            if(self.outFormatter):
-                output = self.outFormatter.FormatOutput(output)
-            ## Keep track of this so we know where we are inserting the text.
             self.resultsTxtStart = self.resultsStartPt + self.level + 1
+            rowadjust = 0
+            if(self.outFormatter):
+                output,rowadjust = self.outFormatter.FormatOutput(output)
+            if(rowadjust > 0):
+                row,col = self.view.rowcol(self.resultsTxtStart)
+                row += rowadjust
+                self.resultsTxtStart = self.view.text_point(row,col)
+            ## Keep track of this so we know where we are inserting the text.
             formattedOutput = (" " * self.level + " ") + output+"\n"
             if(self.CheckResultsFor('silent')):
                 # We only echo to the console in silent mode.

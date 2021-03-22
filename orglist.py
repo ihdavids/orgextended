@@ -79,3 +79,11 @@ def LookupNamedListInFile(name):
                 if(numberedlist.isNumberedLine(view,reg) or checkbox.isUnorderedList(line)):
                     l = ListData(view,pt)
     return l
+
+def IfListExtract(view,pt):
+    l = None
+    reg = view.line(results)
+    line = view.substr(reg)
+    if(numberedlist.isNumberedLine(view,reg) or checkbox.isUnorderedList(line)):
+        l = ListData(view,pt)
+    return l
