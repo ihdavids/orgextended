@@ -33,6 +33,8 @@
 
 ** Handling Lists in Chained Sources
 
+	Here we have a list that acts as a source for some python that acts as a source for more python.
+
 	#+NAME: lst-source
 	1. a
 	2. b
@@ -44,9 +46,11 @@
 	#+END_SRC
 
    #+RESULTS:
+   :results:
    - a
    - b
    - c
+   :end:
 
    #+BEGIN_SRC python :results list :var DATA=python-lstsrc
     print(DATA) 

@@ -98,11 +98,11 @@ def SetupOutputHandler(cmd,skipFile = False):
     res = cmd.params.Get('results',['raw','output','verbatim'])
     if(not skipFile and cmd.params.Has('file')):
         return FileHandler(cmd,cmd.params)
-    elif('table' in res or 'vector' in res):
+    elif(re.search(r'\btable\b',res) or re.search(r'\bvector\b',res)):
         return TableHandler(cmd,cmd.params)
-    elif('raw' in res):
+    elif(re.search(r'\braw\b',res)):
         return RawHandler(cmd,cmd.params)
-    elif('list' in res):
+    elif(re.search(r'\blist\b',res)):
         return ListHandler(cmd,cmd.params)
     # Verbatim is the default
     # Scalar is also allowed for this
@@ -111,15 +111,15 @@ def SetupOutputHandler(cmd,skipFile = False):
 
 def SetupOutputFormatter(cmd):
     res = cmd.params.Get('results',['raw','output','verbatim'])
-    if('drawer' in res):
+    if(re.search(r'\bdrawer\b',res)):
         return DrawerFormatter(cmd)
-    elif('code' in res):
+    elif(re.search(r'\bcode\b', res)):
         return CodeFormatter(cmd)
-    elif('org' in res):
+    elif(re.search(r'\borg\b', res)):
         return OrgFormatter(cmd)
-    elif('html' in res):
+    elif(re.search(r'\bhtml\b', res)):
         return HtmlFormatter(cmd)
-    elif('latex' in res):
+    elif(re.search(r'\blatex\b', res)):
         return LatexFormatter(cmd)
     # Raw is the default
     else:
@@ -177,6 +177,7 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
     var = cmd.params.GetDict('var',None)
     cmd.params.Replace('var',var)
     cmd.deferedSources = 0
+    hadDeferred = False
     if(var):
         for k in var:
             n = var[k]
@@ -197,10 +198,10 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
                         if(None != pt):
                             if(not n in cmd.sourcefns):
                                 cmd.deferedSources += 1
+                                hadDeferred = True
                                 cmd.sourcefns[n] = {'at': pt, 'key': k,'name': n}
                                 cmd.view.run_command('org_execute_source_block',{'at':pt, 'onDoneResultsPos': evt.Make(cmd.OnDoneFunction), 'onDoneFnName': n})
-        print("REPLACED VAR: " + str(var))
-    return cmd.deferedSources > 0
+    return hadDeferred
 
 class ResultsFormatter:
     def __init__(self,cmd):
@@ -304,10 +305,7 @@ class ListHandler(ResultsHandler):
     def GetIndent(self):
         if(self.level == 0):
             return "- "
-        if(not self.cmd.outFormatter):
-            return (" " * self.level) + " - "
-        else:
-            return (" " * self.level) + " "
+        return (" " * self.level) + " - "
 
     def FormatOutput(self, output):
         indent = "\n"+ self.GetIndent()
@@ -334,10 +332,7 @@ class ListHandler(ResultsHandler):
                 pass
         output = indent.join(output).rstrip()
         output = output.lstrip()
-        if(not self.cmd.outFormatter):
-            return "- " + output
-        else:
-            return output
+        return "- " + output
 
 class RawHandler(ResultsHandler):
     def __init__(self,cmd,params):
@@ -613,7 +608,6 @@ class OrgExecuteSourceBlock:
             else:
                 l = lst.IfListExtract(self.view, pos)
                 if(l):
-                    print(str(var))
                     var[fn['key']] = l
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
@@ -666,6 +660,8 @@ class OrgExecuteSourceBlock:
             rowadjust = 0
             if(self.outFormatter):
                 output,rowadjust = self.outFormatter.FormatOutput(output)
+            # If our formatter wrapped us we have to adjust our text point for post processing
+            # and results text.
             if(rowadjust > 0):
                 row,col = self.view.rowcol(self.resultsTxtStart)
                 row += rowadjust
