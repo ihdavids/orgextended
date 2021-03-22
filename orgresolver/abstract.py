@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 import subprocess
 import sublime
@@ -39,6 +40,12 @@ class AbstractLinkResolver(object):
         return None
 
     def execute(self, content):
+
+        if os.path.isfile(content) or os.path.isdir(content):
+            content = os.path.normpath(content)
+        else:
+            print('{} does not exist!'.format(content))
+
         command = self.get_link_command()
         if not command:
             sublime.error_message(
@@ -66,17 +73,16 @@ class AbstractLinkResolver(object):
         if sys.platform != 'win32':
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        else:
-            process = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
-        stdout, stderr = process.communicate()
-        if stdout:
-            stdout = str(stdout, sys.getfilesystemencoding())
-            sublime.status_message(stdout)
-        if stderr:
-            stderr = str(stderr, sys.getfilesystemencoding())
-            sublime.error_message(stderr)
+            stdout, stderr = process.communicate()
+            if stdout:
+                stdout = str(stdout, sys.getfilesystemencoding())
+                sublime.status_message(stdout)
+            if stderr:
+                stderr = str(stderr, sys.getfilesystemencoding())
+                sublime.error_message(stderr)
+        else:     
+            os.startfile(content)
 
 
 class AbstractRegexLinkResolver(AbstractLinkResolver):
