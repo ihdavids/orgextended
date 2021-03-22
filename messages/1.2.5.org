@@ -16,12 +16,10 @@
   #+END_SRC
 
   #+RESULTS:
-  :results:
-  | a | b | c | d | e |
-  | 1 | 2 | 3 | 4 | 5 |
-
-  :end:
-
+   :results:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
+   :end:
 
    This source block uses the output from python-src as an input
 
@@ -30,8 +28,31 @@
    #+END_SRC
 
    #+RESULTS:
-  | a | b | c | d | e |
-  | 1 | 2 | 3 | 4 | 5 |
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
 
+** Handling Lists in Chained Sources
 
+	#+NAME: lst-source
+	1. a
+	2. b
+	3. c
 
+	#+NAME: python-lstsrc
+	#+BEGIN_SRC python :results drawer list :var DATA=lst-source
+	  print(DATA)
+	#+END_SRC
+
+   #+RESULTS:
+   - a
+   - b
+   - c
+
+   #+BEGIN_SRC python :results list :var DATA=python-lstsrc
+    print(DATA) 
+   #+END_SRC
+
+   #+RESULTS:
+   - a
+   - b
+   - c

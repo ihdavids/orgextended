@@ -175,6 +175,7 @@ def LookupNamedSourceBlockInFile(name):
 def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
     BuildFullParamList(cmd,language,cmdArgs)
     var = cmd.params.GetDict('var',None)
+    cmd.params.Replace('var',var)
     cmd.deferedSources = 0
     if(var):
         for k in var:
@@ -198,7 +199,7 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
                                 cmd.deferedSources += 1
                                 cmd.sourcefns[n] = {'at': pt, 'key': k,'name': n}
                                 cmd.view.run_command('org_execute_source_block',{'at':pt, 'onDoneResultsPos': evt.Make(cmd.OnDoneFunction), 'onDoneFnName': n})
-        cmd.params.Replace('var',var)
+        print("REPLACED VAR: " + str(var))
     return cmd.deferedSources > 0
 
 class ResultsFormatter:
@@ -392,7 +393,7 @@ class TableHandler(ResultsHandler):
         indent = "\n"+ self.GetIndent()
         output = indent.join(output).rstrip()
         output,self.isTable = tbl.TableConversion(self.level,output)
-        output = output.lstrip()
+        output = output.strip()
         return output
 
     def PostProcess(self, view, outPos, onDone):
@@ -612,6 +613,7 @@ class OrgExecuteSourceBlock:
             else:
                 l = lst.IfListExtract(self.view, pos)
                 if(l):
+                    print(str(var))
                     var[fn['key']] = l
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
@@ -669,7 +671,7 @@ class OrgExecuteSourceBlock:
                 row += rowadjust
                 self.resultsTxtStart = self.view.text_point(row,col)
             ## Keep track of this so we know where we are inserting the text.
-            formattedOutput = (" " * self.level + " ") + output+"\n"
+            formattedOutput = (" " * self.level + " ") + output+'\n'
             if(self.CheckResultsFor('silent')):
                 # We only echo to the console in silent mode.
                 print(formattedOutput)
