@@ -84,8 +84,8 @@
 ** Silent Exec 
 
    #+NAME: ps-src
-   #+BEGIN_SRC powershell :results value silent
-	return 5     
+   #+BEGIN_SRC powershell :results value list silent :var DATA=lst-source
+	  $DATA
    #+END_SRC
 
 
@@ -95,7 +95,7 @@
 
    #+RESULTS:
    :results:
-   5
+   ['a b c']
    :end:
 
 

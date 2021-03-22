@@ -54,7 +54,7 @@ class ListData:
     def CreateListFromList(lst):
         ls = ListData()
         for l in lst:
-            l = RE_LIST_REPLACE.sub(l)
+            l = RE_LIST_REPLACE.sub("",l)
             ls.data.append([None,l])
         return ls
 

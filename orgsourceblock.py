@@ -656,7 +656,7 @@ class OrgExecuteSourceBlock:
             preFormat = otherParams['preFormat']
             preFormat = preFormat.split('\n')
             if(lst.isListLine(preFormat[0])):
-                l = lst.CreateListFromList(preFormat)
+                l = lst.ListData.CreateListFromList(preFormat)
                 var[fn['key']] = l
             elif(tbl.isTableLine(preFormat[0])):
                 pass
