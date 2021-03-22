@@ -46,6 +46,28 @@ def HasFailure(output):
     os = " ".join(output)
     return RE_FAIL.search(os)
 
+RE_TEXT_PREFIX = re.compile(r'^\s*[:]\s')
+def IsPrefixedTextBlob(view,pt):
+    line = view.line(pt)
+    line = view.substr(line)
+    return RE_TEXT_PREFIX.search(line)
+
+class TextDef:
+    def __init__(self,view,pt):
+        self.lines = []
+        row,_        = view.rowcol(pt)
+        last_row = view.lastRow()
+        for r in range(row,last_row+1):
+            point = view.text_point(r,0)
+            line = view.line(point)
+            line = view.substr(line)
+            line = RE_TEXT_PREFIX.sub("",line)
+            if(line.strip() == ""):
+                break
+            self.lines.append(line)
+
+
+
 def ProcessPotentialFileOrgOutput(cmd):
     outputs = list(filter(None, cmd.outputs)) 
     if(cmd.params and cmd.params.Get('file',None)):
@@ -609,6 +631,14 @@ class OrgExecuteSourceBlock:
                 l = lst.IfListExtract(self.view, pos)
                 if(l):
                     var[fn['key']] = l
+                else:
+                    # Assume blank text
+                    txt = TextDef(self.view,pos)
+                    l = "\n".join(txt.lines)
+                    l = l.strip()
+                    var[fn['key']] = l
+                    # TODO Strip the : for text?
+                    # Or just go raw
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
         if(self.deferedSources <= 0):

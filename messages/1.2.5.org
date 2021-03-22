@@ -60,3 +60,23 @@
    - a
    - b
    - c
+
+** Numeric and Text Values
+
+	Here the powershell scripts results are piped into the python script.
+
+   #+NAME: ps-src
+   #+BEGIN_SRC powershell :results value
+	return 5     
+   #+END_SRC
+   #+RESULTS:
+   : 5
+
+   #+BEGIN_SRC python :results drawer :var DATA=ps-src
+     print(DATA)
+   #+END_SRC
+
+   #+RESULTS:
+   :results:
+   5
+   :end:
