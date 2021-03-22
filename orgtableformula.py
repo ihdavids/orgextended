@@ -30,6 +30,7 @@ import json
 import ast
 
 random.seed()
+RE_TABLE_LINE   = re.compile(r'\s*[|]')
 RE_PRINTFSTYLE = re.compile(r"(?P<formatter>[%][0-9]*\.[0-9]+f)")
 RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
 RE_AUTOLINE = re.compile(r"^\s*[|]\s*[#]\s*[|]")
@@ -52,6 +53,9 @@ def isTable(view,at=None):
 def isTableFormula(view):
     names = view.scope_name(view.sel()[0].end())
     return 'orgmode.tblfm' in names
+
+def isTableLine(line):
+    return RE_TABLE_LINE.search(line)
 
 def isAutoComputeRow(view):
     return None != RE_AUTOLINE.search(view.curLineText())
@@ -516,7 +520,6 @@ class OrgInsertBlankTableCommand(sublime_plugin.TextCommand):
         self.input = ins.OrgInput()
         self.input.run("WxH", None, evt.Make(self.OnDims))
 
-RE_TABLE_LINE   = re.compile(r'\s*[|]')
 RE_TABLE_HLINE  = re.compile(r'\s*[|][-][+-]*[|]')
 RE_FMT_LINE     = re.compile(r'\s*[#][+](TBLFM|tblfm)[:]\s*(?P<expr>.*)')
 RE_TARGET       = re.compile(r'\s*(([@](?P<rowonly>[-]?[0-9><]+))|([$](?P<colonly>[-]?[0-9><]+))|([@](?P<row>[-]?[0-9><]+)[$](?P<col>[-]?[0-9><]+)))\s*$')

@@ -53,20 +53,27 @@ def IsPrefixedTextBlob(view,pt):
     return RE_TEXT_PREFIX.search(line)
 
 class TextDef:
-    def __init__(self,view,pt):
+    def __init__(self,view=None,pt=None):
         self.lines = []
-        row,_        = view.rowcol(pt)
-        last_row = view.lastRow()
-        for r in range(row,last_row+1):
-            point = view.text_point(r,0)
-            line = view.line(point)
-            line = view.substr(line)
-            line = RE_TEXT_PREFIX.sub("",line)
-            if(line.strip() == ""):
-                break
-            self.lines.append(line)
+        if(None != view):
+            row,_        = view.rowcol(pt)
+            last_row = view.lastRow()
+            for r in range(row,last_row+1):
+                point = view.text_point(r,0)
+                line = view.line(point)
+                line = view.substr(line)
+                line = RE_TEXT_PREFIX.sub("",line)
+                if(line.strip() == ""):
+                    break
+                self.lines.append(line)
 
-
+    @staticmethod
+    def CreateTextFromText(txt):
+        tdef = TextDef()
+        for t in txt:
+            t = RE_TEXT_PREFIX.sub("",t)
+            tdef.lines.append(t)
+        return tdef
 
 def ProcessPotentialFileOrgOutput(cmd):
     outputs = list(filter(None, cmd.outputs)) 
@@ -195,7 +202,7 @@ def LookupNamedSourceBlockInFile(name):
 # data sources that reference their various potential
 # locations.
 def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
-    BuildFullParamList(cmd,language,cmdArgs)
+    #BuildFullParamList(cmd,language,cmdArgs)
     var = cmd.params.GetDict('var',None)
     cmd.params.Replace('var',var)
     cmd.deferedSources = 0
@@ -438,7 +445,10 @@ class OrgExecuteSourceBlock:
 
     def OnDone(self):
         evt.EmitIf(self.onDone)
-        evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
+        if(self.silent != None):
+            evt.EmitIfParams(self.onDoneResultsPos,postFormat=self.formattedOutput,preFormat=self.preFormattedOutput,name=self.onDoneFnName)
+        else:
+            evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
 
     def OnPostProcess(self):
         self.curPt = self.view.sel()[0]
@@ -512,7 +522,8 @@ class OrgExecuteSourceBlock:
                 pt = self.view.text_point(self.endRow,0)
                 pt = self.view.line(pt).end() + 1
             indent = db.Get().AtPt(self.view,at).indent()
-            self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
+            if(not self.CheckResultsFor('silent') and self.silent == None):
+                self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
             self.startResults   = self.endRow + 2 
             self.endResults     = self.startResults + 1
             self.resultsStartPt = self.view.text_point(self.startResults+1,0)
@@ -528,10 +539,11 @@ class OrgExecuteSourceBlock:
             return
         self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
 
-    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None):
+    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None):
         self.onDone = onDone
         self.onDoneResultsPos = onDoneResultsPos
         self.onDoneFnName=onDoneFnName
+        self.silent = silent
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
@@ -593,6 +605,7 @@ class OrgExecuteSourceBlock:
                 view.run_command("save", {"async": False})
                 sublime.set_timeout(self.OnWarningSaved,1)
                 return
+            BuildFullParamList(self,self.language,self.paramdata)
             # We need to find and or buid a results block
             # so we can replace it with the results.
             # ORG is super flexible about this, we are NOT!
@@ -637,8 +650,22 @@ class OrgExecuteSourceBlock:
                     l = "\n".join(txt.lines)
                     l = l.strip()
                     var[fn['key']] = l
-                    # TODO Strip the : for text?
-                    # Or just go raw
+        # We didn't output, so we have to parse the contents
+        # but not from the buffer
+        if('preFormat' in otherParams):
+            preFormat = otherParams['preFormat']
+            preFormat = preFormat.split('\n')
+            if(lst.isListLine(preFormat[0])):
+                l = lst.CreateListFromList(preFormat)
+                var[fn['key']] = l
+            elif(tbl.isTableLine(preFormat[0])):
+                pass
+            else:
+                t = TextDef.CreateTextFromText(preFormat)
+                l = "\n".join(t.lines)
+                l = l.strip()
+                var[fn['key']] = l
+            pass
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
         if(self.deferedSources <= 0):
@@ -684,8 +711,8 @@ class OrgExecuteSourceBlock:
             self.outHandler.SetIndent(n.level)
             if(self.outFormatter):
                 self.outFormatter.SetIndent(n.level)
-            #print("VVV: " + str(self.outputs))
             output = self.outHandler.FormatOutput(self.outputs)
+            self.preFormattedOutput = output
             self.resultsTxtStart = self.resultsStartPt + self.level + 1
             rowadjust = 0
             if(self.outFormatter):
@@ -697,17 +724,18 @@ class OrgExecuteSourceBlock:
                 row += rowadjust
                 self.resultsTxtStart = self.view.text_point(row,col)
             ## Keep track of this so we know where we are inserting the text.
-            formattedOutput = (" " * self.level + " ") + output+'\n'
+            self.formattedOutput = (" " * self.level + " ") + output+'\n'
             if(self.CheckResultsFor('silent')):
                 # We only echo to the console in silent mode.
-                print(formattedOutput)
+                print(self.formattedOutput)
+                self.silent = True
                 self.OnReplaced()
             # Add after other text
             elif(self.CheckResultsFor('append')):
-                self.view.run_command("org_internal_replace", {"start": self.resultsEndPt, "end": self.resultsEndPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+                self.view.run_command("org_internal_replace", {"start": self.resultsEndPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
             # Add before other text
             elif(self.CheckResultsFor('prepend')):
-                self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsStartPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+                self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsStartPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
             # Replace mode
             else:
-                self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+                self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})

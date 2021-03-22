@@ -30,17 +30,33 @@ import OrgExtended.orgnumberedlist as numberedlist
 
 log = logging.getLogger(__name__)
 
+
+RE_LIST_REPLACE = re.compile(r'\s*(([0-9]+[.)])|[-+])\s+')
+def isListLine(l):
+    return RE_LIST_REPLACE.search(l)
+
 class ListData:
-    def __init__(self,view,pt=None):
-        reg = view.line(pt)
-        line = view.substr(reg)
-        if(numberedlist.isNumberedLine(view,reg)):
-            wasNumbered = True
-            self.data = numberedlist.getListAtPoint(view,pt)
-        elif(checkbox.isUnorderedList(line)):
-            self.data = checkbox.getListAtPoint(view,pt)
+    def __init__(self,view=None,pt=None):
+        if(view != None):
+            reg = view.line(pt)
+            line = view.substr(reg)
+            if(numberedlist.isNumberedLine(view,reg)):
+                wasNumbered = True
+                self.data = numberedlist.getListAtPoint(view,pt)
+            elif(checkbox.isUnorderedList(line)):
+                self.data = checkbox.getListAtPoint(view,pt)
+            else:
+                self.data = None
         else:
-            self.data = None
+            self.data = [] 
+
+    @staticmethod
+    def CreateListFromList(lst):
+        ls = ListData()
+        for l in lst:
+            l = RE_LIST_REPLACE.sub(l)
+            ls.data.append([None,l])
+        return ls
 
     def __iter__(self):
         return self.Iterate()
