@@ -32,6 +32,63 @@ RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee][Ss]?)|([Ff][Aa][Ii][Ll])|([Ee][Rr][Rr][Oo][Rr][Ss]?)\b")
 
 
+
+# TODO: Make a version of this that works with a very simple list of lists
+#     : Make a version of this that wraps a tabledef!
+
+# Interface that can be used to wrap a TableDef OR a simple list
+# Very simple table wrapper!
+class TableData:
+    def __init__(self,data):
+        self.data = data
+        if(isinstance(self.data,tbl.TableDef)):
+            self.tabledef = True
+        else:
+            self.tabledef = False
+    def Width(self):
+        if(self.tabledef):
+            return self.data.Width()
+        else:
+            return len(self.data[0]) if self.data and len(self.data) > 0 else 0
+    def Height(self):
+        if(self.tabledef):
+            return self.data.Height()
+        else:
+            return len(self.data) if self.data else 0
+    def ForEachRow(self):
+        if(self.tabledef):
+            return self.data.ForEachRow()
+        else:
+            return range(1,self.Height() + 1)
+    def ForEachCol(self):
+        if(self.tabledef):
+            return self.data.ForEachCol()
+        else:
+            return range(1,self.Width() + 1)
+    def GetCell(self,r,c):
+        if(self.tabledef):
+            return tbl.Cell(r,c,self.data).GetVal()
+        else:
+            r -= 1
+            c -= 1
+            if(r >= 0 and r <= self.Height() and c >= 0 and c <= self.Width()):
+                return self.data[r][c]
+            return None
+    @staticmethod
+    def ParseTable(data):
+        if(isinstance(data,str)):
+            data = data.split('\n')
+        out = []
+        for line in data:
+            lineOut = []
+            cells = line.split('|')
+            for i in range(1,len(cells)-1):
+                c = cells[i].strip()
+                lineOut.append(c)
+            out.append(lineOut)
+        return TableData(out)
+
+
 def IsSourceBlock(view):
     at = view.sel()[0]
     return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
@@ -124,7 +181,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
 
 
 def SetupOutputHandler(cmd,skipFile = False):
-    res = cmd.params.Get('results',['raw','output','verbatim'])
+    res = cmd.params.Get('results','')
     if(not skipFile and cmd.params.Has('file')):
         return FileHandler(cmd,cmd.params)
     elif(re.search(r'\btable\b',res) or re.search(r'\bvector\b',res)):
@@ -139,7 +196,7 @@ def SetupOutputHandler(cmd,skipFile = False):
         return TextHandler(cmd,cmd.params)
 
 def SetupOutputFormatter(cmd):
-    res = cmd.params.Get('results',['raw','output','verbatim'])
+    res = cmd.params.Get('results','')
     if(re.search(r'\bdrawer\b',res)):
         return DrawerFormatter(cmd)
     elif(re.search(r'\bcode\b', res)):
@@ -203,8 +260,7 @@ def LookupNamedSourceBlockInFile(name):
 # locations.
 def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
     #BuildFullParamList(cmd,language,cmdArgs)
-    var = cmd.params.GetDict('var',None)
-    cmd.params.Replace('var',var)
+    var = cmd.params.Get('var',None)
     cmd.deferedSources = 0
     hadDeferred = False
     if(var):
@@ -217,7 +273,7 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
                     # Each language may want to do something very different and abstracting away
                     # What the data source actually is may actually be a disservice
                     #var[k] = GetGeneratorForTable(td,cmd.params)
-                    var[k] = td
+                    var[k] = TableData(td)
                 else:
                     l = lst.LookupNamedListInFile(n)
                     if(l):
@@ -432,10 +488,151 @@ class TableHandler(ResultsHandler):
 
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
-    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None):
+    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None):
         value = str(uuid.uuid4())
         self.exc = OrgExecuteSourceBlock(self.view,value)
-        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at)
+        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams)
+
+
+def FormatParam(x):
+    if(x.startswith("\"")):
+        x = x[1:]
+    if(x.endswith("\"")):
+        x = x[:-1]
+    return x
+
+def GetDict(strData):
+    rc = {}
+    vals = strData.strip().split(',')
+    for va in vals:
+        k,v = va.strip().split('=')
+        rc[k.strip()] = v.strip()
+    return rc
+
+
+RE_FUNCTION=re.compile(r'\s+[#][+][Cc][Aa][Ll][Ll][:]\s*(?P<name>[a-zA-Z][a-zA-Z0-9_-]+)\s*\((?P<params>[^)]*)\)')
+def IsCallCommentBlock(view):
+    line = view.substr(view.line(view.sel()[0]))
+    return RE_FUNCTION.search(line)
+
+class OrgExecuteCallCommentCommand(sublime_plugin.TextCommand):
+
+    def OnReplaced(self):
+        evt.EmitIf(self.onDone)
+
+    def OnDoneFunction(self,otherParams=None):
+        if('postFormat' in otherParams):
+            postFormat = otherParams['postFormat']
+            self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": postFormat,"onDone": evt.Make(self.OnReplaced)})
+
+    def AdjustParams(self,otherParams=None):
+        if('cmd' in otherParams):
+            cmd = otherParams['cmd']
+            self.cmd = cmd
+            var = cmd.params.Get('var',None)
+            if(var):
+                for k in self.params:
+                    var[k] = self.params[k]
+            self.outHandler   = SetupOutputHandler(cmd)
+            self.outFormatter = SetupOutputFormatter(cmd)
+
+    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None):
+        self.onDone = onDone
+        # TODO: Parse Params
+        self.sourcefns      = {}
+        self.deferedSources = 0
+        hasDeferred         = False
+        reg = self.view.sel()[0]
+        row,_ = self.view.rowcol(reg.begin())
+        line = self.view.substr(self.view.line(reg))
+        m = RE_FUNCTION.search(line)
+        if(m):
+            n = m.group('name')
+            ps = m.group('params')
+            self.params = GetDict(ps)
+            pt = LookupNamedSourceBlockInFile(n)
+            self.s = reg.begin()
+            if(None != pt):
+                self.startRow = row
+                self.endRow   = row
+                FindResults(self,edit,reg.begin(),False)
+                if(not n in self.sourcefns):
+                    self.deferedSources += 1
+                    hadDeferred = True
+                    self.sourcefns[n] = {'at': pt, 'name': n}
+                    self.view.run_command('org_execute_source_block',{'at':pt, 'onDoneResultsPos': evt.Make(self.OnDoneFunction), 'onDoneFnName': n, 'onAdjustParams': evt.Make(self.AdjustParams), 'silent': True})
+
+def EndResults(self,rw):
+    self.endResults     = rw
+    self.resultsStartPt = self.view.text_point(self.startResults+1,0)
+    self.resultsEndPt   = self.view.text_point(self.endResults,0)
+    self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
+
+def FindResults(self,edit,at,checkSilent=True):
+    self.createdResults = False
+    row              = self.endRow+1
+    fileEndRow,_     = self.view.rowcol(self.view.size())
+    inResults        = False
+    inPropertyDrawer = False
+    inBlock          = False
+    for rw in range(row, fileEndRow):
+        line = self.view.substr(self.view.line(self.view.text_point(rw,0)))
+        if(not inResults and RE_RESULTS.search(line)):
+            self.startResults = rw
+            inResults = True
+            continue
+        if(RE_FUNCTION.search(line)):
+            if(inResults):
+                EndResults(self,rw)
+                return True
+            else:
+                break
+        # A new heading ends the results.
+        if(RE_HEADING.search(line)):
+            if(inResults):
+                EndResults(self,rw)
+                return True
+            else:
+                break
+        if(inResults and not inPropertyDrawer and RE_PROPERTY_DRAWER.search(line)):
+            inPropertyDrawer = True
+            continue
+        if(inResults and not inBlock and RE_BLOCK.search(line)):
+            inBlock = True
+            continue
+        if(inResults and not inBlock and not inPropertyDrawer and inResults and RE_IS_BLANK_LINE.search(line)):
+            EndResults(self,rw)
+            return True
+        if(inPropertyDrawer and RE_END_PROPERTY_DRAWER.search(line)):
+            EndResults(self,rw+1)
+            return True
+        if(inBlock and RE_END_BLOCK.search(line)):
+            EndResults(self,rw+1)
+            return True
+    # We just hit the end of the file.
+    if(inResults):
+        EndResults(self,fileEndRow)
+        return True
+    # We hit the end of the file and didn't find a results tag.
+    # We need to make one.
+    if(not inResults):
+        log.debug("Could not locate #+RESULTS tag adding one!")
+        if(self.endRow == self.view.endRow()):
+            pt = self.view.text_point(self.endRow,0)
+            pt = self.view.line(pt).end()
+        else:
+            pt = self.view.text_point(self.endRow,0)
+            pt = self.view.line(pt).end() + 1
+        indent = db.Get().AtPt(self.view,at).indent()
+        if(not checkSilent or not self.CheckResultsFor('silent') and self.silent == None):
+            self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
+        self.startResults   = self.endRow + 2 
+        self.endResults     = self.startResults + 1
+        self.resultsStartPt = self.view.text_point(self.startResults+1,0)
+        self.resultsEndPt   = self.view.text_point(self.endResults,0)
+        self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
+        self.createdResults = True
+        return True
 
 class OrgExecuteSourceBlock:
 
@@ -469,73 +666,6 @@ class OrgExecuteSourceBlock:
             self.curmod.PostExecute(self)
         self.OnPostProcess()
 
-
-    def EndResults(self,rw):
-        self.endResults     = rw
-        self.resultsStartPt = self.view.text_point(self.startResults+1,0)
-        self.resultsEndPt   = self.view.text_point(self.endResults,0)
-        self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
-
-    def FindResults(self,edit,at):
-        self.createdResults = False
-        row              = self.endRow+1
-        fileEndRow,_     = self.view.rowcol(self.view.size())
-        inResults        = False
-        inPropertyDrawer = False
-        inBlock          = False
-        for rw in range(row, fileEndRow):
-            line = self.view.substr(self.view.line(self.view.text_point(rw,0)))
-            if(not inResults and RE_RESULTS.search(line)):
-                self.startResults = rw
-                inResults = True
-                continue
-            # A new heading ends the results.
-            if(RE_HEADING.search(line)):
-                if(inResults):
-                    self.EndResults(rw)
-                    return True
-                else:
-                    break
-            if(inResults and not inPropertyDrawer and RE_PROPERTY_DRAWER.search(line)):
-                inPropertyDrawer = True
-                continue
-            if(inResults and not inBlock and RE_BLOCK.search(line)):
-                inBlock = True
-                continue
-            if(inResults and not inBlock and not inPropertyDrawer and inResults and RE_IS_BLANK_LINE.search(line)):
-                self.EndResults(rw)
-                return True
-            if(inPropertyDrawer and RE_END_PROPERTY_DRAWER.search(line)):
-                self.EndResults(rw+1)
-                return True
-            if(inBlock and RE_END_BLOCK.search(line)):
-                self.EndResults(rw+1)
-                return True
-        # We just hit the end of the file.
-        if(inResults):
-            self.EndResults(fileEndRow)
-            return True
-        # We hit the end of the file and didn't find a results tag.
-        # We need to make one.
-        if(not inResults):
-            log.debug("Could not locate #+RESULTS tag adding one!")
-            if(self.endRow == self.view.endRow()):
-                pt = self.view.text_point(self.endRow,0)
-                pt = self.view.line(pt).end()
-            else:
-                pt = self.view.text_point(self.endRow,0)
-                pt = self.view.line(pt).end() + 1
-            indent = db.Get().AtPt(self.view,at).indent()
-            if(not self.CheckResultsFor('silent') and self.silent == None):
-                self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
-            self.startResults   = self.endRow + 2 
-            self.endResults     = self.startResults + 1
-            self.resultsStartPt = self.view.text_point(self.startResults+1,0)
-            self.resultsEndPt   = self.view.text_point(self.endResults,0)
-            self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
-            self.createdResults = True
-            return True
-
     def OnWarningSaved(self):
         if(self.view.is_dirty()):
             self.view.set_status("Error: ","Failed to save the view. ABORT, cannot execute source block since it is dirty")
@@ -543,11 +673,12 @@ class OrgExecuteSourceBlock:
             return
         self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
 
-    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None):
+    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None):
         self.onDone = onDone
         self.onDoneResultsPos = onDoneResultsPos
         self.onDoneFnName=onDoneFnName
         self.silent = silent
+        self.onAdjustParams = onAdjustParams
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
@@ -613,7 +744,7 @@ class OrgExecuteSourceBlock:
             # We need to find and or buid a results block
             # so we can replace it with the results.
             # ORG is super flexible about this, we are NOT!
-            self.FindResults(edit,self.s)
+            FindResults(self,edit,self.s)
             # TODO: Early out if this is a chain and we have already computed our
             #       results.
             self.ParamsPhase()
@@ -622,6 +753,12 @@ class OrgExecuteSourceBlock:
 
     def ParamsPhase(self):
             view = self.view
+            # Turn our variable table into a dictionary
+            var = self.params.GetDict('var',None)
+            if(var):
+                self.params.Replace('var',var)
+            # If we are being called from elsewhere let the caller adjust our parameter list
+            evt.EmitIfParams(self.onAdjustParams,cmd=self)
             # Setup formatting and parameters now that we have execution state. 
             if(ProcessPossibleSourceObjects(self,self.language,self.paramdata)):
                 # We are deferred! We do not continue form here!
@@ -643,7 +780,7 @@ class OrgExecuteSourceBlock:
             pos = otherParams['pos']
             if(tbl.isTable(self.view,pos)):
                 td = tbl.create_table(self.view, pos)
-                var[fn['key']] = td
+                var[fn['key']] = TableData(td)
             else:
                 l = lst.IfListExtract(self.view, pos)
                 if(l):
@@ -666,7 +803,7 @@ class OrgExecuteSourceBlock:
                 l = lst.ListData.CreateListFromList(preFormat)
                 var[fn['key']] = l
             elif(tbl.isTableLine(preFormat[0])):
-                td = tbl.create_table_from_node(preFormat,0)
+                td = TableData.ParseTable(preFormat)
                 var[fn['key']] = td
             else:
                 t = TextDef.CreateTextFromText(preFormat)
@@ -677,7 +814,7 @@ class OrgExecuteSourceBlock:
         # TODO: Handle lists, text and other things.
         self.deferedSources -= 1
         if(self.deferedSources <= 0):
-            self.FindResults(0,self.s)
+            FindResults(self,0,self.s)
             self.Execute()
     def Execute(self):
             view = self.view
@@ -733,7 +870,7 @@ class OrgExecuteSourceBlock:
                 self.resultsTxtStart = self.view.text_point(row,col)
             ## Keep track of this so we know where we are inserting the text.
             self.formattedOutput = (" " * self.level + " ") + output+'\n'
-            if(self.CheckResultsFor('silent')):
+            if(self.CheckResultsFor('silent') or self.silent == True):
                 # We only echo to the console in silent mode.
                 print(self.formattedOutput)
                 self.silent = True

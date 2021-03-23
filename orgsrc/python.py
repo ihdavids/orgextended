@@ -4,6 +4,7 @@ import sys
 import io
 import re
 import OrgExtended.orgtableformula as fml
+import OrgExtended.orgsourceblock as src
 import OrgExtended.orglist as lst
 import OrgExtended.orgparse.date as odate
 import OrgExtended.orgutil.util as util
@@ -31,6 +32,19 @@ def PreProcessSourceFile(cmd):
         out = ""
         for k in var:
             v = var[k]
+            if(isinstance(v,src.TableData)):
+                out += str(k) + " = [\n"
+                fr = True
+                for r in v.ForEachRow():
+                    first = True
+                    out += '[' if fr else ",["
+                    fr = False
+                    for c in v.ForEachCol():
+                        txt = v.GetCell(r,c)
+                        out += (',' if not first else "") + str(FormatText(txt))
+                        first = False
+                    out += ']'
+                out += "]\n"
             if(isinstance(v,fml.TableDef)):
                 out += str(k) + " = [\n"
                 fr = True

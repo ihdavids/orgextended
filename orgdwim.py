@@ -70,6 +70,9 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
         if(src.IsSourceBlock(self.view)):
             self.view.run_command('org_execute_source_block')
             return
+        if(src.IsCallCommentBlock(self.view)):
+            self.view.run_command('org_execute_call_comment')
+            return
         if(tbl.isTable(self.view)):
             self.view.run_command('org_execute_table')
             return

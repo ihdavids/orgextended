@@ -8,6 +8,14 @@
 ** PlantUML
   - Fixed a regression in the parameter handling for plantuml.
 
+  #+BEGIN_SRC plantuml :file out.png
+    a -> b
+    b -> c
+  #+END_SRC
+
+   #+RESULTS:
+   [[file:out.png]]
+
 ** Handling Drawers in Chained Sources
 
   #+NAME: tbl-source
@@ -89,13 +97,13 @@
 
 ** Silent Exec 
 
-   #+NAME: ps-src
+   #+NAME: ps-src2
    #+BEGIN_SRC powershell :results output list silent :var DATA=lst-source
 	  $DATA
    #+END_SRC
 
 
-   #+BEGIN_SRC python :results drawer list :var DATA=ps-src
+   #+BEGIN_SRC python :results drawer list :var DATA=ps-src2
      print(DATA)
    #+END_SRC
 
@@ -118,11 +126,28 @@
    #+END_SRC
 
    #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |
    
-   
-   
-   
-   
+** Call
+  Begining support for the babel call syntax.
+  Here we define a function that can be called elsewhere in the document
+  with different parameters.
+
+ 
+   #+NAME: varfunction
+   #+BEGIN_SRC python :var DATA=6
+     print(DATA)
+   #+END_SRC 
+
+   #+RESULTS:
+   : 6
+
+   #+call: varfunction(DATA=7)
+
+   #+RESULTS:
+   : 7
+
    
    
 

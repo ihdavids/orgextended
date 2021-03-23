@@ -44,6 +44,7 @@ highlightEnabled = True
 
 log = logging.getLogger(__name__)
 
+
 def isTable(view,at=None):
     if(at == None):
         at = view.sel()[0].end()
@@ -2030,12 +2031,7 @@ def create_table(view, at=None):
 # ====================================================================
 def create_table_from_node(node, row):
     start_row = row
-    lineData = None
-    if(isinstance(node,list)):
-        lineData = node
-        node = None
-    else:
-        lineData = node._lines
+    lineData = node._lines
     last_row  = len(lineData)
     end = last_row
     start = row

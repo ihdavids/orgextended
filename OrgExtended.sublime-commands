@@ -94,6 +94,7 @@
     {"caption": "Org Create Heading Id",       "command": "org_create_heading_id"       },
     {"caption": "Org Insert Effort",           "command": "org_insert_effort"           },
     {"caption": "Org Insert Archive Tag",      "command": "org_insert_archive_tag"      },
+    {"caption": "Org Execute Call",            "command": "org_execute_call_comment"    },
 
     // Agenda
     {"caption": "Org Agenda Goto",             "command": "org_agenda_go_to"            },

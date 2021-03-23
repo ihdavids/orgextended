@@ -7,6 +7,7 @@ import logging
 import subprocess, os
 import threading, time, signal
 import OrgExtended.orgtableformula as fml
+import OrgExtended.orgsourceblock as src
 import OrgExtended.orgparse.date as odate
 import OrgExtended.orgutil.util as util
 import OrgExtended.orglist as lst
@@ -37,6 +38,19 @@ def PreProcessSourceFile(cmd):
         out = ""
         for k in var:
             v = var[k]
+            if(isinstance(v,src.TableData)):
+                out += "$" + str(k) + " = @("
+                fr = True
+                for r in v.ForEachRow():
+                    first = True
+                    out += '(' if fr else ",("
+                    fr = False
+                    for c in v.ForEachCol():
+                        txt = v.GetCell(r,c)
+                        out += (',' if not first else "") + str(FormatText(txt))
+                        first = False
+                    out += ')'
+                out += ")\n"
             if(isinstance(v,fml.TableDef)):
                 out += "$" + str(k) + " = @("
                 fr = True
