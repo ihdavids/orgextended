@@ -33,9 +33,6 @@ RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee
 
 
 
-# TODO: Make a version of this that works with a very simple list of lists
-#     : Make a version of this that wraps a tabledef!
-
 # Interface that can be used to wrap a TableDef OR a simple list
 # Very simple table wrapper!
 class TableData:
@@ -220,37 +217,6 @@ def GetGeneratorForTable(table,params):
         yield GetGeneratorForRow(table,params,r)
 
 
-RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
-def LookupNamedSourceBlockInFile(name):
-    view = sublime.active_window().active_view()
-    if(view):
-        node = db.Get().AtInView(view)
-        if(node):
-            # Look for named objects in the file.
-            names = node.names
-            if(names and name in names):
-                row = names[name]['row']
-                last_row = view.lastRow()
-                for r in range(row,last_row):
-                    if(IsSourceFence(view,r)):
-                        row = r
-                        break
-                    pt = view.text_point(r, 0)
-                    line = view.substr(view.line(pt))
-                    m = RE_ISCOMMENT.search(line)
-                    if(m):
-                        continue
-                    elif(line.strip() == ""):
-                        continue
-                    else:
-                        row = r
-                        break
-                pt = view.text_point(row,0)
-                reg = view.line(pt)
-                line = view.substr(reg)
-                if(IsSourceFence(view,row)):
-                    return pt
-    return None
 
 # We want to first build up the full list of vars
 # from options, comments, properties and everything else
@@ -279,7 +245,7 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
                     if(l):
                         var[k] = l
                     else:
-                        pt = LookupNamedSourceBlockInFile(n)
+                        pt = tbl.LookupNamedSourceBlockInFile(n)
                         if(None != pt):
                             if(not n in cmd.sourcefns):
                                 cmd.deferedSources += 1
@@ -488,10 +454,10 @@ class TableHandler(ResultsHandler):
 
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
-    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None):
+    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
         value = str(uuid.uuid4())
         self.exc = OrgExecuteSourceBlock(self.view,value)
-        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams)
+        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)
 
 
 def FormatParam(x):
@@ -516,9 +482,16 @@ def IsCallCommentBlock(view):
     return RE_FUNCTION.search(line)
 
 class OrgExecuteCallCommentCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        exc = ExecuteCallComment(self.view)
+        exc.run(edit,onDone)
+
+class ExecuteCallComment:
+    def __init__(self,view):
+        self.view = view
 
     def OnReplaced(self):
-        evt.EmitIf(self.onDone)
+        evt.EmitIfParams(self.onDone)
 
     def OnDoneFunction(self,otherParams=None):
         if('postFormat' in otherParams):
@@ -533,10 +506,8 @@ class OrgExecuteCallCommentCommand(sublime_plugin.TextCommand):
             if(var):
                 for k in self.params:
                     var[k] = self.params[k]
-            self.outHandler   = SetupOutputHandler(cmd)
-            self.outFormatter = SetupOutputFormatter(cmd)
 
-    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None):
+    def run(self,edit, onDone=None):
         self.onDone = onDone
         # TODO: Parse Params
         self.sourcefns      = {}
@@ -550,7 +521,7 @@ class OrgExecuteCallCommentCommand(sublime_plugin.TextCommand):
             n = m.group('name')
             ps = m.group('params')
             self.params = GetDict(ps)
-            pt = LookupNamedSourceBlockInFile(n)
+            pt = tbl.LookupNamedSourceBlockInFile(n)
             self.s = reg.begin()
             if(None != pt):
                 self.startRow = row
@@ -673,7 +644,7 @@ class OrgExecuteSourceBlock:
             return
         self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
 
-    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None):
+    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
         self.onDone = onDone
         self.onDoneResultsPos = onDoneResultsPos
         self.onDoneFnName=onDoneFnName
@@ -735,7 +706,7 @@ class OrgExecuteSourceBlock:
                 log.error("Your source org file must exist on disk to generate images. The path is used when setting up relative paths.")
                 self.OnDone()
                 return
-            if(view.is_dirty()):
+            if(not skipSaveWarning and view.is_dirty()):
                 log.warning("Your source file has unsaved changes. We cannot run source modifications without saving the buffer.")
                 view.run_command("save", {"async": False})
                 sublime.set_timeout(self.OnWarningSaved,1)

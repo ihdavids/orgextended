@@ -148,7 +148,17 @@
    #+RESULTS:
    : 7
 
-   
+
+** First Draft Source Block Execute in Tables
+
+  This is a slight breakaway from orgmode as we do not support lisp and in orgmode this would be done with (org-sbe 'name' (key x) (key y))
+  This is not a syntax I can easily support properly without implementing a full lisp parser inside sublime and... I don't like that idea.
+  So, I am using the more python friendly function call as seen below. Note this is running the varfunction above, taking the results and placing
+  them in the table below in cell 2,1.
+
+  | a     | b |
+  | 12345 | 6 |
+  #+TBLFM:@2$1=sbe('varfunction',DATA=12345)::@2$2=sbe('varfunction')
    
 
 

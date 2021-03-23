@@ -895,6 +895,108 @@ def GetNum(i):
 #  Functions
 # ============================================================
 
+RE_END = re.compile(r"^\s*\#\+(END_SRC|end_src)")
+RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*")
+def IsSourceFence(view,row):
+    #line = view.getLine(view.curRow())
+    line = view.getLine(row)
+    return RE_SRC_BLOCK.search(line) or RE_END.search(line)
+
+RE_ISCOMMENT = re.compile(r"^\s*[#][+]")
+def LookupNamedSourceBlockInFile(name):
+    view = sublime.active_window().active_view()
+    if(view):
+        node = db.Get().AtInView(view)
+        if(node):
+            # Look for named objects in the file.
+            names = node.names
+            if(names and name in names):
+                row = names[name]['row']
+                last_row = view.lastRow()
+                for r in range(row,last_row):
+                    if(IsSourceFence(view,r)):
+                        row = r
+                        break
+                    pt = view.text_point(r, 0)
+                    line = view.substr(view.line(pt))
+                    m = RE_ISCOMMENT.search(line)
+                    if(m):
+                        continue
+                    elif(line.strip() == ""):
+                        continue
+                    else:
+                        row = r
+                        break
+                pt = view.text_point(row,0)
+                reg = view.line(pt)
+                line = view.substr(reg)
+                if(IsSourceFence(view,row)):
+                    return pt
+    return None
+
+# This class lets us run an arbitrary source block
+# and place the result of that into a cell.
+class SourceBlockExecute:
+    def __init__(self,cell):
+        self.cell = cell
+        self.r = cell.GetRow()
+        self.c = cell.GetCol()
+        self.i = cell.table.GetActiveFormula()
+        self.gotVal = False
+        self.val = None
+
+    def OnDoneFunction(self,otherParams=None):
+        print("ON DONE FNCT")
+        if('preFormat' in otherParams):
+            data = otherParams['preFormat']
+            print("PRE FORMAT: " + str(data))
+            table = self.cell.table
+            reg = table.FindCellRegion(self.r,self.c)
+            fmt = table.FormulaFormatter(self.i)
+            if(data and isinstance(data,float) and fmt and "%" in fmt):
+                data = fmt % data
+            print("REPLACING WITH: " + str(data))
+            self.val = str(data)
+            if(self.gotVal):
+                sublime.active_window().active_view().run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(data)})
+
+    def __str__(self):
+        self.gotVal = True
+        if(self.val):
+            return str(self.val)
+        else:
+            return "<SBE>"
+
+    def AdjustParams(self,otherParams=None):
+        if('cmd' in otherParams):
+            cmd = otherParams['cmd']
+            self.cmd = cmd
+            # We hack the results to be raw and silent with no formatting
+            # output or value is not something we want to overwrite
+            res = cmd.params.Get('results',None)
+            if(res):
+                if(re.search('\bvalue\b',res)):
+                    cmd.params.Replace('results','raw silent value')
+                else:
+                    cmd.params.Replace('results','raw silent output')
+            else:
+                cmd.params.Replace('results','raw silent')
+            var = cmd.params.Get('var',None)
+            if(var):
+                for k in self.params:
+                    var[k] = self.params[k]
+
+    def run(self, name, kwargs):
+        self.params = kwargs
+        self.sourcefns = {}
+        pt = LookupNamedSourceBlockInFile(name)
+        if(None != pt):
+            if(not name in self.sourcefns):
+                self.sourcefns[name] = {'at': pt, 'name': name}
+                sublime.active_window().active_view().run_command('org_execute_source_block',{'at':pt, 'onDoneResultsPos': evt.Make(self.OnDoneFunction), 'onDoneFnName': name, 'onAdjustParams': evt.Make(self.AdjustParams), 'silent': True, 'skipSaveWarning': True})
+
+
+
 def myabs(a):
     """Convert value to a positive value"""
     return abs(GetVal(a))
@@ -1418,6 +1520,15 @@ class TableDef(simpev.SimpleEval):
         else:
             raise RangeExprOnNonCells(str(a), "range expression is invalid")
 
+    def mysbe(table, name,**kwargs):
+        view = sublime.active_window().active_view()
+        cell = Cell(table.CurRow(),table.CurCol(),table)
+        sbe = SourceBlockExecute(cell)
+        sbe.run(name,kwargs)
+        print(name)
+        print(str(kwargs))
+        return sbe
+
     def mypassed(table,test,cell=None):
         if(not cell):
             cell = Cell(table.CurRow(),table.CurCol(),table)
@@ -1485,6 +1596,7 @@ class TableDef(simpev.SimpleEval):
         f['getrowcell'] = self.getrowcell
         f['getcolcell'] = self.getcolcell
         f['passed']     = self.mypassed
+        f['sbe']        = self.mysbe
 
 
     def __init__(self,view, start,end,linedef):
@@ -1538,6 +1650,12 @@ class TableDef(simpev.SimpleEval):
 
     def CurCol(self):
         return self.curCol
+
+    def GetActiveFormula(self):
+        return self.activeFormula
+
+    def SetActiveFormula(self,i):
+        self.activeFormula = i
 
     def GetCellText(self,r,c):
         self.accessList.append([r,c])
@@ -2231,6 +2349,7 @@ def create_table_from_node(node, row):
     return td
 
 def SingleFormulaIterator(table,i):
+    table.SetActiveFormula(i)
     cellIterator = table.FormulaTargetCellIterator(i) 
     for cell in cellIterator:
         r,c = cell.rc()
@@ -2241,6 +2360,7 @@ def SingleFormulaIterator(table,i):
 
 def FormulaIterator(table):
     for i in range(0,table.NumFormulas()):
+        table.SetActiveFormula(i)
         cellIterator = table.FormulaTargetCellIterator(i) 
         for cell in cellIterator:
             r,c = cell.rc()
