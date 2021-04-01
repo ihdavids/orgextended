@@ -287,6 +287,7 @@ class OrgDb:
         self.orgExcludeFiles = sets.Get("orgExcludeFiles",None)
         matches = []
         if(self.orgPaths):
+            # Just in case the user gave us a string instead of a list.
             if(isinstance(self.orgPaths,str)):
                 self.orgPaths = [ self.orgPaths ]
             for orgPath in self.orgPaths:
@@ -327,6 +328,9 @@ class OrgDb:
                     except Exception as e:
                         log,logging.warning("ERROR globbing {}\n{}".format(orgPath, traceback.format_exc()))
         if(self.orgFiles):
+            # Just in case the user gave us a string instead of a list.
+            if(isinstance(self.orgFiles,str)):
+                self.orgFiles = [ self.orgFiles ]
             for orgFile in self.orgFiles:
                 path = orgFile.replace('\\','/')
                 if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
