@@ -17,7 +17,12 @@
 	- Bugfix thanks to Anti-Distinctlyminty - on windows uses os.startfile() to launch a file link
 	  providing better support for out of sublime file links. Also some improved error notation
 	  in the contols when a link cannot resolve.
+** Agenda Hover
+	- Sometimes this would assert when the agenda was not active.
 
+** Settings orgDirs
+	- If someone sets their orgDirs to a string vs a list we would treat each character as an orgDir
+		
 ** Input
 	- Additional guards against asserts in popups for the input box:
 	  [[https://github.com/ihdavids/orgextended/issues/28][Errors in Sublime Console]]
@@ -30,7 +35,37 @@
 
 	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello=)}}}
 
+
+** PList Enhancements
+	- Plists now have propper exclusion properties so :results output value will only have the last value
+		since the options are considered mutually exclusive.
+	- The unit tests have been enhanced to cover exclusivity.
+	- Source blocks now have a global setting allowing you to control their default behaviour globally.
+	  this is inline with what you can do in emacs with: org-babel-default-header-args
+
+	
+		#+BEGIN_EXAMPLE
+				"orgBabelDefaultHeaderArgs": ":var x=5"
+		#+END_EXAMPLE	
+
 ** TODO HEADER comments
+
+Traceback (most recent call last):
+  File "C:\Program Files\Sublime Text\Lib\python33\sublime_plugin.py", line 1494, in run_
+    return self.run(edit)
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 482, in run
+    self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 744, in run
+    self.ParamsPhase()
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 761, in ParamsPhase
+    self.Execute()
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 853, in Execute
+    output = self.outHandler.FormatOutput(self.outputs)
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 463, in FormatOutput
+    output,self.isTable = tbl.TableConversion(self.level,output)
+  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgtableformula.py", line 272, in TableConversion
+    separator = min(vars, key=vars.get) 
+ValueError: min() arg is an empty sequence
 ** Buffer Swap Respects Startup
 	I find that as I move around the buffer I tend to unfold a lot of "things"
 	When I have a buffer set to "content" mode I like it to clean up the open folds when it can.

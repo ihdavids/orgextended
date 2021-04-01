@@ -287,6 +287,8 @@ class OrgDb:
         self.orgExcludeFiles = sets.Get("orgExcludeFiles",None)
         matches = []
         if(self.orgPaths):
+            if(isinstance(self.orgPaths,str)):
+                self.orgPaths = [ self.orgPaths ]
             for orgPath in self.orgPaths:
                 orgPath = orgPath.replace('\\','/')
                 globSuffix = sets.Get("validOrgExtensions",[".org"])
