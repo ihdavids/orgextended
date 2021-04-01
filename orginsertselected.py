@@ -78,13 +78,14 @@ class OrgInput:
             background-color: #353555;
         }
         </style><div class=\"orgselect\">"""
-        if(not self.current in self.matched and len(self.matched) > 0):
-            self.current = self.matched[0]
-        for i in self.matched:
-            if(i == self.current):
-                content += "<div class=\"currentsel\">" + i + "</div>"
-            else:
-                content += i + "<br>"
+        if(hasattr(self,'matched')):
+            if(not self.current in self.matched and len(self.matched) > 0):
+                self.current = self.matched[0]
+            for i in self.matched:
+                if(i == self.current):
+                    content += "<div class=\"currentsel\">" + i + "</div>"
+                else:
+                    content += i + "<br>"
         content += "</div></body></html>"
         #self.inputpanel.show_popup_menu(self.matched,None) 
         #self.inputpanel.show_popup(content,sublime.COOPERATE_WITH_AUTO_COMPLETE,-1) 
@@ -134,16 +135,17 @@ class OrgInput:
         if(not self.amRunning or None == self.inputpanel):
             return
         self.skipRecalc = True
-        mlen = len(self.matched)
-        for i in range(0,mlen):
-            if(self.matched[i] == self.current):
-                if(i == (mlen - 1)):
-                    self.current = self.matched[0]
-                else:
-                    self.current = self.matched[i+1]
-                self.redraw() 
-                self.inputpanel.ReplaceRegion(self.inputpanel.line(self.inputpanel.text_point(0,0)), self.current)
-                return
+        if(hasattr(self,'matched')):
+            mlen = len(self.matched)
+            for i in range(0,mlen):
+                if(self.matched[i] == self.current):
+                    if(i == (mlen - 1)):
+                        self.current = self.matched[0]
+                    else:
+                        self.current = self.matched[i+1]
+                    self.redraw() 
+                    self.inputpanel.ReplaceRegion(self.inputpanel.line(self.inputpanel.text_point(0,0)), self.current)
+                    return
         self.current = None
         self.redraw()
 
@@ -151,16 +153,17 @@ class OrgInput:
         if(not self.amRunning or None == self.inputpanel):
             return
         self.skipRecalc = True
-        mlen = len(self.matched)
-        for i in range(0,mlen):
-            if(self.matched[i] == self.current):
-                if(i == 0):
-                    self.current = self.matched[mlen - 1]
-                else:
-                    self.current = self.matched[i-1]
-                self.redraw() 
-                self.inputpanel.ReplaceRegion(self.inputpanel.line(self.inputpanel.text_point(0,0)), self.current)
-                return
+        if(hasattr(self,'matched')):
+            mlen = len(self.matched)
+            for i in range(0,mlen):
+                if(self.matched[i] == self.current):
+                    if(i == 0):
+                        self.current = self.matched[mlen - 1]
+                    else:
+                        self.current = self.matched[i-1]
+                    self.redraw() 
+                    self.inputpanel.ReplaceRegion(self.inputpanel.line(self.inputpanel.text_point(0,0)), self.current)
+                    return
         self.current = None
         self.redraw()
 
