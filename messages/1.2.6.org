@@ -1,0 +1,42 @@
+* 1.2.6
+  Core Idea: Inline Babel Blocks
+             #+header: comments
+
+  With this release we are focusing on some fringe pieces
+  of the core babel feature set that we need to be complete.
+
+  Inline babel blocks allow you to call a babel function within
+  some other text providing even more dynamic living breathing documents.
+
+  Header blocks extend the core babel features providing more real estate to add
+  parameters to a source block.
+
+** Links
+	- Bugfix thanks to Anti-Distinctlyminty - on windows uses os.startfile() to launch a file link
+	  providing better support for out of sublime file links. Also some improved error notation
+	  in the contols when a link cannot resolve.
+
+** TODO Inline Blocks
+	src_python[:var x=5]{print("hello" + str(x))} hello world
+
+** TODO HEADER comments
+** TODO Buffer Swap Respects Startup
+	This is something I have wanted for a bit.
+
+	I find that as I move around the buffer I tend to unfold a lot of "things"
+	When I have a buffer set to "content" mode I like it to clean up the open folds when it can.
+	
+	This new setting will allow sublime to aggressively cleanup the folds to just your active subtree
+	of the file if you turn this on.
+
+	What I really want is org-narrow-to-subtree which is the ability to restrict a view to a narrowing of the buffer
+	but in the absence of that capability this helps keep me focused on the
+	things that matter in my file.
+
+	- This is controlled by a setting:
+
+	#+BEGIN_EXAMPLE
+	  "onFocusRespectStartupFolds": true,
+	#+END_EXAMPLE
+
+

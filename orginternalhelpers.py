@@ -30,7 +30,18 @@ template = """
       escape: '{{{{endsrc}}}}'
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
-        1: constant.other orgmode.fence.sourceblock"""
+        1: constant.other orgmode.fence.sourceblock
+    - match: '(src_({match}))(\[[^\]]+\])?(\{{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:{source}
+      scope: orgmode.sourceblock.inline
+      escape: '(\}})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content"""
 
 
 introBlock = """

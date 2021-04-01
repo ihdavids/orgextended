@@ -275,6 +275,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(python))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.python
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((cpp)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -286,6 +297,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(cpp))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.c++
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((C)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -297,6 +319,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(C))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.c
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((perl)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -308,6 +341,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(perl))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.perl
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((ini)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -319,6 +363,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(ini))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.ini
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((bash|sh)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -330,6 +385,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(bash|sh))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.shell.bash
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((lua)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -341,6 +407,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(lua))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.lua
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((javascript|js)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -352,6 +429,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(javascript|js))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.js
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((json)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -363,6 +451,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(json))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.json
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((java)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -374,6 +473,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(java))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.java
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((php)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -385,6 +495,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(php))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.php
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((xml)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -396,6 +517,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(xml))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.xml
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((csharp|cs)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -407,6 +539,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(csharp|cs))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.cs
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((powershell)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -418,6 +561,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(powershell))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.powershell
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((plantuml)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -429,6 +583,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(plantuml))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.wsd
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((ditaa)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -440,6 +605,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(ditaa))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.ditaa
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((graphviz)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -451,6 +627,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(graphviz))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.dot
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((lisp)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -462,6 +649,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(lisp))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.lisp
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((emacs-lisp)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -473,6 +671,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(emacs-lisp))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.lisp
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((yaml)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -484,6 +693,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(yaml))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.yaml
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((rust)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -495,6 +715,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(rust))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.rust
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((sql)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -506,6 +737,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(sql))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.sql
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((r(\s|$))\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -517,6 +759,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(r(\s|$)))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.r(\s|$)
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((html)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -528,6 +781,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(html))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.html.basic
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((go)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -539,6 +803,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(go))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.go
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((ledger)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -550,6 +825,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(ledger))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.ledger
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((make)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -561,6 +847,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(make))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.makefile
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((makefile)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -572,6 +869,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(makefile))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.makefile
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((typescript|ts)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -583,6 +891,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(typescript|ts))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.ts
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((clojure)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -594,6 +913,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(clojure))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.clojure
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((bat|cmd)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -605,6 +935,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(bat|cmd))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.dosbatch
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((org)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -616,6 +957,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(org))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.orgmode
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((pascal)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -627,6 +979,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(pascal))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.pascal
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((actionscript)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -638,6 +1001,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(actionscript))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.actionscript.2
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((applescript)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -649,6 +1023,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(applescript))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.applescript
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((dtd)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -660,6 +1045,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(dtd))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.xml.dtd
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((haskell)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -671,6 +1067,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(haskell))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.haskell
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}(((markdown|md)(\s|$))\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -682,6 +1089,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_((markdown|md)(\s|$)))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.html.markdown
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((groovy)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -693,6 +1111,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(groovy))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.groovy
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((regexp)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -704,6 +1133,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(regexp))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.regexp
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((ruby)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -715,6 +1155,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(ruby))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.ruby
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((restructuredtext)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -726,6 +1177,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(restructuredtext))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.restructuredtext
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((xsl)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -737,6 +1199,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(xsl))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:text.xml.xsl
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((scala)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -748,6 +1221,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(scala))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.scala
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((hex)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -759,6 +1243,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(hex))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.hex
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((erlang)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -770,6 +1265,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(erlang))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.erlang
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((diff)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -781,6 +1287,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(diff))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.diff
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((d(\s|$))\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -792,6 +1309,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(d(\s|$)))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.d(\s|$)
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((css)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -803,6 +1331,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(css))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.css
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((cmake)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -814,6 +1353,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(cmake))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.cmake
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((asp)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -825,6 +1375,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(asp))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.asp
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
     - match: '{{beginsrc}}((gnuplot)\s*)'
       captures:
         1: constant.other orgmode.fence.sourceblock
@@ -836,6 +1397,17 @@ contexts:
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
         1: constant.other orgmode.fence.sourceblock
+    - match: '(src_(gnuplot))(\[[^\]]+\])?(\{)'
+      captures:
+        1: keyword orgmode.fence.language
+        3: comment
+        4: constant.other
+      embed: scope:source.gnuplot
+      scope: orgmode.sourceblock.inline
+      escape: '(\})'
+      escape_captures:
+        1: constant.other
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content
       # #+SOMETHING:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks
