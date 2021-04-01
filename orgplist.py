@@ -14,10 +14,57 @@ from OrgExtended.orgutil.addmethod import *
 log = logging.getLogger(__name__)
 
 
+class ExclusivityLists:
+    def __init__(self):
+        self.lookup = {}
+
+    def Add(self, l):
+        for i in l:
+            self.lookup[i] = l
+
+    def Find(self,k):
+        if(k in self.lookup):
+            return self.lookup[k]
+        return None
+
+class PListExclusiveLists:
+    def __init__(self):
+        self.keys = {}
+
+    def Add(self,k,ex):
+        self.keys[k] = ex
+
+    def Has(self,k):
+        return k in self.keys
+
+    def AddList(self,k,l):
+        rlist = None
+        if(k in self.keys):
+            rlist = self.keys[k]
+        else:
+            rlist = ExclusivityLists()
+            self.keys[k] = rlist
+        rlist.Add(l)
+
+    def Get(self,k):
+        if(k in self.keys):
+            return self.keys[k]
+        return None
+
+    def GetParam(self,k,p):
+        l = self.Get(k)
+        if(l):
+            return l.Find(p)
+
+
 RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]*)\s+(([a-zA-Z][a-zA-Z0-9]*\s*[=]\s*[\"][^\"]+[\"])|((([ ](?!:))|[^ ()\"])+)|([(][^)]+[)])|([\"][^\"]+[\"]))")
 class PList:
     def __init__(self,plist):
         self.params = plist
+        self.exList = PListExclusiveLists()
+
+    def AddExclusiveList(self,el):
+        self.exList = el
 
     def Get(self, name, defaultValue):
         if(name in self.params and self.params[name]):
@@ -37,6 +84,12 @@ class PList:
     	if(x.endswith("\"")):
     		x = x[:-1]
     	return x
+
+    def GetStr(self,name,defaultValue):
+        v = self.Get(name,defaultValue)
+        if(isinstance(v,list)):
+            v = ' '.join(v)
+        return v
 
     def GetInt(self,name,defaultValue):
         v = self.Get(name,defaultValue)
@@ -95,10 +148,10 @@ class PList:
             return
         d = PList.plistParse(strData)
         for k in d:
-            self.addToParam(self.params,k,d[k])
+            self.addToParam(self.params,k,d[k],self.exList)
 
     @staticmethod
-    def addToParam(params,key,val):
+    def addToParam(params,key,val,exList=None):
         val = val.strip()
         if(val.startswith("\"")):
             val = val[1:]
@@ -106,12 +159,33 @@ class PList:
             val = val[:-1]
         if(key in params):
             v = params[key]
+            # Promote to a list if its just a string.
             if(isinstance(v,str)):
                 params[key] = []
                 params[key].append(v)
-            params[key].append(val)
+            if(exList and exList.Has(key)):
+                val = util.ToList(val)
+                for vv in val:
+                    eList = exList.GetParam(key,vv)
+                    # Remove exclusive items from the list.
+                    if(eList):
+                        params[key] = list(set(params[key]) - set(eList))
+                    params[key].append(vv)
+            else:
+                params[key].append(val)
         else:
-            params[key] = val
+            if(exList and exList.Has(key)):
+                val = util.ToList(val)
+                for vv in val:
+                    eList = exList.GetParam(key,vv)
+                    # Remove exclusive items from the list.
+                    if(eList and key in params):
+                        params[key] = list(set(params[key]) - set(eList))
+                    elif(not key in params):
+                        params[key] = []
+                    params[key].append(vv)
+            else:
+                params[key] = val
 
     @staticmethod
     def plistParse(data):
@@ -126,6 +200,8 @@ class PList:
         return params
 
     @staticmethod
-    def createPList(data):
+    def createPList(data=None):
+        if(data == None):
+            data = ""
         params = PList.plistParse(data)
         return PList(params)

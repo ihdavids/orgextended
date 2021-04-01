@@ -240,4 +240,7 @@
     // This will cause org extended to aggressively re-fold a buffer marked as #+STARTUP: content when you refocus the buffer
     // Some people may find this jarring so it is hidden behind an option for now.
     //"onFocusRespectStartupFolds": true,
+
+    // These are the default state for all source execution. You can change the defaults by changing this plist
+    "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
 }

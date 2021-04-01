@@ -90,14 +90,14 @@ class TableData:
 
 def IsSourceBlock(view,at=None):
     if(None == at):
-        at = view.sel()[0]
-    return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
+        at = view.sel()[0].begin()
+    return (view.match_selector(at,'orgmode.fence.sourceblock') or view.match_selector(at,'orgmode.sourceblock.content'))
 
 # inline source blocks are inline with the text: src_python[:var x=5]{print('hello'+str(x))}
 def IsInlineSourceBlock(view,at=None):
     if(None == at):
-        at = view.sel()[0]
-    return (view.match_selector(at.begin(),'orgmode.sourceblock.inline') or view.match_selector(at.begin(),'orgmode.sourceblock.content.inline'))
+        at = view.sel()[0].begin()
+    return (view.match_selector(at,'orgmode.sourceblock.inline') or view.match_selector(at,'orgmode.sourceblock.content.inline'))
 
 def IsSourceFence(view,row):
     #line = view.getLine(view.curRow())
@@ -158,7 +158,20 @@ def ProcessPotentialFileOrgOutput(cmd):
 def BuildFullParamList(cmd,language,cmdArgs):
     # First Add from global settings
     # First Add from PROPERTIES
-    plist = PList.createPList("")
+    # Global properties are all controlled from our settings file.
+    plist = PList.createPList()
+    # The exclusion list forces replacement of keywords in the plist
+    # Each of these are exclusive.
+    # Collection
+    plist.exList.AddList('results',['output','value'])
+    # Type
+    plist.exList.AddList('results',['table','vector','list','scalar','file', 'verbatim'])
+    # Format
+    plist.exList.AddList('results',['code','drawer','html','latex','link','graphics','org','pp','raw'])
+    # Handling
+    plist.exList.AddList('results',['silent','replace','prepend','append'])
+    defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
+    plist.AddFromPList(defaultPlist)
     view = sublime.active_window().active_view()
     if(view):
         plist.AddFromPList(sets.Get('babel-args',None))
@@ -187,7 +200,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
 
 
 def SetupOutputHandler(cmd,skipFile = False):
-    res = cmd.params.Get('results','')
+    res = cmd.params.GetStr('results','')
     if(not skipFile and cmd.params.Has('file')):
         return FileHandler(cmd,cmd.params)
     elif(re.search(r'\btable\b',res) or re.search(r'\bvector\b',res)):
@@ -202,7 +215,7 @@ def SetupOutputHandler(cmd,skipFile = False):
         return TextHandler(cmd,cmd.params)
 
 def SetupOutputFormatter(cmd):
-    res = cmd.params.Get('results','')
+    res = cmd.params.GetStr('results','')
     if(re.search(r'\bdrawer\b',res)):
         return DrawerFormatter(cmd)
     elif(re.search(r'\bcode\b', res)):

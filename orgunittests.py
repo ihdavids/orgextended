@@ -64,3 +64,9 @@ class OrgPlistTestCommand(sublime_plugin.TextCommand):
         util.TEST("plist dict",p.GetDict('var',None),{'a':'b','c':'d','e':'f'},"Dict test 1")
         util.TEST("plist dict other",p.Get('other',None),"hello","Dict other test 1")
 
+        p = PList.createPList()
+        p.exList.AddList('say',['hello','world','exclusive'])
+        p.AddFromPList(":say hello world")
+        p.AddFromPList(":say hello world exclusive")
+        util.TEST('exclusiveList',p.Get('say',None),['exclusive'],"test it")
+
