@@ -17,7 +17,10 @@
 	  in the contols when a link cannot resolve.
 
 ** TODO Inline Blocks
-	src_python[:var x=5]{print("hello" + str(x))} hello world
+
+	Basic inline source block syntax highlighting
+
+	src_python[:var x=5]{print("hello" + str(x))}
 
 ** TODO HEADER comments
 ** TODO Buffer Swap Respects Startup

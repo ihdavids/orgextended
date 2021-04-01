@@ -34,7 +34,7 @@ template = """
     - match: '(src_({match}))(\[[^\]]+\])?(\{{)'
       captures:
         1: keyword orgmode.fence.language
-        3: comment
+        3: markup.raw.block comment
         4: constant.other
       embed: scope:{source}
       scope: orgmode.sourceblock.inline
