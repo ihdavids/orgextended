@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 
 RE_END = re.compile(r"^\s*\#\+(END_SRC|end_src)")
 RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*")
+RE_INL_SRC_BLOCK = re.compile(r"\b(SRC_|src_)(?P<name>[^: ]+)(\[(?P<params>[^\]]+)\])?\{(?P<code>[^}]+)\}\b")
+RE_INL_RESULTS_BLOCK = re.compile(r"\{\{\{results\(=(?P<val>.*)=\)\}\}\}")
 RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)\s*")
 RE_RESULTS = re.compile(r"^\s*\#\+(RESULTS|results)[:]\s*$")
 RE_HEADING = re.compile(r"^[*]+\s+")
@@ -89,6 +91,10 @@ class TableData:
 def IsSourceBlock(view):
     at = view.sel()[0]
     return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
+
+def IsInlineSourceBlock(view):
+    at = view.sel()[0]
+    return (view.match_selector(at.begin(),'orgmode.sourceblock.inline') or view.match_selector(at.begin(),'orgmode.sourceblock.content.inline'))
 
 def IsSourceFence(view,row):
     #line = view.getLine(view.curRow())

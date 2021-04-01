@@ -41,7 +41,7 @@ template = """
       escape: '(\}})'
       escape_captures:
         1: constant.other
-      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content"""
+      embed_scope: markup.raw.block orgmode.raw.block orgmode.sourceblock.content.inline"""
 
 
 introBlock = """
