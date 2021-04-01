@@ -88,12 +88,15 @@ class TableData:
         return TableData(out)
 
 
-def IsSourceBlock(view):
-    at = view.sel()[0]
+def IsSourceBlock(view,at=None):
+    if(None == at):
+        at = view.sel()[0]
     return (view.match_selector(at.begin(),'orgmode.fence.sourceblock') or view.match_selector(at.begin(),'orgmode.sourceblock.content'))
 
-def IsInlineSourceBlock(view):
-    at = view.sel()[0]
+# inline source blocks are inline with the text: src_python[:var x=5]{print('hello'+str(x))}
+def IsInlineSourceBlock(view,at=None):
+    if(None == at):
+        at = view.sel()[0]
     return (view.match_selector(at.begin(),'orgmode.sourceblock.inline') or view.match_selector(at.begin(),'orgmode.sourceblock.content.inline'))
 
 def IsSourceFence(view,row):
@@ -659,7 +662,8 @@ class OrgExecuteSourceBlock:
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
-        if(view.match_selector(at,'orgmode.fence.sourceblock') or view.match_selector(at,'orgmode.sourceblock.content')):
+        if(IsSourceBlock(view,at)):
+            #if(view.match_selector(at,'orgmode.fence.sourceblock') or view.match_selector(at,'orgmode.sourceblock.content')):
             # Scan up till we find the start of the block.
             row,_ = view.rowcol(at)
             while(row > 0):
