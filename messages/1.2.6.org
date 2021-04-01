@@ -16,6 +16,12 @@
 	  providing better support for out of sublime file links. Also some improved error notation
 	  in the contols when a link cannot resolve.
 
+** Input
+	- Additional guards against asserts in popups for the input box:
+	  [[https://github.com/ihdavids/orgextended/issues/28][Errors in Sublime Console]]
+
+	  Thanks to OlegBc for finding this one.
+
 ** TODO Inline Blocks
 
 	Basic inline source block syntax highlighting
