@@ -20,7 +20,7 @@
 
 	Basic inline source block syntax highlighting
 
-	src_python[:var x=5]{print("hello" + str(x))}
+	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello=)}}}
 
 ** TODO HEADER comments
 ** TODO Buffer Swap Respects Startup

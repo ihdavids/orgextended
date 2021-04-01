@@ -182,6 +182,11 @@ contexts:
       scope: orgmode.link.href
     - match: \b([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})\b
       scope: orgmode.email
+      # {{{results(=hello=)}}}
+    - match: '\{\{\{results\(([^)]+)\)\}\}\}'
+      scope: comment orgmode.results.inline
+      captures:
+        1: keyword orgmode.results.value
       # {numerical_value}
     - match: \{(\d+)\}
       scope: orgmode.link.internal.number
@@ -214,7 +219,6 @@ contexts:
 
     - match: =[^=]+=
       scope: orgmode.verbatim
-
 
     - match: '<<'
       scope: orgmode.target.bracket
