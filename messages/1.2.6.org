@@ -1,3 +1,5 @@
+#+STARTUP: content
+
 * 1.2.6
   Core Idea: Inline Babel Blocks
              #+header: comments
@@ -29,9 +31,7 @@
 	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello=)}}}
 
 ** TODO HEADER comments
-** TODO Buffer Swap Respects Startup
-	This is something I have wanted for a bit.
-
+** Buffer Swap Respects Startup
 	I find that as I move around the buffer I tend to unfold a lot of "things"
 	When I have a buffer set to "content" mode I like it to clean up the open folds when it can.
 	
@@ -43,6 +43,8 @@
 	things that matter in my file.
 
 	- This is controlled by a setting:
+
+	[[http://reg.ca][Text]]
 
 	#+BEGIN_EXAMPLE
 	  "onFocusRespectStartupFolds": true,

@@ -114,6 +114,20 @@ def onLoad(view):
         fold_all_links(view)
         # showeverything is implicit
 
+def onActivated(view):
+    shouldHandleActivationFolding = sets.Get("onFocusRespectStartupFolds",None)
+    if(shouldHandleActivationFolding):
+        # Now lets respect the fold state if we have any.
+        file = db.Get().FindInfo(view)
+        if(file):
+            r = file.org[0]
+            globalStartup = sets.Get("startup",["showall"])
+            startup = r.startup(globalStartup)
+            if(Startup.overview in startup or Startup.fold in startup):
+                fold_all_but_my_tree(view)
+            elif(Startup.content in startup):
+                fold_all_but_my_tree(view)
+        fold_all_links(view)
 
 class OrgFoldAllButMeCommand(sublime_plugin.TextCommand):
     def run(self, edit):

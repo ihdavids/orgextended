@@ -237,4 +237,7 @@
     // You will need to restart sublime to get this.
     // "enableDebugLogging": true, 
 
+    // This will cause org extended to aggressively re-fold a buffer marked as #+STARTUP: content when you refocus the buffer
+    // Some people may find this jarring so it is hidden behind an option for now.
+    //"onFocusRespectStartupFolds": true,
 }

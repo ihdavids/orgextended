@@ -112,6 +112,10 @@ class OrgCore(sublime_plugin.EventListener):
     def on_deactivated(self, view):
         capture.onDeactivated(view)
 
+    def on_activated(self, view):
+        if(util.isPotentialOrgFile(view.file_name())):
+            folding.onActivated(view)
+
     def ShouldLocalFold(self, view):
         file = db.Get().FindInfo(view.file_name())
         if(file != None and file.HasChanged(view)):
