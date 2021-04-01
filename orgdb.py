@@ -304,8 +304,12 @@ class OrgDb:
                             sublime.active_window().active_view().set_status("Error: ","orgDirs only supports double star style directory wildcards! Anything else is not supported: " + str(orgPath))
                         log.error(" skipping orgDirs value: " + str(orgPath))
                         continue
-                    if not Path(orgPath).exists():
-                        log.warning('orgDir path {} does not exist!'.format(orgPath))
+                    try:
+                        if not Path(orgPath).exists():
+                            log.warning('orgDir path {} does not exist!'.format(orgPath))
+                            continue
+                    except:
+                        log.warning('could not add org path: {} - does not seem to exist'.format(orgPath))
                         continue
                     try:
                         for path in Path(orgPath).glob(suffix):
