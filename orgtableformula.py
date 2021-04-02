@@ -1792,16 +1792,17 @@ class TableDef(simpev.SimpleEval):
 
     def HighlightFormula(self, i):
         self.PreExecute()
-        it = SingleFormulaIterator(self,i)
-        for n in it:
-            r,c,val,reg = n
-            # This is important, the cell COULD return a cell
-            # until we convert it to a string that cell will not
-            # necessarily be touched so the accessList will not be
-            # correct.
-            valStr = str(val)
-            self.HighlightCells(self.accessList,1)
-            self.HighlightCells([[r,c]],2)
+        if(not hasattr(self,'highlight') or self.highlight):
+            it = SingleFormulaIterator(self,i)
+            for n in it:
+                r,c,val,reg = n
+                # This is important, the cell COULD return a cell
+                # until we convert it to a string that cell will not
+                # necessarily be touched so the accessList will not be
+                # correct.
+                valStr = str(val)
+                self.HighlightCells(self.accessList,1)
+                self.HighlightCells([[r,c]],2)
         self.HighlightFormulaRegion(i)
         self.PostExecute()
 
@@ -2093,6 +2094,7 @@ def create_table(view, at=None):
     td.nameRowsAbove = namesRowsAbove
     td.nameRowsBelow = namesRowsBelow
     td.colNames      = colNames
+    td.highlight     = True
     if(isAdvanced):
         td.ignore        = ignore
         td.ignoreRows    = ignoreRows
@@ -2116,6 +2118,8 @@ def create_table(view, at=None):
                         consts[name] = val
             if(hasattr(node,'properties')):
                 props = node.properties
+                if('NoTableHighlight' in props):
+                    td.highlight = False
                 if(props and len(props) > 0):
                     for k,v in props.items():
                         consts['PROP_'+k] = v
