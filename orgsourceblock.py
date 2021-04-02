@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 RE_END = re.compile(r"^\s*\#\+(END_SRC|end_src)")
 RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*")
-RE_INL_SRC_BLOCK = re.compile(r"\b(SRC_|src_)(?P<name>[^: ]+)(\[(?P<params>[^\]]+)\])?\{(?P<code>[^}]+)\}\b")
+RE_INL_SRC_BLOCK = re.compile(r"(?P<block>(SRC_|src_)(?P<name>[a-zA-Z0-9_-]+)(\[(?P<params>[^\]]+)\])?\{(?P<code>[^}]+)\})(?P<resblock>\s*\{\{\{results\(\s*=(?P<res>[^)]*)=\s*\)\}\}\})?")
 RE_INL_RESULTS_BLOCK = re.compile(r"\{\{\{results\(=(?P<val>.*)=\)\}\}\}")
 RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)\s*")
 RE_RESULTS = re.compile(r"^\s*\#\+(RESULTS|results)[:]\s*$")
@@ -32,7 +32,8 @@ RE_BLOCK = re.compile(r"^\s*\#\+(BEGIN_|begin_)[a-zA-Z]+\s+")
 RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee][Ss]?)|([Ff][Aa][Ii][Ll])|([Ee][Rr][Rr][Oo][Rr][Ss]?)\b")
-
+RE_HEADER_PARAMS = re.compile(r"^\s*\#\+(HEADER|header)[:]\s*(?P<params>.*)$")
+RE_TABLE = re.compile(r"^\s*[|]")
 
 
 # Interface that can be used to wrap a TableDef OR a simple list
@@ -173,6 +174,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
     view = sublime.active_window().active_view()
+    node = None
     if(view):
         plist.AddFromPList(sets.Get('babel-args',None))
         plist.AddFromPList(sets.Get('babel-args-'+language,None))
@@ -195,6 +197,21 @@ def BuildFullParamList(cmd,language,cmdArgs):
             if('var' in node.properties):
                 vs = node.properties['var'].strip()
                 plist.Add('var',vs)
+    # At this point we have added all the global properties.
+    # We need to check if there is a header block somewhere near us.
+    if(node):
+        header = node.get_comment("HEADER",None)
+        if(header):
+            # We have to scan for it!
+            sr,_ = view.rowcol(cmd.s)
+            for r in range(sr,node.start_row,-1):
+                line = view.getLine(r)
+                if(RE_HEADING.search(line) or RE_END.search(line) or RE_END_PROPERTY_DRAWER.search(line) or RE_TABLE.search(line)):
+                    break
+                m = RE_HEADER_PARAMS.search(line)
+                if(m):
+                    plist.AddFromPList(m.group('params'))
+                    break
     plist.AddFromPList(cmdArgs)
     cmd.params = plist
 
@@ -238,7 +255,19 @@ def GetGeneratorForTable(table,params):
     for r in range(1,table.Height()+1):
         yield GetGeneratorForRow(table,params,r)
 
-
+def IsOutputEmpty(output):
+    if(output == None):
+        return True
+    if(isinstance(output,str)):
+        return output.strip() == ""
+    if(isinstance(output,list)):
+        if(len(output) == 0):
+            return True
+        for o in output:
+            if(o.strip() != ""):
+                return False
+        return True
+    return False
 
 # We want to first build up the full list of vars
 # from options, comments, properties and everything else
@@ -456,16 +485,19 @@ class FileHandler(ResultsHandler):
 class TableHandler(ResultsHandler):
     def __init__(self,cmd,params):
         super(TableHandler,self).__init__(cmd,params)
+        self.isTable = False
 
     def FormatOutput(self, output):
         indent = "\n"+ self.GetIndent()
         output = indent.join(output).rstrip()
+        if(IsOutputEmpty(output)):
+            return output
         output,self.isTable = tbl.TableConversion(self.level,output)
         output = output.strip()
         return output
 
     def PostProcess(self, view, outPos, onDone):
-        if(not self.cmd.CheckResultsFor('silent') and None == self.cmd.silent):
+        if(not self.cmd.CheckResultsFor('silent') and None == self.cmd.silent and self.isTable):
             view.sel().clear()
             view.sel().add(outPos)
             view.run_command("table_editor_align")
@@ -762,9 +794,6 @@ class OrgExecuteSourceBlock:
     def OnDoneFunction(self,otherParams=None):
         #results = otherParams['results']
         name    = otherParams['name']
-        #print("DONE: " + str(results))
-        #print("DONE2: " + str(name))
-        #print("SOURCES: " + str(self.sourcefns))
         # Process the source here!
         var = self.params.Get('var',None) 
         fn = self.sourcefns[name]
@@ -878,3 +907,239 @@ class OrgExecuteSourceBlock:
             # Replace mode
             else:
                 self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+
+# ============================================================
+class OrgExecuteInlineSourceBlock:
+
+    def __init__(self,view,id):
+        self.id = id
+        self.view = view
+
+    def FindInlineResults(self):
+        self.startResults   = self.row
+        self.endResults     = self.row
+        if(self.m.group('resblock')):
+            self.resultsStartPt = self.view.text_point(self.row, self.m.start('resblock'))
+            self.resultsEndPt   = self.view.text_point(self.row, self.m.end('resblock'))
+            self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
+            self.createdResults = False
+        else:
+            self.resultsStartPt = self.view.text_point(self.row, self.m.end('code') + 1)
+            self.resultsEndPt   = self.view.text_point(self.row, self.m.end('code') + 1)
+            self.resultsRegion  = sublime.Region(self.resultsStartPt, self.resultsEndPt)
+            self.createdResults = True
+
+    def CheckResultsFor(self,val):
+        res = self.params.Get('results',[])
+        return (val in res)
+
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+        if(self.silent != None):
+            evt.EmitIfParams(self.onDoneResultsPos,postFormat=self.formattedOutput,preFormat=self.preFormattedOutput,name=self.onDoneFnName)
+        else:
+            evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
+
+    def OnPostProcess(self):
+        self.curPt = self.view.sel()[0]
+        self.outHandler.PostProcess(self.view, self.resultsTxtStart, self.OnPostPostProcess)
+
+    def OnPostPostProcess(self):
+        if(hasattr(self.curmod,"GeneratesImages") and self.curmod.GeneratesImages(self)):
+            self.view.run_command("org_cycle_images",{"onDone": evt.Make(self.OnDone)})
+        else:
+            self.OnDone()
+
+    def OnReplaced(self):
+        if(hasattr(self.curmod,"PostExecute")):
+            self.curmod.PostExecute(self)
+        self.OnPostProcess()
+
+    def OnWarningSaved(self):
+        if(self.view.is_dirty()):
+            self.view.set_status("Error: ","Failed to save the view. ABORT, cannot execute source block since it is dirty")
+            log.error("Failed to save the view. ABORT, cannot execute source code")
+            return
+        self.view.run_command("org_execute_inline_source_block", {"onDone": self.onDone})
+
+    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
+        self.onDone           = onDone
+        self.onDoneResultsPos = onDoneResultsPos
+        self.onDoneFnName     =onDoneFnName
+        self.silent = silent
+        self.onAdjustParams = onAdjustParams
+        view = self.view
+        if(at == None):
+            at = view.sel()[0].begin()
+        if(IsInlineSourceBlock(view,at)):
+            # Scan up till we find the start of the block.
+            row,col = view.rowcol(at)
+            line = view.getLine(row)
+            self.m = None
+            for tm in RE_INL_SRC_BLOCK.finditer(line):
+                if(tm.start('block') <= col and tm.end('block') >= col):
+                    self.m = tm
+                    break
+            if(self.m == None):
+                log.warning("Failed to execute inline script block could not locate bounds")
+                return
+            
+            start = self.m.start('code')
+            end   = self.m.end('code') 
+
+            self.paramdata = tm.group('params')
+            self.language  = tm.group('name')
+            self.row       = row
+
+            # Okay now we have a start and end to build a region out of.
+            # time to run a command and try to get the output.
+            extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
+            # Now find me that function!
+            if(self.language not in extensions):
+                log.error("Function not found in src folder! Cannot execute!")
+                return
+
+            # Start setting up our execution state.
+            self.curmod   = extensions[self.language]
+            self.startRow = row
+            self.endRow   = row
+            self.s        = view.text_point(row,start)
+            self.e        = view.text_point(row,end)
+            self.region   = sublime.Region(self.s,self.e)
+            self.sourcefile = view.file_name()
+            self.sourcefns = {}
+            # Sanity check that the file exists on disk
+            if(not self.sourcefile or not os.path.exists(self.sourcefile)):
+                self.view.set_status("Error: ","Your source org file must exist on disk. ABORT.")
+                log.error("Your source org file must exist on disk to generate images. The path is used when setting up relative paths.")
+                self.OnDone()
+                return
+            if(not skipSaveWarning and view.is_dirty()):
+                log.warning("Your source file has unsaved changes. We cannot run source modifications without saving the buffer.")
+                view.run_command("save", {"async": False})
+                sublime.set_timeout(self.OnWarningSaved,1)
+                return
+            BuildFullParamList(self,self.language,self.paramdata)
+            # We need to find and or buid a results block
+            # so we can replace it with the results.
+            # ORG is super flexible about this, we are NOT!
+            self.FindInlineResults()
+            self.ParamsPhase()
+        else:
+            log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
+
+    def ParamsPhase(self):
+            view = self.view
+            # Turn our variable table into a dictionary
+            var = self.params.GetDict('var',None)
+            if(var):
+                self.params.Replace('var',var)
+            # If we are being called from elsewhere let the caller adjust our parameter list
+            evt.EmitIfParams(self.onAdjustParams,cmd=self)
+            # Setup formatting and parameters now that we have execution state. 
+            if(ProcessPossibleSourceObjects(self,self.language,self.paramdata)):
+                # We are deferred! We do not continue form here!
+                return
+            else:
+                self.Execute()
+    def OnDoneFunction(self,otherParams=None):
+        #results = otherParams['results']
+        name    = otherParams['name']
+        #print("DONE: " + str(results))
+        #print("DONE2: " + str(name))
+        #print("SOURCES: " + str(self.sourcefns))
+        # Process the source here!
+        var = self.params.Get('var',None) 
+        fn = self.sourcefns[name]
+        # Our goal is determine what is at results location
+        # convert it and insert it into var.
+        if('pos' in otherParams):
+            pos = otherParams['pos']
+            if(tbl.isTable(self.view,pos)):
+                td = tbl.create_table(self.view, pos)
+                var[fn['key']] = TableData(td)
+            else:
+                l = lst.IfListExtract(self.view, pos)
+                if(l):
+                    var[fn['key']] = l
+                else:
+                    # Assume blank text
+                    txt = TextDef(self.view,pos)
+                    l = "\n".join(txt.lines)
+                    l = l.strip()
+                    var[fn['key']] = l
+        # We didn't output, so we have to parse the contents
+        # but not from the buffer
+        if('preFormat' in otherParams):
+            preFormat = otherParams['preFormat']
+            preFormat1 = preFormat.split('\n')
+            preFormat = []
+            for l in preFormat1:
+                preFormat.append(l.strip())
+            if(lst.isListLine(preFormat[0])):
+                l = lst.ListData.CreateListFromList(preFormat)
+                var[fn['key']] = l
+            elif(tbl.isTableLine(preFormat[0])):
+                td = TableData.ParseTable(preFormat)
+                var[fn['key']] = td
+            else:
+                t = TextDef.CreateTextFromText(preFormat)
+                l = "\n".join(t.lines)
+                l = l.strip()
+                var[fn['key']] = l
+            pass
+        # TODO: Handle lists, text and other things.
+        self.deferedSources -= 1
+        if(self.deferedSources <= 0):
+            self.FindInlineResults()
+            self.Execute()
+    def Execute(self):
+            view = self.view
+            self.outHandler   = RawHandler(self, self.params)
+
+            if(hasattr(self.curmod,"Execute")):
+                # Okay now time to replace the contents of the block
+                self.source = view.substr(self.region)
+                if(hasattr(self.curmod,"PreProcessSourceFile")):
+                    self.curmod.PreProcessSourceFile(self)
+                if(hasattr(self.curmod,"Extension")):
+                    tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
+                    try:
+                        self.filename = tmp.name
+                        if(hasattr(self.curmod,"WrapStart")):
+                            tmp.write((self.curmod.WrapStart(self) + "\n").encode("ascii"))
+                        tmp.write(self.source.encode('ascii'))
+                        if(hasattr(self.curmod,"WrapEnd")):
+                            tmp.write(("\n" + self.curmod.WrapEnd(self)).encode("ascii"))
+                        tmp.close() 
+                        self.outputs = self.curmod.Execute(self,sets)
+                    except:
+                        log.debug(" " + traceback.format_exc())
+                    finally:
+                        pass
+                else:
+                    self.filename = None
+                    self.outputs = self.curmod.Execute(self,sets)
+                log.debug("OUTPUT: " + str(self.outputs))
+            else:
+                log.error("No execute in module, abort")
+                return
+            self.level = 0
+            self.outHandler.SetIndent(0)
+            output = self.outHandler.FormatOutput(self.outputs)
+            self.preFormattedOutput = output
+            self.resultsTxtStart = self.resultsStartPt
+            self.formattedOutput = " {{{results(=" + output.replace("\n","") + "=)}}} "
+            if(self.CheckResultsFor('silent') or self.silent == True):
+                # We only echo to the console in silent mode.
+                print(str(output))
+                self.silent = True
+                self.OnReplaced()
+            # We only support replace mode for inline source blocks
+            self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
+
+class OrgExecuteInlineSourceBlockCommand(sublime_plugin.TextCommand):
+    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
+        value = str(uuid.uuid4())
+        self.exc = OrgExecuteInlineSourceBlock(self.view,value)
+        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)

@@ -68,6 +68,7 @@
     {"caption": "Org Filtered Todo View",      "command": "org_tag_filtered_todo_view"  },
     {"caption": "Org Exec Dynamic Block",      "command": "org_execute_dynamic_block"   },
     {"caption": "Org Exec Source Block",       "command": "org_execute_source_block"    },
+    {"caption": "Org Exec Inline Source Block","command": "org_execute_inline_source_block"},
     {"caption": "Org Checkbox Toggle",         "command": "org_toggle_checkbox"         },
     {"caption": "Org Recalc Checkbox",         "command": "org_recalc_checkbox_summary" },
     {"caption": "Org Recalc All Checkbox",     "command": "org_recalc_all_checkbox_summaries" },

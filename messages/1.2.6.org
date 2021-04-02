@@ -1,5 +1,3 @@
-#+STARTUP: content
-
 * 1.2.6
   Core Idea: Inline Babel Blocks
              #+header: comments
@@ -22,19 +20,24 @@
 
 ** Settings orgDirs
 	- If someone sets their orgDirs to a string vs a list we would treat each character as an orgDir
-		
+		which was just plain wrong. I have augmented the db to detect that and just "do the right thing"
+
 ** Input
 	- Additional guards against asserts in popups for the input box:
 	  [[https://github.com/ihdavids/orgextended/issues/28][Errors in Sublime Console]]
 
 	  Thanks to OlegBc for finding this one.
 
-** TODO Inline Blocks
+** Inline Blocks
 
-	Basic inline source block syntax highlighting
+	Basic inline source block syntax highlighting now works. 
+	Org has a somewhat odd inline syntax:
 
-	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello=)}}}
+	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello5=)}}}     
 
+	Simple execution seems to be working:
+
+	src_powershell{Write-Host "Hello World"} {{{results(=Hello World=)}}} 
 
 ** PList Enhancements
 	- Plists now have propper exclusion properties so :results output value will only have the last value
@@ -48,25 +51,20 @@
 				"orgBabelDefaultHeaderArgs": ":var x=5"
 		#+END_EXAMPLE	
 
-** TODO HEADER comments
+** HEADER comments
 
-Traceback (most recent call last):
-  File "C:\Program Files\Sublime Text\Lib\python33\sublime_plugin.py", line 1494, in run_
-    return self.run(edit)
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 482, in run
-    self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 744, in run
-    self.ParamsPhase()
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 761, in ParamsPhase
-    self.Execute()
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 853, in Execute
-    output = self.outHandler.FormatOutput(self.outputs)
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgsourceblock.py", line 463, in FormatOutput
-    output,self.isTable = tbl.TableConversion(self.level,output)
-  File "C:\Users\ihdav\AppData\Roaming\Sublime Text\Packages\OrgExtended\orgtableformula.py", line 272, in TableConversion
-    separator = min(vars, key=vars.get) 
-ValueError: min() arg is an empty sequence
-** Buffer Swap Respects Startup
+	Added support for the more generic HEADER comment blocks as seen below.
+
+	#+HEADER: :var y=10
+	#+BEGIN_SRC python :var x=5
+	  print(str(y) + " x " + str(x))
+	#+END_SRC
+
+   #+RESULTS:
+   : 10 x 5
+
+** Buffer Swap Respects Startup Comment
+
 	I find that as I move around the buffer I tend to unfold a lot of "things"
 	When I have a buffer set to "content" mode I like it to clean up the open folds when it can.
 	
@@ -78,8 +76,6 @@ ValueError: min() arg is an empty sequence
 	things that matter in my file.
 
 	- This is controlled by a setting:
-
-	[[http://reg.ca][Text]]
 
 	#+BEGIN_EXAMPLE
 	  "onFocusRespectStartupFolds": true,
