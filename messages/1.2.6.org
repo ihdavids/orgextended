@@ -33,7 +33,7 @@
 	Basic inline source block syntax highlighting now works. 
 	Org has a somewhat odd inline syntax:
 
-	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello5=)}}}     
+	src_python[:var x=5]{print("hello" + str(x))} {{{results(=hello5=)}}}       
 
 	Simple execution seems to be working:
 

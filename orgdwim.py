@@ -67,6 +67,9 @@ class OrgRecalcCommand(sublime_plugin.TextCommand):
         if(dynamic.IsDynamicBlock(self.view)):
             self.view.run_command('org_execute_dynamic_block')
             return
+        if(src.IsInlineSourceBlock(self.view)):
+            self.view.run_command('org_execute_inline_source_block')
+            return
         if(src.IsSourceBlock(self.view)):
             self.view.run_command('org_execute_source_block')
             return
