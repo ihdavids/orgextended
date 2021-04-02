@@ -20,20 +20,26 @@ def HandleValue(cmd):
     if(cmd.CheckResultsFor('value')):
         out = "def OrgExtendedPythonWrapperFunction():\n"
         outs = cmd.source.split('\n')
+        leadingIndent = ""
+        if(len(outs) > 0):
+            leadingIndent = re.match(r"\s*", outs[0]).group()
+        for vaDefs in cmd.varsDefs:
+            out += "    " + leadingIndent + vaDefs + "\n"
         for o in outs:
             out += "    " + o + "\n"
         out += "\n\norgExtendedPythonReturnVar = OrgExtendedPythonWrapperFunction()\n"
         cmd.source = out
 
 def PreProcessSourceFile(cmd):
-    HandleValue(cmd)
     var = cmd.params.Get('var',None)
+    cmd.varsDefs = []
+    out = ""
     if(var):
-        out = ""
         for k in var:
             v = var[k]
             if(isinstance(v,src.TableData)):
                 out += str(k) + " = [\n"
+                cmd.varsDefs.append("global " + str(k))
                 fr = True
                 for r in v.ForEachRow():
                     first = True
@@ -47,6 +53,7 @@ def PreProcessSourceFile(cmd):
                 out += "]\n"
             if(isinstance(v,fml.TableDef)):
                 out += str(k) + " = [\n"
+                cmd.varsDefs.append("global " + str(k))
                 fr = True
                 for r in v.ForEachRow():
                     first = True
@@ -60,6 +67,7 @@ def PreProcessSourceFile(cmd):
                 out += "]\n"
             elif(isinstance(v,lst.ListData)):
                 out += str(k) + " = [\n"
+                cmd.varsDefs.append("global " + str(k))
                 first = True
                 for txt in v:
                     out += (',' if not first else "") + str(FormatText(txt))
@@ -67,8 +75,12 @@ def PreProcessSourceFile(cmd):
                 out += "]\n"
             elif(isinstance(v,int) or isinstance(v,float) or (isinstance(v,str) and util.numberCheck(v))):
                 out += str(k) + " = " + str(v) + "\n"
+                cmd.varsDefs.append("global " + str(k))
             elif(isinstance(v,str)):
                 out += str(k) + " = \'" + str(v) + "\'\n"
+                cmd.varsDefs.append("global " + str(k))
+    HandleValue(cmd)
+    if(out != ""):
         cmd.source = out + cmd.source
 
 
@@ -86,6 +98,8 @@ def Execute(cmd, sets):
     ret = None
     loc = {}
     loc['orgExtendedPythonReturnVar'] = None
+    loc['view'] = sublime.active_window().active_view()
+    loc['window'] = sublime.active_window()
     globs = globals()
     try:
         if(not cmd.CheckResultsFor('value')):
@@ -113,7 +127,11 @@ def Execute(cmd, sets):
     codeOut.close()
     codeErr.close()
     if(cmd.CheckResultsFor('value')):
+        if(loc['orgExtendedPythonReturnVar'] == None):
+            if(e.strip()+o.strip() != ""):
+                return o.split('\n') + e.split('\n')
         return [ str(loc['orgExtendedPythonReturnVar']) ]
+        #return [ str(globs) ]
     else:
         return o.split('\n') + e.split('\n')
 

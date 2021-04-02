@@ -82,7 +82,6 @@
   #+END_SRC
 
   #+RESULTS:
-  ERROR - missing ditaa.jar file
   [[file:ditaa.png]]
 
 * Simple Graphviz Diagram
@@ -101,9 +100,9 @@
 * Tools
 
   #+NAME: file-exists
-  #+BEGIN_SRC python :var filename="sourceunittests.org" :results value
+  #+BEGIN_SRC python :var filename="filetotest" :results value
     import os 
     return os.path.exists(filename)
   #+END_SRC
   #+RESULTS:
-  : None
+  : False
