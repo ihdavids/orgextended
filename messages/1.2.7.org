@@ -1,1 +1,5 @@
 * 1.2.7
+	Core Idea: Quality of Life
+
+	This release is about taking a break, testing and fixing things.
+	

@@ -960,6 +960,17 @@ class SourceBlockExecute:
             if(self.gotVal):
                 sublime.active_window().active_view().run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(data)})
 
+    def __getitem__(self,index):
+        if(self.val):
+            try:
+                l = ast.literal_eval(self.val)
+                rv = l[index]
+                self.gotVal = True
+                return rv
+            except:
+                pass
+        return "<SBE>"
+
     def __str__(self):
         self.gotVal = True
         if(self.val):
@@ -975,12 +986,12 @@ class SourceBlockExecute:
             # output or value is not something we want to overwrite
             res = cmd.params.Get('results',None)
             if(res):
-                if(re.search('\bvalue\b',res)):
-                    cmd.params.Replace('results','raw silent value')
+                if('value' in res):
+                    cmd.params.Replace('results',['raw','silent','value'])
                 else:
-                    cmd.params.Replace('results','raw silent output')
+                    cmd.params.Replace('results',['raw','silent','output'])
             else:
-                cmd.params.Replace('results','raw silent')
+                cmd.params.Replace('results',['raw', 'silent'])
             var = cmd.params.Get('var',None)
             if(var):
                 for k in self.params:
