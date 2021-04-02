@@ -1,5 +1,18 @@
 * 1.2.7
 	Core Idea: Quality of Life
 
-	This release is about taking a break, testing and fixing things.
-	
+	This release is about stability, testing and validating the core babel feature set.
+
+** Babel Unit Tests
+	- Having most of the core babel features in place we have started to work towards
+	  validating the core babel feature set and putting a rough stamp of non preview on
+	  the babel feature set.
+
+	- Added "Org Show Table Tests" and "Org Show Source Block Tests" which will create a file with the unit tests
+	  for these features as a means of documentation and exploration for new users.
+
+** SBE
+	- FIXED: The Source Block Execute method had a bug that was preventing propper execution due to some
+	  of the features introduced in 1.2.6
+
+

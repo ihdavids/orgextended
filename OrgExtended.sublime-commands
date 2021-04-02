@@ -144,6 +144,8 @@
     // Resources 
     {"caption": "Org Show Worklog",            "command": "org_build_dev_docs"                },
     {"caption": "Org Show TestFile",           "command": "org_show_testfile"                 },
+    {"caption": "Org Show Table Tests",        "command": "org_show_table_tests"              },
+    {"caption": "Org Show Source Tests",       "command": "org_show_source_block_tests"       },
 
     // Internal Maintenance Commands
     //{"caption": "Org Output Table Docs",       "command": "org_doc_table"                     },

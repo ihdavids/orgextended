@@ -50,3 +50,25 @@ class OrgShowTestfileCommand(sublime_plugin.TextCommand):
         data = data.replace("\r","")
         view.insert(edit,view.size(),"\n" + data + "\n")
         view.run_command("save")
+
+# ===================================================================================
+class OrgShowTableTestsCommand(sublime_plugin.TextCommand):
+    """Show the org extended table unit tests to help users get started"""
+    def run(self, edit):
+        view = sublime.active_window().new_file()
+        view.set_syntax_file("Packages/OrgExtended/OrgExtended.sublime-syntax")
+        data = sublime.load_resource("Packages/OrgExtended/tests/tableunittests.org")
+        data = data.replace("\r","")
+        view.insert(edit,view.size(),"\n" + data + "\n")
+        view.run_command("save")
+
+# ===================================================================================
+class OrgShowSourceBlockTestsCommand(sublime_plugin.TextCommand):
+    """Show the org extended babel unit tests to help users get started"""
+    def run(self, edit):
+        view = sublime.active_window().new_file()
+        view.set_syntax_file("Packages/OrgExtended/OrgExtended.sublime-syntax")
+        data = sublime.load_resource("Packages/OrgExtended/tests/sourceunittests.org")
+        data = data.replace("\r","")
+        view.insert(edit,view.size(),"\n" + data + "\n")
+        view.run_command("save")
