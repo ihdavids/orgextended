@@ -1,3 +1,22 @@
+* Introduction
+  These are unit tests for the babel or source block functionality of org extended.
+  To run these you will need:
+
+  - The Java Runtime installed (to execute ditaa and plantuml diagrams)
+  - [[https://plantuml.com/download][PlantUML]] and [[http://ditaa.sourceforge.net/][Ditaa]] jar files in your config file.
+  - [[https://graphviz.org/][Graphviz]] installed and in your settings path.
+
+  Execution of these is done by evaluating the table in the result check section below.
+  ALL results are chained off those tables.
+
+
+* Result Checks
+  |    Name   |  Result  |   Ok   |
+  |-----------+----------+--------|
+  | Row Sums  | [15, 40] | PASSED |
+  | List Sums | [6]      | PASSED |
+  #+TBLFM:@2$3=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$3=passed(sbe('list-sums')[0] == 6)::@2$2=sbe('row-sums')::@3$2=sbe('list-sums')
+
 * Simple Table Test
 
   #+NAME: table-data
@@ -42,9 +61,49 @@
   #+RESULTS:
   | 6 |
 
-* Result Checks
-  |    Name   |  Result  |   Ok   |
-  |-----------+----------+--------|
-  | Row Sums  | [15, 40] | PASSED |
-  | List Sums | [6]      | PASSED |
-  #+TBLFM:@2$3=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$3=passed(sbe('list-sums')[0] == 6)::@2$2=sbe('row-sums')::@3$2=sbe('list-sums')
+
+* Simple PlantUML Diagram
+
+  #+BEGIN_SRC plantuml :file plantuml.png
+    a -> b
+    b -> c
+    c -> d
+  #+END_SRC
+
+  #+RESULTS:
+  [[file:plantuml.png]]
+
+* Simple Ditaa Diagram
+
+  #+BEGIN_SRC ditaa :file ditaa.png
+    +--------+        +----------+
+    | Ditaa  | -----> | Sublime  |
+    +--------+        +----------+
+  #+END_SRC
+
+  #+RESULTS:
+  ERROR - missing ditaa.jar file
+  [[file:ditaa.png]]
+
+* Simple Graphviz Diagram
+
+  #+BEGIN_SRC graphviz :file graphviz.png
+   digraph G {
+    a -> b;
+    b -> c;
+    a -> c;
+   } 
+  #+END_SRC
+
+  #+RESULTS:
+  [[file:graphviz.png]]
+
+* Tools
+
+  #+NAME: file-exists
+  #+BEGIN_SRC python :var filename="sourceunittests.org" :results value
+    import os 
+    return os.path.exists(filename)
+  #+END_SRC
+  #+RESULTS:
+  : None
