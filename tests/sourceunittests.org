@@ -11,11 +11,15 @@
 
 
 * Result Checks
-  |    Name   |  Result  |   Ok   |
-  |-----------+----------+--------|
-  | Row Sums  | [15, 40] | PASSED |
-  | List Sums | [6]      | PASSED |
-  #+TBLFM:@2$3=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$3=passed(sbe('list-sums')[0] == 6)::@2$2=sbe('row-sums')::@3$2=sbe('list-sums')
+  :PROPERTIES:
+    :NoTableHighlight: True
+  :END:
+  |    Name   |           R1          |   R2  |  Result  |   Ok   |
+  |-----------+-----------------------+-------+----------+--------|
+  | Row Sums  |                       |       | [15, 40] | PASSED |
+  | List Sums |                       |       | [6]      | PASSED |
+  |           | [[file:plantuml.png]] | <SBE> |          |        |
+  #+TBLFM:@2$5=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$5=passed(sbe('list-sums')[0] == 6)::@2$4=sbe('row-sums')::@3$4=sbe('list-sums')::@4$2=sbe('plantuml-test')::@4$3=sbe('file-exists',filename=@4$2)
 
 * Simple Table Test
 
@@ -64,6 +68,7 @@
 
 * Simple PlantUML Diagram
 
+  #+NAME: plantuml-test
   #+BEGIN_SRC plantuml :file plantuml.png
     a -> b
     b -> c
