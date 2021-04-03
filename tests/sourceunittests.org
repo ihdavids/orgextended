@@ -14,14 +14,15 @@
   :PROPERTIES:
     :NoTableHighlight: True
   :END:
-  |    Name   |           R1          |  Result  |   Ok   |
-  |-----------+-----------------------+----------+--------|
-  | Row Sums  |                       | [15, 40] | PASSED |
-  | List Sums |                       | [6]      | PASSED |
-  | PlantUML  | [[file:plantuml.png]] | True     | PASSED |
-  | GraphViz  | [[file:graphviz.png]] | True     | PASSED |
-  | Dataa     | [[file:ditaa.png]]    | True     | PASSED |
-  #+TBLFM:@2$4=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$4=passed(sbe('list-sums')[0] == 6)::@2$3=sbe('row-sums')::@3$3=sbe('list-sums')::@4$2=sbe('plantuml-test')::@4$3=sbe('file-exists',filename=filename(@4$2).replace('\\','\\\\'))::@4$4=passed($-1)::@5$2=sbe('graphviz-test')::@5$3=sbe('file-exists',filename=filename(@5$2).replace('\\','\\\\'))::@5$4=passed($-1)::@6$2=sbe('ditaa-test')::@6$3=sbe('file-exists',filename=filename($-1).replace('\\','\\\\'))::@6$4=passed($-1)
+  |     Name     |           R1          |  Result  |   Ok   |
+  |--------------+-----------------------+----------+--------|
+  | Row Sums     |                       | [15, 40] | PASSED |
+  | List Sums    |                       | [6]      | PASSED |
+  | NumList Sums |                       | 10       | PASSED |
+  | PlantUML     | [[file:plantuml.png]] | True     | PASSED |
+  | GraphViz     | [[file:graphviz.png]] | True     | PASSED |
+  | Dataa        | [[file:ditaa.png]]    | True     | PASSED |
+  #+TBLFM:@2$4=passed(sbe('row-sums')[0] == 15 and sbe('row-sums')[1] == 40)::@3$4=passed(sbe('list-sums')[0] == 6)::@2$3=sbe('row-sums')::@3$3=sbe('list-sums')::@5$2=sbe('plantuml-test')::@5$3=sbe('file-exists',filename=filename(@5$2).replace('\\','\\\\'))::@5$4=passed($-1)::@6$2=sbe('graphviz-test')::@6$3=sbe('file-exists',filename=filename(@6$2).replace('\\','\\\\'))::@6$4=passed($-1)::@7$2=sbe('ditaa-test')::@7$3=sbe('file-exists',filename=filename($-1).replace('\\','\\\\'))::@7$4=passed($-1)::@4$3=sbe('numlist-sums')::@4$4=passed($-1==10)
 
 * Simple Table Test
 
@@ -67,6 +68,25 @@
   #+RESULTS:
   | 6 |
 
+* Simple Numbered List Test
+
+  #+NAME: numlist-data
+  1. 2
+  2. 3
+  3. 4
+     1. 5
+  4. 1
+
+  #+NAME: numlist-sums
+  #+BEGIN_SRC python :var DATA=numlist-data
+    sum = 0
+    for i in DATA:
+      sum += int(i)
+    print("{}".format(sum))
+  #+END_SRC
+
+  #+RESULTS:
+  : 10
 
 * Simple PlantUML Diagram
 
