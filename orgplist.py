@@ -148,15 +148,21 @@ class PList:
             return
         d = PList.plistParse(strData)
         for k in d:
-            self.addToParam(self.params,k,d[k],self.exList)
+            val = d[k]
+            if(isinstance(val,list)):
+                for vv in val:
+                    self.addToParam(self.params,k,vv,self.exList)
+            else:
+                self.addToParam(self.params,k,val,self.exList)
 
     @staticmethod
     def addToParam(params,key,val,exList=None):
-        val = val.strip()
-        if(val.startswith("\"")):
-            val = val[1:]
-        if(val.endswith("\"")):
-            val = val[:-1]
+        if(isinstance(val,str)):
+            val = val.strip()
+            if(val.startswith("\"")):
+                val = val[1:]
+            if(val.endswith("\"")):
+                val = val[:-1]
         if(key in params):
             v = params[key]
             # Promote to a list if its just a string.
@@ -164,7 +170,8 @@ class PList:
                 params[key] = []
                 params[key].append(v)
             if(exList and exList.Has(key)):
-                val = util.ToList(val)
+                if(not isinstance(val,list)):
+                    val = util.ToList(val)
                 for vv in val:
                     eList = exList.GetParam(key,vv)
                     # Remove exclusive items from the list.
@@ -175,7 +182,8 @@ class PList:
                 params[key].append(val)
         else:
             if(exList and exList.Has(key)):
-                val = util.ToList(val)
+                if(not isinstance(val,list)):
+                    val = util.ToList(val)
                 for vv in val:
                     eList = exList.GetParam(key,vv)
                     # Remove exclusive items from the list.
