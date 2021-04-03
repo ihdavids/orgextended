@@ -178,7 +178,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     if(view):
         plist.AddFromPList(sets.Get('babel-args',None))
         plist.AddFromPList(sets.Get('babel-args-'+language,None))
-        node = db.Get().AtInView(view)
+        node = db.Get().AtPt(view,cmd.s)
         if(node):
             props = node.get_comment('PROPERTY',None)
             if(props):
