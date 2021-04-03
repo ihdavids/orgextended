@@ -283,6 +283,9 @@ def ProcessPossibleSourceObjects(cmd,language,cmdArgs):
     if(var):
         for k in var:
             n = var[k]
+            if(isinstance(n,tbl.Cell)):
+                n = str(n)
+                var[k] = n
             if(not util.numberCheck(n)):
                 td = tbl.LookupTableFromNamedObject(n)
                 if(td):

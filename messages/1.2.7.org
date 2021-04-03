@@ -15,4 +15,15 @@
 	- FIXED: The Source Block Execute method had a bug that was preventing propper execution due to some
 	  of the features introduced in 1.2.6
 
+** Table Highlights
+	- Some expressions using SBE can get fairly expensive to compute. When highlighting cells the system executes
+	  formulas in the background to determine which cells the formula touches. To avoid paying that cost when moving
+	  around you can turn this off for a node in the heirarchy as follows:
+
+	  #+BEGIN_EXAMPLE
+      :PROPERTIES:
+        :NoTableHighlight: True
+      :END:
+	  #+END_EXAMPLE
+
 
