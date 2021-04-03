@@ -186,6 +186,7 @@ def GetFunctions():
         f['int'] = myint
         f['float'] = myfloat
         f['highlight'] = myhighlight
+        f['filename'] = mylocalfile
         add_dynamic_functions(f)
         functionsTable = f
     return functionsTable
@@ -1289,6 +1290,24 @@ def mytime(dt):
     """Return the current time from a datetime object time(datetime)"""
     dt = GetTime(dt)
     return dt.time()
+
+LINK_RE = re.compile(r'^\s*\[\[(file:)?(?P<filepath>.+?)(((::(?P<row>\d+))(::(?P<col>\d+))?)|(::\#(?P<cid>[a-zA-Z0-9!$@%&_-]+))|(::\*(?P<heading>[a-zA-Z0-9!$@%&_-]+))|(::(?P<textmatch>[a-zA-Z0-9!$@%&_-]+)))?\s*\]\s*(\]|\s*\[.*\])')
+def mylocalfile(obj):
+    """Convert a local filename or link into an absolute filename"""
+    txt = GetVal(obj)
+    m = LINK_RE.search(txt)
+    if(m):
+        txt = m.group('filepath')
+    txt = txt.strip()
+    # We assume this is an abs path
+    if(txt.startswith('/') or (len(txt) > 3 and txt[2] == ':' and (txt[3] == '\\' or txt[3] == '/'))):
+        return txt
+    else:
+        p = sublime.active_window().active_view().file_name()
+        if(p):
+            p = os.path.dirname(p)
+            txt = os.path.normpath(os.path.join(p,txt))
+    return txt
 
 # Not currently used, the python if is forced on us due to the use
 # of the AST backend. I could convert from this to that with an RE
