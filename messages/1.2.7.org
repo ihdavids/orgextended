@@ -1,7 +1,7 @@
 * 1.2.7
 	Core Idea: Quality of Life
 
-	This release is about stability, testing and validating the core babel feature set.
+	This release is about stability, testing and validating the core babel feature set before I move on to noweb and tangle.
 
 ** Babel Unit Tests
 	- Having most of the core babel features in place we have started to work towards
@@ -11,9 +11,13 @@
 	- Added "Org Show Table Tests" and "Org Show Source Block Tests" which will create a file with the unit tests
 	  for these features as a means of documentation and exploration for new users.
 
+  - FIXED: Issues with multiple :var statements on the fence line of a babel block.
+
 ** SBE
+
 	- FIXED: The Source Block Execute method had a bug that was preventing propper execution due to some
 	  of the features introduced in 1.2.6
+	- FIXED: cell being passed to an sbe function would sometimes not evaluate properly.
 
 ** Table Highlights
 	- Some expressions using SBE can get fairly expensive to compute. When highlighting cells the system executes
@@ -25,5 +29,9 @@
         :NoTableHighlight: True
       :END:
 	  #+END_EXAMPLE
+
+	  I had to do this for the unit tests since our unit tests were generating diagrams as a result of the sbe calls
+	  Although an unrealistic real world case, this was slowing down the highlight to be somewhat unusable so merited
+	  the feature.
 
 
