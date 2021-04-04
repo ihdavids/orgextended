@@ -529,8 +529,12 @@ def GetDict(strData):
     rc = {}
     vals = strData.strip().split(',')
     for va in vals:
-        k,v = va.strip().split('=')
-        rc[k.strip()] = v.strip()
+        if(va.strip() != ""):
+            if("=" in va):
+                k,v = va.strip().split('=')
+                rc[k.strip()] = v.strip()
+            else:
+                log.error(" Params are not valid: " + str(va))
     return rc
 
 

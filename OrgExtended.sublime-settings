@@ -243,4 +243,8 @@
 
     // These are the default state for all source execution. You can change the defaults by changing this plist
     "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
+
+    // DAY PAGE
+    // Path where we would like day pages created
+    //"dayPagePath": "PATH",
 }

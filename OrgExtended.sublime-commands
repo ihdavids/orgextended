@@ -148,6 +148,9 @@
     {"caption": "Org Show Table Tests",        "command": "org_show_table_tests"              },
     {"caption": "Org Show Source Tests",       "command": "org_show_source_block_tests"       },
 
+    // Day Page
+    {"caption": "Org Day Page Create",         "command": "org_day_page_create"               },
+
     // Internal Maintenance Commands
     //{"caption": "Org Output Table Docs",       "command": "org_doc_table"                     },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"         },

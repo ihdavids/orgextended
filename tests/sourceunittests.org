@@ -149,6 +149,15 @@
   #+RESULTS:
   : 15
 
+
+  #+NAME: single-var
+  #+BEGIN_SRC python :var x=5
+    print(x)
+  #+END_SRC
+
+  #+RESULTS:
+  : 5
+
 * Handlers
   Handlers re-interpret the data in various ways. This could be a table, a list or just adding a text adornment.
 
@@ -257,7 +266,27 @@
    #+begin_src html
    <a>hello</a>
    #+end_src
-   
+
+* Call and Inline
+
+** Call Other Functions
+
+  #+call: html-output()
+
+   #+RESULTS:
+   #+begin_src html
+   <a>hello</a>
+   #+end_src
+
+  #+call: single-var(x=20)
+
+  #+RESULTS:
+  : 20
+
+** Inline Blocks
+
+  Inline block can be anywhere src_python{print("hello world")} {{{results(=hello world=)}}} a good exporter should just include the resuls here
+
 * Tools
 
   #+NAME: file-exists

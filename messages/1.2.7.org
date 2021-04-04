@@ -39,4 +39,6 @@
 	  Although an unrealistic real world case, this was slowing down the highlight to be somewhat unusable so merited
 	  the feature.
 
-
+** Day Page
+	- olegBc asked for a day page system. The project still has a little definition before we know where we need to take it.
+	  That said, I added a text command to create a day page as a first little step in that direction.
