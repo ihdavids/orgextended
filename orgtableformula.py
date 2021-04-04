@@ -1814,7 +1814,7 @@ class TableDef(simpev.SimpleEval):
         if(not hasattr(self,'highlight') or self.highlight):
             it = SingleFormulaIterator(self,i)
             for n in it:
-                r,c,val,reg = n
+                r,c,val,reg,_ = n
                 # This is important, the cell COULD return a cell
                 # until we convert it to a string that cell will not
                 # necessarily be touched so the accessList will not be
@@ -2390,7 +2390,7 @@ def SingleFormulaIterator(table,i):
         table.SetCurRow(r)
         table.SetCurCol(c)
         val = table.Execute(i)
-        yield [r,c,val,table.FindCellRegion(r,c)]
+        yield [r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i)]
 
 def FormulaIterator(table):
     for i in range(0,table.NumFormulas()):
@@ -2404,6 +2404,65 @@ def FormulaIterator(table):
             yield (r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i))
     return None
 
+# ================================================================================
+class OrgExecuteFormulaCommand(sublime_plugin.TextCommand):
+    def on_reformat(self):
+        self.td.RecalculateTableDimensions()
+        self.process_next()
+
+    def on_done_cell(self):
+        self.view.sel().clear()
+        self.view.sel().add(self.result[3])
+        #self.view.run_command('table_editor_next_field')
+        self.view.run_command('table_editor_align')
+        sublime.set_timeout(self.on_reformat,1)
+
+    def process_next(self):
+        self.result = next(self.it,None)
+        if(None == self.result):
+            self.on_done()
+            return
+        r,c,val,reg,fmt = self.result
+        if(val and isinstance(val,float) and fmt and "%" in fmt):
+            val = fmt % val
+        #print("REPLACING WITH: " + str(val))
+        self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
+
+    def on_done(self):
+        global highlightEnabled
+        highlightEnabled = True
+        self.td.PostExecute()
+        if(None != self.origCur):
+            self.view.sel().clear()
+            self.view.sel().add(self.origCur)
+        evt.EmitIf(self.onDone)
+
+    def on_formula_copy_done(self):
+        if(None != self.at):
+            self.view.sel().clear()
+            self.view.sel().add(self.at)
+        # Working on formula handling
+        self.td = create_table(self.view)
+        self.td.ClearAllRegions()
+        self.td.PreExecute()
+        formulaIdx = self.td.GetFormulaAt()
+        self.it = SingleFormulaIterator(self.td,formulaIdx)
+        self.process_next()
+
+    def run(self, edit,onDone=None,skipFormula=None,at=None,clearHighlights=True):
+        global highlightEnabled
+        highlightEnabled = False
+        self.at = at
+        if(self.view.sel()):
+            self.origCur = self.view.sel()[0]
+        if(clearHighlights):
+            ClearAllOldCellHighlights()
+        self.onDone = onDone
+        if(skipFormula):
+            self.on_formula_copy_done()
+        else:
+            self.view.run_command('org_fill_in_formula_from_cell',{"onDone": evt.Make(self.on_formula_copy_done), "at": at,"clearHighlights":clearHighlights})
+        #td.HighlightFormula(i)
 # ================================================================================
 class OrgExecuteTableCommand(sublime_plugin.TextCommand):
     def on_reformat(self):
@@ -2544,7 +2603,7 @@ class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
             if(None != formulaIdx):
                 it = SingleFormulaIterator(td,formulaIdx)
                 for n in it:
-                    r,c,val,reg = n
+                    r,c,val,reg,_ = n
                     if(r == cell[0] and c == cell[1]):
                         self.result = n
                         fmt = td.FormulaFormatter(formulaIdx)
