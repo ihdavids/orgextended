@@ -250,14 +250,14 @@
 
   #+NAME: html-output
   #+BEGIN_SRC python :results html
-    print(['a','b','c'])
+    print("<a>hello</a>")
   #+END_SRC
 
    #+RESULTS:
-   #+begin_export html
-   ['a', 'b', 'c']
-   #+end_export
-
+   #+begin_src html
+   <a>hello</a>
+   #+end_src
+   
 * Tools
 
   #+NAME: file-exists

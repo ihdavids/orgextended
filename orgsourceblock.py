@@ -340,7 +340,7 @@ class HtmlFormatter(ResultsFormatter):
         super(HtmlFormatter,self).__init__(cmd)
 
     def FormatOutput(self,output):
-        output = "#+begin_export html\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
+        output = "#+begin_src html\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
         return (output,1)
 
 class LatexFormatter(ResultsFormatter):
@@ -348,7 +348,7 @@ class LatexFormatter(ResultsFormatter):
         super(LatexFormatter,self).__init__(cmd)
 
     def FormatOutput(self,output):
-        output = "#+begin_export latex\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_export"
+        output = "#+begin_src latex\n" + self.GetIndent() + output + "\n" + self.GetIndent() + "#+end_src"
         return (output,1)
 
 class OrgFormatter(ResultsFormatter):
