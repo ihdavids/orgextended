@@ -215,7 +215,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     plist.AddFromPList(cmdArgs)
     cmd.params = plist
 
-
+# Determine the output handler to user from our parameters
 def SetupOutputHandler(cmd,skipFile = False):
     res = cmd.params.GetStr('results','')
     if(not skipFile and cmd.params.Has('file')):
@@ -231,6 +231,7 @@ def SetupOutputHandler(cmd,skipFile = False):
     else:
         return TextHandler(cmd,cmd.params)
 
+# Determine the output formatter to used based on our parameters
 def SetupOutputFormatter(cmd):
     res = cmd.params.GetStr('results','')
     if(re.search(r'\bdrawer\b',res)):
@@ -677,10 +678,12 @@ class OrgExecuteSourceBlock:
         if(self.silent != None):
             evt.EmitIfParams(self.onDoneResultsPos,postFormat=self.formattedOutput,preFormat=self.preFormattedOutput,name=self.onDoneFnName)
         else:
+            self.resultsTxtStart = self.view.text_point(self.resultsTxtStartRow,self.resultsTxtStartCol)
             evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
 
     def OnPostProcess(self):
         self.curPt = self.view.sel()[0]
+        self.resultsTxtStart = self.view.text_point(self.resultsTxtStartRow,self.resultsTxtStartCol)
         self.outHandler.PostProcess(self.view, self.resultsTxtStart, self.OnPostPostProcess)
 
     def OnPostPostProcess(self):
@@ -884,16 +887,14 @@ class OrgExecuteSourceBlock:
                 self.outFormatter.SetIndent(n.level)
             output = self.outHandler.FormatOutput(self.outputs)
             self.preFormattedOutput = output
-            self.resultsTxtStart = self.resultsStartPt + self.level + 1
+            self.resultsTxtStartRow,self.resultsTxtStartCol = self.view.rowcol(self.resultsStartPt + self.level + 1)
             rowadjust = 0
             if(self.outFormatter):
                 output,rowadjust = self.outFormatter.FormatOutput(output)
             # If our formatter wrapped us we have to adjust our text point for post processing
             # and results text.
             if(rowadjust > 0):
-                row,col = self.view.rowcol(self.resultsTxtStart)
-                row += rowadjust
-                self.resultsTxtStart = self.view.text_point(row,col)
+                self.resultsTxtStartRow += rowadjust
             ## Keep track of this so we know where we are inserting the text.
             self.formattedOutput = (" " * self.level + " ") + output+'\n'
             if(self.CheckResultsFor('silent') or self.silent == True):
@@ -941,10 +942,12 @@ class OrgExecuteInlineSourceBlock:
         if(self.silent != None):
             evt.EmitIfParams(self.onDoneResultsPos,postFormat=self.formattedOutput,preFormat=self.preFormattedOutput,name=self.onDoneFnName)
         else:
+            self.resultsTxtStart = self.view.text_point(self.resultsTxtStartRow,self.resultsTxtStartCol)
             evt.EmitIfParams(self.onDoneResultsPos,pos=self.resultsTxtStart,name=self.onDoneFnName)
 
     def OnPostProcess(self):
         self.curPt = self.view.sel()[0]
+        self.resultsTxtStart = self.view.text_point(self.resultsTxtStartRow,self.resultsTxtStartCol)
         self.outHandler.PostProcess(self.view, self.resultsTxtStart, self.OnPostPostProcess)
 
     def OnPostPostProcess(self):
@@ -1131,6 +1134,7 @@ class OrgExecuteInlineSourceBlock:
             self.outHandler.SetIndent(0)
             output = self.outHandler.FormatOutput(self.outputs)
             self.preFormattedOutput = output
+            self.resultsTxtStartRow,self.resultsTxtStartCol = self.view.rowcol(self.resultsStartPt)
             self.resultsTxtStart = self.resultsStartPt
             self.formattedOutput = " {{{results(=" + output.replace("\n","") + "=)}}} "
             if(self.CheckResultsFor('silent') or self.silent == True):
