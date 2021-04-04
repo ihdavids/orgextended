@@ -218,6 +218,33 @@
    | c |
    :end:
 
+** Org
+  Source block in orgmode format
+
+  #+NAME: org-output
+  #+BEGIN_SRC python :results table org
+    print(['a','b','c'])
+  #+END_SRC
+
+   #+RESULTS:
+   #+begin_src org
+   | a |
+   | b |
+   | c |
+   #+end_src
+
+** Code
+  Source that outputs source code
+
+  #+NAME: code-output
+  #+BEGIN_SRC python :results raw code
+    print("print(['a','b','c'])")
+  #+END_SRC
+
+   #+RESULTS:
+   #+begin_src python
+   print(['a','b','c'])
+   #+end_src
 * Tools
 
   #+NAME: file-exists

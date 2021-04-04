@@ -12,6 +12,7 @@
 	  for these features as a means of documentation and exploration for new users.
 
   - FIXED: Issues with multiple :var statements on the fence line of a babel block.
+  - FIXED: Exception with initial inserts with drawer formatter. 
 
 ** SBE
 
