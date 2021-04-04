@@ -1,0 +1,2 @@
+* 1.2.8
+	- 1.2.7 was missing a source file. This fixes that.
