@@ -149,6 +149,74 @@
   #+RESULTS:
   : 15
 
+* Handlers
+  Handlers re-interpret the data in various ways. This could be a table, a list or just adding a text adornment.
+
+** Table Output
+   Table output will try to format the output as a table
+
+  #+NAME: table-output
+  #+BEGIN_SRC python :results table
+    print(['a','b','c'])
+  #+END_SRC
+
+  #+RESULTS:
+  | a |
+  | b |
+  | c |
+
+** List Output
+   List output will try to interpret the data as a list of some sort.
+
+  #+NAME: list-output
+  #+BEGIN_SRC python :results list
+    print(['a','b','c'])
+  #+END_SRC
+
+  #+RESULTS:
+  - a
+  - b
+  - c
+
+** Raw Output
+   Raw output does 0 decoration
+
+  #+NAME: raw-output
+  #+BEGIN_SRC python :results raw
+    print(['a','b','c'])
+  #+END_SRC
+
+   #+RESULTS:
+   ['a', 'b', 'c']
+
+** Text Output
+  Text output gets a : at the start of each line
+
+  #+NAME: text-output
+  #+BEGIN_SRC python
+    print(['a','b','c'])
+  #+END_SRC
+
+   #+RESULTS:
+   : ['a', 'b', 'c']
+
+* Formatters
+  Formatters wrap the output from the handler in some kind of wrapping. A drawer, a source block, etc.
+
+** Drawer
+   The drawer formatter wraps the output in a drawer
+
+  #+NAME: table-output
+  #+BEGIN_SRC python :results table drawer
+    print(['a','b','c'])
+  #+END_SRC
+
+   #+RESULTS:
+   :results:
+   | a |
+   | b |
+   | c |
+   :end:
 
 * Tools
 
