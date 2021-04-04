@@ -245,6 +245,19 @@
    #+begin_src python
    print(['a','b','c'])
    #+end_src
+
+** Html
+
+  #+NAME: html-output
+  #+BEGIN_SRC python :results html
+    print(['a','b','c'])
+  #+END_SRC
+
+   #+RESULTS:
+   #+begin_export html
+   ['a', 'b', 'c']
+   #+end_export
+
 * Tools
 
   #+NAME: file-exists
