@@ -46,6 +46,9 @@ class PListExclusiveLists:
             self.keys[k] = rlist
         rlist.Add(l)
 
+    def AddBool(self,k):
+        self.AddList(k,['t','true','false','nil','on','yes','no','off'])
+
     def Get(self,k):
         if(k in self.keys):
             return self.keys[k]
@@ -59,6 +62,8 @@ class PListExclusiveLists:
 
 RE_FN_MATCH = re.compile(r"\s+[:]([a-zA-Z][a-zA-Z0-9-_]*)\s+(([a-zA-Z][a-zA-Z0-9]*\s*[=]\s*[\"][^\"]+[\"])|((([ ](?!:))|[^ ()\"])+)|([(][^)]+[)])|([\"][^\"]+[\"]))")
 class PList:
+
+
     def __init__(self,plist):
         self.params = plist
         self.exList = PListExclusiveLists()
@@ -100,6 +105,8 @@ class PList:
 
     def GetBool(self,name):
         v = self.Get(name,"no")
+        if(isinstance(v,list) and len(v) == 1):
+            v = v[0]
         if(v and isinstance(v,str)):
             v = v.lower()
             if(v == 'yes' or v == 't' or v == 'true' or v == '1' or v == 'on'):

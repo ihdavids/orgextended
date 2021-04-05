@@ -4,6 +4,7 @@ import os
 import re
 import tempfile
 import traceback 
+import hashlib
 
 import OrgExtended.orgdb as db
 import OrgExtended.orgextension as ext
@@ -24,7 +25,7 @@ RE_SRC_BLOCK = re.compile(r"^\s*\#\+(BEGIN_SRC|begin_src)\s+(?P<name>[^: ]+)\s*"
 RE_INL_SRC_BLOCK = re.compile(r"(?P<block>(SRC_|src_)(?P<name>[a-zA-Z0-9_-]+)(\[(?P<params>[^\]]+)\])?\{(?P<code>[^}]+)\})(?P<resblock>\s*\{\{\{results\(\s*=(?P<res>[^)]*)=\s*\)\}\}\})?")
 RE_INL_RESULTS_BLOCK = re.compile(r"\{\{\{results\(=(?P<val>.*)=\)\}\}\}")
 RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)\s*")
-RE_RESULTS = re.compile(r"^\s*\#\+(RESULTS|results)[:]\s*$")
+RE_RESULTS = re.compile(r"^\s*\#\+(RESULTS|results)(\s*\[\s*(?P<hash>[a-fA-F0-9]+)\s*\]\s*)?[:]\s*(?P<comment>[a-zA-Z0-9_-]+)?$")
 RE_HEADING = re.compile(r"^[*]+\s+")
 RE_PROPERTY_DRAWER = re.compile(r"^\s*[:][a-zA-Z0-9]+[:]\s*$")
 RE_END_PROPERTY_DRAWER = re.compile(r"^\s*[:](END|end)[:]\s*$")
@@ -171,6 +172,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     plist.exList.AddList('results',['code','drawer','html','latex','link','graphics','org','pp','raw'])
     # Handling
     plist.exList.AddList('results',['silent','replace','prepend','append'])
+    plist.exList.AddBool('cache')
     defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
     view = sublime.active_window().active_view()
@@ -608,12 +610,17 @@ def FindResults(self,edit,at,checkSilent=True):
     inResults        = False
     inPropertyDrawer = False
     inBlock          = False
+    m                = None
+    self.resultsHash        = None
     for rw in range(row, fileEndRow):
         line = self.view.substr(self.view.line(self.view.text_point(rw,0)))
-        if(not inResults and RE_RESULTS.search(line)):
-            self.startResults = rw
-            inResults = True
-            continue
+        if(not inResults):
+            m = RE_RESULTS.search(line)
+            if(m):
+                self.resultsHash = m.group('hash')
+                self.startResults = rw
+                inResults = True
+                continue
         if(RE_FUNCTION.search(line)):
             if(inResults):
                 EndResults(self,rw)
@@ -860,6 +867,10 @@ class OrgExecuteSourceBlock:
                 self.source = view.substr(self.region)
                 if(hasattr(self.curmod,"PreProcessSourceFile")):
                     self.curmod.PreProcessSourceFile(self)
+                if(self.params.GetBool('cache')):
+                    hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
+                    print(hashVal)
+                # Is this a file backed execution?
                 if(hasattr(self.curmod,"Extension")):
                     tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
                     try:
@@ -875,6 +886,7 @@ class OrgExecuteSourceBlock:
                         log.debug(" " + traceback.format_exc())
                     finally:
                         pass
+                # This is an inline execution
                 else:
                     self.filename = None
                     self.outputs = self.curmod.Execute(self,sets)
