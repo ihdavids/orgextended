@@ -1,2 +1,18 @@
 * 1.2.9
-	
+
+** Babel Cache
+   This mode is dangerous if the operation has any side effects.
+
+   It does  however skip execution when the operation is already present.
+   It will keep a hash of the source and params and will only execute
+   if the source does not change.
+
+   That said, not yet supported for call operations.
+
+	#+BEGIN_SRC python :cache yes :var x=5
+	  print("Hello world") 
+	#+END_SRC
+
+   #+RESULTS[5ce4498b4cf15deb48101207ad5673485754fd11]:
+   : Hello world
+

@@ -860,6 +860,7 @@ class OrgExecuteSourceBlock:
             view = self.view
             self.outHandler   = SetupOutputHandler(self)
             self.outFormatter = SetupOutputFormatter(self)
+            self.hashVal = None
 
             # Run the "writer"
             if(hasattr(self.curmod,"Execute")):
@@ -867,13 +868,12 @@ class OrgExecuteSourceBlock:
                 self.source = view.substr(self.region)
                 if(hasattr(self.curmod,"PreProcessSourceFile")):
                     self.curmod.PreProcessSourceFile(self)
-                self.hashVal = None
                 if(self.params.GetBool('cache')):
                     self.hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
                     if(self.hashVal == self.resultsHash):
-                        print('Hash matches, skilling execution')
+                        log.warning(' Hash matches, skipping execution')
                         return
-                    print(hashVal)
+                    print(self.hashVal)
                 # Is this a file backed execution?
                 if(hasattr(self.curmod,"Extension")):
                     tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
@@ -930,6 +930,12 @@ class OrgExecuteSourceBlock:
                 self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsStartPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
             # Replace mode
             else:
+                # Hash means we have to update the hash!
+                if(self.hashVal):
+                    row,col = view.rowcol(self.resultsStartPt)
+                    row -= 1
+                    self.resultsStartPt = view.text_point(row,col)
+                    self.formattedOutput = (" " * self.level + " ") + "#+RESULTS[{}]:\n".format(self.hashVal) + self.formattedOutput
                 self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
 
 # ============================================================

@@ -272,11 +272,11 @@ contexts:
       # #+SOMETHING:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks
-    - match: '^\s*(\#\+(?!(TBLFM|tblfm|BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)\:)\s*(.*)'
+    - match: '^\s*(\#\+(?!(TBLFM|tblfm|BEGIN|END|begin|end))([a-zA-Z][a-zA-Z0-9_-]+)(\s*\[[a-zA-Z0-9_-]+\]\s*)?\:)\s*(.*)'
       scope: orgmode.controltag
       captures:
         1: keyword orgmode.controltag.tag
-        4: comment orgmode.controltag.text
+        5: comment orgmode.controltag.text
       # #+TBLFM:
       # But not a dynamic block
       # Use negative look ahead to avoid matching begin and end dynamic blocks
