@@ -861,11 +861,19 @@ class OrgExecuteSourceBlock:
             view = self.view
             self.outHandler   = SetupOutputHandler(self)
             self.outFormatter = SetupOutputFormatter(self)
-            self.hashVal = None
+            self.hashVal      = None
+            # Compute our expected results location. We may need to adjust
+            # it based on formatting later though.
+            n                 = db.Get().AtPt(view,self.s)
+            self.level        = n.level
+            self.resultsTxtStartRow, self.resultsTxtStartCol = self.view.rowcol(self.resultsStartPt + self.level + 1)
 
+            # If we have a never eval param this block is NOT ALLOWED
+            # to be executed! So we bail!
             evalParam = self.params.Get('eval',[])
             if('no' in evalParam or 'never' in evalParam):
-                self.OnReplaced()
+                self.OnDone()
+                return
 
             # Run the "writer"
             if(hasattr(self.curmod,"Execute")):
@@ -906,14 +914,11 @@ class OrgExecuteSourceBlock:
                 return
             # Reformat adding indents to each line!
             # No bad formatting allowed!
-            n = db.Get().AtPt(view,self.s)
-            self.level = n.level
             self.outHandler.SetIndent(n.level)
             if(self.outFormatter):
                 self.outFormatter.SetIndent(n.level)
             output = self.outHandler.FormatOutput(self.outputs)
             self.preFormattedOutput = output
-            self.resultsTxtStartRow,self.resultsTxtStartCol = self.view.rowcol(self.resultsStartPt + self.level + 1)
             rowadjust = 0
             if(self.outFormatter):
                 output,rowadjust = self.outFormatter.FormatOutput(output)
