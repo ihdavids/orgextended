@@ -173,6 +173,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     # Handling
     plist.exList.AddList('results',['silent','replace','prepend','append'])
     plist.exList.AddBool('cache')
+    plist.exList.AddList('eval',['never','no','query','never-export','no-export','query-export'])
     defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
     view = sublime.active_window().active_view()
@@ -862,6 +863,10 @@ class OrgExecuteSourceBlock:
             self.outFormatter = SetupOutputFormatter(self)
             self.hashVal = None
 
+            evalParam = self.params.Get('eval',[])
+            if('no' in evalParam or 'never' in evalParam):
+                self.OnReplaced()
+
             # Run the "writer"
             if(hasattr(self.curmod,"Execute")):
                 # Okay now time to replace the contents of the block
@@ -872,6 +877,7 @@ class OrgExecuteSourceBlock:
                     self.hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
                     if(self.hashVal == self.resultsHash):
                         log.warning(' Hash matches, skipping execution')
+                        self.OnReplaced()
                         return
                     print(self.hashVal)
                 # Is this a file backed execution?
