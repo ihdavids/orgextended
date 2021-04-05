@@ -98,6 +98,14 @@ class PList:
         except:
             return defaultValue
 
+    def GetBool(self,name):
+        v = self.Get(name,"no")
+        if(v and isinstance(v,str)):
+            v = v.lower()
+            if(v == 'yes' or v == 't' or v == 'true' or v == '1' or v == 'on'):
+                return True
+        return False
+
     def GetFloat(self,name,defaultValue):
         v = self.Get(name,defaultValue)
         try:
