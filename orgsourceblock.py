@@ -867,8 +867,12 @@ class OrgExecuteSourceBlock:
                 self.source = view.substr(self.region)
                 if(hasattr(self.curmod,"PreProcessSourceFile")):
                     self.curmod.PreProcessSourceFile(self)
+                self.hashVal = None
                 if(self.params.GetBool('cache')):
-                    hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
+                    self.hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
+                    if(self.hashVal == self.resultsHash):
+                        print('Hash matches, skilling execution')
+                        return
                     print(hashVal)
                 # Is this a file backed execution?
                 if(hasattr(self.curmod,"Extension")):
