@@ -16,3 +16,9 @@
    #+RESULTS[5ce4498b4cf15deb48101207ad5673485754fd11]:
    : Hello world
 
+** Never Eval
+
+	#+BEGIN_SRC python :eval never
+		print("hi")	  
+	#+END_SRC
+   #+RESULTS:
