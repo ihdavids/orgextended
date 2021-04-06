@@ -665,7 +665,7 @@ def FindResults(self,edit,at,checkSilent=True):
             pt = self.view.text_point(self.endRow,0)
             pt = self.view.line(pt).end() + 1
         indent = db.Get().AtPt(self.view,at).indent()
-        if(not checkSilent or not self.CheckResultsFor('silent') and self.silent == None):
+        if(not checkSilent or not self.CheckResultsFor('silent') and self.silent == None and not self.CheckEval(('no','never'))):
             self.view.insert(edit, pt, "\n" +indent+ "#+RESULTS:\n")
         self.startResults   = self.endRow + 2 
         self.endResults     = self.startResults + 1
@@ -684,6 +684,17 @@ class OrgExecuteSourceBlock:
     def CheckResultsFor(self,val):
         res = self.params.Get('results',[])
         return (val in res)
+    
+    def CheckEval(self,val):
+        evalParam = self.params.Get('eval',[])
+        if(isinstance(val,list) or isinstance(val,tuple)):
+            for x in val:
+                if( x in evalParam):
+                    return True
+        else:
+            if(val in evalParam):
+                return True
+        return False
 
     def OnDone(self):
         evt.EmitIf(self.onDone)
@@ -857,6 +868,8 @@ class OrgExecuteSourceBlock:
         if(self.deferedSources <= 0):
             FindResults(self,0,self.s)
             self.Execute()
+
+
     def Execute(self):
             view = self.view
             self.outHandler   = SetupOutputHandler(self)
@@ -870,8 +883,7 @@ class OrgExecuteSourceBlock:
 
             # If we have a never eval param this block is NOT ALLOWED
             # to be executed! So we bail!
-            evalParam = self.params.Get('eval',[])
-            if('no' in evalParam or 'never' in evalParam):
+            if(self.CheckEval(('no','never'))):
                 self.OnDone()
                 return
 
