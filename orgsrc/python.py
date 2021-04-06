@@ -83,6 +83,9 @@ def PreProcessSourceFile(cmd):
     if(out != ""):
         cmd.source = out + cmd.source
 
+def LineCommentPrefix():
+    return "#"
+
 
 # Actually do the work, return an array of output.
 def Execute(cmd, sets):

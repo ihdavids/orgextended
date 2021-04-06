@@ -1331,7 +1331,16 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
                         log.debug(" " + traceback.format_exc())
                 else:
                     filename = os.path.splitext(filename)[0]+".py"
+                comStart = None
+                if(hasattr(self.curmod,"LineCommentPrefix")):
+                    comStart = self.curmod.LineCommentPrefix()
+                    temp = "\n{} -- Line: {}\n".format(comStart,str(self.startRow))
+                    self.source = temp + self.source
+
                 if(not filename in self.fileData):
+                    if(comStart):
+                        temp = "{} Generated From: {}\n".format(comStart,filename)
+                        self.source = temp + self.source
                     self.fileData[filename] = self.source
                 else:
                     self.fileData[filename] += self.source

@@ -81,6 +81,9 @@ def PreProcessSourceFile(cmd):
 def Extension(cmd):
     return ".ps1"
 
+def LineCommentPrefix():
+    return "#"
+    
 # Actually do the work, return an array of output.
 def Execute(cmd,sets):
     commandLine = [r"C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", cmd.filename]
