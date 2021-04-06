@@ -7,7 +7,7 @@
    It will keep a hash of the source and params and will only execute
    if the source does not change.
 
-	#+BEGIN_SRC python :cache yes :var x=5
+	#+BEGIN_SRC python :cache yes :var x=5 :tangle yes
 	  print("Hello world") 
 	#+END_SRC
 
@@ -26,7 +26,7 @@
 
 	Query evaluation is mostly working now although the title is not great.
 
-	#+BEGIN_SRC python :eval query
+	#+BEGIN_SRC python :eval query :tangle yes
 	  print("Hello World")
 	#+END_SRC
 

@@ -547,6 +547,34 @@ def GetDict(strData):
                 log.error(" Params are not valid: " + str(va))
     return rc
 
+def FindEndOfSourceBlock(view,row):
+    end   = None
+    erow  = view.endRow()
+    for rw in range(row,erow+1):
+        line = view.substr(view.line(view.text_point(rw,0)))
+        if(RE_END.search(line)):
+            end = rw
+            break
+    if(not end):
+        log.error("Could not locate #+END_SRC tag")
+        return None
+    return end
+
+def GetModuleAndParams(view,row):
+    extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
+    line = view.substr(view.line(row))
+    m = RE_SRC_BLOCK.search(line)
+    if(not m):
+        log.error("FAILED TO PARSE SOURCE BLOCK: " + line)
+        return (None, None, None, None)
+    fnname = m.group('name')
+    log.debug("SRC NAME: " + fnname)
+    paramdata = line[len(m.group(0)):]
+    # Now find me that function!
+    if(fnname not in extensions):
+        log.error("Function not found in src folder! Cannot execute!")
+        return (None, None, None, None)
+    return (extensions,fnname,paramdata,line)
 
 RE_FUNCTION=re.compile(r'\s+[#][+][Cc][Aa][Ll][Ll][:]\s*(?P<name>[a-zA-Z][a-zA-Z0-9_-]+)\s*\((?P<params>[^)]*)\)')
 def IsCallCommentBlock(view):
@@ -754,36 +782,18 @@ class OrgExecuteSourceBlock:
                 row -= 1
             # Okay we have a dynamic block, now we need to know where it ends.
             start = at
-            end   = None
-            erow = view.endRow()
-            for rw in range(row,erow+1):
-                line = view.substr(view.line(view.text_point(rw,0)))
-                if(RE_END.search(line)):
-                    end = rw
-                    break
+            end   = FindEndOfSourceBlock(view,row)
             if(not end):
-                log.error("Could not locate #+END_SRC tag")
                 return
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
-            line = view.substr(view.line(start))
-            m = RE_SRC_BLOCK.search(line)
-            if(not m):
-                log.error("FAILED TO PARSE SOURCE BLOCK: " + line)
-                return
-            fnname = m.group('name')
-            log.debug("SRC NAME: " + fnname)
-            self.paramdata = line[len(m.group(0)):]
-            self.language = fnname
-            # Now find me that function!
-            if(fnname not in extensions):
-                log.error("Function not found in src folder! Cannot execute!")
+            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,start)
+            if(not self.language):
                 return
 
             # Start setting up our execution state.
-            self.curmod   = extensions[fnname]
+            self.curmod   = extensions[self.language]
             self.startRow = row + 1
             self.endRow   = end
             self.s        = view.text_point(self.startRow,0)
@@ -1233,28 +1243,123 @@ class OrgExecuteInlineSourceBlockCommand(sublime_plugin.TextCommand):
 
 # ================================================================================
 class OrgExecuteAllSourceBlocksCommand(sublime_plugin.TextCommand):
-    def continueRun(self):
-        for r in range(self.cur,self.last_row):
+    def ContinueRun(self):
+        # I have to go bottom to top in case my 
+        for r in range(self.cur,0,-1):
             self.cur = r
             pt = self.view.text_point(r,1)
-            if(not self.inBlock and IsSourceBlock(self.view,pt)):
+            if(self.inBlock and IsSourceBlock(self.view,pt)):
                 self.view.run_command('org_execute_source_block',{"at":pt,"onDone":evt.Make(self.continueRun)})
-                self.inBlock = True
-                break
-            elif(self.inBlock and IsEndSourceBlock(self.view,pt)):
                 self.inBlock = False
+                break
+            elif(not self.inBlock and IsEndSourceBlock(self.view,pt)):
+                self.inBlock = True
 
     def run(self,edit,at=None):
         # Do we want to avoid re-execution?
         self.last_row = self.view.endRow()
-        self.cur = 0
+        self.cur = self.last_row
         self.inBlock = False
-        self.continueRun()
+        self.ContinueRun()
 
 # ================================================================================
 class OrgTangleFileCommand(sublime_plugin.TextCommand):
     def OnDone(self):
         evt.EmitIf(self.onDone)
 
+    def CheckResultsFor(self,val):
+        res = self.params.Get('results',[])
+        return (val in res)
+
+    def ParseFile(self,at):
+        view = self.view
+        if(IsSourceBlock(view,at)):
+            filename = self.view.file_name()
+
+            # Okay we have a dynamic block, now we need to know where it ends.
+            start   = at
+            row,col = view.rowcol(at)
+            end = FindEndOfSourceBlock(view,row)
+            if(not end):
+                return
+            # Okay now we have a start and end to build a region out of.
+            # time to run a command and try to get the output.
+            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,start)
+            if(not self.language):
+                return
+
+            log.debug(" TANGLE: {}".format(fenceLine))
+
+            # Start setting up our execution state.
+            self.curmod   = extensions[self.language]
+            self.startRow = row + 1
+            self.endRow   = end
+            self.s        = view.text_point(self.startRow,0)
+            self.e        = view.text_point(self.endRow,0)
+            self.region   = sublime.Region(self.s,self.e)
+            self.sourcefile = view.file_name()
+            self.sourcefns = {}
+            # We mark as silent so we don't execute here.
+            self.silent    = True
+            BuildFullParamList(self,self.language,self.paramdata)
+            #FindResults(self,edit,self.s)
+            var = self.params.GetDict('var',None)
+            if(var):
+                self.params.Replace('var',var)
+            #if(self.CheckEval(('no','never'))):
+            #    return
+            if(not self.params.Get('tangle',None) or not self.params.GetBool('tangle')):
+                return
+            # Run the "writer"
+            if(hasattr(self.curmod,"Execute")):
+                # Okay now time to replace the contents of the block
+                self.source = view.substr(self.region)
+                self.source = re.sub(r"^(\s+)(.*)$",
+                    lambda m: re.sub("^" + " "*len(m.group(1)),"",m.group(2),flags=re.MULTILINE)
+                    ,self.source,flags=re.MULTILINE|re.DOTALL)
+                if(hasattr(self.curmod,"PreProcessSourceFile")):
+                    self.curmod.PreProcessSourceFile(self)
+                # Is this a file backed execution?
+                if(hasattr(self.curmod,"Extension")):
+                    filename = os.path.splitext(filename)[0]+self.curmod.Extension()
+                    try:
+                        if(hasattr(self.curmod,"WrapStart")):
+                            self.source = ((self.curmod.WrapStart(self) + "\n").encode("ascii")) + self.source
+                        if(hasattr(self.curmod,"WrapEnd")):
+                            self.source += (("\n" + self.curmod.WrapEnd(self)).encode("ascii"))
+                    except:
+                        log.debug(" " + traceback.format_exc())
+                else:
+                    filename = os.path.splitext(filename)[0]+".py"
+                if(not filename in self.fileData):
+                    self.fileData[filename] = self.source
+                else:
+                    self.fileData[filename] += self.source
+                #log.debug("TANGLE: " + str(self.source)
+        else:
+            log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
+
+    def ContinueRun(self):
+        for r in range(self.cur,self.last_row):
+            self.cur = r
+            pt = self.view.text_point(r,1)
+            if(not self.inBlock and IsSourceBlock(self.view,pt)):
+                self.ParseFile(pt)
+                self.inBlock = True
+                continue
+            elif(self.inBlock and IsEndSourceBlock(self.view,pt)):
+                self.inBlock = False
+        for filename in self.fileData:
+            with open(filename,"w") as f:
+                f.write(self.fileData[filename])
+                print("WROTE: " + filename)
+        if(self.cur >= self.last_row):
+            self.OnDone()
+
     def run(self,edit,onDone=None):
+        self.fileData = {}
         self.onDone = onDone
+        self.last_row = self.view.endRow()
+        self.cur = 0
+        self.inBlock = False
+        self.ContinueRun()

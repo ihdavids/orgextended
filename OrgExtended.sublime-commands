@@ -70,6 +70,7 @@
     {"caption": "Org Exec Source Block",       "command": "org_execute_source_block"    },
     {"caption": "Org Exec All Source Blocks",  "command": "org_execute_all_source_blocks"},
     {"caption": "Org Exec Inline Source Block","command": "org_execute_inline_source_block"},
+    {"caption": "Org Tangle File",             "command": "org_tangle_file"             },
     {"caption": "Org Checkbox Toggle",         "command": "org_toggle_checkbox"         },
     {"caption": "Org Recalc Checkbox",         "command": "org_recalc_checkbox_summary" },
     {"caption": "Org Recalc All Checkbox",     "command": "org_recalc_all_checkbox_summaries" },
