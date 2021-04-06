@@ -869,6 +869,15 @@ class OrgExecuteSourceBlock:
             FindResults(self,0,self.s)
             self.Execute()
 
+    def OnCached(self):
+        self.formattedOutput    = self.view.substr(self.resultsRegion)
+        self.preFormattedOutput = self.formattedOutput
+        res = self.formattedOutput.split('\n')
+        if(len(res) >= 2):
+            if(re.search(r"\s*(([:]results[:])|[#][+]begin_)",res[0])):
+                self.preFormattedOutput = '\n'.join(res[1:-1])
+        ## Keep track of this so we know where we are inserting the text.
+        self.OnReplaced()
 
     def Execute(self):
             view = self.view
@@ -897,7 +906,7 @@ class OrgExecuteSourceBlock:
                     self.hashVal = hashlib.sha1(bytes(self.source,'utf-8')).hexdigest()
                     if(self.hashVal == self.resultsHash):
                         log.warning(' Hash matches, skipping execution')
-                        self.OnReplaced()
+                        self.OnCached()
                         return
                     print(self.hashVal)
                 # Is this a file backed execution?
