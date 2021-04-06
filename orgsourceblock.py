@@ -95,6 +95,13 @@ def IsSourceBlock(view,at=None):
         at = view.sel()[0].begin()
     return (view.match_selector(at,'orgmode.fence.sourceblock') or view.match_selector(at,'orgmode.sourceblock.content'))
 
+def IsEndSourceBlock(view,at=None):
+    if(None == at):
+        at = view.sel()[0].begin()
+    row,_ = view.rowcol(at)
+    line = view.getLine(row)
+    return RE_END.search(line)
+
 # inline source blocks are inline with the text: src_python[:var x=5]{print('hello'+str(x))}
 def IsInlineSourceBlock(view,at=None):
     if(None == at):
@@ -1217,8 +1224,37 @@ class OrgExecuteInlineSourceBlock:
             # We only support replace mode for inline source blocks
             self.view.run_command("org_internal_replace", {"start": self.resultsStartPt, "end": self.resultsEndPt, "text": self.formattedOutput,"onDone": evt.Make(self.OnReplaced)})
 
+# ================================================================================
 class OrgExecuteInlineSourceBlockCommand(sublime_plugin.TextCommand):
     def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
         value = str(uuid.uuid4())
         self.exc = OrgExecuteInlineSourceBlock(self.view,value)
         self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)
+
+# ================================================================================
+class OrgExecuteAllSourceBlocksCommand(sublime_plugin.TextCommand):
+    def continueRun(self):
+        for r in range(self.cur,self.last_row):
+            self.cur = r
+            pt = self.view.text_point(r,1)
+            if(not self.inBlock and IsSourceBlock(self.view,pt)):
+                self.view.run_command('org_execute_source_block',{"at":pt,"onDone":evt.Make(self.continueRun)})
+                self.inBlock = True
+                break
+            elif(self.inBlock and IsEndSourceBlock(self.view,pt)):
+                self.inBlock = False
+
+    def run(self,edit,at=None):
+        # Do we want to avoid re-execution?
+        self.last_row = self.view.endRow()
+        self.cur = 0
+        self.inBlock = False
+        self.continueRun()
+
+# ================================================================================
+class OrgTangleFileCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+
+    def run(self,edit,onDone=None):
+        self.onDone = onDone
