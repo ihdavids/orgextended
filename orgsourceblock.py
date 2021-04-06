@@ -819,7 +819,21 @@ class OrgExecuteSourceBlock:
                 # We are deferred! We do not continue form here!
                 return
             else:
+                self.QueryCheckExecute()
+
+    def AmExporting(self):
+        # TODO Make this true when exporting
+        return False
+
+    def QueryCheckExecute(self):
+        if(self.CheckEval('query') or (self.CheckEval('query-export') and self.AmExporting())):
+            if(sublime.DIALOG_YES == sublime.yes_no_cancel_dialog("Should we execute", "Yes Please", "No Thank You")):
                 self.Execute()
+            else:
+                self.resultsTxtStartRow, self.resultsTxtStartCol = self.view.rowcol(self.resultsStartPt)
+                self.OnDone()
+        else:
+            self.Execute()
     def OnDoneFunction(self,otherParams=None):
         #results = otherParams['results']
         name    = otherParams['name']
@@ -867,7 +881,7 @@ class OrgExecuteSourceBlock:
         self.deferedSources -= 1
         if(self.deferedSources <= 0):
             FindResults(self,0,self.s)
-            self.Execute()
+            self.QueryCheckExecute()
 
     def OnCached(self):
         self.formattedOutput    = self.view.substr(self.resultsRegion)

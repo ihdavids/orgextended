@@ -7,8 +7,6 @@
    It will keep a hash of the source and params and will only execute
    if the source does not change.
 
-   That said, not yet supported for call operations.
-
 	#+BEGIN_SRC python :cache yes :var x=5
 	  print("Hello world") 
 	#+END_SRC
@@ -17,9 +15,20 @@
    : Hello world
 
 ** Never Eval
+	A security feature of org is that you can specify that a block should never execute.
+	This is now mostly working.
 
 	#+BEGIN_SRC python :eval never
 		print("hi")	  
 	#+END_SRC
 
+** Query Eval
 
+	Query evaluation is mostly working now although the title is not great.
+
+	#+BEGIN_SRC python :eval query
+	  print("Hello World")
+	#+END_SRC
+
+   #+RESULTS:
+   : Hello World
