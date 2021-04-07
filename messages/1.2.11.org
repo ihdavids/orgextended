@@ -1,0 +1,3 @@
+* 1.2.11
+  - Trying to get dateutil to operate well as a package inside OrgExtended. Had some problems with six.py's location.
+  - I believe this will fix it.
