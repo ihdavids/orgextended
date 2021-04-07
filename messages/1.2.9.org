@@ -1,6 +1,10 @@
 * 1.2.9
 
 ** Babel Cache
+   Caching will try to avoid executing a block if the source and or parameters have not changed.
+   Caching uses a Sha1 hash of the source and parameter mix to determine if it should re-run the
+   block.
+
    This mode is dangerous if the operation has any side effects.
 
    It does  however skip execution when the operation is already present.
@@ -10,6 +14,8 @@
 	#+BEGIN_SRC python :cache yes :var x=5 :tangle yes
 	  print("Hello world") 
 	#+END_SRC
+
+	This feature is not yet well tested with source block chaining.
 
    #+RESULTS[5ce4498b4cf15deb48101207ad5673485754fd11]:
    : Hello world
@@ -24,7 +30,7 @@
 
 ** Query Eval
 
-	Query evaluation is mostly working now although the title is not great.
+	Query evaluation is mostly working now although the title of the query prompt is not great.
 
 	#+BEGIN_SRC python :eval query :tangle yes
 	  print("Hello World")
@@ -36,8 +42,13 @@
 ** Tangle
    This release marks the begining of tangle work. Marking a source block as tangleable
    allows someone to export just the source code to a "detangled" file containing the source code and data
-   from the page. The resulting file will have the name of the the org file with the appropriate file extension
+   from the page without the rest of the document. 
+   The resulting file will have the name of the the org file with the appropriate file extension
    for the source code.
+
+   We get a new command with this release:
+
+   - Org Tangle File
 
    #+BEGIN_SRC powershell :var y=5 :tangle yes
    	Write-Host("Hello World")
