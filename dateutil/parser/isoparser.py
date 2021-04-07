@@ -14,7 +14,7 @@ from OrgExtended.dateutil import tz
 from functools import wraps
 
 import re
-import six
+import OrgExtended.dateutil.six as six
 
 __all__ = ["isoparse", "isoparser"]
 
