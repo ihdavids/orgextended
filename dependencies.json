@@ -2,7 +2,6 @@
 	"*": {
 		"*": [
 			"pathlib",
-			"dateutil",
 			"pyyaml",
 			"requests",
 			"regex"

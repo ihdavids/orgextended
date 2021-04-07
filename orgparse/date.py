@@ -1,8 +1,8 @@
 import datetime
 import re
-import dateutil.rrule as dr
-import dateutil.parser as dp
-import dateutil.relativedelta as drel
+import OrgExtended.dateutil.rrule as dr
+import OrgExtended.dateutil.parser as dp
+import OrgExtended.dateutil.relativedelta as drel
 import OrgExtended.orgduration as orgduration
 import calendar
 

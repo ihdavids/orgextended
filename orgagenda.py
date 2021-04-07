@@ -19,9 +19,9 @@ import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 import calendar
 
-import dateutil.rrule as dr
-import dateutil.parser as dp
-import dateutil.relativedelta as drel
+import OrgExtended.dateutil.rrule as dr
+import OrgExtended.dateutil.parser as dp
+import OrgExtended.dateutil.relativedelta as drel
 
 log = logging.getLogger(__name__)
 AGENDA_VIEW = "Org Mode Agenda"
