@@ -1,3 +1,5 @@
 * 1.2.10
   Dateutil seems to have vanished on package control. This was causing some people to have problems installing.
-  I have been forced (for now) to embed dateutil into orgextended so we can continue chugging alone.
+  I have been forced (for now) to embed dateutil into orgextended so we can continue chugging along.
+
+  My hope is that in doing this it will fix the ST3 issues we have been seeing.
