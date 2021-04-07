@@ -3,6 +3,7 @@
 		"*": [
 			"pathlib",
 			"pyyaml",
+			"dateutil",
 			"requests",
 			"regex"
 		]

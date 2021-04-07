@@ -1,5 +1,9 @@
 * Initial release of Org Extended
 
+  AFTER YOU INSTALL FOR THE FIRST TIME: LET IT RUN FOR ABOUT 1 MINUTE AND RESTART SUBLIME.
+  WE INSTALL SOME DEPENDENCIES AND ARE NOT VERY GOOD ABOUT LETTING YOU KNOW THAT YOU
+  NEED TO RESTART SUBLIME!
+
   Setup instructions can be found here:
   https://github.com/ihdavids/orgextended_docs/blob/master/start.org
 

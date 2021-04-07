@@ -1,0 +1,4 @@
+* 1.2.12
+  - Thankfully the problem with dateutil has been discovered by wbond.
+    we should now be able to install again once dateutil clears.
+    I have removed the dependency on an internal dateutil.
