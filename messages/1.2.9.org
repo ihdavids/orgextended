@@ -32,3 +32,13 @@
 
    #+RESULTS:
    : Hello World
+
+** Tangle
+   This release marks the begining of tangle work. Marking a source block as tangleable
+   allows someone to export just the source code to a "detangled" file containing the source code and data
+   from the page. The resulting file will have the name of the the org file with the appropriate file extension
+   for the source code.
+
+   #+BEGIN_SRC powershell :var y=5 :tangle yes
+   	Write-Host("Hello World")
+   #+END_SRC

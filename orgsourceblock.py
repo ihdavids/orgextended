@@ -5,6 +5,8 @@ import re
 import tempfile
 import traceback 
 import hashlib
+import getpass
+import datetime
 
 import OrgExtended.orgdb as db
 import OrgExtended.orgextension as ext
@@ -1321,7 +1323,7 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
                     self.curmod.PreProcessSourceFile(self)
                 # Is this a file backed execution?
                 if(hasattr(self.curmod,"Extension")):
-                    filename = os.path.splitext(filename)[0]+self.curmod.Extension()
+                    filename = os.path.splitext(filename)[0]+self.curmod.Extension(self)
                     try:
                         if(hasattr(self.curmod,"WrapStart")):
                             self.source = ((self.curmod.WrapStart(self) + "\n").encode("ascii")) + self.source
@@ -1339,7 +1341,9 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
 
                 if(not filename in self.fileData):
                     if(comStart):
-                        temp = "{} Generated From: {}\n".format(comStart,filename)
+                        dt = datetime.datetime.now()
+                        dateString = dt.strftime("%Y %m %d %a %H:%M")
+                        temp = "{} Generated From: {}\n{} Author: {}\n{} Date: {}\n".format(comStart,view.file_name(),comStart,getpass.getuser(),comStart,dateString)
                         self.source = temp + self.source
                     self.fileData[filename] = self.source
                 else:
