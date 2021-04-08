@@ -681,7 +681,19 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 				except:
 					print("Failed to parse tmTheme file: \n" + traceback.format_exc())
 			else:
-				cs = ast.literal_eval(self.colorSchemeData)
+				try:
+					csDat = self.colorSchemeData.replace("\r","").split('\n')
+					out = []
+					for o in csDat:
+						if(o.strip().startswith('//') or o.strip() == ""):
+							continue
+						out.append(o)
+					self.colorSchemeData = '\n'.join(out)
+					cs = ast.literal_eval(self.colorSchemeData)
+				except:
+					print("ERROR: Failed to parse color scheme data")
+					print(traceback.format_exc())
+					print(self.colorSchemeData)
 			if(not cs):
 				print("FAILED TO GENERATE NEW COLOR SCHEME COULD NOT PARSE SCHEME")
 				return
