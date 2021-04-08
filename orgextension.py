@@ -79,16 +79,17 @@ def find_extension_modules(folder, builtins):
 
 
 def find_extension_file(folder,name,extension='.py'):
-	base = os.path.dirname(os.path.abspath(__file__))
 	# User generated extensions
-	path = base + '/../User/' + folder
+	path = os.path.join(GetUserFolder(),folder)
 	fname = name + extension
 	for root, dirnames, filenames in os.walk(path):
 		for filename in fnmatch.filter(filenames, fname):
 			return "Packages/User/" + folder + "/" + filename
 	# Built in extensions
-	path = base + '/' + folder
-	for root, dirnames, filenames in os.walk(path):
-		for filename in fnmatch.filter(filenames, fname):
-			return "Packages/OrgExtended/" + folder + "/" + filename
+	internalName = "Packages/OrgExtended/"+folder+"/" +fname
+	try:
+		if(sublime.load_resource(internalName)):
+			return internalName
+	except:
+		pass
 	return None

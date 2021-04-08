@@ -1,0 +1,6 @@
+* 1.2.13
+  - Fixed a fairly major regression with capture templates.
+
+  1. Capture snippets now live in Packages\User\orgsnippets folder (for consistency with other extension types)
+  2. A bug was fixed which would fail to find a snippet in some cases.
+  

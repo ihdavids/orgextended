@@ -417,7 +417,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.panel.settings().set('auto_indent',False)
         snippet = template['snippet']
-        snipName = ext.find_extension_file('snippets',snippet,'.sublime-snippet')
+        snipName = ext.find_extension_file('orgsnippets',snippet,'.sublime-snippet')
         window.focus_view(self.panel)
         #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
         self.panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
