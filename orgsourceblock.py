@@ -37,6 +37,7 @@ RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee][Ss]?)|([Ff][Aa][Ii][Ll])|([Ee][Rr][Rr][Oo][Rr][Ss]?)\b")
 RE_HEADER_PARAMS = re.compile(r"^\s*\#\+(HEADER|header)[:]\s*(?P<params>.*)$")
 RE_TABLE = re.compile(r"^\s*[|]")
+RE_NOWEB = re.compile(r'^\s*[<][<](?P<noweb>[^>(]+)(\s*\(\s*(?P<params>[^)]*)\s*\))?[>][>]')
 
 
 # Interface that can be used to wrap a TableDef OR a simple list
@@ -115,6 +116,10 @@ class NoWebRefs:
             if(not refName in self.refs):
                 self.refs[refName] = []
             self.refs[refName].append(p)
+    def Find(self,name):
+        if(name in self.refs):
+            return self.refs[name]
+        return None
 
 class NoWebRefCache:
     def __init__(self):
@@ -879,9 +884,31 @@ class OrgExecuteSourceBlock:
             FindResults(self,edit,self.s)
             # TODO: Early out if this is a chain and we have already computed our
             #       results.
-            self.ParamsPhase()
+            if(self.params.GetBool('noweb')):
+                self.NoWebPhase()
+            else:
+                self.ParamsPhase()
         else:
             log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
+
+    def NoWebPhase(self):
+        for r in range(self.startRow, self.endRow):
+            pt = self.view.text_point(r,0)
+            line = self.view.line(pt)
+            txt = self.view.substr(line)
+            m = RE_NOWEB.search(txt)
+            if(m):
+                href = refCache.GetFile(self.view)
+                nw = m.group('noweb')
+                ref = href.Find(nw)
+                if(ref):
+                    for rr in ref:
+                        sp = self.view.text_point(rr.start,0)
+                        ep = self.view.line(self.view.text_point(rr.end,0)).end()
+                        cpFrom = self.view.substr(sp,ep)
+                        # This probably doesn't work! So... don't turn on noweb yet!
+                        self.view.run_command("org_internal_replace", {"start": line.begin(), "end": line.end(), "text": cpFrom})
+        self.ParamsPhase()
 
     def ParamsPhase(self):
             view = self.view
