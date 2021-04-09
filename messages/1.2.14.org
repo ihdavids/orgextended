@@ -1,0 +1,4 @@
+* 1.2.14
+** Color Scheme Generator
+  - FIXED: Improved color scheme generator. It did not handle comments so Solarized Dark as throwing.
+    [[https://github.com/ihdavids/orgextended/issues/29][Issue]]
