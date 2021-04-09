@@ -101,6 +101,27 @@ contexts:
       push:
         - meta_scope: entity.name.filename orgmode.headline6
         - include: header-matches
+    - match: ^\s*([*][*][*][*][*][*])[*]\s+
+      captures:
+        1: comment orgmode.preamble
+      scope: orgmode.headline7
+      push:
+        - meta_scope: entity.name.filename orgmode.headline7
+        - include: header-matches
+    - match: ^\s*([*][*][*][*][*][*][*])[*]\s+
+      captures:
+        1: comment orgmode.preamble
+      scope: orgmode.headline8
+      push:
+        - meta_scope: entity.name.filename orgmode.headline8
+        - include: header-matches
+    - match: ^\s*([*][*][*][*][*][*][*][*])[*]\s+
+      captures:
+        1: comment orgmode.preamble
+      scope: orgmode.headline9
+      push:
+        - meta_scope: entity.name.filename orgmode.headline9
+        - include: header-matches
 
     - match: ^\s*(\|.+\|)
       captures:

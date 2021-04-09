@@ -206,6 +206,21 @@
 			"foreground": "#afe3de",
 			"font_style": "italic",
 		},
+		{
+			"scope": "orgmode.headline7",
+			"foreground": "#afe3fe",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.headline8",
+			"foreground": "#ffe3de",
+			"font_style": "italic",
+		},
+		{
+			"scope": "orgmode.headline9",
+			"foreground": "#fff3de",
+			"font_style": "italic",
+		},
 		// Stars before the last star in a headline
 		// make these background to hide them.
 		{

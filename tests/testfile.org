@@ -74,6 +74,9 @@
 **** Heading 4
 ***** Heading 5
 ****** Heading 6
+******* Heading 7
+******** Heading 8
+********* Heading 9
 
 * Tags                                                                    :TAG1:TAG2:
   Tags are a means of filtering your headings in this file or across all your files.
