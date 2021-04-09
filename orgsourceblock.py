@@ -91,6 +91,64 @@ class TableData:
             out.append(lineOut)
         return TableData(out)
 
+class NoWebRefs:
+    def __init__(self):
+        self.refs = {}
+
+    def ParseParams(self,view,pt):
+        extensions, language, paramdata, fenceLine = GetModuleAndParams(view,pt)
+        if(not language):
+            return
+        log.debug(" CACHE: {}".format(fenceLine))
+        p = type('', (), {})() 
+        BuildFullParamList(p, language, paramdata)
+        row,_ = view.rowcol(pt)
+        end   = FindEndOfSourceBlock(view,row)
+        if(not end):
+            return
+        refName = p.params.Get('noweb-ref',None)
+        if(refName):
+            p.at       = pt
+            p.language = language
+            p.end      = end
+            p.start    = row
+            if(not refName in self.refs):
+                self.refs[refName] = []
+            self.refs[refName].append(p)
+
+class NoWebRefCache:
+    def __init__(self):
+        self.files = {}
+
+    def ParseFile(self,view):
+        filename = view.file_name()
+        if(not filename):
+            return
+        refs = NoWebRefs()
+        self.files[filename] = refs
+        last_row = view.endRow()
+        cur      = 0
+        inBlock  = False
+        for r in range(cur,last_row):
+            cur = r
+            pt = view.text_point(r,1)
+            if(not inBlock and IsSourceBlock(view,pt)):
+                refs.ParseParams(view,pt)
+                inBlock = True
+                continue
+            elif(inBlock and IsEndSourceBlock(view,pt)):
+                inBlock = False
+
+    def GetFile(self,view):
+        filename = view.file_name()
+        if(not filename):
+            return None
+        if(not filename in self.files):
+            self.ParseFile(view)
+        return self.files[filename]
+
+
+refCache = NoWebRefCache()
 
 def IsSourceBlock(view,at=None):
     if(None == at):
@@ -1263,6 +1321,8 @@ class OrgExecuteAllSourceBlocksCommand(sublime_plugin.TextCommand):
         self.cur = self.last_row
         self.inBlock = False
         self.ContinueRun()
+
+
 
 # ================================================================================
 class OrgTangleFileCommand(sublime_plugin.TextCommand):
