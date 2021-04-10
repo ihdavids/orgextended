@@ -93,32 +93,44 @@ class TableData:
         return TableData(out)
 
 class NoWebRefs:
-    def __init__(self):
+    def __init__(self,view):
         self.refs = {}
+        self.change_count = view.change_count()
+        self.view = view
 
-    def ParseParams(self,view,pt):
+    def ParseParamsInternal(self,view,pt):
         extensions, language, paramdata, fenceLine = GetModuleAndParams(view,pt)
         if(not language):
             return
         log.debug(" CACHE: {}".format(fenceLine))
         p = type('', (), {})() 
+        p.s = pt
         BuildFullParamList(p, language, paramdata)
         row,_ = view.rowcol(pt)
         end   = FindEndOfSourceBlock(view,row)
         if(not end):
             return
-        refName = p.params.Get('noweb-ref',None)
-        if(refName):
-            p.at       = pt
-            p.language = language
-            p.end      = end
-            p.start    = row
-            if(not refName in self.refs):
-                self.refs[refName] = []
-            self.refs[refName].append(p)
+        p.refName = p.params.Get('noweb-ref',None)
+        p.at       = pt
+        p.language = language
+        p.end      = end
+        p.start    = row
+        return p
+
+    def ParseParams(self,view,pt):
+        p = self.ParseParamsInternal(view,pt)
+        if(p.refName):
+            if(not p.refName in self.refs):
+                self.refs[p.refName] = []
+            self.refs[p.refName].append(p)
     def Find(self,name):
         if(name in self.refs):
             return self.refs[name]
+        else:
+            pt = tbl.LookupNamedSourceBlockInFile(name)
+            if(pt != None):
+                p = self.ParseParamsInternal(self.view,pt)
+                return [p]
         return None
 
 class NoWebRefCache:
@@ -129,7 +141,7 @@ class NoWebRefCache:
         filename = view.file_name()
         if(not filename):
             return
-        refs = NoWebRefs()
+        refs = NoWebRefs(view)
         self.files[filename] = refs
         last_row = view.endRow()
         cur      = 0
@@ -148,7 +160,7 @@ class NoWebRefCache:
         filename = view.file_name()
         if(not filename):
             return None
-        if(not filename in self.files):
+        if(not filename in self.files or self.files[filename].change_count < view.change_count()):
             self.ParseFile(view)
         return self.files[filename]
 
@@ -245,6 +257,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     # Handling
     plist.exList.AddList('results',['silent','replace','prepend','append'])
     plist.exList.AddBool('cache')
+    plist.exList.AddBool('noweb')
     plist.exList.AddList('eval',['never','no','query','never-export','no-export','query-export'])
     defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
@@ -884,6 +897,7 @@ class OrgExecuteSourceBlock:
             FindResults(self,edit,self.s)
             # TODO: Early out if this is a chain and we have already computed our
             #       results.
+            self.source = None
             if(self.params.GetBool('noweb')):
                 self.NoWebPhase()
             else:
@@ -891,24 +905,80 @@ class OrgExecuteSourceBlock:
         else:
             log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
 
+    def NoWebSourceDone(self,otherParams=None):
+        self.deferredNoWeb -= 1
+        name = otherParams['name']
+        res = self.nowebfn[name]
+        result = res['result']
+        r      = res['r']
+        idx    = res['idx']
+        # Insert the output from our execution into our results
+        if('preFormat' in otherParams):
+            preFormat = otherParams['preFormat']
+            result[idx] = preFormat
+        # Paste our results into our source block where it belongs line by line
+        if(len(result) > 0):
+            self.source[r] = result[0]
+            result = result[1:]
+            if(len(result) > 0):
+                for i in range(len(result)):
+                    self.source.insert(r+i+1,result[i])
+        # If this was the LAST source block executing then join up our source block
+        # and prepare for the full parameters phase!
+        if(self.deferredNoWeb <= 0):
+            self.source = '\n'.join(self.source)
+            self.ParamsPhase()
+
     def NoWebPhase(self):
-        for r in range(self.startRow, self.endRow):
-            pt = self.view.text_point(r,0)
-            line = self.view.line(pt)
-            txt = self.view.substr(line)
+        self.deferredNoWeb = 0
+        self.nowebfn = {}
+        sp = self.view.text_point(self.startRow,0)
+        ep = self.view.line(self.view.text_point(self.endRow,0)).end()
+        myRegion = sublime.Region(sp,ep)
+        self.source = self.view.substr(self.region).split('\n')
+        hadAnyDeferred = False
+        for r in range(len(self.source)-1,-1,-1):
+            txt = self.source[r]
             m = RE_NOWEB.search(txt)
             if(m):
+                hadDeferred = False
                 href = refCache.GetFile(self.view)
                 nw = m.group('noweb')
+                ps = m.group('params')
                 ref = href.Find(nw)
                 if(ref):
+                    result = []
                     for rr in ref:
-                        sp = self.view.text_point(rr.start,0)
-                        ep = self.view.line(self.view.text_point(rr.end,0)).end()
-                        cpFrom = self.view.substr(sp,ep)
-                        # This probably doesn't work! So... don't turn on noweb yet!
-                        self.view.run_command("org_internal_replace", {"start": line.begin(), "end": line.end(), "text": cpFrom})
-        self.ParamsPhase()
+                        if(ps != None):
+                            hadDeferred = True
+                            self.deferredNoWeb += 1
+                            # Reserve a slot to insert into!
+                            idx = len(result)
+                            result.append("")
+                            name = 'result_' + str(idx) + '_' + str(pt)
+                            self.nowebfn[name] = {'at': pt, 'idx': idx, 'result': result,'r': r}
+                            # TODO: Pass parameters here somehow!
+                            self.view.run_command('org_execute_source_block',{'at':rr.start, 'onDoneResultsPos': evt.Make(self.NoWebSourceDone), 'onDoneFnName': name})
+                        else:
+                            s = self.view.text_point(rr.start+1,0)
+                            e = self.view.line(self.view.text_point(rr.end-1,0)).end()
+                            if(myRegion.contains(s)):
+                                continue
+                            cpFrom = self.view.substr(sublime.Region(s,e))
+                            result.append(cpFrom.rstrip())
+                    if(not hadDeferred and len(result) > 0):
+                        self.source[r] = result[0]
+                        result = result[1:]
+                        if(len(result) > 0):
+                            for i in range(len(result)):
+                                self.source.insert(r+i+1,result[i])
+                else:
+                    print("No match for reference")
+                hadAnyDeferred = hadDeferred if hadDeferred else hadAnyDeferred
+        print(self.source)
+        if(not hadAnyDeferred):
+            self.source = '\n'.join(self.source)
+            self.ParamsPhase()
 
     def ParamsPhase(self):
             view = self.view
@@ -1017,7 +1087,8 @@ class OrgExecuteSourceBlock:
             # Run the "writer"
             if(hasattr(self.curmod,"Execute")):
                 # Okay now time to replace the contents of the block
-                self.source = view.substr(self.region)
+                if(self.source == None):
+                    self.source = view.substr(self.region)
                 if(hasattr(self.curmod,"PreProcessSourceFile")):
                     self.curmod.PreProcessSourceFile(self)
                 if(self.params.GetBool('cache')):

@@ -1,0 +1,41 @@
+* 1.2.15
+  :PROPERTIES:
+    :header-args: :noweb-ref includeme 
+  :END:
+
+  The start of noweb like babel support.
+  The contents of source blocks and be dynamically included 
+  from remote blocks. (Much like a macro)
+
+  References can be done by parameters or by name, which mean property parameters
+  can apply to a set of source blocks.
+
+
+  #+BEGIN_SRC python 
+      print("Hello World")
+  #+END_SRC
+  
+  #+BEGIN_SRC python
+      print("And again!")
+  #+END_SRC
+  
+  #+BEGIN_SRC python
+      print("Even More!")
+  #+END_SRC
+
+  #+BEGIN_SRC python :noweb yes
+      <<includeme>>
+      <<by-name>>
+  #+END_SRC
+  #+RESULTS:
+  : Hello World
+  : And again!
+  : Even More!
+  : By-Name
+
+* By-Name Source Block
+
+    #+NAME: by-name
+    #+BEGIN_SRC python
+      print("By-Name")
+    #+END_SRC
