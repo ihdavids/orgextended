@@ -3,12 +3,18 @@
     :header-args: :noweb-ref includeme 
   :END:
 
-  The start of noweb like babel support.
-  The contents of source blocks and be dynamically included 
-  from remote blocks. (Much like a macro)
 
-  References can be done by parameters or by name, which mean property parameters
-  can apply to a set of source blocks.
+  1.2.15 introduces the start of noweb like macro support to our babel offering.
+
+  The contents of source blocks can be dynamically included 
+  from remote blocks. (Much like a macro the code is pasted into the block)
+
+  References can be done by parameters or by name.
+  The noweb-ref parameter allows you to define the target of a reference much like a name would.
+
+  Since the source of a noweb reference can be named in a parameter this means that property parameters 
+  can apply to a set of source blocks that each has a part of the full snippet.
+  In this case snippets will be pasted in the order they appear in your file.
 
 
   #+BEGIN_SRC python 
@@ -37,11 +43,19 @@
 
 * By-Name Source Block
 
+  In the example above we are referencing the blocks by a name in the parameter field.
+  Here we are referencing the source block by the name of the block.
+
+
     #+NAME: by-name
     #+BEGIN_SRC python
       print("By-Name")
     #+END_SRC
 
+
+    If you use () in your reference you are requesting the results of the block be pasted rather than the block itself.
+    This can be useful but can easily get complicated if abused. So use with restraint.
+     
 
     #+NAME: by-results
     #+BEGIN_SRC python :var x=5 :results raw
