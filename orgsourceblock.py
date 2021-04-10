@@ -978,7 +978,7 @@ class OrgExecuteSourceBlock:
                             for i in range(len(result)):
                                 self.source.insert(r+i+1,result[i])
                 else:
-                    print("No match for reference")
+                    log.error(" NoWeb: No match for reference")
         for r in range(len(self.source)-1,-1,-1):
             txt = self.source[r]
             m = RE_NOWEB.search(txt)
@@ -1001,8 +1001,7 @@ class OrgExecuteSourceBlock:
                         self.nowebfn[name] = {'idx': idx, 'result': result,'r': r, 'ps': ps}
                         self.view.run_command('org_execute_source_block',{'at':rr.at, 'silent': True, 'onDoneResultsPos': evt.Make(self.NoWebSourceDone),"onAdjustParams": evt.Make(self.NoWebAdjustParams), 'onDoneFnName': name})
                 else:
-                    print("No match for reference")
-        print(self.source)
+                    log.error(" NoWeb: No match for reference")
         if(not hadAnyDeferred):
             self.source = '\n'.join(self.source)
             self.ParamsPhase()
@@ -1124,7 +1123,7 @@ class OrgExecuteSourceBlock:
                         log.warning(' Hash matches, skipping execution')
                         self.OnCached()
                         return
-                    print(self.hashVal)
+                    #print(self.hashVal)
                 # Is this a file backed execution?
                 if(hasattr(self.curmod,"Extension")):
                     tmp = tempfile.NamedTemporaryFile(delete=False,suffix=self.curmod.Extension(self))
@@ -1550,7 +1549,7 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
         for filename in self.fileData:
             with open(filename,"w") as f:
                 f.write(self.fileData[filename])
-                print("WROTE: " + filename)
+                #print("WROTE: " + filename)
         if(self.cur >= self.last_row):
             self.OnDone()
 
