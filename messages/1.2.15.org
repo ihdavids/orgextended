@@ -26,16 +26,24 @@
   #+BEGIN_SRC python :noweb yes
       <<includeme>>
       <<by-name>>
+      <<by-results(x=5)>>
   #+END_SRC
   #+RESULTS:
   : Hello World
   : And again!
   : Even More!
   : By-Name
+  : By-Results: 5
 
 * By-Name Source Block
 
     #+NAME: by-name
     #+BEGIN_SRC python
       print("By-Name")
+    #+END_SRC
+
+
+    #+NAME: by-results
+    #+BEGIN_SRC python :var x=5 :results raw
+      print("print('By-Results: " + str(x) + "')")
     #+END_SRC

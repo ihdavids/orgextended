@@ -928,6 +928,21 @@ class OrgExecuteSourceBlock:
         if(self.deferredNoWeb <= 0):
             self.source = '\n'.join(self.source)
             self.ParamsPhase()
+    
+    def NoWebAdjustParams(self,otherParams=None):
+        # Punch our noweb parameters into the remote blocks
+        # parameter list!
+        if('cmd' in otherParams):
+            cmd = otherParams['cmd']
+            var = cmd.params.Get('var',None)
+            name = otherParams['name']
+            if(var and name in self.nowebfn):
+                res = self.nowebfn[name]
+                ps  = res['ps']
+                if(ps): 
+                    params = GetDict(ps)
+                    for k in params:
+                        var[k] = params[k]
 
     def NoWebPhase(self):
         self.deferredNoWeb = 0
@@ -941,32 +956,22 @@ class OrgExecuteSourceBlock:
             txt = self.source[r]
             m = RE_NOWEB.search(txt)
             if(m):
-                hadDeferred = False
-                href = refCache.GetFile(self.view)
-                nw = m.group('noweb')
                 ps = m.group('params')
+                if(None != ps):
+                    continue
+                nw = m.group('noweb')
+                href = refCache.GetFile(self.view)
                 ref = href.Find(nw)
                 if(ref):
                     result = []
                     for rr in ref:
-                        if(ps != None):
-                            hadDeferred = True
-                            self.deferredNoWeb += 1
-                            # Reserve a slot to insert into!
-                            idx = len(result)
-                            result.append("")
-                            name = 'result_' + str(idx) + '_' + str(pt)
-                            self.nowebfn[name] = {'at': pt, 'idx': idx, 'result': result,'r': r}
-                            # TODO: Pass parameters here somehow!
-                            self.view.run_command('org_execute_source_block',{'at':rr.start, 'onDoneResultsPos': evt.Make(self.NoWebSourceDone), 'onDoneFnName': name})
-                        else:
-                            s = self.view.text_point(rr.start+1,0)
-                            e = self.view.line(self.view.text_point(rr.end-1,0)).end()
-                            if(myRegion.contains(s)):
-                                continue
-                            cpFrom = self.view.substr(sublime.Region(s,e))
-                            result.append(cpFrom.rstrip())
-                    if(not hadDeferred and len(result) > 0):
+                        s = self.view.text_point(rr.start+1,0)
+                        e = self.view.line(self.view.text_point(rr.end-1,0)).end()
+                        if(myRegion.contains(s)):
+                            continue
+                        cpFrom = self.view.substr(sublime.Region(s,e))
+                        result.append(cpFrom.rstrip())
+                    if(len(result) > 0):
                         self.source[r] = result[0]
                         result = result[1:]
                         if(len(result) > 0):
@@ -974,7 +979,29 @@ class OrgExecuteSourceBlock:
                                 self.source.insert(r+i+1,result[i])
                 else:
                     print("No match for reference")
-                hadAnyDeferred = hadDeferred if hadDeferred else hadAnyDeferred
+        for r in range(len(self.source)-1,-1,-1):
+            txt = self.source[r]
+            m = RE_NOWEB.search(txt)
+            if(m):
+                ps = m.group('params')
+                if(ps == None):
+                    continue
+                href = refCache.GetFile(self.view)
+                nw = m.group('noweb')
+                ref = href.Find(nw)
+                if(ref):
+                    result = []
+                    for rr in ref:
+                        hadAnyDeferred = True
+                        self.deferredNoWeb += 1
+                        # Reserve a slot to insert into!
+                        idx = len(result)
+                        result.append("")
+                        name = 'result_' + str(idx) + '_' + str(r)
+                        self.nowebfn[name] = {'idx': idx, 'result': result,'r': r, 'ps': ps}
+                        self.view.run_command('org_execute_source_block',{'at':rr.at, 'silent': True, 'onDoneResultsPos': evt.Make(self.NoWebSourceDone),"onAdjustParams": evt.Make(self.NoWebAdjustParams), 'onDoneFnName': name})
+                else:
+                    print("No match for reference")
         print(self.source)
         if(not hadAnyDeferred):
             self.source = '\n'.join(self.source)
@@ -987,7 +1014,7 @@ class OrgExecuteSourceBlock:
             if(var):
                 self.params.Replace('var',var)
             # If we are being called from elsewhere let the caller adjust our parameter list
-            evt.EmitIfParams(self.onAdjustParams,cmd=self)
+            evt.EmitIfParams(self.onAdjustParams,cmd=self,name=self.onDoneFnName)
             # Setup formatting and parameters now that we have execution state. 
             if(ProcessPossibleSourceObjects(self,self.language,self.paramdata)):
                 # We are deferred! We do not continue form here!
