@@ -23,12 +23,17 @@ def FormatText(txt):
 
 def HandleValue(cmd):
     if(cmd.CheckResultsFor('value')):
-        out = "function OrgExtendedPowershellWrapperFunction {\n"
+        out = "\nsetlocal\n"
+        out += "CALL :OrgExtendedBatchWrapperFunction orgExtendedWrapperVar\n"
+        out += "echo RETURNVALUESTART\n"
+        out += "echo %orgExtendedWrapperVar%\n"
+        out += "echo RETURNVALUEEND\n"
+        out += "EXIT /B %ERRORLEVEL%\n"
+        out += ":OrgExtendedBatchWrapperFunction\n"
         outs = cmd.source.split('\n')
         for o in outs:
             out += " " + o + "\n"
-        out += '}\n'
-        out += "$orgExtendedWrapperVar = OrgExtendedPowershellWrapperFunction\nWrite-Host RETURNVALUESTART\nWrite-Host $orgExtendedWrapperVar\nWrite-Host RETURNVALUEEND\n"
+        out += 'EXIT /B 0\n'
         cmd.source = out
 
 def PreProcessSourceFile(cmd):

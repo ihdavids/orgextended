@@ -29,3 +29,16 @@
    : Hello World 5
    : 'a''b''c''d''e'.
    : 12346.
+
+*** Cmd Return Values
+
+	Value execution is kind of funny. Batch files can reach out and touch a parent parameter var.
+	The return value is the first. Set it like so:
+
+	#+BEGIN_SRC cmd :results value
+	  echo "hi"
+	  set "%~1=5"
+	#+END_SRC
+	
+    #+RESULTS:
+    : 5
