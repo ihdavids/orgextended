@@ -912,6 +912,8 @@ class OrgExecuteSourceBlock:
         else:
             log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
 
+    # Each remote noweb call will hit this when complete. We integrate the results
+    # back into our source block that we are constructing.
     def NoWebSourceDone(self,otherParams=None):
         self.deferredNoWeb -= 1
         name = otherParams['name']
@@ -936,6 +938,9 @@ class OrgExecuteSourceBlock:
             self.source = '\n'.join(self.source)
             self.ParamsPhase()
     
+    # NoWeb <<my-function(x=1) calls another block but
+    # with different params. This adjusts those params
+    # during the remote call.
     def NoWebAdjustParams(self,otherParams=None):
         # Punch our noweb parameters into the remote blocks
         # parameter list!
@@ -951,6 +956,9 @@ class OrgExecuteSourceBlock:
                     for k in params:
                         var[k] = params[k]
 
+    # If the :noweb yes param is turned on 
+    # Then we need to replace any <<NAME>> blocks
+    # in our source code.
     def NoWebPhase(self):
         self.deferredNoWeb = 0
         self.nowebfn = {}
@@ -1013,6 +1021,17 @@ class OrgExecuteSourceBlock:
             self.source = '\n'.join(self.source)
             self.ParamsPhase()
 
+    # We have parameters BUT we do not have the full story
+    # There are elements in there that may require deferred execution!
+    #
+    # Also these are OUR params not necessarily the ones from our caller if we are
+    # being evaluated from a call.
+    # 
+    #   ParamPhase --> #+CALL::onAdjustParams() // set my params from your scope
+    #
+    #   ProcessPossibleSourceObjects --> Evaluate other source blocks
+    #                                          |
+    #            OnDoneFunction     <---------+
     def ParamsPhase(self):
             view = self.view
             # Turn our variable table into a dictionary
@@ -1032,6 +1051,8 @@ class OrgExecuteSourceBlock:
         # TODO Make this true when exporting
         return False
 
+    # We may not want to execute. This is a barrier to ACTUALLY executing this block!
+    # We support querying the user and just bailing if need be.
     def QueryCheckExecute(self):
         if(self.CheckEval('query') or (self.CheckEval('query-export') and self.AmExporting())):
             if(sublime.DIALOG_YES == sublime.yes_no_cancel_dialog("Should we execute", "Yes Please", "No Thank You")):
@@ -1041,6 +1062,9 @@ class OrgExecuteSourceBlock:
                 self.OnDone()
         else:
             self.Execute()
+
+    # Param() - paramters referencing other source blocks will call this back
+    #           when evaluation is complete.
     def OnDoneFunction(self,otherParams=None):
         #results = otherParams['results']
         name    = otherParams['name']
@@ -1315,6 +1339,17 @@ class OrgExecuteInlineSourceBlock:
         else:
             log.error("NOT in A Source Block, nothing to run, place cursor on first line of source block")
 
+    # We have parameters BUT we do not have the full story
+    # There are elements in there that may require deferred execution!
+    #
+    # Also these are OUR params not necessarily the ones from our caller if we are
+    # being evaluated from a call.
+    # 
+    #   ParamPhase --> #+CALL::onAdjustParams() // set my params from your scope
+    #
+    #   ProcessPossibleSourceObjects --> Evaluate other source blocks
+    #                                          |
+    #            OnDoneFunction     <---------+
     def ParamsPhase(self):
             view = self.view
             # Turn our variable table into a dictionary
@@ -1329,6 +1364,8 @@ class OrgExecuteInlineSourceBlock:
                 return
             else:
                 self.Execute()
+    # Param() - paramters referencing other source blocks will call this back
+    #           when evaluation is complete.
     def OnDoneFunction(self,otherParams=None):
         #results = otherParams['results']
         name    = otherParams['name']
