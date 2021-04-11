@@ -1,0 +1,31 @@
+* 1.2.16
+** Source Blocks
+	- Improved noweb error reporting and handling
+	- Added "builtinSourceBlockHandlers" setting allowing users 
+	  to override one of the built in source handlers with their own.
+
+** Cmd Source Block Support
+
+	Batch files do not support arrays so we play some games.
+	VAR_width and VAR_height are defined to help with iteration and
+	array like variables are defined
+
+	#+NAME: table-source
+	| a | b | c | d | e |
+	| 1 | 2 | 3 | 4 | 6 |
+
+	#+BEGIN_SRC cmd :var x=5 :var DATA=table-source
+        setLocal enableDelayedExpansion	
+		echo Hello World %x%
+		FOR /L %%r IN (1,1,%DATA_height%) DO (
+		    FOR /L %%c IN (1,1,%DATA_width%) DO (
+			echo|set /p dummy=!DATA[%%r,%%c]!
+		)
+		echo .
+		)
+	#+END_SRC
+
+   #+RESULTS:
+   : Hello World 5
+   : 'a''b''c''d''e'.
+   : 12346.

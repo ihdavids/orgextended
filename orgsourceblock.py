@@ -642,7 +642,8 @@ def FindEndOfSourceBlock(view,row):
     return end
 
 def GetModuleAndParams(view,row):
-    extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
+    builtInModules = sets.Get("builtinSourceBlockHandlers",[])
+    extensions = ext.find_extension_modules('orgsrc', builtInModules)
     pt = view.text_point(row,0)
     line = view.substr(view.line(pt))
     m = RE_SRC_BLOCK.search(line)
@@ -1278,7 +1279,8 @@ class OrgExecuteInlineSourceBlock:
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
+            builtInModules = sets.Get("builtinSourceBlockHandlers",[])
+            extensions = ext.find_extension_modules('orgsrc', builtInModules)
             # Now find me that function!
             if(self.language not in extensions):
                 log.error("Function not found in src folder! Cannot execute!")
