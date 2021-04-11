@@ -62,7 +62,7 @@
 
 # This Plugin
 
-  - [Starter Tutorial](https://github.com/ihdavids/orgextended_docs/blob/master/learning_todos.org) - A startup primer.
+  - [Starter Tutorial](https://github.com/ihdavids/orgextended_docs/blob/master/learning_todos.org) - Learning about todos
   - [Basic Structure](https://github.com/ihdavids/orgextended_docs/blob/master/orgextended.org) - Basic file structure
   - [Setup](https://github.com/ihdavids/orgextended_docs/blob/master/setup.org) - Sublime Setup
   - [Editing](https://github.com/ihdavids/orgextended_docs/blob/master/editing.org) - Editing your org file
@@ -76,8 +76,13 @@
   - [Scheduling](https://github.com/ihdavids/orgextended_docs/blob/master/dates.org) - Dates and times
   - [Time Tracking](https://github.com/ihdavids/orgextended_docs/blob/master/clocking.org) - Clocking and clock reports
   - [Dynamic Blocks](https://github.com/ihdavids/orgextended_docs/blob/master/dynamicblocks.org) - Run arbitrary code
-  - [Tables](https://github.com/ihdavids/orgextended_docs/blob/master/tables.org) - Spreadsheet like capabilities
+  - [Living Documents](https://github.com/ihdavids/orgextended_docs/blob/master/babel.org) - Babel - Literate Programming, Reproducible Research and Living Documents
+  - [Tables](https://github.com/ihdavids/orgextended_docs/blob/master/tables.org) - Spreadsheets in your documents.
+  - [Diagrams](https://github.com/ihdavids/orgextended_docs/blob/master/diagrams.org) - Adding diagrams to your documents.
   - [Agenda](https://github.com/ihdavids/orgextended_docs/blob/master/agenda.org) - Keeping track of your day.
+  - [Key Bindings](https://github.com/ihdavids/orgextended_docs/blob/master/keybindings.org) - A quick reference of some of the default keybindings.
+  
+  The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
 
   The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
 
