@@ -99,9 +99,11 @@ class NoWebRefs:
         self.view = view
 
     def ParseParamsInternal(self,view,pt):
-        extensions, language, paramdata, fenceLine = GetModuleAndParams(view,pt)
+        row,_ = view.rowcol(pt)
+        extensions, language, paramdata, fenceLine = GetModuleAndParams(view,row)
         if(not language):
-            return
+            log.error(" Could not find language value from source row: " + str(language))
+            return None
         log.debug(" CACHE: {}".format(fenceLine))
         p = type('', (), {})() 
         p.s = pt
@@ -109,7 +111,8 @@ class NoWebRefs:
         row,_ = view.rowcol(pt)
         end   = FindEndOfSourceBlock(view,row)
         if(not end):
-            return
+            log.error("Could not find the end of the source block! " + str(end))
+            return None
         p.refName = p.params.Get('noweb-ref',None)
         p.at       = pt
         p.language = language
@@ -119,7 +122,7 @@ class NoWebRefs:
 
     def ParseParams(self,view,pt):
         p = self.ParseParamsInternal(view,pt)
-        if(p.refName):
+        if(p and p.refName):
             if(not p.refName in self.refs):
                 self.refs[p.refName] = []
             self.refs[p.refName].append(p)
@@ -640,10 +643,12 @@ def FindEndOfSourceBlock(view,row):
 
 def GetModuleAndParams(view,row):
     extensions = ext.find_extension_modules('orgsrc', ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot"])
-    line = view.substr(view.line(row))
+    pt = view.text_point(row,0)
+    line = view.substr(view.line(pt))
     m = RE_SRC_BLOCK.search(line)
     if(not m):
-        log.error("FAILED TO PARSE SOURCE BLOCK: " + line)
+        log.error("FAILED TO PARSE SOURCE BLOCK: @" + str(row) + " " + line + "\n" )
+        log.debug("FAILURE AT:\n"+ '\n'.join(traceback.format_stack()))
         return (None, None, None, None)
     fnname = m.group('name')
     log.debug("SRC NAME: " + fnname)
@@ -849,6 +854,7 @@ class OrgExecuteSourceBlock:
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
+        row = 0
         if(IsSourceBlock(view,at)):
             #if(view.match_selector(at,'orgmode.fence.sourceblock') or view.match_selector(at,'orgmode.sourceblock.content')):
             # Scan up till we find the start of the block.
@@ -866,7 +872,7 @@ class OrgExecuteSourceBlock:
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,start)
+            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
             if(not self.language):
                 return
 
@@ -1470,7 +1476,7 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
                 return
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,start)
+            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
             if(not self.language):
                 return
 
