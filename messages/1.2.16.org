@@ -8,7 +8,7 @@
 
 	Batch files do not support arrays so we play some games.
 	VAR_width and VAR_height are defined to help with iteration and
-	array like variables are defined
+	array like variables are defined a value at a time VARNAME[r#,c#]
 
 	#+NAME: table-source
 	| a | b | c | d | e |
