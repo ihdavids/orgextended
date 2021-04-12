@@ -14,6 +14,11 @@
     // 1. write a handler in Packages/User/orgsrc folder
     // 2. remove them from your list in your settings file.
     "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot", "cmd", "sh"],
+    // These are source block aliases for languages listed in the builtinSourceBlockHandlers
+    "builtinSourceBlockAliases": {
+        "bash":  "sh",
+        "bat":   "cmd"
+    },
 
 	// The quick capture buffer gets this name
 	"captureBufferName": "*capture*",

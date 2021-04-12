@@ -100,7 +100,7 @@ class NoWebRefs:
 
     def ParseParamsInternal(self,view,pt):
         row,_ = view.rowcol(pt)
-        extensions, language, paramdata, fenceLine = GetModuleAndParams(view,row)
+        language, paramdata, fenceLine = GetModuleAndParams(view,row)
         if(not language):
             log.error(" Could not find language value from source row: " + str(language))
             return None
@@ -641,24 +641,38 @@ def FindEndOfSourceBlock(view,row):
         return None
     return end
 
-def GetModuleAndParams(view,row):
+def HasModule(fname):
     builtInModules = sets.Get("builtinSourceBlockHandlers",[])
     extensions = ext.find_extension_modules('orgsrc', builtInModules)
+    aliases = sets.Get("builtinSourceBlockAliases",{})
+    if(fname in aliases):
+        fname = aliases[fname]
+    return fname in extensions
+
+def GetModule(fname):
+    builtInModules = sets.Get("builtinSourceBlockHandlers",[])
+    extensions = ext.find_extension_modules('orgsrc', builtInModules)
+    aliases = sets.Get("builtinSourceBlockAliases",{})
+    if(fname in aliases):
+        fname = aliases[fname]
+    return extensions[fname]
+
+def GetModuleAndParams(view,row):
     pt = view.text_point(row,0)
     line = view.substr(view.line(pt))
     m = RE_SRC_BLOCK.search(line)
     if(not m):
         log.error("FAILED TO PARSE SOURCE BLOCK: @" + str(row) + " " + line + "\n" )
         log.debug("FAILURE AT:\n"+ '\n'.join(traceback.format_stack()))
-        return (None, None, None, None)
+        return (None, None, None)
     fnname = m.group('name')
     log.debug("SRC NAME: " + fnname)
     paramdata = line[len(m.group(0)):]
     # Now find me that function!
-    if(fnname not in extensions):
+    if(not HasModule(fnname)):
         log.error("Function not found in src folder! Cannot execute!")
-        return (None, None, None, None)
-    return (extensions,fnname,paramdata,line)
+        return (None, None, None)
+    return (fnname,paramdata,line)
 
 RE_FUNCTION=re.compile(r'\s+[#][+][Cc][Aa][Ll][Ll][:]\s*(?P<name>[a-zA-Z][a-zA-Z0-9_-]+)\s*\((?P<params>[^)]*)\)')
 def IsCallCommentBlock(view):
@@ -873,12 +887,12 @@ class OrgExecuteSourceBlock:
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
+            self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
             if(not self.language):
                 return
 
             # Start setting up our execution state.
-            self.curmod   = extensions[self.language]
+            self.curmod   = GetModule(self.language)
             self.startRow = row + 1
             self.endRow   = end
             self.s        = view.text_point(self.startRow,0)
@@ -1303,15 +1317,12 @@ class OrgExecuteInlineSourceBlock:
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            builtInModules = sets.Get("builtinSourceBlockHandlers",[])
-            extensions = ext.find_extension_modules('orgsrc', builtInModules)
-            # Now find me that function!
-            if(self.language not in extensions):
+            if(not HasModule(self.language)):
                 log.error("Function not found in src folder! Cannot execute!")
                 return
 
             # Start setting up our execution state.
-            self.curmod   = extensions[self.language]
+            self.curmod   = GetModule(self.language)
             self.startRow = row
             self.endRow   = row
             self.s        = view.text_point(row,start)
@@ -1515,14 +1526,14 @@ class OrgTangleFileCommand(sublime_plugin.TextCommand):
                 return
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
-            extensions, self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
+            self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
             if(not self.language):
                 return
 
             log.debug(" TANGLE: {}".format(fenceLine))
 
             # Start setting up our execution state.
-            self.curmod   = extensions[self.language]
+            self.curmod   = GetModule(self.language)
             self.startRow = row + 1
             self.endRow   = end
             self.s        = view.text_point(self.startRow,0)

@@ -8,12 +8,12 @@
 	| a | b | c | d | e |
 	| 1 | 2 | 3 | 4 | 5 |
 
-  #+BEGIN_SRC sh :var DATA=in-table
+  #+BEGIN_SRC bash :var DATA=in-table
    echo "$DATA" 
   #+END_SRC
   #+RESULTS:
-  : a	b	c	d	e
-  : 1	2	3	4	5
+   : a  b   c   d   e
+   : 1  2   3   4   5
 
 
   Not yet sure if value types work like this in emacs.
