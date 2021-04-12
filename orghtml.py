@@ -559,7 +559,7 @@ class HtmlDoc:
 					self.fs.write("     <ul>\n")
 					inUl += 1
 				elif(thisIndent < ulIndent and inUl > 1):
-					inul -= 1
+					inUl -= 1
 					self.fs.write("     </ul>\n")
 				data = self.EscAndLinks(m.group('data'))
 				self.fs.write("     <li>{content}</li>\n".format(content=data))
