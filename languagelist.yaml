@@ -38,6 +38,7 @@
   text: html.basic
 - language: go
 - language: ledger
+- language: beancount
 - language: make
   source: makefile
 - language: makefile
