@@ -1,5 +1,11 @@
 * 1.2.17
 
+  More source block handlers!
+
+** Alias Support in Source Blocks
+    bat = cmd
+    js  = javascript
+
 ** SH source blocks kind on windows with WSL (assuming you have WSL setup)
 
 	This is not yet tested on any other platform!
@@ -25,3 +31,20 @@
   #+RESULTS:
   : 5
 
+** Javascript source blocks require node.js
+    Set nodejsPath in your settings file.
+
+    #+BEGIN_SRC javascript :var x=5
+        console.log('Hello world ' + x);
+    #+END_SRC
+
+   #+RESULTS:
+   : Hello world 5
+
+
+   #+BEGIN_SRC js :var DATA=in-table :results table
+     console.log(DATA);
+   #+END_SRC
+   #+RESULTS:
+   | a | b | c | d | e |
+   | 1 | 2 | 3 | 4 | 5 |

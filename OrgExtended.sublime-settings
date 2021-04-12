@@ -13,11 +13,12 @@
     // version:
     // 1. write a handler in Packages/User/orgsrc folder
     // 2. remove them from your list in your settings file.
-    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot", "cmd", "sh"],
+    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot", "cmd", "sh", "javascript"],
     // These are source block aliases for languages listed in the builtinSourceBlockHandlers
     "builtinSourceBlockAliases": {
         "bash":  "sh",
-        "bat":   "cmd"
+        "bat":   "cmd",
+        "js":    "javascript"
     },
 
 	// The quick capture buffer gets this name
@@ -258,4 +259,6 @@
     // DAY PAGE
     // Path where we would like day pages created
     //"dayPagePath": "PATH",
+
+    //"nodejsPath": "C:\\Program Files\\nodejs\\node.exe",
 }
