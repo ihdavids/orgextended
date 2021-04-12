@@ -1,7 +1,11 @@
+
+
 * 1.2.18
 
-  Beancount. I like beancount and I find it handy to have source block support
-  for beancount.
+
+** Syntax Highlighting
+
+  Beancount is now supported for syntax highlighting.
 
   #+BEGIN_SRC beancount
 2014-01-01 open Assets:Checking
