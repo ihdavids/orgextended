@@ -1,0 +1,27 @@
+* 1.2.17
+
+** SH source blocks kind on windows with WSL (assuming you have WSL setup)
+
+	This is not yet tested on any other platform!
+
+	#+NAME: in-table
+	| a | b | c | d | e |
+	| 1 | 2 | 3 | 4 | 5 |
+
+  #+BEGIN_SRC sh :var DATA=in-table
+   echo "$DATA" 
+  #+END_SRC
+  #+RESULTS:
+  : a	b	c	d	e
+  : 1	2	3	4	5
+
+
+  Not yet sure if value types work like this in emacs.
+  I may need to adjust this.
+
+  #+BEGIN_SRC sh :results value
+  return 5
+  #+END_SRC
+  #+RESULTS:
+  : 5
+
