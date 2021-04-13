@@ -1,17 +1,11 @@
-
+#+HTML_STYLE: funky
 
 * 1.2.18
-
-
 ** Syntax Highlighting
 
-  Beancount is now supported for syntax highlighting.
+  Beancount is now supported for syntax highlighting in source blocks
 
-  #+BEGIN_SRC beancount
-2014-01-01 open Assets:Checking
-2014-01-01 open Equity:Opening-Balances
-
-2014-01-02 * "Deposit"
-   Assets:Checking           100.00 USD
-   Equity:Opening-Balances
-  #+END_SRC
+** Html Exporter
+	- Fixed issue with exporting unordered lists.
+	- Org Export Subtree as Html now handles HTML_STYLE properly
+	- Org Export Subtree as Html will export <filename>_subtree.html rather than as a temp file.

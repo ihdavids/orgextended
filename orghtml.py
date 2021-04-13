@@ -32,10 +32,10 @@ log = logging.getLogger(__name__)
 
 
 
-def HtmlFilename(view):
+def HtmlFilename(view,suffix=""):
 	fn = view.file_name()
 	fn,ext = os.path.splitext(fn)
-	return fn + ".html"
+	return fn + suffix + ".html"
 
 # Global properties I AT LEAST want to support.
 # Both as a property on the document and in our settings.
@@ -631,9 +631,13 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 		doc.EndNode(n)
 
 	def build_nodes(self, doc):
-		nodes = self.file.org
-		for n in nodes.children:
-			self.build_node(doc, n)
+		if(self.index == None):
+			nodes = self.file.org
+			for n in nodes.children:
+				self.build_node(doc, n)
+		else:
+			n = self.file.org.env._nodes[self.index]
+			self.build_node(doc,n)
 
 	def build_document(self, doc):
 		doc.StartNodes()
@@ -646,8 +650,12 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 		doc.EndDocument()
 		doc.InsertScripts(self.file)
 
-	def run(self,edit, onDone=None):
+	def run(self,edit, onDone=None,index=None,suffix=""):
 		self.file = db.Get().FindInfo(self.view)
+		if(index != None):
+			self.index = index
+		else:
+			self.index = None
 		if(None == self.file):
 			log.error("Not an org file? Cannot build reveal document")
 			evt.EmitIf(onDone)	
@@ -656,7 +664,7 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 		self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
 		log.log(51,"EXPORT STYLE: " + self.style)
 		try:
-			outputFilename = HtmlFilename(self.view)
+			outputFilename = HtmlFilename(self.view,suffix)
 			doc = HtmlDoc(outputFilename, self.file)
 			doc.style = self.style
 			doc.StartHead()
@@ -687,28 +695,20 @@ class OrgDownloadHighlighJs(sublime_plugin.TextCommand):
 		wp.download_highlightjs()
 
 class OrgExportSubtreeAsOrgHtmlCommand(sublime_plugin.TextCommand):
-	def onDone(self):
-		# Remove this item from the DB!
-		outputFilename = HtmlFilename(self.tempView)
-		db.Get().Remove(self.tempView)
-		self.tempView.set_scratch(True)
-		self.view.window().focus_view(self.tempView)
-		self.view.window().run_command("close_file")	
-		self.tempView = None
-		self.view.window().focus_view(self.view)
-		sublime.set_timeout(lambda: sync_up_on_closed(), 1000)
-		db.Get().RebuildDb()
+	def OnDone(self):
+		evt.EmitIf(self.onDone)
 
-	def run(self,edit):
+	def run(self,edit,onDone=None):
+		self.onDone = onDone
 		n = db.Get().AtInView(self.view)
-		s = self.view.text_point(n.start_row,0)
-		e = self.view.line(self.view.text_point(n.end_row,0)).end()
-		r = sublime.Region(s,e)
-		ct = self.view.substr(r)
-		start = ""
-		#if "#+TITLE:" not in ct:
-		#	start = "#+TITLE: " + os.path.splitext(os.path.basename(self.view.file_name()))[0]
-		tempFile = tf.CreateTempFileFromRegion(self.view, r, ".org", start)
-		#print("temp file: " + str(tempFile))
-		self.tempView = self.view.window().open_file(tempFile)
-		self.tempView.run_command('org_export_file_org_html', {"onDone": evt.Make(self.onDone)})
+		if(n == None):
+			log.error(" Failed to find node! Subtree cannot be exported!")
+			return
+		index = 0
+		for i in range(0,len(n.env._nodes)):
+			if(n == n.env._nodes[i]):
+				index = i
+		if(index == 0):
+			log.error(" Failed to find node in file! Something is wrong. Cannot export subtree!")
+			return
+		self.view.run_command('org_export_file_org_html', {"onDone": evt.Make(self.OnDone), "index": index, "suffix":"_subtree"})
