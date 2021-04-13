@@ -9,3 +9,4 @@
 	- Fixed issue with exporting unordered lists.
 	- Org Export Subtree as Html now handles HTML_STYLE properly
 	- Org Export Subtree as Html will export <filename>_subtree.html rather than as a temp file.
+	- "htmlExportPartialCheckboxChecked": False - Will export partial checkboxes as unchecked vs checked.

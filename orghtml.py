@@ -445,7 +445,10 @@ class HtmlDoc:
 			line = RE_ENDNOTE.sub(r"</aside>",line)
 			line = RE_CHECKBOX.sub(r'<input type="checkbox">',line)
 			line = RE_CHECKED_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
-			line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
+			if(sets.Get("htmlExportPartialCheckboxChecked",True)):
+				line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
+			else:
+				line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox">',line)
 			line = RE_HR.sub(r'<hr>',line)
 		return line
 
