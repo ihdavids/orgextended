@@ -74,7 +74,7 @@ def GetCollapsibleCode():
 	return """
 var coll = document.getElementsByClassName("collapsible");
 var i;
-
+var accume = 0;
 for (i = 0; i < coll.length; i++) {
   coll[i].addEventListener("click", function() {
     this.classList.toggle("active");
@@ -84,7 +84,7 @@ for (i = 0; i < coll.length; i++) {
     } else {
       content.style.maxHeight = content.scrollHeight + "px";
     }
-    var accume = content.scrollHeight + 5;
+    accume += content.scrollHeight + 5;
     while(content.parentNode && (content.parentNode.nodeName == 'DIV' || content.parentNode.nodeName == 'SECTION')) {
     	if(content.parentNode.nodeName == 'DIV') {
     		//alert(content.parentNode.nodeName);
@@ -248,7 +248,7 @@ class HtmlDoc:
 	def __init__(self, filename, file):
 		self.file = file
 		self.PreScan()
-		self.fs = open(filename,"w")
+		self.fs = open(filename,"w",encoding="utf-8")
 		self.fs.write("<!DOCTYPE html>\n")
 		self.fs.write("<!-- exported by orgextended html exporter -->\n")
 		if(self.language):
@@ -422,7 +422,7 @@ class HtmlDoc:
 					for key in self.attrs:
 						extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
 				preamble = ""
-				postable = ""
+				postamble = ""
 				if(hasattr(self,'caption') and self.caption):
 					preamble = "<div class=\"figure\"><p>"
 					postamble = "</p><p><span class=\"figure-number\">Figure {index}: </span>{caption}</p></div>".format(index=self.figureIndex,caption=self.caption)

@@ -1,0 +1,5 @@
+* 1.2.19
+** Html Exporter
+	- Exporter now exports as utf-8 to avoid problems with unicode characters.
+	- Fixed a type in the postamble handling
+	- The exporter can handle "* NOTE :" malformed headings and not crash.
