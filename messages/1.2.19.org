@@ -3,3 +3,6 @@
 	- Exporter now exports as utf-8 to avoid problems with unicode characters.
 	- Fixed a type in the postamble handling
 	- The exporter can handle "* NOTE :" malformed headings and not crash.
+	- The collapse system had problems computing the correct max-height on 
+	  startup and nodes would not fold properly.
+	- Added plain style to htmlstyles
