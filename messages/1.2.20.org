@@ -7,6 +7,14 @@
 	      we only export code. This is in complaince with org mode defaults. If you would like to change that
 	      add the key to your settings file and set the defaults as you need:
 
+	#+BEGIN_SRC python :exports both
+	 print("hi") 
+	#+END_SRC
+
+   #+RESULTS:
+   : hi
+
+
 	#+BEGIN_EXAMPLE
       "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
 	#+END_EXAMPLE
@@ -21,3 +29,11 @@
 	#+END_EXAMPLE
 
 	Remove this list if you would like to always have explicit control with the exports keyword.
+
+*** Source Block Execution on Export
+
+	This is now turned on by default. If you would like to disable it:
+
+	#+BEGIN_EXAMPLE
+      "htmlExecuteSourceOnExport": false,
+	#+END_EXAMPLE

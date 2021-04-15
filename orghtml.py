@@ -719,7 +719,7 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 			log.error("Not an org file? Cannot build reveal document")
 			evt.EmitIf(onDone)	
 			return
-		if(sets.GetBool("htmlExecuteSourceOnExport",True)):
+		if(sets.Get("htmlExecuteSourceOnExport",True)):
 			self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
 		else:
 			self.OnDoneSourceBlockExecution()
