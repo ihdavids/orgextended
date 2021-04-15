@@ -244,7 +244,7 @@ def ProcessPotentialFileOrgOutput(cmd):
             return outputs,destFile
 
 
-def BuildFullParamList(cmd,language,cmdArgs):
+def BuildFullParamList(cmd,language,cmdArgs,node=None):
     # First Add from global settings
     # First Add from PROPERTIES
     # Global properties are all controlled from our settings file.
@@ -259,17 +259,21 @@ def BuildFullParamList(cmd,language,cmdArgs):
     plist.exList.AddList('results',['code','drawer','html','latex','link','graphics','org','pp','raw'])
     # Handling
     plist.exList.AddList('results',['silent','replace','prepend','append'])
+    # Exports
+    plist.exList.AddList('exports',['code','results','both','none'])
     plist.exList.AddBool('cache')
     plist.exList.AddBool('noweb')
     plist.exList.AddList('eval',['never','no','query','never-export','no-export','query-export'])
     defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
-    view = sublime.active_window().active_view()
-    node = None
-    if(view):
+    view = None
+    if(node == None):
+        view = sublime.active_window().active_view()
+    if(view or node):
         plist.AddFromPList(sets.Get('babel-args',None))
         plist.AddFromPList(sets.Get('babel-args-'+language,None))
-        node = db.Get().AtPt(view,cmd.s)
+        if(node == None):
+            node = db.Get().AtPt(view,cmd.s)
         if(node):
             props = node.get_comment('PROPERTY',None)
             if(props):
@@ -292,7 +296,7 @@ def BuildFullParamList(cmd,language,cmdArgs):
     # We need to check if there is a header block somewhere near us.
     if(node):
         header = node.get_comment("HEADER",None)
-        if(header):
+        if(header and view):
             # We have to scan for it!
             sr,_ = view.rowcol(cmd.s)
             for r in range(sr,node.start_row,-1):

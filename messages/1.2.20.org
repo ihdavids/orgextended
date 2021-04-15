@@ -1,0 +1,14 @@
+* 1.2.20
+** Html Exporter
+	Continuing the Babel adventure we add support for :exports [code,results,both,none]
+
+	NOTE: this means that the default parameters for babel header args are now more important
+	      Before we would default to exporting both code and results, now, due to the defaults set in our settings
+	      we only export code. This is in complaince with org mode defaults. If you would like to change that
+	      add the key to your settings file and set the defaults as you need:
+
+	#+BEGIN_EXAMPLE
+      "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
+	#+END_EXAMPLE
+
+	

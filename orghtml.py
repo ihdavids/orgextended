@@ -23,6 +23,7 @@ import OrgExtended.orgutil.temp as tf
 import OrgExtended.pymitter as evt
 import OrgExtended.orgnotifications as notice
 import OrgExtended.orgextension as ext
+import OrgExtended.orgsourceblock as src
 import yaml
 import sys
 import subprocess
@@ -454,15 +455,31 @@ class HtmlDoc:
 
 	def NodeBody(self,slide):
 		inDrawer = False
+		inResults= False
 		inUl     = 0
 		ulIndent = 0
 		inTable  = False
 		haveTableHeader = False
 		inSrc    = False
 		skipSrc  = False
+		exp      = None
 		for l in slide._lines[1:]:
 			if(self.AttributesGather(l)):
 				continue
+			if(inResults):
+				if(l.strip() == ""):
+					inResults = False
+				elif(RE_ENDSRC.search(l) or RE_END_DRAWER_LINE.search(l)):
+					inResults = False
+					continue
+				if(inResults):
+					print(str(l) + " -> " + str(exp))
+					if(exp == 'code' or exp == 'none'):
+						continue
+					else:
+						line = self.EscAndLinks(l)
+						self.fs.write("     " + line + "\n")
+						continue
 			if(inDrawer):
 				if(RE_END_DRAWER_LINE.search(l)):
 					inDrawer = False
@@ -505,18 +522,29 @@ class HtmlDoc:
 			m = RE_STARTSRC.search(l)
 			if(m):
 				inSrc = True
-				if(m.group('lang') == 'plantuml'):
+				language = m.group('lang')
+				paramstr = l[len(m.group(0)):]
+				p = type('', (), {})() 
+				src.BuildFullParamList(p,language,paramstr,slide)
+				exp = p.params.Get("exports",None)
+				if(isinstance(exp,list) and len(exp) > 0):
+					exp = exp[0]
+				if(exp == 'results' or exp == 'none'):
 					skipSrc = True
 					continue
-				paramstr = l[len(m.group(0)):]
-				params = {}
-				for ps in RE_FN_MATCH.finditer(paramstr):
-					params[ps.group(1)] = ps.group(2)
+				# Some languages we skip source by default
+				skipLangs = sets.Get("htmlDefaultSkipSrc",[])
+				if(exp == None and language == skipLangs):
+					skipSrc = True
+					continue
+				#params = {}
+				#for ps in RE_FN_MATCH.finditer(paramstr):
+				#	params[ps.group(1)] = ps.group(2)
 				attribs = ""
 				# This is left over from reveal.
-				if("data-line-numbers" in params):
-					attribs += " data-line-numbers=\"{nums}\"".format(nums=params["data-line-numbers"])
-				self.fs.write("    <pre><code language=\"{language}\" {attribs}>\n".format(language=mapLanguage(m.group('lang')),attribs=attribs))
+				if(p.params.Get("data-line-numbers",None)):
+					attribs += " data-line-numbers=\"{nums}\"".format(nums=p.params.Get("data-line-numbers",""))
+				self.fs.write("    <pre><code language=\"{lang}\" {attribs}>\n".format(lang=mapLanguage(language),attribs=attribs))
 				continue
 			# property drawer
 			if(RE_DRAWER_LINE.search(l)):
@@ -526,6 +554,7 @@ class HtmlDoc:
 			if(RE_SCHEDULING_LINE.search(l)):
 				continue
 			if(RE_RESULTS.search(l)):
+				inResults = True
 				continue
 			m = RE_COMMENT_TAG.search(l)
 			if(m):
