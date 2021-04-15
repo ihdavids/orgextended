@@ -32,15 +32,6 @@ import html
 
 log = logging.getLogger(__name__)
 
-def TexFilename(view,suffix=""):
-	fn = view.file_name()
-	fn,ext = os.path.splitext(fn)
-	return fn + suffix + ".tex"
-
-def GetGlobalOption(file, name, settingsName, defaultValue):
-	value = sets.Get(settingsName, defaultValue)
-	value = ' '.join(file.org[0].get_comment(name, [str(value)]))
-	return value
 
 
 #\documentclass{article}
@@ -67,7 +58,7 @@ class LatexDoc(exp.OrgExporter):
 # ============================================================
 class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
 	def build_head(self, doc):
-		highlight      = GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
+		highlight      = exp.GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
 		doc.AddInlineStyle(GetHighlightJsCss(highlight))
 		doc.AddInlineStyle(GetCollapsibleCss())
 		doc.AddInlineStyle(GetStyleData(self.style, self.file))
@@ -107,9 +98,9 @@ class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
 		# Reload if necessary
 		self.file = db.Get().FindInfo(self.view)
 		doc = None
-		self.docClass = GetGlobalOption(self.file,"LATEX_CLASS","latexClass","article").lower()
+		self.docClass = exp.GetGlobalOption(self.file,"LATEX_CLASS","latexClass","article").lower()
 		try:
-			outputFilename = LatexFilename(self.view,self.suffix)
+			outputFilename = exp.ExportFilename(self.view,".tex",self.suffix)
 			self.doc = LatexDoc(outputFilename,self.file)
 			self.doc.setClass(self.docClass)
 			doc.StartHead()

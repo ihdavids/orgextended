@@ -6,6 +6,7 @@ import fnmatch
 import logging
 import sys
 import traceback 
+import OrgExtended.asettings as sets
 
 log = logging.getLogger(__name__)
 
@@ -15,6 +16,18 @@ RE_NAME = regex.compile(r"^\s*[#][+](NAME|name)[:]\s*(?P<data>.*)")
 RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
 RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
 RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
+
+
+def ExportFilename(view,extension,suffix=""):
+	fn = view.file_name()
+	fn,ext = os.path.splitext(fn)
+	return fn + suffix + extension
+
+def GetGlobalOption(file, name, settingsName, defaultValue):
+	value = sets.Get(settingsName, defaultValue)
+	value = ' '.join(file.org[0].get_comment(name, [str(value)]))
+	return value
+
 
 class OrgExporter:
 
@@ -31,6 +44,9 @@ class OrgExporter:
 		self.email    = None
 		self.date     = None
 		self.name     = None
+
+	def GetOption(self,name,settingsName,defaultValue):
+		return GetGlobalOption(self.file, name, settingsName, defaultValue)
 
 	def PreScanExportCommentsGather(self, l):
 		m = RE_TITLE.match(l)

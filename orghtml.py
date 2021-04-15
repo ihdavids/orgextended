@@ -34,11 +34,6 @@ log = logging.getLogger(__name__)
 
 
 
-def HtmlFilename(view,suffix=""):
-  fn = view.file_name()
-  fn,ext = os.path.splitext(fn)
-  return fn + suffix + ".html"
-
 # Global properties I AT LEAST want to support.
 # Both as a property on the document and in our settings.
 #+OPTIONS: num:nil toc:nil
@@ -47,11 +42,6 @@ def HtmlFilename(view,suffix=""):
 #+Title: Title of Your Talk
 #+Author: Your Name
 #+Email: Your Email Address or Twitter Handle
-
-def GetGlobalOption(file, name, settingsName, defaultValue):
-  value = sets.Get(settingsName, defaultValue)
-  value = ' '.join(file.org[0].get_comment(name, [str(value)]))
-  return value
 
 def GetCollapsibleCodeOld():
   return """
@@ -189,7 +179,7 @@ def GetStyleRelatedData(style, extension):
 
 
 def GetStyleRelatedPropertyData(file, key, setting):
-  val = GetGlobalOption(file, key, setting, "")
+  val = exp.GetGlobalOption(file, key, setting, "")
   if("<" in val or "{" in val):
     return val
   elif(os.path.isfile(val)):
@@ -592,7 +582,7 @@ class HtmlDoc(exp.OrgExporter):
 # Export the entire file using our internal exporter
 class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
   def build_head(self, doc):
-    highlight      = GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
+    highlight      = exp.GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
     doc.AddInlineStyle(GetHighlightJsCss(highlight))
     doc.AddInlineStyle(GetCollapsibleCss())
     doc.AddInlineStyle(GetStyleData(self.style, self.file))
@@ -632,10 +622,10 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
     # Reload if necessary
     self.file = db.Get().FindInfo(self.view)
     doc = None
-    self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
+    self.style = exp.GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
     log.log(51,"EXPORT STYLE: " + self.style)
     try:
-      outputFilename = HtmlFilename(self.view,self.suffix)
+      outputFilename = exp.ExportFilename(self.view,".html", self.suffix)
       doc = HtmlDoc(outputFilename, self.file)
       doc.style = self.style
       doc.StartHead()
