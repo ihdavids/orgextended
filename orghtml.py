@@ -24,6 +24,7 @@ import OrgExtended.pymitter as evt
 import OrgExtended.orgnotifications as notice
 import OrgExtended.orgextension as ext
 import OrgExtended.orgsourceblock as src
+import OrgExtended.orgexporter as exp
 import yaml
 import sys
 import subprocess
@@ -34,9 +35,9 @@ log = logging.getLogger(__name__)
 
 
 def HtmlFilename(view,suffix=""):
-	fn = view.file_name()
-	fn,ext = os.path.splitext(fn)
-	return fn + suffix + ".html"
+  fn = view.file_name()
+  fn,ext = os.path.splitext(fn)
+  return fn + suffix + ".html"
 
 # Global properties I AT LEAST want to support.
 # Both as a property on the document and in our settings.
@@ -48,12 +49,12 @@ def HtmlFilename(view,suffix=""):
 #+Email: Your Email Address or Twitter Handle
 
 def GetGlobalOption(file, name, settingsName, defaultValue):
-	value = sets.Get(settingsName, defaultValue)
-	value = ' '.join(file.org[0].get_comment(name, [str(value)]))
-	return value
+  value = sets.Get(settingsName, defaultValue)
+  value = ' '.join(file.org[0].get_comment(name, [str(value)]))
+  return value
 
 def GetCollapsibleCodeOld():
-	return """
+  return """
 var coll = document.getElementsByClassName("collapsible");
 var i;
 
@@ -72,7 +73,7 @@ for (i = 0; i < coll.length; i++) {
 
 
 def GetCollapsibleCode():
-	return """
+  return """
 var coll = document.getElementsByClassName("collapsible");
 var i;
 var accume = 0;
@@ -87,12 +88,12 @@ for (i = 0; i < coll.length; i++) {
     }
     accume += content.scrollHeight + 5;
     while(content.parentNode && (content.parentNode.nodeName == 'DIV' || content.parentNode.nodeName == 'SECTION')) {
-    	if(content.parentNode.nodeName == 'DIV') {
-    		//alert(content.parentNode.nodeName);
-    		content.parentNode.style.maxHeight = (accume + content.parentNode.scrollHeight) + "px";
-    		accume += content.parentNode.scrollHeight;
-    	}
-    	content = content.parentNode;
+      if(content.parentNode.nodeName == 'DIV') {
+        //alert(content.parentNode.nodeName);
+        content.parentNode.style.maxHeight = (accume + content.parentNode.scrollHeight) + "px";
+        accume += content.parentNode.scrollHeight;
+      }
+      content = content.parentNode;
     }
   });
   coll[i].click();
@@ -100,8 +101,8 @@ for (i = 0; i < coll.length; i++) {
 """
 
 def GetCollapsibleCss():
-	return """
-	.node-body {
+  return """
+  .node-body {
   padding: 0 18px;
   max-height: 0;
   overflow: hidden;
@@ -124,12 +125,6 @@ def GetCollapsibleCss():
 """
 
 
-RE_TITLE = regex.compile(r"^\s*[#][+](TITLE|title)[:]\s*(?P<data>.*)")
-RE_AUTHOR = regex.compile(r"^\s*[#][+](AUTHOR|author)[:]\s*(?P<data>.*)")
-RE_NAME = regex.compile(r"^\s*[#][+](NAME|name)[:]\s*(?P<data>.*)")
-RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
-RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
-RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
 RE_CAPTION = regex.compile(r"^\s*[#][+]CAPTION[:]\s*(?P<caption>.*)")
 RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-Z0-9._-]+)\s+(?P<value>([^:]|((?<! )[:]))+))+$")
 RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
@@ -166,592 +161,544 @@ RE_COMMENT_TAG = re.compile(r"^\s*[<][!][-][-]\s+(?P<name>[a-zA-Z0-9_-]+)\s+(?P<
 
 
 def mapLanguage(lang):
-	if(lang == 'html'):
-		return 'language-html'
-	elif(lang == 'python'):
-		return 'language-python'
-	else:
-		return lang
+  if(lang == 'html'):
+    return 'language-html'
+  elif(lang == 'python'):
+    return 'language-python'
+  else:
+    return lang
 
 def GetStyleRelatedData(style, extension):
-	inHeader = os.path.join(sublime.packages_path(),"User", "htmlstyles", style + extension)
-	if(os.path.isfile(inHeader)):
-		with open(inHeader) as f:
-			contents = f.read()
-			return contents
-	resourceName = "Packages/OrgExtended/htmlstyles/" + style + extension
-	try:
-		contents = sublime.load_resource(resourceName)
-		return contents
-	except:
-		pass
-	#inHeader = os.path.join(sublime.packages_path(),"OrgExtended", "htmlstyles", style + extension)
-	#if(os.path.isfile(inHeader)):
-	#	with open(inHeader) as f:
-	#		contents = f.read()
-	#		return contents
-	return ""
+  inHeader = os.path.join(sublime.packages_path(),"User", "htmlstyles", style + extension)
+  if(os.path.isfile(inHeader)):
+    with open(inHeader) as f:
+      contents = f.read()
+      return contents
+  resourceName = "Packages/OrgExtended/htmlstyles/" + style + extension
+  try:
+    contents = sublime.load_resource(resourceName)
+    return contents
+  except:
+    pass
+  #inHeader = os.path.join(sublime.packages_path(),"OrgExtended", "htmlstyles", style + extension)
+  #if(os.path.isfile(inHeader)):
+  # with open(inHeader) as f:
+  #   contents = f.read()
+  #   return contents
+  return ""
 
 
 def GetStyleRelatedPropertyData(file, key, setting):
-	val = GetGlobalOption(file, key, setting, "")
-	if("<" in val or "{" in val):
-		return val
-	elif(os.path.isfile(val)):
-		with open(val) as f:
-			contents = f.read()
-			return contents
-	else:
-		return val
+  val = GetGlobalOption(file, key, setting, "")
+  if("<" in val or "{" in val):
+    return val
+  elif(os.path.isfile(val)):
+    with open(val) as f:
+      contents = f.read()
+      return contents
+  else:
+    return val
 
 
 def GetHighlightJsCss(style):
-	import OrgExtended.orgutil.webpull as wp
-	wp.download_highlightjs()
-	data = os.path.join(sublime.packages_path(),"User", "highlightjs", "styles", style + ".css")
-	if(os.path.isfile(data)):
-		with open(data) as f:
-			contents = f.read()
-			return contents
+  import OrgExtended.orgutil.webpull as wp
+  wp.download_highlightjs()
+  data = os.path.join(sublime.packages_path(),"User", "highlightjs", "styles", style + ".css")
+  if(os.path.isfile(data)):
+    with open(data) as f:
+      contents = f.read()
+      return contents
 
 
 def GetHighlightJs():
-	import OrgExtended.orgutil.webpull as wp
-	wp.download_highlightjs()
-	data = os.path.join(sublime.packages_path(),"User", "highlightjs", "highlight.pack.js")
-	if(os.path.isfile(data)):
-		with open(data) as f:
-			contents = f.read()
-			return contents
+  import OrgExtended.orgutil.webpull as wp
+  wp.download_highlightjs()
+  data = os.path.join(sublime.packages_path(),"User", "highlightjs", "highlight.pack.js")
+  if(os.path.isfile(data)):
+    with open(data) as f:
+      contents = f.read()
+      return contents
 
 
 def GetHeaderData(style, file):
-	d1 = GetStyleRelatedData(style,"_inheader.html")
-	d2 = GetStyleRelatedPropertyData(file, "HtmlInHeader", "HTML_INHEADER")
-	return d1 + d2
+  d1 = GetStyleRelatedData(style,"_inheader.html")
+  d2 = GetStyleRelatedPropertyData(file, "HtmlInHeader", "HTML_INHEADER")
+  return d1 + d2
 
 def GetHeadingData(style, file):
-	d1 = GetStyleRelatedData(style,"_heading.html")
-	d2 = GetStyleRelatedPropertyData(file, "HtmlHeading", "HTML_HEADING")
-	return d1 + d2
+  d1 = GetStyleRelatedData(style,"_heading.html")
+  d2 = GetStyleRelatedPropertyData(file, "HtmlHeading", "HTML_HEADING")
+  return d1 + d2
 
 def GetFootingData(style, file):
-	d1 = GetStyleRelatedData(style,"_footing.html")
-	d2 = GetStyleRelatedPropertyData(file, "HtmlFooting", "HTML_FOOTING")
-	return d1 + d2
+  d1 = GetStyleRelatedData(style,"_footing.html")
+  d2 = GetStyleRelatedPropertyData(file, "HtmlFooting", "HTML_FOOTING")
+  return d1 + d2
 
 def GetStyleData(style, file):
-	d1 = GetStyleRelatedData(style,".css")
-	d2 = GetStyleRelatedPropertyData(file, "HtmlCss", "HTML_CSS")
-	return d1 + d2
+  d1 = GetStyleRelatedData(style,".css")
+  d2 = GetStyleRelatedPropertyData(file, "HtmlCss", "HTML_CSS")
+  return d1 + d2
 
-class HtmlDoc:
-	def __init__(self, filename, file):
-		self.file = file
-		self.PreScan()
-		self.fs = open(filename,"w",encoding="utf-8")
-		self.fs.write("<!DOCTYPE html>\n")
-		self.fs.write("<!-- exported by orgextended html exporter -->\n")
-		if(self.language):
-			self.fs.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"{language}\" xml:lang=\"{language}\">".format(language=self.language))
-		else:	
-			self.fs.write("<html lang=\"en\" class>\n")
-		self.commentName = None
-		self.figureIndex = 1
-		self.tableIndex = 1
+class HtmlDoc(exp.OrgExporter):
+  def __init__(self, filename, file,**kwargs):
+    super(HtmlDoc, self).__init__(filename, file, **kwargs)
+    self.fs.write("<!DOCTYPE html>\n")
+    self.fs.write("<!-- exported by orgextended html exporter -->\n")
+    if(self.language):
+      self.fs.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"{language}\" xml:lang=\"{language}\">".format(language=self.language))
+    else: 
+      self.fs.write("<html lang=\"en\" class>\n")
+    self.commentName = None
+    self.figureIndex = 1
+    self.tableIndex = 1
 
-	def PreScan(self):
-		if(len(self.file.org._lines) == 0):
-			self.ExportCommentsGather("")
-		for l in self.file.org._lines:
-			self.ExportCommentsGather(l)
+  def AddJs(self,link):
+    self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
 
-	def AddJs(self,link):
-		self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
+  def AddStyle(self,link):
+    self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\"></link>\n")
 
-	def AddStyle(self,link):
-		self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\"></link>\n")
+  def AddInlineStyle(self,content):
+    # <style>
+    #    BLOCK
+    # </style> 
+    self.fs.write("   <style>\n{0}\n   </style>\n".format(content))
 
-	def AddInlineStyle(self,content):
-		# <style>
-		#    BLOCK
-		# </style> 
-		self.fs.write("   <style>\n{0}\n   </style>\n".format(content))
+  def InsertJs(self,content):
+    # <style>
+    #    BLOCK
+    # </style> 
+    self.fs.write("   <script>\n{0}\n   </script>\n".format(content))
 
-	def InsertJs(self,content):
-		# <style>
-		#    BLOCK
-		# </style> 
-		self.fs.write("   <script>\n{0}\n   </script>\n".format(content))
+  def StartHead(self):
+    self.fs.write("  <head>\n")
 
-	def StartHead(self):
-		self.fs.write("  <head>\n")
+  def EndHead(self):
+    data = GetHeaderData(self.style, self.file)
+    self.fs.write(data)
+    self.fs.write("  </head>\n")
 
-	def EndHead(self):
-		data = GetHeaderData(self.style, self.file)
-		self.fs.write(data)
-		self.fs.write("  </head>\n")
+  def AddExportMeta(self):
+    if(self.title):
+      self.fs.write("<title>{title}</title>".format(title=self.title))
+    if(self.author):
+      self.fs.write("<meta name=\"author\" content=\"{author}\" />".format(author=self.author))
 
-	def AddExportMeta(self):
-		if(self.title):
-			self.fs.write("<title>{title}</title>".format(title=self.title))
-		if(self.author):
-			self.fs.write("<meta name=\"author\" content=\"{author}\" />".format(author=self.author))
+  def StartDocument(self, file):
+    self.fs.write("  <div class=\"ready\">\n")
 
-	def StartDocument(self, file):
-		self.fs.write("  <div class=\"ready\">\n")
+  def EndDocument(self):
+    self.fs.write("  </div>\n")
 
-	def EndDocument(self):
-		self.fs.write("  </div>\n")
+  def StartNodes(self):
+    self.fs.write("    <div class=\"orgmode\">\n")
 
-	def StartNodes(self):
-		self.fs.write("    <div class=\"orgmode\">\n")
+  def EndNodes(self):
+    self.fs.write("    </div>\n")
 
-	def EndNodes(self):
-		self.fs.write("    </div>\n")
+  # Per slide properties
+  #:PROPERTIES:
+  #:css_property: value
+  #:END:
+  def StartNode(self,n):
+    properties = ""
+    for prop in n.properties:
+      properties = "{0} {1}=\"{2}\"".format(properties, prop, n.properties[prop])
+    self.fs.write("      <section {0}>\n".format(properties))
 
-	# Per slide properties
-	#:PROPERTIES:
-	#:css_property: value
-	#:END:
-	def StartNode(self,n):
-		properties = ""
-		for prop in n.properties:
-			properties = "{0} {1}=\"{2}\"".format(properties, prop, n.properties[prop])
-		self.fs.write("      <section {0}>\n".format(properties))
+  def StartNodeBody(self, n):
+    level = n.level + 1
+    self.fs.write("      <div class=\"node-body h{level}\">\n".format(level=level))
 
-	def StartNodeBody(self, n):
-		level = n.level + 1
-		self.fs.write("      <div class=\"node-body h{level}\">\n".format(level=level))
+  def EndNodeBody(self,n):
+    self.fs.write("      </div>\n")
 
-	def EndNodeBody(self,n):
-		self.fs.write("      </div>\n")
+  def EndNode(self,n):
+    self.fs.write("      </section>\n")
 
-	def EndNode(self,n):
-		self.fs.write("      </section>\n")
+  def NodeHeading(self,n):
+    heading = html.escape(n.heading)
+    level = n.level + 1
+    self.fs.write("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
 
-	def NodeHeading(self,n):
-		heading = html.escape(n.heading)
-		level = n.level + 1
-		self.fs.write("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
+  def ClearAttributes(self):
+    self.attrs = {}
+    self.caption = None
 
-	def ClearAttributes(self):
-		self.attrs = {}
-		self.caption = None
+  def AttributesGather(self, l):
+    if(self.PreScanExportCommentsGather(l)):
+      return True
+    m = RE_CAPTION.match(l)
+    if(not hasattr(self, 'caption')):
+      self.caption = None
+    if(m):
+      self.caption = m.captures('caption')[0]
+      return True
+    m = RE_ATTR.match(l)
+    # We capture #+ATTR_HTML: lines
+    if(m):
+      keys = m.captures('name')
+      vals = m.captures('value')
+      if not hasattr(self,'attrs'):
+        self.attrs = {}
+      for i in range(len(keys)):
+        self.attrs[keys[i]] = vals[i]
+      return True
+    # We skip #+ATTR_ORG: lines
+    m = RE_ATTR_ORG.match(l)
+    if(m):
+      return True
+    return False
 
-	def ExportCommentsGather(self, l):
-		if not hasattr(self,'title'):
-			self.title = None
-		if not hasattr(self,'author'):
-			self.author = None
-		if not hasattr(self,'language'):
-			self.language = None
-		if not hasattr(self,'email'):
-			self.email = None
-		if not hasattr(self,'date'):
-			self.date = None
-		if not hasattr(self,'name'):
-			self.name = None
-		m = RE_TITLE.match(l)
-		if(m):
-			self.title = m.captures('data')[0]
-			return True
-		m = RE_AUTHOR.match(l)
-		if(m):
-			self.author = m.captures('data')[0]
-			return True
-		m = RE_LANGUAGE.match(l)
-		if(m):
-			self.language = m.captures('data')[0]
-			return True
-		m = RE_EMAIL.match(l)
-		if(m):
-			self.email = m.captures('data')[0]
-			return True
-		m = RE_DATE.match(l)
-		if(m):
-			self.date = m.captures('data')[0]
-			return True
-		m = RE_NAME.match(l)
-		if(m):
-			self.name = m.captures('data')[0]
-			return True
+  def EscAndLinks(self, l):
+    line = html.escape(l)
+    m = RE_LINK.search(line)
+    if(m):
+      link = m.group('link').strip()
+      desc = m.group('desc')
+      if(not desc):
+        desc = link
+      else:
+        desc = desc.strip()
+      if(link.endswith(".png") or link.endswith(".jpg") or link.endswith(".jpeg") or link.endswith(".gif")):
+        if(link.startswith("file:")):
+          link = re.sub(r'^file:','',link)  
+        extradata = ""  
+        if(self.commentName and self.commentName in link):
+          extradata =  " " + self.commentData
+          self.commentName = None
+        if(hasattr(self,'attrs')):
+          for key in self.attrs:
+            extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
+        preamble = ""
+        postamble = ""
+        if(hasattr(self,'caption') and self.caption):
+          preamble = "<div class=\"figure\"><p>"
+          postamble = "</p><p><span class=\"figure-number\">Figure {index}: </span>{caption}</p></div>".format(index=self.figureIndex,caption=self.caption)
+          self.figureIndex += 1
+        line = RE_LINK.sub("{preamble}<img src=\"{link}\" alt=\"{desc}\"{extradata}>{postamble}".format(preamble=preamble,link=link,desc=desc,extradata=extradata,postamble=postamble),line)
+        self.ClearAttributes()
+      else:
+        line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
+        self.ClearAttributes()
+    else:
+      line = RE_BOLD.sub(r"<b>\1</b>",line)
+      line = RE_ITALICS.sub(r"<i>\1</i>",line)
+      line = RE_UNDERLINE.sub(r"<u>\1</u>",line)
+      line = RE_STRIKETHROUGH.sub(r"<strike>\1</strike>",line)
+      line = RE_VERBATIM.sub(r"<pre>\1</pre>",line)
+      line = RE_CODE.sub(r"<code>\1</code>",line)
+      line = RE_STARTQUOTE.sub(r"<blockquote>",line)
+      line = RE_ENDQUOTE.sub(r"</blockquote>",line)
+      line = RE_STARTNOTE.sub(r'<aside class="notes">',line)
+      line = RE_ENDNOTE.sub(r"</aside>",line)
+      line = RE_CHECKBOX.sub(r'<input type="checkbox">',line)
+      line = RE_CHECKED_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
+      if(sets.Get("htmlExportPartialCheckboxChecked",True)):
+        line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
+      else:
+        line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox">',line)
+      line = RE_HR.sub(r'<hr>',line)
+    return line
 
-	def AttributesGather(self, l):
-		if(self.ExportCommentsGather(l)):
-			return True
-		m = RE_CAPTION.match(l)
-		if(not hasattr(self, 'caption')):
-			self.caption = None
-		if(m):
-			self.caption = m.captures('caption')[0]
-			return True
-		m = RE_ATTR.match(l)
-		# We capture #+ATTR_HTML: lines
-		if(m):
-			keys = m.captures('name')
-			vals = m.captures('value')
-			if not hasattr(self,'attrs'):
-				self.attrs = {}
-			for i in range(len(keys)):
-				self.attrs[keys[i]] = vals[i]
-			return True
-		# We skip #+ATTR_ORG: lines
-		m = RE_ATTR_ORG.match(l)
-		if(m):
-			return True
-		return False
+  def NodeBody(self,slide):
+    inDrawer = False
+    inResults= False
+    inUl     = 0
+    ulIndent = 0
+    inTable  = False
+    haveTableHeader = False
+    inSrc    = False
+    skipSrc  = False
+    exp      = None
+    for l in slide._lines[1:]:
+      if(self.AttributesGather(l)):
+        continue
+      if(inResults):
+        if(l.strip() == ""):
+          inResults = False
+        elif(RE_ENDSRC.search(l) or RE_END_DRAWER_LINE.search(l)):
+          inResults = False
+          continue
+        if(inResults):
+          if(exp == 'code' or exp == 'none'):
+            continue
+          else:
+            line = self.EscAndLinks(l)
+            self.fs.write("     " + line + "\n")
+            continue
+      if(inDrawer):
+        if(RE_END_DRAWER_LINE.search(l)):
+          inDrawer = False
+        continue
+      if(inTable):
+        if(RE_TABLE_ROW.search(l)):
+          if(RE_TABLE_SEPARATOR.search(l)):
+            continue
+          else:
+            tds = l.split('|')
+            if(len(tds) > 3):
+              # An actual table row, build a row
+              self.fs.write("    <tr>\n")
+              for td in tds[1:-1]:
+                if(haveTableHeader):
+                  self.fs.write("     <td>{0}</td>\n".format(self.EscAndLinks(td)))
+                else:
+                  self.fs.write("     <th>{0}</th>\n".format(self.EscAndLinks(td)))
+              haveTableHeader = True
+              # Fill in the tds
+              self.fs.write("    </tr>\n")
+              continue
+        else:
+          self.fs.write("    </table>\n")
+          inTable         = False
+          haveTableHeader = False
+      if(inSrc):
+        if(RE_ENDSRC.search(l)):
+          inSrc = False
+          if(skipSrc):
+            skipSrc = False
+            continue
+          self.fs.write("    </code></pre>\n")
+          continue
+        else:
+          if(not skipSrc):
+            self.fs.write("     " + l + "\n")
+          continue
+      # src block
+      m = RE_STARTSRC.search(l)
+      if(m):
+        inSrc = True
+        language = m.group('lang')
+        paramstr = l[len(m.group(0)):]
+        p = type('', (), {})() 
+        src.BuildFullParamList(p,language,paramstr,slide)
+        exp = p.params.Get("exports",None)
+        if(isinstance(exp,list) and len(exp) > 0):
+          exp = exp[0]
+        if(exp == 'results' or exp == 'none'):
+          skipSrc = True
+          continue
+        # Some languages we skip source by default
+        skipLangs = sets.Get("htmlDefaultSkipSrc",[])
+        if(exp == None and language == skipLangs):
+          skipSrc = True
+          continue
+        #params = {}
+        #for ps in RE_FN_MATCH.finditer(paramstr):
+        # params[ps.group(1)] = ps.group(2)
+        attribs = ""
+        # This is left over from reveal.
+        if(p.params.Get("data-line-numbers",None)):
+          attribs += " data-line-numbers=\"{nums}\"".format(nums=p.params.Get("data-line-numbers",""))
+        self.fs.write("    <pre><code language=\"{lang}\" {attribs}>\n".format(lang=mapLanguage(language),attribs=attribs))
+        continue
+      # property drawer
+      if(RE_DRAWER_LINE.search(l)):
+        inDrawer = True
+        continue
+      # scheduling
+      if(RE_SCHEDULING_LINE.search(l)):
+        continue
+      if(RE_RESULTS.search(l)):
+        inResults = True
+        continue
+      m = RE_COMMENT_TAG.search(l)
+      if(m):
+        self.commentData = m.group('props')
+        self.commentName = m.group('name')
+        continue
 
-	def EscAndLinks(self, l):
-		line = html.escape(l)
-		m = RE_LINK.search(line)
-		if(m):
-			link = m.group('link').strip()
-			desc = m.group('desc')
-			if(not desc):
-				desc = link
-			else:
-				desc = desc.strip()
-			if(link.endswith(".png") or link.endswith(".jpg") or link.endswith(".jpeg") or link.endswith(".gif")):
-				if(link.startswith("file:")):
-					link = re.sub(r'^file:','',link)	
-				extradata = ""	
-				if(self.commentName and self.commentName in link):
-					extradata =  " " + self.commentData
-					self.commentName = None
-				if(hasattr(self,'attrs')):
-					for key in self.attrs:
-						extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
-				preamble = ""
-				postamble = ""
-				if(hasattr(self,'caption') and self.caption):
-					preamble = "<div class=\"figure\"><p>"
-					postamble = "</p><p><span class=\"figure-number\">Figure {index}: </span>{caption}</p></div>".format(index=self.figureIndex,caption=self.caption)
-					self.figureIndex += 1
-				line = RE_LINK.sub("{preamble}<img src=\"{link}\" alt=\"{desc}\"{extradata}>{postamble}".format(preamble=preamble,link=link,desc=desc,extradata=extradata,postamble=postamble),line)
-				self.ClearAttributes()
-			else:
-				line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
-				self.ClearAttributes()
-		else:
-			line = RE_BOLD.sub(r"<b>\1</b>",line)
-			line = RE_ITALICS.sub(r"<i>\1</i>",line)
-			line = RE_UNDERLINE.sub(r"<u>\1</u>",line)
-			line = RE_STRIKETHROUGH.sub(r"<strike>\1</strike>",line)
-			line = RE_VERBATIM.sub(r"<pre>\1</pre>",line)
-			line = RE_CODE.sub(r"<code>\1</code>",line)
-			line = RE_STARTQUOTE.sub(r"<blockquote>",line)
-			line = RE_ENDQUOTE.sub(r"</blockquote>",line)
-			line = RE_STARTNOTE.sub(r'<aside class="notes">',line)
-			line = RE_ENDNOTE.sub(r"</aside>",line)
-			line = RE_CHECKBOX.sub(r'<input type="checkbox">',line)
-			line = RE_CHECKED_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
-			if(sets.Get("htmlExportPartialCheckboxChecked",True)):
-				line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
-			else:
-				line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox">',line)
-			line = RE_HR.sub(r'<hr>',line)
-		return line
+      m = RE_TABLE_ROW.search(l)
+      if(m):
+        self.fs.write("    <table>\n")
+        if(hasattr(self,'caption') and self.caption):
+          self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
+          self.tableIndex += 1
+          self.ClearAttributes()
+        if(not RE_TABLE_SEPARATOR.search(l)):
+          tds = l.split('|')
+          if(len(tds) > 3):
+            self.fs.write("    <tr>\n")
+            for td in tds[1:-1]:
+              self.fs.write("     <th>{0}</th>".format(self.EscAndLinks(td)))
+            self.fs.write("    </tr>\n")
+          haveTableHeader = True
+        inTable = True
+        continue
+      m = RE_UL.search(l)
+      if(m):
+        thisIndent = len(m.group('indent'))
+        if(not inUl):
+          ulIndent = thisIndent
+          self.fs.write("     <ul>\n")
+          inUl += 1
+        elif(thisIndent > ulIndent):
+          ulIndent = thisIndent
+          self.fs.write("     <ul>\n")
+          inUl += 1
+        elif(thisIndent < ulIndent and inUl > 1):
+          inUl -= 1
+          self.fs.write("     </ul>\n")
+        data = self.EscAndLinks(m.group('data'))
+        self.fs.write("     <li>{content}</li>\n".format(content=data))
+        continue
+      elif(inUl):
+        while(inUl > 0):
+          inUl -= 1
+          self.fs.write("     </ul>\n")
+      if(RE_EMPTY_LINE.search(l)):
+        self.fs.write("    <br>\n")
+      # Normal Write
+      line = self.EscAndLinks(l)
+      self.fs.write("     " + line + "\n")
+    if(inUl):
+      inUl -= 1
+      self.fs.write("     </ul>\n")
 
-	def NodeBody(self,slide):
-		inDrawer = False
-		inResults= False
-		inUl     = 0
-		ulIndent = 0
-		inTable  = False
-		haveTableHeader = False
-		inSrc    = False
-		skipSrc  = False
-		exp      = None
-		for l in slide._lines[1:]:
-			if(self.AttributesGather(l)):
-				continue
-			if(inResults):
-				if(l.strip() == ""):
-					inResults = False
-				elif(RE_ENDSRC.search(l) or RE_END_DRAWER_LINE.search(l)):
-					inResults = False
-					continue
-				if(inResults):
-					if(exp == 'code' or exp == 'none'):
-						continue
-					else:
-						line = self.EscAndLinks(l)
-						self.fs.write("     " + line + "\n")
-						continue
-			if(inDrawer):
-				if(RE_END_DRAWER_LINE.search(l)):
-					inDrawer = False
-				continue
-			if(inTable):
-				if(RE_TABLE_ROW.search(l)):
-					if(RE_TABLE_SEPARATOR.search(l)):
-						continue
-					else:
-						tds = l.split('|')
-						if(len(tds) > 3):
-							# An actual table row, build a row
-							self.fs.write("    <tr>\n")
-							for td in tds[1:-1]:
-								if(haveTableHeader):
-									self.fs.write("     <td>{0}</td>\n".format(self.EscAndLinks(td)))
-								else:
-									self.fs.write("     <th>{0}</th>\n".format(self.EscAndLinks(td)))
-							haveTableHeader = True
-							# Fill in the tds
-							self.fs.write("    </tr>\n")
-							continue
-				else:
-					self.fs.write("    </table>\n")
-					inTable         = False
-					haveTableHeader = False
-			if(inSrc):
-				if(RE_ENDSRC.search(l)):
-					inSrc = False
-					if(skipSrc):
-						skipSrc = False
-						continue
-					self.fs.write("    </code></pre>\n")
-					continue
-				else:
-					if(not skipSrc):
-						self.fs.write("     " + l + "\n")
-					continue
-			# src block
-			m = RE_STARTSRC.search(l)
-			if(m):
-				inSrc = True
-				language = m.group('lang')
-				paramstr = l[len(m.group(0)):]
-				p = type('', (), {})() 
-				src.BuildFullParamList(p,language,paramstr,slide)
-				exp = p.params.Get("exports",None)
-				if(isinstance(exp,list) and len(exp) > 0):
-					exp = exp[0]
-				if(exp == 'results' or exp == 'none'):
-					skipSrc = True
-					continue
-				# Some languages we skip source by default
-				skipLangs = sets.Get("htmlDefaultSkipSrc",[])
-				if(exp == None and language == skipLangs):
-					skipSrc = True
-					continue
-				#params = {}
-				#for ps in RE_FN_MATCH.finditer(paramstr):
-				#	params[ps.group(1)] = ps.group(2)
-				attribs = ""
-				# This is left over from reveal.
-				if(p.params.Get("data-line-numbers",None)):
-					attribs += " data-line-numbers=\"{nums}\"".format(nums=p.params.Get("data-line-numbers",""))
-				self.fs.write("    <pre><code language=\"{lang}\" {attribs}>\n".format(lang=mapLanguage(language),attribs=attribs))
-				continue
-			# property drawer
-			if(RE_DRAWER_LINE.search(l)):
-				inDrawer = True
-				continue
-			# scheduling
-			if(RE_SCHEDULING_LINE.search(l)):
-				continue
-			if(RE_RESULTS.search(l)):
-				inResults = True
-				continue
-			m = RE_COMMENT_TAG.search(l)
-			if(m):
-				self.commentData = m.group('props')
-				self.commentName = m.group('name')
-				continue
+    pass
 
-			m = RE_TABLE_ROW.search(l)
-			if(m):
-				self.fs.write("    <table>\n")
-				if(hasattr(self,'caption') and self.caption):
-					self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
-					self.tableIndex += 1
-					self.ClearAttributes()
-				if(not RE_TABLE_SEPARATOR.search(l)):
-					tds = l.split('|')
-					if(len(tds) > 3):
-						self.fs.write("    <tr>\n")
-						for td in tds[1:-1]:
-							self.fs.write("     <th>{0}</th>".format(self.EscAndLinks(td)))
-						self.fs.write("    </tr>\n")
-					haveTableHeader = True
-				inTable = True
-				continue
-			m = RE_UL.search(l)
-			if(m):
-				thisIndent = len(m.group('indent'))
-				if(not inUl):
-					ulIndent = thisIndent
-					self.fs.write("     <ul>\n")
-					inUl += 1
-				elif(thisIndent > ulIndent):
-					ulIndent = thisIndent
-					self.fs.write("     <ul>\n")
-					inUl += 1
-				elif(thisIndent < ulIndent and inUl > 1):
-					inUl -= 1
-					self.fs.write("     </ul>\n")
-				data = self.EscAndLinks(m.group('data'))
-				self.fs.write("     <li>{content}</li>\n".format(content=data))
-				continue
-			elif(inUl):
-				while(inUl > 0):
-					inUl -= 1
-					self.fs.write("     </ul>\n")
-			if(RE_EMPTY_LINE.search(l)):
-				self.fs.write("    <br>\n")
-			# Normal Write
-			line = self.EscAndLinks(l)
-			self.fs.write("     " + line + "\n")
-		if(inUl):
-			inUl -= 1
-			self.fs.write("     </ul>\n")
+  def StartBody(self):
+    self.fs.write("  <body>\n")
+    data = GetHeadingData(self.style, self.file)
+    if(data):
+      self.fs.write(data)
 
-		pass
+  def EndBody(self):
+    data = GetFootingData(self.style, self.file)
+    if(data):
+      self.fs.write(data)
+    self.fs.write("  </body>\n")
 
-	def StartBody(self):
-		self.fs.write("  <body>\n")
-		data = GetHeadingData(self.style, self.file)
-		if(data):
-			self.fs.write(data)
+  def InsertScripts(self,file):
+    self.InsertJs(GetHighlightJs())
+    self.fs.write("<script>hljs.initHighlightingOnLoad();</script>\n")
+    self.InsertJs(GetCollapsibleCode())
 
-	def EndBody(self):
-		data = GetFootingData(self.style, self.file)
-		if(data):
-			self.fs.write(data)
-		self.fs.write("  </body>\n")
+  def Postamble(self):
+    self.fs.write("<div id=\"postamble\" class=\"status\">")
+    if(self.date):
+      self.fs.write("<p class=\"date\">Date: {date}</p>".format(date=self.date))
+    if(self.author):
+      self.fs.write("<p class=\"author\">Author: {author}</p>".format(author=self.author))
+    self.fs.write("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
+    self.fs.write("</div>")
 
-	def InsertScripts(self,file):
-		self.InsertJs(GetHighlightJs())
-		self.fs.write("<script>hljs.initHighlightingOnLoad();</script>\n")
-		self.InsertJs(GetCollapsibleCode())
-
-	def Postamble(self):
-		self.fs.write("<div id=\"postamble\" class=\"status\">")
-		if(self.date):
-			self.fs.write("<p class=\"date\">Date: {date}</p>".format(date=self.date))
-		if(self.author):
-			self.fs.write("<p class=\"author\">Author: {author}</p>".format(author=self.author))
-		self.fs.write("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
-		self.fs.write("</div>")
-
-	def Close(self):
-		self.Postamble()
-		self.fs.write("</html>\n")
-		self.fs.close()
-
+  def FinishDoc(self):
+    self.Postamble()
+    self.fs.write("</html>\n")
 
 # Export the entire file using our internal exporter
 class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
-	def build_head(self, doc):
-		highlight      = GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
-		doc.AddInlineStyle(GetHighlightJsCss(highlight))
-		doc.AddInlineStyle(GetCollapsibleCss())
-		doc.AddInlineStyle(GetStyleData(self.style, self.file))
-		doc.AddExportMeta()
+  def build_head(self, doc):
+    highlight      = GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
+    doc.AddInlineStyle(GetHighlightJsCss(highlight))
+    doc.AddInlineStyle(GetCollapsibleCss())
+    doc.AddInlineStyle(GetStyleData(self.style, self.file))
+    doc.AddExportMeta()
 
-	def build_node(self, doc, n):
-		doc.StartNode(n)
-		doc.NodeHeading(n)
-		doc.StartNodeBody(n)
-		doc.NodeBody(n)
-		for c in n.children:
-			self.build_node(doc, c)
-		doc.EndNodeBody(n)
-		doc.EndNode(n)
+  def build_node(self, doc, n):
+    doc.StartNode(n)
+    doc.NodeHeading(n)
+    doc.StartNodeBody(n)
+    doc.NodeBody(n)
+    for c in n.children:
+      self.build_node(doc, c)
+    doc.EndNodeBody(n)
+    doc.EndNode(n)
 
-	def build_nodes(self, doc):
-		if(self.index == None):
-			nodes = self.file.org
-			for n in nodes.children:
-				self.build_node(doc, n)
-		else:
-			n = self.file.org.env._nodes[self.index]
-			self.build_node(doc,n)
+  def build_nodes(self, doc):
+    if(self.index == None):
+      nodes = self.file.org
+      for n in nodes.children:
+        self.build_node(doc, n)
+    else:
+      n = self.file.org.env._nodes[self.index]
+      self.build_node(doc,n)
 
-	def build_document(self, doc):
-		doc.StartNodes()
-		self.build_nodes(doc)
-		doc.EndNodes()
+  def build_document(self, doc):
+    doc.StartNodes()
+    self.build_nodes(doc)
+    doc.EndNodes()
 
-	def build_body(self, doc):
-		doc.StartDocument(self.file)
-		self.build_document(doc)
-		doc.EndDocument()
-		doc.InsertScripts(self.file)
+  def build_body(self, doc):
+    doc.StartDocument(self.file)
+    self.build_document(doc)
+    doc.EndDocument()
+    doc.InsertScripts(self.file)
 
-	def OnDoneSourceBlockExecution(self):
-		# Reload if necessary
-		self.file = db.Get().FindInfo(self.view)
-		doc = None
-		self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
-		log.log(51,"EXPORT STYLE: " + self.style)
-		try:
-			outputFilename = HtmlFilename(self.view,self.suffix)
-			doc = HtmlDoc(outputFilename, self.file)
-			doc.style = self.style
-			doc.StartHead()
-			self.build_head(doc)
-			doc.EndHead()
+  def OnDoneSourceBlockExecution(self):
+    # Reload if necessary
+    self.file = db.Get().FindInfo(self.view)
+    doc = None
+    self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
+    log.log(51,"EXPORT STYLE: " + self.style)
+    try:
+      outputFilename = HtmlFilename(self.view,self.suffix)
+      doc = HtmlDoc(outputFilename, self.file)
+      doc.style = self.style
+      doc.StartHead()
+      self.build_head(doc)
+      doc.EndHead()
 
-			doc.StartBody()
-			self.build_body(doc)
-			doc.EndBody()
-		finally:	
-			if(None != doc):
-				doc.Close()
-			log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
-			self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
-			sublime.set_timeout(self.clear_status, 1000*10)
-			evt.EmitIf(self.onDone)
+      doc.StartBody()
+      self.build_body(doc)
+      doc.EndBody()
+    finally:  
+      if(None != doc):
+        doc.Close()
+      log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
+      self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
+      sublime.set_timeout(self.clear_status, 1000*10)
+      evt.EmitIf(self.onDone)
 
 
-	def run(self,edit, onDone=None, index=None, suffix=""):
-		self.file = db.Get().FindInfo(self.view)
-		self.onDone = onDone
-		self.suffix = suffix
-		if(index != None):
-			self.index = index
-		else:
-			self.index = None
-		if(None == self.file):
-			log.error("Not an org file? Cannot build reveal document")
-			evt.EmitIf(onDone)	
-			return
-		if(sets.Get("htmlExecuteSourceOnExport",True)):
-			self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
-		else:
-			self.OnDoneSourceBlockExecution()
+  def run(self,edit, onDone=None, index=None, suffix=""):
+    self.file = db.Get().FindInfo(self.view)
+    self.onDone = onDone
+    self.suffix = suffix
+    if(index != None):
+      self.index = index
+    else:
+      self.index = None
+    if(None == self.file):
+      log.error("Not an org file? Cannot build reveal document")
+      evt.EmitIf(onDone)  
+      return
+    if(sets.Get("htmlExecuteSourceOnExport",True)):
+      self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
+    else:
+      self.OnDoneSourceBlockExecution()
 
-	def clear_status(self):
-		self.view.set_status("ORG_EXPORT","")
+  def clear_status(self):
+    self.view.set_status("ORG_EXPORT","")
 
 def sync_up_on_closed():
-	notice.Get().BuildToday()
+  notice.Get().BuildToday()
 
 
 class OrgDownloadHighlighJs(sublime_plugin.TextCommand):
-	def run(self,edit):
-		log.info("Trying to download highlightjs")
-		import OrgExtended.orgutil.webpull as wp
-		wp.download_highlightjs()
+  def run(self,edit):
+    log.info("Trying to download highlightjs")
+    import OrgExtended.orgutil.webpull as wp
+    wp.download_highlightjs()
 
 class OrgExportSubtreeAsOrgHtmlCommand(sublime_plugin.TextCommand):
-	def OnDone(self):
-		evt.EmitIf(self.onDone)
+  def OnDone(self):
+    evt.EmitIf(self.onDone)
 
-	def run(self,edit,onDone=None):
-		self.onDone = onDone
-		n = db.Get().AtInView(self.view)
-		if(n == None):
-			log.error(" Failed to find node! Subtree cannot be exported!")
-			return
-		index = 0
-		for i in range(0,len(n.env._nodes)):
-			if(n == n.env._nodes[i]):
-				index = i
-		if(index == 0):
-			log.error(" Failed to find node in file! Something is wrong. Cannot export subtree!")
-			return
-		self.view.run_command('org_export_file_org_html', {"onDone": evt.Make(self.OnDone), "index": index, "suffix":"_subtree"})
+  def run(self,edit,onDone=None):
+    self.onDone = onDone
+    n = db.Get().AtInView(self.view)
+    if(n == None):
+      log.error(" Failed to find node! Subtree cannot be exported!")
+      return
+    index = 0
+    for i in range(0,len(n.env._nodes)):
+      if(n == n.env._nodes[i]):
+        index = i
+    if(index == 0):
+      log.error(" Failed to find node in file! Something is wrong. Cannot export subtree!")
+      return
+    self.view.run_command('org_export_file_org_html', {"onDone": evt.Make(self.OnDone), "index": index, "suffix":"_subtree"})
