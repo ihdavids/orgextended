@@ -265,4 +265,7 @@
     // During Html export some language types we skip exporting source by default unless the user
     // has explicitly overriden the export. This option lets you control which languages we do that for.
     "htmlDefaultSkipSrc": ["plantuml","graphviz","ditaa","gnuplot"], 
+
+    // Should we execute our source blocks on export?
+    "htmlExecuteSourceOnExport": true,
 }

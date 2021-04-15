@@ -473,7 +473,6 @@ class HtmlDoc:
 					inResults = False
 					continue
 				if(inResults):
-					print(str(l) + " -> " + str(exp))
 					if(exp == 'code' or exp == 'none'):
 						continue
 					else:
@@ -682,21 +681,14 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 		doc.EndDocument()
 		doc.InsertScripts(self.file)
 
-	def run(self,edit, onDone=None,index=None,suffix=""):
+	def OnDoneSourceBlockExecution(self):
+		# Reload if necessary
 		self.file = db.Get().FindInfo(self.view)
-		if(index != None):
-			self.index = index
-		else:
-			self.index = None
-		if(None == self.file):
-			log.error("Not an org file? Cannot build reveal document")
-			evt.EmitIf(onDone)	
-			return
 		doc = None
 		self.style = GetGlobalOption(self.file,"HTML_STYLE","HtmlStyle","blocky").lower()
 		log.log(51,"EXPORT STYLE: " + self.style)
 		try:
-			outputFilename = HtmlFilename(self.view,suffix)
+			outputFilename = HtmlFilename(self.view,self.suffix)
 			doc = HtmlDoc(outputFilename, self.file)
 			doc.style = self.style
 			doc.StartHead()
@@ -712,7 +704,26 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
 			log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
 			self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
 			sublime.set_timeout(self.clear_status, 1000*10)
-			evt.EmitIf(onDone)
+			evt.EmitIf(self.onDone)
+
+
+	def run(self,edit, onDone=None, index=None, suffix=""):
+		self.file = db.Get().FindInfo(self.view)
+		self.onDone = onDone
+		self.suffix = suffix
+		if(index != None):
+			self.index = index
+		else:
+			self.index = None
+		if(None == self.file):
+			log.error("Not an org file? Cannot build reveal document")
+			evt.EmitIf(onDone)	
+			return
+		if(sets.GetBool("htmlExecuteSourceOnExport",True)):
+			self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
+		else:
+			self.OnDoneSourceBlockExecution()
+
 	def clear_status(self):
 		self.view.set_status("ORG_EXPORT","")
 

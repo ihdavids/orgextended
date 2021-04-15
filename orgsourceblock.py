@@ -170,6 +170,10 @@ class NoWebRefCache:
 
 refCache = NoWebRefCache()
 
+def IsSourceBlockStartFence(view,row):
+    line = view.getLine(row)
+    return RE_SRC_BLOCK.search(line)
+
 def IsSourceBlock(view,at=None):
     if(None == at):
         at = view.sel()[0].begin()
@@ -607,10 +611,10 @@ class TableHandler(ResultsHandler):
 
 
 class OrgExecuteSourceBlockCommand(sublime_plugin.TextCommand):
-    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
+    def run(self,edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None,amExporting=False):
         value = str(uuid.uuid4())
         self.exc = OrgExecuteSourceBlock(self.view,value)
-        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning)
+        self.exc.run(edit,onDone,onDoneResultsPos,onDoneFnName,at,silent,onAdjustParams,skipSaveWarning,amExporting)
 
 
 def FormatParam(x):
@@ -864,12 +868,13 @@ class OrgExecuteSourceBlock:
             return
         self.view.run_command("org_execute_source_block", {"onDone": self.onDone})
 
-    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None):
+    def run(self, edit, onDone=None, onDoneResultsPos=None,onDoneFnName=None,at=None,silent=None,onAdjustParams=None,skipSaveWarning=None,amExporting=False):
         self.onDone = onDone
         self.onDoneResultsPos = onDoneResultsPos
         self.onDoneFnName=onDoneFnName
         self.silent = silent
         self.onAdjustParams = onAdjustParams
+        self.amExporting = amExporting
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
@@ -1066,8 +1071,7 @@ class OrgExecuteSourceBlock:
                 self.QueryCheckExecute()
 
     def AmExporting(self):
-        # TODO Make this true when exporting
-        return False
+        return self.amExporting
 
     # We may not want to execute. This is a barrier to ACTUALLY executing this block!
     # We support querying the user and just bailing if need be.
@@ -1488,22 +1492,29 @@ class OrgExecuteInlineSourceBlockCommand(sublime_plugin.TextCommand):
 # ================================================================================
 class OrgExecuteAllSourceBlocksCommand(sublime_plugin.TextCommand):
     def ContinueRun(self):
-        # I have to go bottom to top in case my 
+        # I have to go bottom to top 
         for r in range(self.cur,0,-1):
             self.cur = r
-            pt = self.view.text_point(r,1)
-            if(self.inBlock and IsSourceBlock(self.view,pt)):
-                self.view.run_command('org_execute_source_block',{"at":pt,"onDone":evt.Make(self.continueRun)})
+            pt = self.view.text_point(r,0)
+            line = self.view.line(pt)
+            txt = self.view.substr(line)
+            if(self.inBlock and IsSourceBlockStartFence(self.view,r)):
+                self.cur -= 1
+                self.view.run_command('org_execute_source_block',{"at":pt,"onDone":evt.Make(self.ContinueRun),"amExporting":self.amExporting,"skipSaveWarning": True})
                 self.inBlock = False
                 break
             elif(not self.inBlock and IsEndSourceBlock(self.view,pt)):
                 self.inBlock = True
+        if(self.cur <= 1):
+            evt.EmitIf(self.onDone)
 
-    def run(self,edit,at=None):
+    def run(self,edit,at=None,onDone=None,amExporting=False):
         # Do we want to avoid re-execution?
         self.last_row = self.view.endRow()
         self.cur = self.last_row
         self.inBlock = False
+        self.onDone = onDone
+        self.amExporting = amExporting
         self.ContinueRun()
 
 

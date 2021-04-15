@@ -11,4 +11,13 @@
       "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
 	#+END_EXAMPLE
 
-	
+*** Skip Source 
+
+	Some source formats it is handy to always skip the source and only include results.
+	We have added a list of formats where this overrides the defaults (listed above) for convenience:
+
+	#+BEGIN_EXAMPLE
+    "htmlDefaultSkipSrc": ["plantuml","graphviz","ditaa","gnuplot"], 
+	#+END_EXAMPLE
+
+	Remove this list if you would like to always have explicit control with the exports keyword.
