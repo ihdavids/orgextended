@@ -20,6 +20,14 @@ RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
 RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
 RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
 
+RE_BOLD = re.compile(r"\*(?P<data>.+)\*")
+RE_ITALICS = re.compile(r"/(?P<data>.+)/")
+RE_UNDERLINE = re.compile(r"_(?P<data>.+)_")
+RE_STRIKETHROUGH = re.compile(r"\+(?P<data>.+)\+")
+RE_CODE = re.compile(r"~(?P<data>.+)~")
+RE_VERBATIM = re.compile(r"=(?P<data>.+)=")
+
+RE_HR = re.compile(r"^((\s*-----+\s*)|(\s*---\s+[a-zA-Z0-9 ]+\s+---\s*))$")
 
 def ExportFilename(view,extension,suffix=""):
 	fn = view.file_name()

@@ -123,12 +123,6 @@ RE_DRAWER_LINE = re.compile(r"^\s*[:].+[:]\s*$")
 RE_END_DRAWER_LINE = re.compile(r"^\s*[:](END|end)[:]\s*$")
 RE_LINK = re.compile(r"\[\[(?P<link>[^\]]+)\](\[(?P<desc>[^\]]+)\])?\]")
 RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
-RE_BOLD = re.compile(r"\*(?P<data>.+)\*")
-RE_ITALICS = re.compile(r"/(?P<data>.+)/")
-RE_UNDERLINE = re.compile(r"_(?P<data>.+)_")
-RE_STRIKETHROUGH = re.compile(r"\+(?P<data>.+)\+")
-RE_CODE = re.compile(r"~(?P<data>.+)~")
-RE_VERBATIM = re.compile(r"=(?P<data>.+)=")
 RE_STARTQUOTE = re.compile(r"#\+(BEGIN_QUOTE|BEGIN_EXAMPLE|BEGIN_VERSE|BEGIN_CENTER|begin_quote|begin_example|begin_verse|begin_center)")
 RE_ENDQUOTE = re.compile(r"#\+(END_QUOTE|END_EXAMPLE|END_VERSE|END_CENTER|end_quote|end_example|end_verse|end_center)")
 RE_STARTNOTE = re.compile(r"#\+(BEGIN_NOTES|begin_notes)")
@@ -143,7 +137,6 @@ RE_CHECKBOX         = re.compile(r"^\[ \] ")
 RE_CHECKED_CHECKBOX = re.compile(r"^\[[xX]\] ")
 RE_PARTIAL_CHECKBOX = re.compile(r"^\[[-]\] ")
 RE_EMPTY_LINE = re.compile(r"^\s*$")
-RE_HR = re.compile(r"^((\s*-----+\s*)|(\s*---\s+[a-zA-Z0-9 ]+\s+---\s*))$")
 
 
 # <!-- multiple_stores height="50%" width="50%" --> 
@@ -373,12 +366,12 @@ class HtmlDoc(exp.OrgExporter):
         line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
         self.ClearAttributes()
     else:
-      line = RE_BOLD.sub(r"<b>\1</b>",line)
-      line = RE_ITALICS.sub(r"<i>\1</i>",line)
-      line = RE_UNDERLINE.sub(r"<u>\1</u>",line)
-      line = RE_STRIKETHROUGH.sub(r"<strike>\1</strike>",line)
-      line = RE_VERBATIM.sub(r"<pre>\1</pre>",line)
-      line = RE_CODE.sub(r"<code>\1</code>",line)
+      line = exp.RE_BOLD.sub(r"<b>\1</b>",line)
+      line = exp.RE_ITALICS.sub(r"<i>\1</i>",line)
+      line = exp.RE_UNDERLINE.sub(r"<u>\1</u>",line)
+      line = exp.RE_STRIKETHROUGH.sub(r"<strike>\1</strike>",line)
+      line = exp.RE_VERBATIM.sub(r"<pre>\1</pre>",line)
+      line = exp.RE_CODE.sub(r"<code>\1</code>",line)
       line = RE_STARTQUOTE.sub(r"<blockquote>",line)
       line = RE_ENDQUOTE.sub(r"</blockquote>",line)
       line = RE_STARTNOTE.sub(r'<aside class="notes">',line)
@@ -389,7 +382,7 @@ class HtmlDoc(exp.OrgExporter):
         line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox" checked>',line)
       else:
         line = RE_PARTIAL_CHECKBOX.sub(r'<input type="checkbox">',line)
-      line = RE_HR.sub(r'<hr>',line)
+      line = exp.RE_HR.sub(r'<hr>',line)
     return line
 
   def NodeBody(self,slide):

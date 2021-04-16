@@ -79,10 +79,10 @@ class LatexDoc(exp.OrgExporter):
     def Escape(self,str):
         str,cnt = self.SingleLineReplacements(str)
         if(not cnt):
-            return self.TexEscape(str)
-        return str
+            return self.TexFullEscape(str)
+        return self.TexCommandEscape(str)
 
-    def TexEscape(self,text):
+    def TexFullEscape(self,text):
         conv = {
         '&': r'\&',
         '%': r'\%',
@@ -94,6 +94,21 @@ class LatexDoc(exp.OrgExporter):
         '~': r'\textasciitilde{}',
         '^': r'\^{}',
         '\\': r'\textbackslash{}',
+        '<': r'\textless{}',
+        '>': r'\textgreater{}',
+        }
+        cleanre = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
+        return cleanre.sub(lambda match: conv[match.group()], text)        
+    
+    def TexCommandEscape(self,text):
+        conv = {
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '_': r'\_',
+        '~': r'\textasciitilde{}',
+        '^': r'\^{}',
         '<': r'\textless{}',
         '>': r'\textgreater{}',
         }
@@ -113,6 +128,13 @@ class LatexDoc(exp.OrgExporter):
         text = exp.RE_EMAIL.sub("",text)
         text = exp.RE_DATE.sub("",text)
         text,didRep = self.SingleLineReplace(exp.RE_NAME,r"\label{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_BOLD,r"\\textbf{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_ITALICS,r"\\textit{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_UNDERLINE,r"\underline{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_CODE,r"\\texttt{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_VERBATIM,r"\\texttt{{\g<data>}}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_HR,r"\hrulefill",text,didRep)
+
         return (text,didRep)
 
 
