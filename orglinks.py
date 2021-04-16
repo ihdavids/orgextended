@@ -391,47 +391,50 @@ class ImageHandler:
         """
         Determine the image type of img and return its size.
         """
-        print("IMG: " + img)
-        with open(img, 'rb') as f:
-            head = f.read(24)
-            ttype = None
+        #print("IMG: " + img)
+        try:
+            with open(img, 'rb') as f:
+                head = f.read(24)
+                ttype = None
 
-            if b'<svg' in head:
-                ttype = 'svg'
-                width, height = (100,100)
-                return width, height, ttype
-            if len(head) != 24:
-                return
-            if imghdr.what(img) == 'png':
-                ttype = "png"
-                check = struct.unpack('>i', head[4:8])[0]
-                if check != 0x0d0a1a0a:
+                if b'<svg' in head:
+                    ttype = 'svg'
+                    width, height = (100,100)
+                    return width, height, ttype
+                if len(head) != 24:
                     return
-                width, height = struct.unpack('>ii', head[16:24])
-            elif imghdr.what(img) == 'gif':
-                ttype = "gif"
-                width, height = struct.unpack('<HH', head[6:10])
-            elif imghdr.what(img) == 'jpeg':
-                ttype = "jpeg"
-                try:
-                    f.seek(0)  # Read 0xff next
-                    size = 2
-                    ftype = 0
-                    while not 0xc0 <= ftype <= 0xcf:
-                        f.seek(size, 1)
-                        byte = f.read(1)
-                        while ord(byte) == 0xff:
+                if imghdr.what(img) == 'png':
+                    ttype = "png"
+                    check = struct.unpack('>i', head[4:8])[0]
+                    if check != 0x0d0a1a0a:
+                        return
+                    width, height = struct.unpack('>ii', head[16:24])
+                elif imghdr.what(img) == 'gif':
+                    ttype = "gif"
+                    width, height = struct.unpack('<HH', head[6:10])
+                elif imghdr.what(img) == 'jpeg':
+                    ttype = "jpeg"
+                    try:
+                        f.seek(0)  # Read 0xff next
+                        size = 2
+                        ftype = 0
+                        while not 0xc0 <= ftype <= 0xcf:
+                            f.seek(size, 1)
                             byte = f.read(1)
-                        ftype = ord(byte)
-                        size = struct.unpack('>H', f.read(2))[0] - 2
-                    # SOFn block
-                    f.seek(1, 1)  # skip precision byte.
-                    height, width = struct.unpack('>HH', f.read(4))
-                except Exception:
+                            while ord(byte) == 0xff:
+                                byte = f.read(1)
+                            ftype = ord(byte)
+                            size = struct.unpack('>H', f.read(2))[0] - 2
+                        # SOFn block
+                        f.seek(1, 1)  # skip precision byte.
+                        height, width = struct.unpack('>HH', f.read(4))
+                    except Exception:
+                        return
+                else:
                     return
-            else:
-                return
-            return width, height, ttype
+                return width, height, ttype
+        except:
+            return 100,100,'png'
 
 class OrgCycleImagesCommand(sublime_plugin.TextCommand):
     def OnDone(self):

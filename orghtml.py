@@ -579,6 +579,16 @@ class HtmlDoc(exp.OrgExporter):
     self.Postamble()
     self.fs.write("</html>\n")
 
+class HtmlExportHelper(exp.OrgExportHelper):
+  def __init__(self,view,index):
+    super(HtmlExportHelper,self).__init__(view,index)
+
+  def CustomBuildHead(self):
+    highlight      = exp.GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
+    self.doc.AddInlineStyle(GetHighlightJsCss(highlight))
+    self.doc.AddInlineStyle(GetCollapsibleCss())
+    self.doc.AddInlineStyle(GetStyleData(self.doc.style, self.file))
+
 # Export the entire file using our internal exporter
 class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
   def build_head(self, doc):
@@ -626,21 +636,18 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
     log.log(51,"EXPORT STYLE: " + self.style)
     try:
       outputFilename = exp.ExportFilename(self.view,".html", self.suffix)
-      doc = HtmlDoc(outputFilename, self.file)
-      doc.style = self.style
-      doc.StartHead()
-      self.build_head(doc)
-      doc.EndHead()
+      doc            = HtmlDoc(outputFilename, self.file)
+      doc.style      = self.style
+      self.helper    = HtmlExportHelper(self.view, self.index)
+      self.helper.Run(outputFilename, doc)
+      #doc.StartHead()
+      #self.build_head(doc)
+      #doc.EndHead()
 
-      doc.StartBody()
-      self.build_body(doc)
-      doc.EndBody()
+      #doc.StartBody()
+      #self.build_body(doc)
+      #doc.EndBody()
     finally:  
-      if(None != doc):
-        doc.Close()
-      log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
-      self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
-      sublime.set_timeout(self.clear_status, 1000*10)
       evt.EmitIf(self.onDone)
 
 

@@ -1,3 +1,5 @@
+import sublime
+import sublime_plugin
 import re
 import regex
 from pathlib import Path
@@ -7,6 +9,7 @@ import logging
 import sys
 import traceback 
 import OrgExtended.asettings as sets
+import OrgExtended.orgdb as db
 
 log = logging.getLogger(__name__)
 
@@ -92,3 +95,73 @@ class OrgExporter:
 	def Close(self):
 		self.FinishDoc()
 		self.fs.close()
+
+
+
+class OrgExportHelper:
+
+	def __init__(self,view,index):
+		self.view = view
+		self.file = db.Get().FindInfo(self.view)
+		self.index = index
+
+
+	# Extend this for this format
+	def CustomBuildHead(self):
+		pass
+
+	def BuildHead(self):
+		self.CustomBuildHead()
+		self.doc.AddExportMeta()
+
+	def BuildNode(self, n):
+		self.doc.StartNode(n)
+		self.doc.NodeHeading(n)
+		self.doc.StartNodeBody(n)
+		self.doc.NodeBody(n)
+		for c in n.children:
+			self.BuildNode(c)
+		self.doc.EndNodeBody(n)
+		self.doc.EndNode(n)
+
+	def BuildNodes(self):
+		if(self.index == None):
+			nodes = self.file.org
+			for n in nodes.children:
+				self.BuildNode(n)
+		else:
+			n = self.file.org.env._nodes[self.index]
+			self.BuildNode(n)
+
+	def BuildDocument(self):
+		self.doc.StartNodes()
+		self.BuildNodes()
+		self.doc.EndNodes()
+
+	def BuildBody(self):
+		self.doc.StartDocument(self.file)
+		self.BuildDocument()
+		self.doc.EndDocument()
+		self.doc.InsertScripts(self.file)
+
+	def Run(self,outputFilename,doc):
+		try:
+			self.doc = doc
+			self.doc.StartHead()
+			self.BuildHead()
+			self.doc.EndHead()
+
+			self.doc.StartBody()
+			self.BuildBody()
+			self.doc.EndBody()
+		finally:	
+			if(None != self.doc):
+				self.doc.Close()
+			log.log(51,"EXPORT COMPLETE: " + str(outputFilename))
+			self.view.set_status("ORG_EXPORT","EXPORT COMPLETE: " + str(outputFilename))
+			sublime.set_timeout(self.ClearStatus, 1000*10)
+
+	def ClearStatus(self):
+		self.view.set_status("ORG_EXPORT","")
+
+
