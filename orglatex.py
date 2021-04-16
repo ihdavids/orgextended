@@ -77,7 +77,10 @@ class LatexDoc(exp.OrgExporter):
         pass 
 
     def Escape(self,str):
-        return self.TexEscape(str)
+        str,cnt = self.SingleLineReplacements(str)
+        if(not cnt):
+            return self.TexEscape(str)
+        return str
 
     def TexEscape(self,text):
         conv = {
@@ -96,6 +99,22 @@ class LatexDoc(exp.OrgExporter):
         }
         cleanre = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
         return cleanre.sub(lambda match: conv[match.group()], text)        
+
+    def SingleLineReplace(self,reg,rep,text,ok):
+        nt = reg.sub(rep,text)
+        ok = ok or nt != text
+        return (nt,ok)
+
+    def SingleLineReplacements(self,text):
+        didRep = False
+        text = exp.RE_TITLE.sub("",text)
+        text = exp.RE_AUTHOR.sub("",text)
+        text = exp.RE_LANGUAGE.sub("",text)
+        text = exp.RE_EMAIL.sub("",text)
+        text = exp.RE_DATE.sub("",text)
+        text,didRep = self.SingleLineReplace(exp.RE_NAME,r"\label{{\g<data>}}",text,didRep)
+        return (text,didRep)
+
 
     # Export the heading of this node
     def NodeHeading(self,n):
