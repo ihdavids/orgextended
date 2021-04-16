@@ -77,25 +77,82 @@ class OrgExporter:
 			self.name = m.captures('data')[0]
 			return True
 
-
+	# Called at the start of export to scan the file for game changing properties
 	def PreScan(self):
 		for l in self.file.org._lines:
 			self.PreScanExportCommentsGather(l)
 			self.PreScanCustom(l)
+	
+	# This is called when the document is being destroyed
+	def Close(self):
+		self.FinishDocCustom()
+		self.fs.close()
 
 	# Override this to add to the pre-scan phase
 	def PreScanCustom(self,l):
 		pass
 
 	# Override this to close off the document for exporting
-	def FinishDoc(self):
+	def FinishDocCustom(self):
 		pass
 
-	# This is called when the document is being destroyed
-	def Close(self):
-		self.FinishDoc()
-		self.fs.close()
 
+	# Document header metadata should go in here
+	def AddExportMetaCustom(self):
+		pass
+
+	# Setup to start the export of a node
+	def StartNode(self, n):
+		pass 
+
+	# Export the heading of this node
+	def NodeHeading(self,n):
+		pass
+
+	# We are about to start exporting the nodes body
+	def StartNodeBody(self,n):
+		pass
+
+	# Actually buid the node body in the document
+	def NodeBody(self,n):
+		pass
+
+	# We are done exporting the nodes body so finish it off
+	def EndNodeBody(self,n):
+		pass
+
+	# We are now done the node itself so finish that off
+	def EndNode(self,n):
+		pass
+
+	# def about to start exporting nodes
+	def StartNodes(self):
+		pass
+
+	# done exporting nodes
+	def EndNodes(self):
+		pass
+
+	def StartDocument(self, file):
+		pass
+
+	def EndDocument(self):
+		pass
+
+	def InsertScripts(self,file):
+		pass
+
+	def StartHead(self):
+		pass
+
+	def EndHead(self):
+		pass
+
+	def StartBody(self):
+		pass
+
+	def EndBody(self):
+		pass
 
 
 class OrgExportHelper:
@@ -112,7 +169,7 @@ class OrgExportHelper:
 
 	def BuildHead(self):
 		self.CustomBuildHead()
-		self.doc.AddExportMeta()
+		self.doc.AddExportMetaCustom()
 
 	def BuildNode(self, n):
 		self.doc.StartNode(n)

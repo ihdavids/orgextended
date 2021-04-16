@@ -40,6 +40,15 @@ log = logging.getLogger(__name__)
 #Hello, \LaTeX\ world.
 #\end{document}
 
+sectionTypes = [
+r"\\chapter\{{heading}\}",
+r"\\section\{{heading}\}",
+r"\\subsection\{{heading}\}",
+r"\\subsubsection\{{heading}\}",
+r"\\subsubsubsection\{{heading}\}",
+r"\\subsubsubsubsection\{{heading}\}",
+r"\\subsubsubsubsubsection\{{heading}\}",
+]
 
 
 class LatexDoc(exp.OrgExporter):
@@ -55,6 +64,62 @@ class LatexDoc(exp.OrgExporter):
     def BuildDoc(self):
         doc = self.documentclass + '\n' + '\n'.join(self.pre) + r'\\begin{document}\n' + '\n'.join(self.doc) + r'\\end{document}\n'
 
+    # Document header metadata should go in here
+    def AddExportMetaCustom(self):
+        pass
+
+    # Setup to start the export of a node
+    def StartNode(self, n):
+        pass 
+
+    # Export the heading of this node
+    def NodeHeading(self,n):
+        pass
+
+    # We are about to start exporting the nodes body
+    def StartNodeBody(self,n):
+        pass
+
+    # Actually buid the node body in the document
+    def NodeBody(self,n):
+        pass
+
+    # We are done exporting the nodes body so finish it off
+    def EndNodeBody(self,n):
+        pass
+
+    # We are now done the node itself so finish that off
+    def EndNode(self,n):
+        pass
+
+    # def about to start exporting nodes
+    def StartNodes(self):
+        pass
+
+    # done exporting nodes
+    def EndNodes(self):
+        pass
+
+    def StartDocument(self, file):
+        pass
+
+    def EndDocument(self):
+        pass
+
+    def InsertScripts(self,file):
+        pass
+
+    def StartHead(self):
+        pass
+
+    def EndHead(self):
+        pass
+
+    def StartBody(self):
+        pass
+
+    def EndBody(self):
+        pass
 
 # ============================================================
 class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):

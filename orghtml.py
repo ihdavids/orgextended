@@ -269,7 +269,7 @@ class HtmlDoc(exp.OrgExporter):
     self.fs.write(data)
     self.fs.write("  </head>\n")
 
-  def AddExportMeta(self):
+  def AddExportMetaCustom(self):
     if(self.title):
       self.fs.write("<title>{title}</title>".format(title=self.title))
     if(self.author):
@@ -575,7 +575,7 @@ class HtmlDoc(exp.OrgExporter):
     self.fs.write("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
     self.fs.write("</div>")
 
-  def FinishDoc(self):
+  def FinishDocCustom(self):
     self.Postamble()
     self.fs.write("</html>\n")
 
