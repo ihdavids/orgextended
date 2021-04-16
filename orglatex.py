@@ -41,40 +41,69 @@ log = logging.getLogger(__name__)
 #\end{document}
 
 sectionTypes = [
-r"\\chapter\{{heading}\}",
-r"\\section\{{heading}\}",
-r"\\subsection\{{heading}\}",
-r"\\subsubsection\{{heading}\}",
-r"\\subsubsubsection\{{heading}\}",
-r"\\subsubsubsubsection\{{heading}\}",
-r"\\subsubsubsubsubsection\{{heading}\}",
+r"\chapter{{{heading}}}",
+r"\section{{{heading}}}",
+r"\subsection{{{heading}}}",
+r"\subsubsection{{{heading}}}",
+r"\paragraph{{{heading}}}",
+r"\subparagraph{{{heading}}}"
 ]
 
 
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
-        self.documentclass = r'\\documentclass{article}'
+        self.documentclass = r'\documentclass{article}'
         self.pre      = []
         self.doc      = []
 
     def setClass(self,className):
-        self.documentclass = r'\\documentclass\{{}\}'.format(className)
+        self.documentclass = r'\documentclass{{{docclass}}}'.format(docclass=className)
 
     def BuildDoc(self):
-        doc = self.documentclass + '\n' + '\n'.join(self.pre) + r'\\begin{document}\n' + '\n'.join(self.doc) + r'\\end{document}\n'
+        out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n' + r'\begin{document}' + '\n' + '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
+        return out
 
     # Document header metadata should go in here
     def AddExportMetaCustom(self):
+        if(self.author):
+            self.pre.append(r"\author{{{data}}}".format(data=self.author))
+        if(self.title):
+            self.pre.append(r"\title{{{data}}}".format(data=self.title))
         pass
 
     # Setup to start the export of a node
     def StartNode(self, n):
         pass 
 
+    def Escape(self,str):
+        return self.TexEscape(str)
+
+    def TexEscape(self,text):
+        conv = {
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '_': r'\_',
+        '{': r'\{',
+        '}': r'\}',
+        '~': r'\textasciitilde{}',
+        '^': r'\^{}',
+        '\\': r'\textbackslash{}',
+        '<': r'\textless{}',
+        '>': r'\textgreater{}',
+        }
+        cleanre = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
+        return cleanre.sub(lambda match: conv[match.group()], text)        
+
     # Export the heading of this node
     def NodeHeading(self,n):
-        pass
+        heading = self.Escape(n.heading)
+        level = n.level
+        if(level >= len(sectionTypes)):
+            level = len(sectionTypes)-1
+        self.doc.append(sectionTypes[level].format(heading=heading))
 
     # We are about to start exporting the nodes body
     def StartNodeBody(self,n):
@@ -82,7 +111,10 @@ class LatexDoc(exp.OrgExporter):
 
     # Actually buid the node body in the document
     def NodeBody(self,n):
-        pass
+        for l in n._lines[1:]:
+            # TODO Build processor!
+            self.doc.append(self.Escape(l))
+            pass
 
     # We are done exporting the nodes body so finish it off
     def EndNodeBody(self,n):
@@ -121,6 +153,26 @@ class LatexDoc(exp.OrgExporter):
     def EndBody(self):
         pass
 
+    def FinishDocCustom(self):
+        self.fs.write(self.BuildDoc())
+
+    def Execute(self):
+        cmdStr = sets.Get("latex2Pdf","C:\\texlive\\2021\\bin\\win32\\pdflatex.exe")
+        commandLine = [cmdStr, self.outputFilename]
+        try:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        except:
+            startupinfo = None
+        # cwd=working_dir, env=my_env,
+        cwd = os.path.join(sublime.packages_path(),"User") 
+        popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #popen.wait()
+        (o,e) = popen.communicate()
+        log.debug(o)
+        log.debug(e)
+        #log.debug(o.split('\n') + e.split('\n'))
+
 # ============================================================
 class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
 
@@ -132,8 +184,10 @@ class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
         try:
             outputFilename = exp.ExportFilename(self.view,".tex",self.suffix)
             self.doc       = LatexDoc(outputFilename,self.file)
+            self.doc.setClass(self.docClass)
             self.helper    = exp.OrgExportHelper(self.view,self.index)
             self.helper.Run(outputFilename, self.doc)
+            self.doc.Execute()
         finally:    
             evt.EmitIf(self.onDone)
 

@@ -37,6 +37,7 @@ class OrgExporter:
 	def __init__(self,filename,file,**kwargs):
 		self.file = file
 		self.fs   = open(filename,"w",encoding="utf-8")
+		self.outputFilename = filename
 		self.InitExportComments()
 		self.PreScan()
 
