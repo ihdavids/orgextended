@@ -875,6 +875,8 @@ class OrgExecuteSourceBlock:
         self.silent = silent
         self.onAdjustParams = onAdjustParams
         self.amExporting = amExporting
+        self.resultsTxtStartRow = 0
+        self.resultsTxtStartCol = 0
         view = self.view
         if(at == None):
             at = view.sel()[0].begin()
@@ -892,12 +894,15 @@ class OrgExecuteSourceBlock:
             start = at
             end   = FindEndOfSourceBlock(view,row)
             if(not end):
+                log.error("Could not find end of source block")
+                self.OnDone()
                 return
 
             # Okay now we have a start and end to build a region out of.
             # time to run a command and try to get the output.
             self.language, self.paramdata, fenceLine = GetModuleAndParams(view,row)
             if(not self.language):
+                self.OnDone()
                 return
 
             # Start setting up our execution state.
@@ -1327,6 +1332,7 @@ class OrgExecuteInlineSourceBlock:
             # time to run a command and try to get the output.
             if(not HasModule(self.language)):
                 log.error("Function not found in src folder! Cannot execute!")
+                self.OnDone()
                 return
 
             # Start setting up our execution state.
