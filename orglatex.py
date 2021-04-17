@@ -34,7 +34,27 @@ log = logging.getLogger(__name__)
 
 langMap = {
     "cpp": "C++",
-    "python": "Python"
+    "python": "Python",
+    "C": "C",
+    "perl": "Perl",
+    "bash": "bash",
+    "sh": "sh",
+    "lua": "Lua",
+    "java": "Java",
+    "php": "PHP",
+    "xml": "XML",
+    "lisp": "Lisp",
+    "sql": "SQL",
+    "r": "R",
+    "html": "HTML",
+    "go": "Go",
+    "make": "make",
+    "pascal": "Pascal",
+    "ruby": "Ruby",
+    "xsl": "XSLT",
+    "scala": "Scala",
+    "erlang": "erlang",
+    "gnuplot": "Gnuplot",
 }
 
 def haveLang(lang):

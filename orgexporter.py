@@ -332,6 +332,20 @@ class StripParser:
                 continue
             yield line
 
+class LineParser:
+    def __init__(self,sre,doc):
+        self.sre      = sre
+        self.e        = doc
+    def Handle(self, lines, orgnode):
+        for line in lines:
+            m = self.sre.search(line)
+            if(m):
+                self.HandleLine(m,line,orgnode)
+                continue
+            yield line
+    def HandleLine(self,m,l,orgnode):
+        pass
+
 RE_STARTSRC = re.compile(r"^\s*#\+(BEGIN_SRC|begin_src)\s+(?P<lang>[a-zA-Z0-9]+)")
 RE_ENDSRC = re.compile(r"^\s*#\+(END_SRC|end_src)")
 
