@@ -49,10 +49,6 @@ RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-
 RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
 RE_LINK = re.compile(r"\[\[(?P<link>[^\]]+)\](\[(?P<desc>[^\]]+)\])?\]")
 RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
-RE_STARTQUOTE = re.compile(r"#\+(BEGIN_QUOTE|BEGIN_EXAMPLE|BEGIN_VERSE|BEGIN_CENTER|begin_quote|begin_example|begin_verse|begin_center)")
-RE_ENDQUOTE = re.compile(r"#\+(END_QUOTE|END_EXAMPLE|END_VERSE|END_CENTER|end_quote|end_example|end_verse|end_center)")
-RE_STARTNOTE = re.compile(r"#\+(BEGIN_NOTES|begin_notes)")
-RE_ENDNOTE = re.compile(r"#\+(END_NOTES|end_notes)")
 RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)?\s*")
 RE_STARTSRC = re.compile(r"^\s*#\+(BEGIN_SRC|begin_src)\s+(?P<lang>[a-zA-Z0-9]+)")
 RE_STARTDYN = re.compile(r"^\s*#\+(BEGIN:|begin:)\s+(?P<lang>[a-zA-Z0-9]+)")
@@ -158,6 +154,16 @@ class LatexQuoteBlockState(exp.QuoteBlockState):
     def HandleIn(self,l, orgnode):
         self.e.doc.append(l)
 
+class LatexGenericBlockState(exp.GenericBlockState):
+    def __init__(self,doc):
+        super(LatexGenericBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.data = m.group('data').strip().lower()
+        self.e.doc.append(r"  \begin{{{data}}}".format(data=self.data))
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"  \end{{{data}}}".format(data=self.data))
+    def HandleIn(self,l, orgnode):
+        self.e.doc.append(l)
 
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
@@ -228,6 +234,7 @@ class LatexDoc(exp.OrgExporter):
         LatexDynamicBlockState(self),
         LatexQuoteBlockState(self),
         LatexTableBlockState(self),
+        LatexGenericBlockState(self),
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
         exp.TblFmStripper(self)

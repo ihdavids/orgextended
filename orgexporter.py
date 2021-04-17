@@ -313,6 +313,13 @@ class QuoteBlockState(BlockState):
     def __init__(self,doc):
         super(QuoteBlockState,self).__init__(RE_STARTQUOTE, RE_ENDQUOTE,doc)
 
+RE_STARTGENERIC = re.compile(r"#\+(BEGIN_|begin_)(?P<data>[a-zA-Z0-9-]+)(\s|$)")
+RE_ENDGENERIC   = re.compile(r"#\+(END_|end_)([a-zA-Z0-9-]+)(\s|$)")
+
+class GenericBlockState(BlockState):
+    def __init__(self,doc):
+        super(GenericBlockState,self).__init__(RE_STARTGENERIC, RE_ENDGENERIC,doc)
+
 RE_TABLE_ROW = re.compile(r"^\s*[|]")
 RE_NOT_TABLE_ROW = re.compile(r"^\s*[^| ]")
 
