@@ -166,16 +166,16 @@ class LatexGenericBlockState(exp.GenericBlockState):
         self.e.doc.append(l)
 
 
-class LatexUnorderedListBlockState(exp.UnorderedBlockState):
+class LatexUnorderedListBlockState(exp.UnorderedListBlockState):
     def __init__(self,doc):
-        super(LatexUnorderedBlockState,self).__init__(doc)
+        super(LatexUnorderedListBlockState,self).__init__(doc)
     def HandleEntering(self,m,l,orgnode):
         self.e.doc.append(r"    \begin{itemize}")
     def HandleExiting(self, m, l , orgnode):
         self.e.doc.append(r"     \end{itemize}")
     def HandleItem(self,m,l, orgnode):
-        data = self.Escape(m.group('data'))
-        self.e.doc.append(r"     \item {{{content}}}".format(content=data))
+        data = self.e.Escape(m.group('data'))
+        self.e.doc.append(r"     \item {content}".format(content=data))
 
 
 class LatexTableBlockState(exp.TableBlockState):
