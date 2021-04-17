@@ -393,3 +393,8 @@ RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
 class UnorderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(UnorderedListBlockState,self).__init__(RE_UL,doc)
+
+RE_OL   = re.compile(r"^(?P<indent>\s*)[0-9]+[).]\s+(?P<data>.+)")
+class OrderedListBlockState(ListBlockState):
+    def __init__(self,doc):
+        super(OrderedListBlockState,self).__init__(RE_OL,doc)

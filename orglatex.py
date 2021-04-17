@@ -177,6 +177,16 @@ class LatexUnorderedListBlockState(exp.UnorderedListBlockState):
         data = self.e.Escape(m.group('data'))
         self.e.doc.append(r"     \item {content}".format(content=data))
 
+class LatexOrderedListBlockState(exp.OrderedListBlockState):
+    def __init__(self,doc):
+        super(LatexOrderedListBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.e.doc.append(r"    \begin{enumerate}")
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"     \end{enumerate}")
+    def HandleItem(self,m,l, orgnode):
+        data = self.e.Escape(m.group('data'))
+        self.e.doc.append(r"     \item {content}".format(content=data))
 
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
@@ -248,6 +258,7 @@ class LatexDoc(exp.OrgExporter):
         LatexQuoteBlockState(self),
         LatexTableBlockState(self),
         LatexUnorderedListBlockState(self),
+        LatexOrderedListBlockState(self),
         LatexGenericBlockState(self),
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
