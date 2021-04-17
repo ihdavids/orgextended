@@ -394,6 +394,11 @@ class UnorderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(UnorderedListBlockState,self).__init__(RE_UL,doc)
 
+RE_CL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+\[(?P<state>[ xX-])\]\s+(?P<data>.+)")
+class CheckboxListBlockState(ListBlockState):
+    def __init__(self,doc):
+        super(CheckboxListBlockState,self).__init__(RE_CL,doc)
+
 RE_OL   = re.compile(r"^(?P<indent>\s*)[0-9]+[).]\s+(?P<data>.+)")
 class OrderedListBlockState(ListBlockState):
     def __init__(self,doc):

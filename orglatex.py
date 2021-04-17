@@ -188,6 +188,24 @@ class LatexOrderedListBlockState(exp.OrderedListBlockState):
         data = self.e.Escape(m.group('data'))
         self.e.doc.append(r"     \item {content}".format(content=data))
 
+class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
+    def __init__(self,doc):
+        super(LatexCheckboxListBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.e.doc.append(r"    \begin{todolist}")
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"     \end{todolist}")
+    def HandleItem(self,m,l, orgnode):
+        data = self.e.Escape(m.group('data'))
+        state = m.group('state')
+        if(state == 'x'):
+            self.e.doc.append(r"     \item[\wontfix] {content}".format(content=data))
+        elif(state == '-'):
+            #self.e.doc.append(r"     \item {content}".format(content=data))
+            self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
+        else:
+            self.e.doc.append(r"     \item {content}".format(content=data))
+
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
         super(LatexTableBlockState,self).__init__(doc)
@@ -250,6 +268,19 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{hyperref}")
         self.pre.append(r"\usepackage{csquotes}")
         self.pre.append(r"\usepackage{makecell, caption}")
+
+        # Checkbox Setup
+        self.pre.append(r"\usepackage{enumitem,amssymb}")
+        self.pre.append(r"\newlist{todolist}{itemize}{2}")
+        self.pre.append(r"\setlist[todolist]{label=$\square$}")
+        self.pre.append(r"\usepackage{pifont}")
+        self.pre.append(r"\newcommand{\cmark}{\ding{51}}%")
+        self.pre.append(r"\newcommand{\xmark}{\ding{55}}%")
+        self.pre.append(r"\newcommand{\tridot}{\ding{73}}%")
+        self.pre.append(r"\newcommand{\inp}{\rlap{$\square$}{\large\hspace{1pt}\tridot}}")
+        self.pre.append(r"\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%")
+        self.pre.append(r"\hspace{-2.5pt}}")
+        self.pre.append(r"\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}")
         #self.pre.append(r"\usepackage{flafter}") 
         self.nodeParsers = [
         exp.CaptionAttributeParser(self),
@@ -257,6 +288,7 @@ class LatexDoc(exp.OrgExporter):
         LatexDynamicBlockState(self),
         LatexQuoteBlockState(self),
         LatexTableBlockState(self),
+        LatexCheckboxListBlockState(self),
         LatexUnorderedListBlockState(self),
         LatexOrderedListBlockState(self),
         LatexGenericBlockState(self),
