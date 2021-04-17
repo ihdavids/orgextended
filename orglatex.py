@@ -32,7 +32,42 @@ import html
 
 log = logging.getLogger(__name__)
 
+langMap = {
+    "cpp": "C++",
+    "python": "Python"
+}
 
+def haveLang(lang):
+    return lang in langMap
+
+def mapLanguage(lang):
+    if(lang in langMap):
+        return langMap[lang]
+    return lang
+
+RE_ATTR = regex.compile(r"^\s*[#][+]ATTR_HTML[:](?P<params>\s+[:](?P<name>[a-zA-Z0-9._-]+)\s+(?P<value>([^:]|((?<! )[:]))+))+$")
+RE_ATTR_ORG = regex.compile(r"^\s*[#][+]ATTR_ORG[:] ")
+RE_LINK = re.compile(r"\[\[(?P<link>[^\]]+)\](\[(?P<desc>[^\]]+)\])?\]")
+RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
+RE_STARTQUOTE = re.compile(r"#\+(BEGIN_QUOTE|BEGIN_EXAMPLE|BEGIN_VERSE|BEGIN_CENTER|begin_quote|begin_example|begin_verse|begin_center)")
+RE_ENDQUOTE = re.compile(r"#\+(END_QUOTE|END_EXAMPLE|END_VERSE|END_CENTER|end_quote|end_example|end_verse|end_center)")
+RE_STARTNOTE = re.compile(r"#\+(BEGIN_NOTES|begin_notes)")
+RE_ENDNOTE = re.compile(r"#\+(END_NOTES|end_notes)")
+RE_FN_MATCH = re.compile(r"\s*[:]([a-zA-Z0-9-_]+)\s+([^: ]+)?\s*")
+RE_STARTSRC = re.compile(r"^\s*#\+(BEGIN_SRC|begin_src)\s+(?P<lang>[a-zA-Z0-9]+)")
+RE_STARTDYN = re.compile(r"^\s*#\+(BEGIN:|begin:)\s+(?P<lang>[a-zA-Z0-9]+)")
+RE_ENDSRC = re.compile(r"^\s*#\+(END_SRC|end_src)")
+RE_ENDDYN = re.compile(r"^\s*#\+(end:|END:)")
+RE_RESULTS = re.compile(r"^\s*#\+RESULTS.*")
+RE_TABLE_SEPARATOR = re.compile(r"^\s*[|][-]")
+RE_CHECKBOX         = re.compile(r"^\[ \] ")
+RE_CHECKED_CHECKBOX = re.compile(r"^\[[xX]\] ")
+RE_PARTIAL_CHECKBOX = re.compile(r"^\[[-]\] ")
+RE_EMPTY_LINE = re.compile(r"^\s*$")
+
+
+# <!-- multiple_stores height="50%" width="50%" --> 
+RE_COMMENT_TAG = re.compile(r"^\s*[<][!][-][-]\s+(?P<name>[a-zA-Z0-9_-]+)\s+(?P<props>.*)\s+[-][-][>]")
 
 #\documentclass{article}
 # PREAMBLE
@@ -50,12 +85,164 @@ r"\subparagraph{{{heading}}}"
 ]
 
 
+class LatexSourceBlockState(exp.SourceBlockState):
+    def __init__(self,doc):
+        super(LatexSourceBlockState,self).__init__(doc)
+        self.skipSrc = False
+
+    def HandleEntering(self, m, l, orgnode):
+        self.skipSrc = False
+        language = m.group('lang')
+        paramstr = l[len(m.group(0)):]
+        p = type('', (), {})() 
+        src.BuildFullParamList(p,language,paramstr,orgnode)
+        exp = p.params.Get("exports",None)
+        if(isinstance(exp,list) and len(exp) > 0):
+            exp = exp[0]
+        if(exp == 'results' or exp == 'none'):
+            self.skipSrc = True
+            return
+        # Some languages we skip source by default
+        skipLangs = sets.Get("latexDefaultSkipSrc",[])
+        if(exp == None and language == skipLangs):
+            self.skipSrc = True
+            return
+        attribs = ""
+        if(haveLang(language)):
+            self.e.doc.append(r"  \begin{{lstlisting}}[language={lang}]".format(lang=mapLanguage(language)))
+        else:
+            self.e.doc.append(r"  \begin{lstlisting}")
+
+    def HandleExiting(self, m, l , orgnode):
+        if(not self.skipSrc):
+            self.e.doc.append(r"  \end{lstlisting}")
+        skipSrc = False
+
+    def HandleIn(self,l, orgnode):
+        if(not self.skipSrc):
+            self.e.doc.append(l)
+
+
+class LatexDynamicBlockState(exp.DynamicBlockState):
+    def __init__(self,doc):
+        super(LatexDynamicBlockState,self).__init__(doc)
+        self.skip = False
+    def HandleEntering(self,m,l,orgnode):
+        self.skip = False
+        language = m.group('lang')
+        paramstr = l[len(m.group(0)):]
+        p = type('', (), {})() 
+        src.BuildFullParamList(p,language,paramstr,orgnode)
+        exp = p.params.Get("exports",None)
+        if(isinstance(exp,list) and len(exp) > 0):
+            exp = exp[0]
+        if(exp == 'results' or exp == 'none'):
+            self.skip = True
+            return
+        self.e.doc.append(r"  \begin{verbatim}")
+    def HandleExiting(self, m, l , orgnode):
+        if(not self.skip):
+            self.e.doc.append(r"  \end{verbatim}")
+        self.skip = False
+    def HandleIn(self,l, orgnode):
+        if(not self.skip):
+            self.e.doc.append(l)
+
+class LatexQuoteBlockState(exp.QuoteBlockState):
+    def __init__(self,doc):
+        super(LatexQuoteBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.e.doc.append(r"  \begin{displayquote}")
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"  \end{displayquote}")
+    def HandleIn(self,l, orgnode):
+        self.e.doc.append(l)
+
+
+class LatexTableBlockState(exp.TableBlockState):
+    def __init__(self,doc):
+        super(LatexTableBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        tabledef = ""
+        tds = None
+        if(not RE_TABLE_SEPARATOR.search(l)):
+            tds = l.split('|')
+            if(len(tds) > 1):
+                tabledef = ("|c" * (len(tds)-2)) + "|"
+        self.e.doc.append(r"    \begin{table}[!htp]")
+        if(self.e.GetAttrib('caption')):
+            self.e.doc.append(r"    \caption{{{caption}}}".format(caption=self.e.GetAttrib('caption')))
+            #self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
+            #self.tableIndex += 1
+            self.e.ClearAttrib()
+        self.e.doc.append(r"    \centering\renewcommand{\arraystretch}{1.2}")
+        self.e.doc.append(r"    \begin{{tabular}}{{{tabledef}}}".format(tabledef=tabledef))
+        self.e.doc.append(r"    \hline") 
+        if(tds):
+            self.HandleData(tds,True)
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"    \hline")
+        self.e.doc.append(r"    \end{tabular}")
+        self.e.doc.append(r"    \end{table}")
+
+    def HandleData(self,tds,head=False): 
+        if(len(tds) > 3):
+            # An actual table row, build a row
+            first = True
+            line = "    "
+            for td in tds[1:-1]:
+                if(not first):
+                    line += " & "
+                first = False
+                if(head):
+                    line += r"\textbf{{{data}}}".format(data=self.e.Escape(td))
+                else:
+                    line += self.e.Escape(td)
+            line += " \\\\"
+            self.e.doc.append(line)
+            haveTableHeader = True
+
+    def HandleIn(self,l, orgnode):
+        if(RE_TABLE_SEPARATOR.search(l)):
+            self.e.doc.append(r'    \hline')
+        else:
+            tds = l.split('|')
+            self.HandleData(tds)
+
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
         self.documentclass = r'\documentclass{article}'
         self.pre      = []
         self.doc      = []
+        self.attribs  = {}
+        # TODO: Make this configurable
+        self.pre.append(r"\usepackage{listings}")
+        self.pre.append(r"\usepackage{hyperref}")
+        self.pre.append(r"\usepackage{csquotes}")
+        self.pre.append(r"\usepackage{makecell, caption}")
+        #self.pre.append(r"\usepackage{flafter}") 
+        self.nodeParsers = [
+        exp.CaptionAttributeParser(self),
+        LatexSourceBlockState(self),
+        LatexDynamicBlockState(self),
+        LatexQuoteBlockState(self),
+        LatexTableBlockState(self),
+        exp.DrawerBlockState(self),
+        exp.SchedulingStripper(self),
+        exp.TblFmStripper(self)
+        ]
+
+    def AddAttrib(self,name,val):
+        self.attribs[name] = val.strip()
+    
+    def GetAttrib(self,name):
+        if(name in self.attribs):
+            return self.attribs[name]
+        return None
+
+    def ClearAttrib(self):
+        self.attribs.clear()
 
     def setClass(self,className):
         self.documentclass = r'\documentclass{{{docclass}}}'.format(docclass=className)
@@ -78,9 +265,12 @@ class LatexDoc(exp.OrgExporter):
 
     def Escape(self,str):
         str,cnt = self.SingleLineReplacements(str)
-        if(not cnt):
+        if(0 == cnt):
             return self.TexFullEscape(str)
-        return self.TexCommandEscape(str)
+        elif(1 == cnt):
+            return self.TexCommandEscape(str)
+        else:
+            return str
 
     def TexFullEscape(self,text):
         conv = {
@@ -97,8 +287,16 @@ class LatexDoc(exp.OrgExporter):
         '<': r'\textless{}',
         '>': r'\textgreater{}',
         }
-        cleanre = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
-        return cleanre.sub(lambda match: conv[match.group()], text)        
+
+
+
+        cleanre = re.compile(r'([^\\])(\%|\&|\$|\#|\_|\{|\}|\~|\^|\\|\>|\<)')
+        #print("AAA: " + '|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
+
+        #cleanre = re.compile('(.)(' + '|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))) + ")")
+        result = cleanre.sub(lambda match: (match.group(1) if match.group(1) else "") + conv[match.group(2)] if (match.group(1) and match.group(1) != "\\") else match.group(), text)        
+        return result
+
     
     def TexCommandEscape(self,text):
         conv = {
@@ -112,8 +310,10 @@ class LatexDoc(exp.OrgExporter):
         '<': r'\textless{}',
         '>': r'\textgreater{}',
         }
-        cleanre = re.compile('|'.join(re.escape(str(key)) for key in sorted(conv.keys(), key = lambda item: - len(item))))
-        return cleanre.sub(lambda match: conv[match.group()], text)        
+        cleanre = re.compile(r'([^\\])(\%|\&|\$|\#|\_|\~|\^|\>|\<)')
+        result = cleanre.sub(lambda match: (match.group(1) if match.group(1) else "") + conv[match.group(2)] if (match.group(1) and match.group(1) != "\\") else match.group(), text)        
+        return result
+        #return cleanre.sub(lambda match: conv[match.group()], text)        
 
     def SingleLineReplace(self,reg,rep,text,ok):
         nt = reg.sub(rep,text)
@@ -121,22 +321,61 @@ class LatexDoc(exp.OrgExporter):
         return (nt,ok)
 
     def SingleLineReplacements(self,text):
-        didRep = False
+        didRep = 0
         text = exp.RE_TITLE.sub("",text)
         text = exp.RE_AUTHOR.sub("",text)
         text = exp.RE_LANGUAGE.sub("",text)
         text = exp.RE_EMAIL.sub("",text)
         text = exp.RE_DATE.sub("",text)
-        text,didRep = self.SingleLineReplace(exp.RE_NAME,r"\label{{\g<data>}}",text,didRep)
-        text,didRep = self.SingleLineReplace(exp.RE_BOLD,r"\\textbf{{\g<data>}}",text,didRep)
-        text,didRep = self.SingleLineReplace(exp.RE_ITALICS,r"\\textit{{\g<data>}}",text,didRep)
-        text,didRep = self.SingleLineReplace(exp.RE_UNDERLINE,r"\underline{{\g<data>}}",text,didRep)
-        text,didRep = self.SingleLineReplace(exp.RE_CODE,r"\\texttt{{\g<data>}}",text,didRep)
-        text,didRep = self.SingleLineReplace(exp.RE_VERBATIM,r"\\texttt{{\g<data>}}",text,didRep)
+        m = RE_LINK.search(text)
+        if(m):
+            link = m.group('link').strip()
+            desc = m.group('desc')
+            if(desc):
+                desc = self.TexFullEscape(desc.strip())
+            if(False and (link.endswith(".png") or link.endswith(".jpg") or link.endswith(".jpeg") or link.endswith(".gif"))):
+                if(link.startswith("file:")):
+                    link = re.sub(r'^file:','',link)  
+                extradata = ""  
+                if(self.commentName and self.commentName in link):
+                    extradata =  " " + self.commentData
+                    self.commentName = None
+                if(hasattr(self,'attrs')):
+                    for key in self.attrs:
+                        extradata += " " + str(key) + "=\"" + str(self.attrs[key]) + "\""
+                preamble = ""
+                postamble = ""
+                if(hasattr(self,'caption') and self.caption):
+                    pass
+                    #preamble = "<div class=\"figure\"><p>"
+                    #postamble = "</p><p><span class=\"figure-number\">Figure {index}: </span>{caption}</p></div>".format(index=self.figureIndex,caption=self.caption)
+                    self.figureIndex += 1
+                #text = RE_LINK.sub("{preamble}<img src=\"{link}\" alt=\"{desc}\"{extradata}>{postamble}".format(preamble=preamble,link=link,desc=desc,extradata=extradata,postamble=postamble),line)
+                didRep = True
+                #self.ClearAttributes()
+                return (text,2)
+            else:
+                if(link.startswith("file:")):
+                    link = re.sub(r'^file:','',link)  
+                link = re.sub(r"[:][:][^/].*","",link)
+                #link = self.TexFullEscape(link)
+                link = link.replace("\\","/")
+                if(desc):
+                    text = RE_LINK.sub(r"\\ref{{{link}}}{{{desc}}}".format(link=link,desc=desc),text)
+                else:
+                    text = RE_LINK.sub(r"\\ref{{{link}}}".format(link=link),text)
+                didRep = 2
+                #self.ClearAttributes()
+                return (text,2)
+
+        text,didRep = self.SingleLineReplace(exp.RE_NAME,r"\label{\g<data>}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_BOLD,r"\\textbf{\g<data>}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_ITALICS,r"\\textit{\g<data>}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_UNDERLINE,r"\underline{\g<data>}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_CODE,r"\\texttt{\g<data>}",text,didRep)
+        text,didRep = self.SingleLineReplace(exp.RE_VERBATIM,r"\\texttt{\g<data>}",text,didRep)
         text,didRep = self.SingleLineReplace(exp.RE_HR,r"\hrulefill",text,didRep)
-
-        return (text,didRep)
-
+        return (text,1 if didRep else 0)
 
     # Export the heading of this node
     def NodeHeading(self,n):
@@ -150,12 +389,222 @@ class LatexDoc(exp.OrgExporter):
     def StartNodeBody(self,n):
         pass
 
-    # Actually buid the node body in the document
+    def AttributesGather(self, l):
+        return False
+
+
     def NodeBody(self,n):
-        for l in n._lines[1:]:
-            # TODO Build processor!
-            self.doc.append(self.Escape(l))
-            pass
+        ilines = n._lines[1:]
+        for parser in self.nodeParsers:
+            ilines = parser.Handle(ilines,n)
+        for line in ilines:
+            self.doc.append(self.TexFullEscape(line))
+
+
+    # Actually buid the node body in the document
+    def OldNodeBody(self,slide):
+        inDrawer = False
+        inResults= False
+        inUl     = 0
+        ulIndent = 0
+        inTable  = False
+        haveTableHeader = False
+        inSrc    = False
+        skipSrc  = False
+        inDynSrc    = False
+        skipDynSrc  = False
+        exp      = None
+
+        blockParsers = [LatexSourceBlockState(self.doc)]
+        for l in slide._lines[1:]:
+          if(self.AttributesGather(l)):
+            continue
+          if(inResults):
+            if(l.strip() == ""):
+              inResults = False
+            elif(RE_ENDSRC.search(l) or RE_END_DRAWER_LINE.search(l)):
+              inResults = False
+              continue
+            if(inResults):
+              if(exp == 'code' or exp == 'none'):
+                continue
+              else:
+                line = self.Escape(l)
+                self.doc.append(line)
+                continue
+          if(inDrawer):
+            if(RE_END_DRAWER_LINE.search(l)):
+              inDrawer = False
+            continue
+          if(inTable):
+            if(RE_TABLE_ROW.search(l)):
+              if(RE_TABLE_SEPARATOR.search(l)):
+                continue
+              else:
+                tds = l.split('|')
+                if(len(tds) > 3):
+                  # An actual table row, build a row
+                  first = True
+                  line = "    "
+                  for td in tds[1:-1]:
+                    if(not first):
+                        line += " & "
+                    first = False
+                    line += self.Escape(td)
+                  line += " \\\\"
+                  self.doc.append(line)
+                  haveTableHeader = True
+                  continue
+            else:
+              self.doc.append(r"    \hline")
+              self.doc.append(r"    \end{tabular}")
+              self.doc.append(r"    \end{table}")
+              inTable         = False
+              haveTableHeader = False
+          if(inDynSrc):
+            if(RE_ENDDYN.search(l)):
+              inDynSrc = False
+              if(skipDynSrc):
+                skipDynSrc = False
+                continue
+              self.doc.append(r"  \end{verbatim}")
+              continue
+            else:
+              if(not skipDynSrc):
+                self.doc.append(l)
+              continue
+          if(inSrc):
+            if(RE_ENDSRC.search(l)):
+              inSrc = False
+              if(skipSrc):
+                skipSrc = False
+                continue
+              self.doc.append(r"  \end{lstlisting}")
+              continue
+            else:
+              if(not skipSrc):
+                self.doc.append(l)
+              continue
+          m = RE_STARTDYN.search(l)
+          if(m):
+            inDynSrc = True
+            language = m.group('lang')
+            paramstr = l[len(m.group(0)):]
+            p = type('', (), {})() 
+            src.BuildFullParamList(p,language,paramstr,slide)
+            exp = p.params.Get("exports",None)
+            if(isinstance(exp,list) and len(exp) > 0):
+              exp = exp[0]
+            if(exp == 'results' or exp == 'none'):
+              skipDynSrc = True
+              continue
+            self.doc.append(r"  \begin{verbatim}")
+          # src block
+          m = RE_STARTSRC.search(l)
+          if(m):
+            inSrc = True
+            language = m.group('lang')
+            paramstr = l[len(m.group(0)):]
+            p = type('', (), {})() 
+            src.BuildFullParamList(p,language,paramstr,slide)
+            exp = p.params.Get("exports",None)
+            if(isinstance(exp,list) and len(exp) > 0):
+              exp = exp[0]
+            if(exp == 'results' or exp == 'none'):
+              skipSrc = True
+              continue
+            # Some languages we skip source by default
+            skipLangs = sets.Get("htmlDefaultSkipSrc",[])
+            if(exp == None and language == skipLangs):
+              skipSrc = True
+              continue
+            #params = {}
+            #for ps in RE_FN_MATCH.finditer(paramstr):
+            # params[ps.group(1)] = ps.group(2)
+            attribs = ""
+            # This is left over from reveal.
+            if(p.params.Get("data-line-numbers",None)):
+              attribs += " data-line-numbers=\"{nums}\"".format(nums=p.params.Get("data-line-numbers",""))
+            if(haveLang(language)):
+                self.doc.append(r"  \begin{{lstlisting}}[language={lang}]".format(lang=mapLanguage(language)))
+            else:
+                self.doc.append(r"  \begin{lstlisting}")
+            continue
+          # property drawer
+          if(RE_DRAWER_LINE.search(l)):
+            inDrawer = True
+            continue
+          # scheduling
+          if(RE_SCHEDULING_LINE.search(l)):
+            continue
+          if(RE_RESULTS.search(l)):
+            inResults = True
+            continue
+          m = RE_COMMENT_TAG.search(l)
+          if(m):
+            self.commentData = m.group('props')
+            self.commentName = m.group('name')
+            continue
+    
+          m = RE_TABLE_ROW.search(l)
+          if(m):
+            tabledef = ""
+            tds = None
+            if(not RE_TABLE_SEPARATOR.search(l)):
+              tds = l.split('|')
+              if(len(tds) > 1):
+                tabledef = ("|c" * (len(tds)-2)) + "|"
+            self.doc.append(r"    \begin{table}")
+            self.doc.append(r"    \centering")
+            self.doc.append(r"    \begin{{tabular}}{{{tabledef}}}".format(tabledef=tabledef))
+            self.doc.append(r"    \hline") 
+            if(hasattr(self,'caption') and self.caption):
+                self.doc.append(r"    \caption{{{caption}}}".format(caption=self.caption))
+                #self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
+                self.tableIndex += 1
+                self.ClearAttributes()
+            if(tds):
+                first = True
+                line = "    "
+                for td in tds[1:-1]:
+                    if(not first):
+                        line += " & "
+                    first = False
+                    line += self.Escape(td)
+                line += " \\\\"
+                self.doc.append(line)
+                haveTableHeader = True
+            inTable = True
+            continue
+          m = RE_UL.search(l)
+          if(m):
+            thisIndent = len(m.group('indent'))
+            if(not inUl):
+              ulIndent = thisIndent
+              self.doc.append(r"    \begin{itemize}")
+              inUl += 1
+            elif(thisIndent > ulIndent):
+              ulIndent = thisIndent
+              self.doc.append(r"     \begin{itemize}")
+              inUl += 1
+            elif(thisIndent < ulIndent and inUl > 1):
+              inUl -= 1
+              self.doc.append(r"     \end{itemize}")
+            data = self.Escape(m.group('data'))
+            self.doc.append(r"     \item {content}".format(content=data))
+            continue
+          elif(inUl):
+            while(inUl > 0):
+              inUl -= 1
+              self.doc.append(r"     \end{itemize}")
+          if(RE_EMPTY_LINE.search(l)):
+            self.doc.append(r"   \smallskip")
+          # Normal Write
+          line = self.Escape(l)
+          self.doc.append(line)
+        if(inUl):
+          inUl -= 1
+          self.doc.append(r"     \end{itemize}")
 
     # We are done exporting the nodes body so finish it off
     def EndNodeBody(self,n):
