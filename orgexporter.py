@@ -265,6 +265,47 @@ class BlockState:
     def HandleEntering(self, m, line, orgnode):
         pass 
 
+class ListBlockState:
+    def __init__(self,listre,doc):
+        self.listre      = listre
+        self.e           = doc
+    def Handle(self, lines, orgnode):
+        inList    = 0
+        curIndent = 0
+        for l in lines:
+            m = self.listre.search(l)
+            if(m):
+                thisIndent = len(m.group('indent'))
+                if(not inList):
+                    curIndent = thisIndent
+                    self.HandleEntering(m,l,orgnode)
+                    inList += 1
+                elif(thisIndent > curIndent):
+                    curIndent = thisIndent
+                    self.HandleEntering(m,l,orgnode)
+                    inList += 1
+                elif(thisIndent < curIndent and inList > 1):
+                    inList -= 1
+                    self.HandleExiting(m,l,orgnode)
+                self.HandleItem(m,l,orgnode)
+                continue
+            elif(inList):
+                while(inList > 0):
+                    inList -= 1
+                    self.HandleExiting(m,l,orgnode)
+                yield l
+            else:
+                yield l
+        while(inList > 0):
+            inList -= 1
+            self.HandleExiting(m,l,orgnode)
+    def HandleItem(self, m, line, orgnode):
+        pass
+    def HandleExiting(self, m, line, orgnode):
+        pass
+    def HandleEntering(self, m, line, orgnode):
+        pass 
+
 class AttributeParser:
     def __init__(self,name,sre,doc):
         self.sre      = sre
@@ -347,3 +388,8 @@ RE_SCHEDULING_LINE = re.compile(r"^\s*(SCHEDULED|CLOSED|DEADLINE|CLOCK)[:].*")
 class SchedulingStripper(StripParser):
     def __init__(self,doc):
         super(SchedulingStripper,self).__init__(RE_SCHEDULING_LINE,doc)
+
+RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
+class UnorderedListBlockState(ListBlockState):
+    def __init__(self,doc):
+        super(UnorderedListBlockState,self).__init__(RE_UL,doc)

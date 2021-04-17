@@ -165,6 +165,19 @@ class LatexGenericBlockState(exp.GenericBlockState):
     def HandleIn(self,l, orgnode):
         self.e.doc.append(l)
 
+
+class LatexUnorderedListBlockState(exp.UnorderedBlockState):
+    def __init__(self,doc):
+        super(LatexUnorderedBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.e.doc.append(r"    \begin{itemize}")
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"     \end{itemize}")
+    def HandleItem(self,m,l, orgnode):
+        data = self.Escape(m.group('data'))
+        self.e.doc.append(r"     \item {{{content}}}".format(content=data))
+
+
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
         super(LatexTableBlockState,self).__init__(doc)
@@ -234,6 +247,7 @@ class LatexDoc(exp.OrgExporter):
         LatexDynamicBlockState(self),
         LatexQuoteBlockState(self),
         LatexTableBlockState(self),
+        LatexUnorderedListBlockState(self),
         LatexGenericBlockState(self),
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
