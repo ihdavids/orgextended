@@ -138,6 +138,30 @@ class LatexSourceBlockState(exp.SourceBlockState):
         if(not self.skipSrc):
             self.e.doc.append(l)
 
+# Skips over contents not intended for a latex buffer
+class LatexExportBlockState(exp.ExportBlockState):
+    def __init__(self,doc):
+        super(LatexExportBlockState,self).__init__(doc)
+        self.skipExport = False
+
+    def HandleEntering(self, m, l, orgnode):
+        self.skipExport = False
+        language = m.group('lang').strip().lower()
+        if(language != "latex"):
+            self.skipExport = True
+            return
+        # We will probably need this in the future.
+        #paramstr = l[len(m.group(0)):]
+        #p = type('', (), {})() 
+        #src.BuildFullParamList(p,language,paramstr,orgnode)
+
+    def HandleExiting(self, m, l , orgnode):
+        self.skipExport = False
+
+    def HandleIn(self,l, orgnode):
+        if(not self.skipExport):
+            self.e.doc.append(l)
+
 
 class LatexDynamicBlockState(exp.DynamicBlockState):
     def __init__(self,doc):
@@ -292,9 +316,7 @@ class LatexHrParser(exp.HrParser):
     def __init__(self,doc):
         super(LatexHrParser,self).__init__(doc)
     def HandleLine(self,m,l,n):
-        self.e.doc.append(r"\newline")
-        self.e.doc.append("\n" + r"\hrulefill")
-        self.e.doc.append(r" ")
+        self.e.doc.append(r"\newline\noindent\rule{\textwidth}{0.5pt}")
 
 class LatexBoldParser(exp.BoldParser):
     def __init__(self,doc):
@@ -407,6 +429,7 @@ class LatexDoc(exp.OrgExporter):
         LatexCheckboxListBlockState(self),
         LatexUnorderedListBlockState(self),
         LatexOrderedListBlockState(self),
+        LatexExportBlockState(self),
         LatexGenericBlockState(self),
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),

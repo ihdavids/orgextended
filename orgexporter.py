@@ -401,6 +401,12 @@ class DynamicBlockState(BlockState):
     def __init__(self,doc):
         super(DynamicBlockState,self).__init__(RE_STARTDYN, RE_ENDDYN,doc)
 
+RE_STARTEXPORT = re.compile(r"^\s*#\+(BEGIN_EXPORT|begin_export)\s+(?P<lang>[a-zA-Z0-9]+)")
+RE_ENDEXPORT = re.compile(r"^\s*#\+(END_EXPORT|end_export)")
+
+class ExportBlockState(BlockState):
+    def __init__(self,doc):
+        super(ExportBlockState,self).__init__(RE_STARTEXPORT, RE_ENDEXPORT,doc)
 
 RE_STARTQUOTE = re.compile(r"^\s*#\+(BEGIN_QUOTE|begin_quote)")
 RE_ENDQUOTE = re.compile(r"^\s*#\+(END_QUOTE|end_quote)")
