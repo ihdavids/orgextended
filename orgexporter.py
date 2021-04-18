@@ -232,10 +232,11 @@ class OrgExportHelper:
 
 
 class BlockState:
-    def __init__(self,startre,endre,doc):
+    def __init__(self,startre,endre,doc,exportEndLine=False):
         self.startre      = startre
         self.endre        = endre
         self.e            = doc
+        self.exportEndLine = exportEndLine
     def Handle(self, lines, orgnode):
         amIn = False
         for line in lines:
@@ -243,18 +244,23 @@ class BlockState:
                 m = self.endre.search(line)
                 if(m):
                     amIn = False
+                    self.e.SetAmInBlock(False)
                     self.HandleExiting(m,line,orgnode)
+                    if(self.exportEndLine):
+                        yield line
                     continue
                 else:
                     self.HandleIn(line,orgnode)
                     continue
             else:
-                m = self.startre.search(line)
-                if(m):
-                    amIn = True
-                    self.HandleEntering(m,line,orgnode)
-                else:
-                    yield line
+                if(not self.e.AmInBlock()):
+                    m = self.startre.search(line)
+                    if(m):
+                        amIn = True
+                        self.e.SetAmInBlock(True)
+                        self.HandleEntering(m,line,orgnode)
+                        continue
+                yield line
         if(amIn):
             self.HandleExiting(None,None,orgnode)
     def HandleIn(self, line, orgnode):
@@ -419,7 +425,7 @@ RE_NOT_TABLE_ROW = re.compile(r"^\s*[^| ]")
 
 class TableBlockState(BlockState):
     def __init__(self,doc):
-        super(TableBlockState,self).__init__(RE_TABLE_ROW, RE_NOT_TABLE_ROW,doc)
+        super(TableBlockState,self).__init__(RE_TABLE_ROW, RE_NOT_TABLE_ROW,doc,True)
 
 RE_DRAWER_LINE = re.compile(r"^\s*[:].+[:]\s*$")
 RE_END_DRAWER_LINE = re.compile(r"^\s*[:](END|end)[:]\s*$")

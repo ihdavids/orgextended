@@ -258,6 +258,7 @@ class LatexTableBlockState(exp.TableBlockState):
         if(tds):
             self.HandleData(tds,True)
     def HandleExiting(self, m, l , orgnode):
+        print("EXIT")
         self.e.doc.append(r"    \hline")
         self.e.doc.append(r"    \end{tabular}")
         self.e.doc.append(r"    \end{table}")
@@ -280,6 +281,7 @@ class LatexTableBlockState(exp.TableBlockState):
             haveTableHeader = True
 
     def HandleIn(self,l, orgnode):
+        print("IN")
         if(RE_TABLE_SEPARATOR.search(l)):
             self.e.doc.append(r'    \hline')
         else:
@@ -346,7 +348,7 @@ class LatexLinkParser(exp.LinkParser):
         if(desc):
             self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
         else:
-            self.e.doc.append(r"\href{{{link}}}".format(link=link))
+            self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=self.e.Escape(link)))
 
 
 class LatexDoc(exp.OrgExporter):
@@ -356,12 +358,13 @@ class LatexDoc(exp.OrgExporter):
         self.pre      = []
         self.doc      = []
         self.attribs  = {}
+        self.amInBlock = False
         # TODO: Make this configurable
+        self.pre.append(r"\usepackage[utf8]{inputenc}")
         self.pre.append(r"\usepackage{listings}")
         self.pre.append(r"\usepackage{hyperref}")
         self.pre.append(r"\usepackage{csquotes}")
         self.pre.append(r"\usepackage{makecell, caption}")
-        self.pre.append(r"\usepackage[utf8]{inputenc}")
         self.pre.append(r"\usepackage[T1]{fontenc}")
         self.pre.append(r"\usepackage[greek,english]{babel}")
         self.pre.append(r"\usepackage{CJKutf8}")
@@ -389,11 +392,11 @@ class LatexDoc(exp.OrgExporter):
         #self.pre.append(r"\usepackage{flafter}") 
         self.nodeParsers = [
         exp.CaptionAttributeParser(self),
+        LatexTableBlockState(self),
         LatexSourceBlockState(self),
         LatexDynamicBlockState(self),
         LatexQuoteBlockState(self),
         LatexExampleBlockState(self),
-        LatexTableBlockState(self),
         LatexCheckboxListBlockState(self),
         LatexUnorderedListBlockState(self),
         LatexOrderedListBlockState(self),
@@ -411,6 +414,11 @@ class LatexDoc(exp.OrgExporter):
         LatexVerbatimParser(self)
         ]
 
+    def SetAmInBlock(self,inBlock):
+        self.amInBlock = inBlock
+
+    def AmInBlock(self):
+        return self.amInBlock
 
     def AddAttrib(self,name,val):
         self.attribs[name] = val.strip()
