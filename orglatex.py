@@ -280,8 +280,8 @@ class LatexHrParser(exp.HrParser):
     def __init__(self,doc):
         super(LatexHrParser,self).__init__(doc)
     def HandleLine(self,m,l,n):
-        self.e.doc.append(r" ")
-        self.e.doc.append(r"\hrulefill")
+        self.e.doc.append(r"\newline")
+        self.e.doc.append("\n" + r"\hrulefill")
         self.e.doc.append(r" ")
 
 class LatexBoldParser(exp.BoldParser):
@@ -351,6 +351,10 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{hyperref}")
         self.pre.append(r"\usepackage{csquotes}")
         self.pre.append(r"\usepackage{makecell, caption}")
+        self.pre.append(r"\usepackage[utf8]{inputenc}")
+        #self.pre.append(r"\usepackage[LGRx,T1]{fontenc}")
+        self.pre.append(r"\usepackage[greek,english]{babel}")
+        self.pre.append(r"\usepackage{CJKutf8}")
         # Needed for strikethrough
         self.pre.append(r"\usepackage[normalem]{ulem}")
         # Checkbox Setup
