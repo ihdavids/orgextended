@@ -174,6 +174,16 @@ class LatexQuoteBlockState(exp.QuoteBlockState):
     def HandleIn(self,l, orgnode):
         self.e.doc.append(l)
 
+class LatexExampleBlockState(exp.ExampleBlockState):
+    def __init__(self,doc):
+        super(LatexExampleBlockState,self).__init__(doc)
+    def HandleEntering(self,m,l,orgnode):
+        self.e.doc.append(r"  \begin{verbatim}")
+    def HandleExiting(self, m, l , orgnode):
+        self.e.doc.append(r"  \end{verbatim}")
+    def HandleIn(self,l, orgnode):
+        self.e.doc.append(l)
+
 class LatexGenericBlockState(exp.GenericBlockState):
     def __init__(self,doc):
         super(LatexGenericBlockState,self).__init__(doc)
@@ -352,9 +362,16 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{csquotes}")
         self.pre.append(r"\usepackage{makecell, caption}")
         self.pre.append(r"\usepackage[utf8]{inputenc}")
-        #self.pre.append(r"\usepackage[LGRx,T1]{fontenc}")
+        self.pre.append(r"\usepackage[T1]{fontenc}")
         self.pre.append(r"\usepackage[greek,english]{babel}")
         self.pre.append(r"\usepackage{CJKutf8}")
+        self.pre.append(r"\usepackage{graphicx}")
+        self.pre.append(r"\usepackage{grffile}")
+        self.pre.append(r"\usepackage{longtable}")
+        self.pre.append(r"\usepackage{wrapfig}")
+        self.pre.append(r"\usepackage{rotating}")
+        self.pre.append(r"\usepackage{textcomp}")
+        self.pre.append(r"\usepackage{capt-of}")
         # Needed for strikethrough
         self.pre.append(r"\usepackage[normalem]{ulem}")
         # Checkbox Setup
@@ -375,6 +392,7 @@ class LatexDoc(exp.OrgExporter):
         LatexSourceBlockState(self),
         LatexDynamicBlockState(self),
         LatexQuoteBlockState(self),
+        LatexExampleBlockState(self),
         LatexTableBlockState(self),
         LatexCheckboxListBlockState(self),
         LatexUnorderedListBlockState(self),
@@ -392,6 +410,7 @@ class LatexDoc(exp.OrgExporter):
         LatexCodeParser(self),
         LatexVerbatimParser(self)
         ]
+
 
     def AddAttrib(self,name,val):
         self.attribs[name] = val.strip()

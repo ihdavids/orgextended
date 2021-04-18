@@ -85,6 +85,7 @@ class OrgExporter:
         for l in self.file.org._lines:
             self.PreScanExportCommentsGather(l)
             self.PreScanCustom(l)
+        self.PostPreScanCustom()
     
     # This is called when the document is being destroyed
     def Close(self):
@@ -93,6 +94,10 @@ class OrgExporter:
 
     # Override this to add to the pre-scan phase
     def PreScanCustom(self,l):
+        pass
+
+    # Called after the pre scan is complete
+    def PostPreScanCustom(self):
         pass
 
     # Override this to close off the document for exporting
@@ -394,6 +399,13 @@ RE_ENDQUOTE = re.compile(r"^\s*#\+(END_QUOTE|end_quote)")
 class QuoteBlockState(BlockState):
     def __init__(self,doc):
         super(QuoteBlockState,self).__init__(RE_STARTQUOTE, RE_ENDQUOTE,doc)
+
+RE_STARTEXAMPLE = re.compile(r"^\s*#\+(BEGIN_EXAMPLE|begin_example)")
+RE_ENDEXAMPLE = re.compile(r"^\s*#\+(END_EXAMPLE|end_example)")
+
+class ExampleBlockState(BlockState):
+    def __init__(self,doc):
+        super(ExampleBlockState,self).__init__(RE_STARTEXAMPLE, RE_ENDEXAMPLE,doc)
 
 RE_STARTGENERIC = re.compile(r"#\+(BEGIN_|begin_)(?P<data>[a-zA-Z0-9-]+)(\s|$)")
 RE_ENDGENERIC   = re.compile(r"#\+(END_|end_)([a-zA-Z0-9-]+)(\s|$)")
