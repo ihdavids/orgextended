@@ -194,7 +194,7 @@ class OrgDb:
         if(fileOrView == None):
             return None
         if(not hasattr(self,'orgPaths') or self.orgPaths == None):
-            self.orgPaths = sets.Get("orgDirs",None)
+            self.orgPaths = self.__GetPaths("orgDirs")
         filename = self.FilenameFromFileOrView(fileOrView)
         if(util.isPotentialOrgFile(filename)):
             file = FileInfo(filename, loader.load(filename), self.orgPaths)
@@ -223,7 +223,7 @@ class OrgDb:
         #self.files.pop(filename,None)
 
     def Reload(self, fileOrView):
-        self.orgPaths = sets.Get("orgDirs",None)
+        self.orgPaths = self.__GetPaths("orgDirs")
         fi = self.FindInfo(fileOrView)
         if(fi != None):
             fi.Reload()
@@ -281,10 +281,10 @@ class OrgDb:
         evt.Get().on("tagsfound",self.OnTags)
         self.Files = []
         self.files = {}
-        self.orgPaths = sets.Get("orgDirs",None)
-        self.orgFiles = sets.Get("orgFiles",None)
-        self.orgExcludePaths = sets.Get("orgExcludeDirs",None)
-        self.orgExcludeFiles = sets.Get("orgExcludeFiles",None)
+        self.orgPaths = self.__GetPaths("orgDirs")
+        self.orgFiles = self.__GetPaths("orgFiles")
+        self.orgExcludePaths = self.__GetPaths("orgExcludeDirs")
+        self.orgExcludeFiles = self.__GetPaths("orgExcludeFiles")
         matches = []
         if(self.orgPaths):
             # Just in case the user gave us a string instead of a list.
@@ -545,6 +545,14 @@ class OrgDb:
             at = file.org.env.ids[id][1]
             return (file,at)
         return (None, None)
+
+    def __GetPaths(self, name):
+        paths = sets.Get(name, None)
+        if (str == type(paths)):
+            return os.path.expanduser(paths)
+        if (list == type(paths)):
+            return list(map(os.path.expanduser, paths))
+        return None
 
 
 # EXPORTED ORGDB

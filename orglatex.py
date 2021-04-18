@@ -39,7 +39,7 @@ langMap = {
     "perl": "Perl",
     "bash": "bash",
     "sh": "sh",
-    "lua": "Lua",
+    "lua": "[5.0]Lua",
     "java": "Java",
     "php": "PHP",
     "xml": "XML",
@@ -56,6 +56,9 @@ langMap = {
     "erlang": "erlang",
     "gnuplot": "Gnuplot",
 }
+
+# overriding it by users settings
+langMap.update(sets.Get("latexListingPackageLang",langMap))
 
 def haveLang(lang):
     return lang in langMap
@@ -125,7 +128,7 @@ class LatexSourceBlockState(exp.SourceBlockState):
             return
         attribs = ""
         if(haveLang(language)):
-            self.e.doc.append(r"  \begin{{lstlisting}}[language={lang}]".format(lang=mapLanguage(language)))
+            self.e.doc.append(r"  \begin{{lstlisting}}[language={{{lang}}}]".format(lang=mapLanguage(language)))
         else:
             self.e.doc.append(r"  \begin{lstlisting}")
 
