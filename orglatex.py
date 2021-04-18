@@ -332,6 +332,7 @@ class LatexVerbatimParser(exp.VerbatimParser):
     def HandleSegment(self,m,l,n):
         self.e.doc.append(self.sre.sub(r"\\texttt{\g<data>}",m.group()))
 
+# Simple links are easy. The hard part is images, includes and results
 class LatexLinkParser(exp.LinkParser):
     def __init__(self,doc):
         super(LatexLinkParser,self).__init__(doc)
@@ -350,6 +351,12 @@ class LatexLinkParser(exp.LinkParser):
         else:
             self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=self.e.Escape(link)))
 
+# <<TARGET>>
+class LatexTargetParser(exp.TargetParser):
+    def __init__(self,doc):
+        super(LatexTargetParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(r"\label{{{data}}}".format(data=m.group('data')))
 
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
@@ -411,7 +418,8 @@ class LatexDoc(exp.OrgExporter):
         LatexUnderlineParser(self),
         LatexStrikethroughParser(self),
         LatexCodeParser(self),
-        LatexVerbatimParser(self)
+        LatexVerbatimParser(self),
+        LatexTargetParser(self)
         ]
 
     def SetAmInBlock(self,inBlock):

@@ -21,7 +21,6 @@ RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
 RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
 
 
-RE_HR = re.compile(r"^((\s*-----+\s*)|(\s*---\s+[a-zA-Z0-9 ]+\s+---\s*))$")
 
 def ExportFilename(view,extension,suffix=""):
     fn = view.file_name()
@@ -504,6 +503,12 @@ class LinkParser(SubLineParser):
     def __init__(self,doc):
         super(LinkParser,self).__init__(RE_LINK,doc)
 
+RE_HR = re.compile(r"^((\s*-----+\s*)|(\s*---\s+[a-zA-Z0-9 ]+\s+---\s*))$")
 class HrParser(LineParser):
     def __init__(self,doc):
         super(HrParser,self).__init__(RE_HR,doc)
+
+RE_TARGET = regex.compile(r"<<(?P<data>.+?)>>")
+class TargetParser(SubLineParser):
+    def __init__(self,doc):
+        super(TargetParser,self).__init__(RE_TARGET,doc)
