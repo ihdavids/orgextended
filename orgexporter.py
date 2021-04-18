@@ -282,9 +282,13 @@ class ListBlockState:
             if(m):
                 thisIndent = len(m.group('indent'))
                 if(not inList):
-                    curIndent = thisIndent
-                    self.HandleEntering(m,l,orgnode)
-                    inList += 1
+                    if(not self.e.AmInBlock()):
+                        curIndent = thisIndent
+                        self.HandleEntering(m,l,orgnode)
+                        inList += 1
+                    else:
+                        yield l
+                        continue
                 elif(thisIndent > curIndent):
                     curIndent = thisIndent
                     self.HandleEntering(m,l,orgnode)
