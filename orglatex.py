@@ -324,6 +324,12 @@ class LatexEmptyParser(exp.EmptyParser):
     def HandleLine(self,m,l,n):
         self.e.doc.append(r"\newline")
 
+class LatexActiveDateParser(exp.EmptyParser):
+    def __init__(self,doc):
+        super(LatexActiveDateParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r"\textit{{{date}}}".format(date=m.group()))
+
 class LatexBoldParser(exp.BoldParser):
     def __init__(self,doc):
         super(LatexBoldParser,self).__init__(doc)
@@ -443,6 +449,7 @@ class LatexDoc(exp.OrgExporter):
         LatexLinkParser(self),
         LatexHrParser(self),
         #LatexEmptyParser(self),
+        LatexActiveDateParser(self),
         LatexBoldParser(self),
         LatexItalicsParser(self),
         LatexUnderlineParser(self),

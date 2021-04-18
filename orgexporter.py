@@ -10,6 +10,7 @@ import sys
 import traceback 
 import OrgExtended.asettings as sets
 import OrgExtended.orgdb as db
+import OrgExtended.orgparse.date as date
 
 log = logging.getLogger(__name__)
 
@@ -261,6 +262,8 @@ class BlockState:
                         continue
                 yield line
         if(amIn):
+            amIn = False
+            self.e.SetAmInBlock(False)
             self.HandleExiting(None,None,orgnode)
     def HandleIn(self, line, orgnode):
         pass
@@ -523,3 +526,11 @@ RE_EMPTY = re.compile(r"^\s*$")
 class EmptyParser(LineParser):
     def __init__(self,doc):
         super(EmptyParser,self).__init__(RE_EMPTY,doc)
+
+class ActiveDateParser(LineParser):
+    def __init__(self,doc):
+        super(ActiveDateParser,self).__init__(date.gene_timestamp_regex('active'),doc)
+
+class InactiveDateParser(LineParser):
+    def __init__(self,doc):
+        super(InactiveDateParser,self).__init__(date.gene_timestamp_regex('inactive'),doc)
