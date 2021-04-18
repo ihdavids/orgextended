@@ -231,8 +231,8 @@ class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
         if(state == 'x'):
             self.e.doc.append(r"     \item[\wontfix] {content}".format(content=data))
         elif(state == '-'):
-            #self.e.doc.append(r"     \item {content}".format(content=data))
-            self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
+            self.e.doc.append(r"     \item {content}".format(content=data))
+            #self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
         else:
             self.e.doc.append(r"     \item {content}".format(content=data))
 
@@ -384,7 +384,7 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{pifont}")
         self.pre.append(r"\newcommand{\cmark}{\ding{51}}%")
         self.pre.append(r"\newcommand{\xmark}{\ding{55}}%")
-        self.pre.append(r"\newcommand{\tridot}{\ding{73}}%")
+        self.pre.append(r"\newcommand{\tridot}{\ding{213}}%")
         self.pre.append(r"\newcommand{\inp}{\rlap{$\square$}{\large\hspace{1pt}\tridot}}")
         self.pre.append(r"\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%")
         self.pre.append(r"\hspace{-2.5pt}}")
