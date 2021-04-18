@@ -476,3 +476,12 @@ class CodeParser(SubLineParser):
 class VerbatimParser(SubLineParser):
     def __init__(self,doc):
         super(VerbatimParser,self).__init__(RE_VERBATIM,doc)
+
+RE_LINK = re.compile(r"\[\[(?P<link>[^\]]+)\](\[(?P<desc>[^\]]+)\])?\]")
+class LinkParser(SubLineParser):
+    def __init__(self,doc):
+        super(LinkParser,self).__init__(RE_LINK,doc)
+
+class HrParser(LineParser):
+    def __init__(self,doc):
+        super(HrParser,self).__init__(RE_HR,doc)

@@ -276,6 +276,14 @@ class LatexTableBlockState(exp.TableBlockState):
             tds = l.split('|')
             self.HandleData(tds)
 
+class LatexHrParser(exp.HrParser):
+    def __init__(self,doc):
+        super(LatexHrParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r" ")
+        self.e.doc.append(r"\hrulefill")
+        self.e.doc.append(r" ")
+
 class LatexBoldParser(exp.BoldParser):
     def __init__(self,doc):
         super(LatexBoldParser,self).__init__(doc)
@@ -311,6 +319,25 @@ class LatexVerbatimParser(exp.VerbatimParser):
         super(LatexVerbatimParser,self).__init__(doc)
     def HandleSegment(self,m,l,n):
         self.e.doc.append(self.sre.sub(r"\\texttt{\g<data>}",m.group()))
+
+class LatexLinkParser(exp.LinkParser):
+    def __init__(self,doc):
+        super(LatexLinkParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        link = m.group('link').strip()
+        desc = m.group('desc')
+        if(desc):
+            desc = self.e.Escape(desc.strip())
+        if(link.startswith("file:")):
+            link = re.sub(r'^file:','',link)  
+        link = re.sub(r"[:][:][^/].*","",link)
+        link = link.replace("\\","/")
+        text = m.group()
+        if(desc):
+            self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
+        else:
+            self.e.doc.append(r"\href{{{link}}}".format(link=link))
+
 
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
@@ -352,6 +379,8 @@ class LatexDoc(exp.OrgExporter):
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
         exp.TblFmStripper(self),
+        LatexLinkParser(self),
+        LatexHrParser(self),
         LatexBoldParser(self),
         LatexItalicsParser(self),
         LatexUnderlineParser(self),
