@@ -20,12 +20,6 @@ RE_DATE = regex.compile(r"^\s*[#][+](DATE|date)[:]\s*(?P<data>.*)")
 RE_EMAIL = regex.compile(r"^\s*[#][+](EMAIL|email)[:]\s*(?P<data>.*)")
 RE_LANGUAGE = regex.compile(r"^\s*[#][+](LANGUAGE|language)[:]\s*(?P<data>.*)")
 
-RE_BOLD = re.compile(r"\*(?P<data>.+)\*")
-RE_ITALICS = re.compile(r"/(?P<data>.+)/")
-RE_UNDERLINE = re.compile(r"_(?P<data>.+)_")
-RE_STRIKETHROUGH = re.compile(r"\+(?P<data>.+)\+")
-RE_CODE = re.compile(r"~(?P<data>.+)~")
-RE_VERBATIM = re.compile(r"=(?P<data>.+)=")
 
 RE_HR = re.compile(r"^((\s*-----+\s*)|(\s*---\s+[a-zA-Z0-9 ]+\s+---\s*))$")
 
@@ -332,6 +326,8 @@ class StripParser:
                 continue
             yield line
 
+# This parser expects the item to live and consume the entire line
+# Match will replace the entire line
 class LineParser:
     def __init__(self,sre,doc):
         self.sre      = sre
@@ -344,6 +340,37 @@ class LineParser:
                 continue
             yield line
     def HandleLine(self,m,l,orgnode):
+        pass
+# This parser expects a match to be "within" a line.
+# This is complicated because we may still have to foward off
+# the other portions of the line 
+class SubLineParser:
+    def __init__(self,sre,doc):
+        self.sre      = sre
+        self.e        = doc
+    def Handle(self, lines, orgnode):
+        for line in lines:
+            start = 0
+            llen = len(self.e.doc)
+            for m in self.sre.finditer(line):
+                s,e = m.span()
+                if(s > start):
+                    segment = line[start:s]
+                    yield segment
+                    start = e
+                self.HandleSegment(m,line,orgnode)
+            if(start != 0 and len(line) > start):
+                segment = line[start:]
+                yield segment
+            elif(start == 0):
+                yield line
+            # We generated more than one line here! need to collapse
+            nlen = len(self.e.doc) - llen
+            if(nlen > 1):
+                ls = "".join(self.e.doc[llen:])
+                del self.e.doc[-nlen:]
+                self.e.doc.append(ls)
+    def HandleSegment(self,m,l,orgnode):
         pass
 
 RE_STARTSRC = re.compile(r"^\s*#\+(BEGIN_SRC|begin_src)\s+(?P<lang>[a-zA-Z0-9]+)")
@@ -417,3 +444,35 @@ RE_OL   = re.compile(r"^(?P<indent>\s*)[0-9]+[).]\s+(?P<data>.+)")
 class OrderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(OrderedListBlockState,self).__init__(RE_OL,doc)
+
+
+RE_BOLD = re.compile(r"\*(?P<data>.+?)\*")
+RE_ITALICS = re.compile(r"/(?P<data>.+?)/")
+RE_UNDERLINE = re.compile(r"[_](?P<data>.+?)[_]")
+RE_STRIKETHROUGH = re.compile(r"\+(?P<data>.+?)\+")
+RE_CODE = re.compile(r"~(?P<data>.+?)~")
+RE_VERBATIM = re.compile(r"=(?P<data>.+?)=")
+
+class BoldParser(SubLineParser):
+    def __init__(self,doc):
+        super(BoldParser,self).__init__(RE_BOLD,doc)
+
+class ItalicsParser(SubLineParser):
+    def __init__(self,doc):
+        super(ItalicsParser,self).__init__(RE_ITALICS,doc)
+
+class UnderlineParser(SubLineParser):
+    def __init__(self,doc):
+        super(UnderlineParser,self).__init__(RE_UNDERLINE,doc)
+
+class StrikethroughParser(SubLineParser):
+    def __init__(self,doc):
+        super(StrikethroughParser,self).__init__(RE_STRIKETHROUGH,doc)
+
+class CodeParser(SubLineParser):
+    def __init__(self,doc):
+        super(CodeParser,self).__init__(RE_CODE,doc)
+
+class VerbatimParser(SubLineParser):
+    def __init__(self,doc):
+        super(VerbatimParser,self).__init__(RE_VERBATIM,doc)

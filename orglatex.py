@@ -276,6 +276,42 @@ class LatexTableBlockState(exp.TableBlockState):
             tds = l.split('|')
             self.HandleData(tds)
 
+class LatexBoldParser(exp.BoldParser):
+    def __init__(self,doc):
+        super(LatexBoldParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\textbf{\g<data>}",m.group()))
+
+class LatexItalicsParser(exp.ItalicsParser):
+    def __init__(self,doc):
+        super(LatexItalicsParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\textit{\g<data>}",m.group()))
+
+class LatexUnderlineParser(exp.UnderlineParser):
+    def __init__(self,doc):
+        super(LatexUnderlineParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\underline{\g<data>}",m.group()))
+
+class LatexStrikethroughParser(exp.StrikethroughParser):
+    def __init__(self,doc):
+        super(LatexStrikethroughParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\sout{\g<data>}",m.group()))
+
+class LatexCodeParser(exp.CodeParser):
+    def __init__(self,doc):
+        super(LatexCodeParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\texttt{\g<data>}",m.group()))
+
+class LatexVerbatimParser(exp.VerbatimParser):
+    def __init__(self,doc):
+        super(LatexVerbatimParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(self.sre.sub(r"\\texttt{\g<data>}",m.group()))
+
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
@@ -288,7 +324,8 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{hyperref}")
         self.pre.append(r"\usepackage{csquotes}")
         self.pre.append(r"\usepackage{makecell, caption}")
-
+        # Needed for strikethrough
+        self.pre.append(r"\usepackage[normalem]{ulem}")
         # Checkbox Setup
         self.pre.append(r"\usepackage{enumitem,amssymb}")
         self.pre.append(r"\newlist{todolist}{itemize}{2}")
@@ -314,7 +351,13 @@ class LatexDoc(exp.OrgExporter):
         LatexGenericBlockState(self),
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
-        exp.TblFmStripper(self)
+        exp.TblFmStripper(self),
+        LatexBoldParser(self),
+        LatexItalicsParser(self),
+        LatexUnderlineParser(self),
+        LatexStrikethroughParser(self),
+        LatexCodeParser(self),
+        LatexVerbatimParser(self)
         ]
 
     def AddAttrib(self,name,val):
