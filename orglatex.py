@@ -318,6 +318,12 @@ class LatexHrParser(exp.HrParser):
     def HandleLine(self,m,l,n):
         self.e.doc.append(r"\newline\noindent\rule{\textwidth}{0.5pt}")
 
+class LatexEmptyParser(exp.EmptyParser):
+    def __init__(self,doc):
+        super(LatexEmptyParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r"\newline")
+
 class LatexBoldParser(exp.BoldParser):
     def __init__(self,doc):
         super(LatexBoldParser,self).__init__(doc)
@@ -436,6 +442,7 @@ class LatexDoc(exp.OrgExporter):
         exp.TblFmStripper(self),
         LatexLinkParser(self),
         LatexHrParser(self),
+        #LatexEmptyParser(self),
         LatexBoldParser(self),
         LatexItalicsParser(self),
         LatexUnderlineParser(self),

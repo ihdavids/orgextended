@@ -518,3 +518,8 @@ RE_TARGET = regex.compile(r"<<(?P<data>.+?)>>")
 class TargetParser(SubLineParser):
     def __init__(self,doc):
         super(TargetParser,self).__init__(RE_TARGET,doc)
+
+RE_EMPTY = re.compile(r"^\s*$")
+class EmptyParser(LineParser):
+    def __init__(self,doc):
+        super(EmptyParser,self).__init__(RE_EMPTY,doc)
