@@ -1,37 +1,17 @@
 import sublime
 import sublime_plugin
-import datetime
 import re
-from pathlib import Path
 import os
-import fnmatch
-import OrgExtended.orgparse.node as node
-from   OrgExtended.orgparse.sublimenode import * 
+from   OrgExtended.orgparse.sublimenode import *
 import OrgExtended.orgutil.util as util
 from OrgExtended.orgutil.util import *
-import OrgExtended.orgutil.navigation as nav
-import OrgExtended.orgutil.template as templateEngine
 import logging
-import sys
-import traceback 
-import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
-import OrgExtended.orgcapture as capture
 import OrgExtended.orgextension as ext
-import subprocess
-import glob
-import datetime
-from collections import defaultdict, deque
-import threading
-import io
-from subprocess import Popen, PIPE
+from collections import defaultdict
 import struct
 import imghdr
-import unicodedata
-from collections import Counter
-from operator import itemgetter
-import base64
 import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
@@ -79,21 +59,26 @@ DEFAULT_LINK_RESOLVERS = [
 available_resolvers = ext.find_extension_modules('orgresolver', DEFAULT_LINK_RESOLVERS)
 linkre              = re.compile(r"\[\[([^\[\]]+)\]\s*(\[[^\[\]]*\])?\]")
 
+
 # Returns the url from the full link
 def extract_link_url(str):
     m = linkre.search(str)
     return m.group(1)
 
+
 def extract_link_url_from_region(view, region):
     return extract_link_url(view.substr(region))
 
+
 def is_region_link(view, region):
     return 'orgmode.link' in view.scope_name(region.end())
+
 
 def get_link_region_at(view):
     if(is_region_link(view, view.sel()[0])):
         return extract_link(view)
     return None
+
 
 def find_image_file(view, url):
     # ABS
@@ -106,17 +91,18 @@ def find_image_file(view, url):
         if(os.path.isfile(filename)):
             return filename
     # In search path
-    searchHere = sets.Get("imageSearchPath",[])
+    searchHere = sets.Get("imageSearchPath", [])
     for direc in searchHere:
         filename = os.path.join(direc, url)
         if(os.path.isfile(filename)):
             return filename
 
-    searchHere = sets.Get("orgDirs",[])
+    searchHere = sets.Get("orgDirs", [])
     for direc in searchHere:
-        filename = os.path.join(direc, "images", url) 
+        filename = os.path.join(direc, "images", url)
         if(os.path.isfile(filename)):
             return filename
+
 
 RE_TARGET = re.compile(r'<<(?P<target>[^>]+)>>')
 RE_NAMED = re.compile(r'[#][+]NAME[:]\s*(?P<target>.+)')
@@ -131,32 +117,33 @@ def CreateLink(view):
         link = None
         # have target on this line?
         if(linet):
-           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(),linet.group('target'))
+           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(), linet.group('target'))
         # have named object on this line?
         if(link == None and namet):
-           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(),namet.group('target'))
+           link = "[[file:{0}::{1}][{1}]]".format(view.file_name(), namet.group('target'))
         n = db.Get().AtInView(view)
         if(link == None and n and not n.is_root()):
             p  = n.get_property("ID")
             cp = n.get_property("CUSTOM_ID")
             if(p):
-               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(),p,n.heading)
+               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(), p, n.heading)
             # Have custom id?
             elif(cp):
-               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(),cp,n.heading)
+               link = "[[file:{0}::#{1}][{2}]]".format(view.file_name(), cp, n.heading)
             # Am near a heading?
             else:
-               link = "[[file:{0}::*{1}][{1}]]".format(view.file_name(),n.heading)
+               link = "[[file:{0}::*{1}][{1}]]".format(view.file_name(), n.heading)
         # okay then just use row,col
         if(link == None):
-            r,c = view.curRowCol()
-            link = "[[file:{0}::{1},{2}][{3}]]".format(view.file_name(),r,c,os.path.basename(view.file_name()))
+            r, c = view.curRowCol()
+            link = "[[file:{0}::{1},{2}][{3}]]".format(view.file_name(), r, c, os.path.basename(view.file_name()))
         return link
     else:
         # Other file types only have line and column
-        r,c = view.curRowCol()
-        link = "[[{0}::{1}::{2}][{3}]]".format(fn,r,c,os.path.basename(fn))
+        r, c = view.curRowCol()
+        link = "[[{0}::{1}::{2}][{3}]]".format(fn, r, c, os.path.basename(fn))
         return link
+
 
 class OrgOpenLinkCommand(sublime_plugin.TextCommand):
     def resolve(self, content):
@@ -194,6 +181,7 @@ class OrgOpenLinkCommand(sublime_plugin.TextCommand):
                 continue
             resolver.execute(newcontent)
 
+
 class OrgCreateLinkCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         link = CreateLink(self.view)
@@ -201,9 +189,9 @@ class OrgCreateLinkCommand(sublime_plugin.TextCommand):
         nvi.TestAndSetClip(self.view, link)
 
 
-
 # global magic
 VIEWS_WITH_IMAGES = set()
+
 
 # Stolen from:
 # https://github.com/renerocksai/sublime_zk/blob/master/sublime_zk.py
@@ -217,14 +205,14 @@ class ImageHandler:
 
     @staticmethod
     def save_cache():
-       user_settings_path = os.path.join(sublime.packages_path(), "User","OrgExtended_image_cache.yaml")
-       f = open(user_settings_path,"w")
+       user_settings_path = os.path.join(sublime.packages_path(), "User", "OrgExtended_image_cache.yaml")
+       f = open(user_settings_path, "w")
        data = yaml.dump(ImageHandler.Cache, f)
-       f.close() 
+       f.close()
 
     @staticmethod
     def load_cache():
-        user_settings_path = os.path.join(sublime.packages_path(), "User","OrgExtended_image_cache.yaml")
+        user_settings_path = os.path.join(sublime.packages_path(), "User", "OrgExtended_image_cache.yaml")
         if(os.path.isfile(user_settings_path)):
             stream = open(user_settings_path, 'r')
             ImageHandler.Cache = yaml.load(stream, Loader=yaml.SafeLoader)
@@ -234,14 +222,14 @@ class ImageHandler:
     def show_image(region, view, max_width=1024):
         width = -1
         height = -1
-        node = db.Get().AtRegion(view,region)
+        node = db.Get().AtRegion(view, region)
         if(node):
-            attr = node.get_comment("ORG_ATTR",None)
+            attr = node.get_comment("ORG_ATTR", None)
             if(attr):
                 params = PList.createPList(attr)
                 try:
-                    width = int(params.Get('width',-1))
-                    height = int(params.Get('height',-1))
+                    width = int(params.Get('width', -1))
+                    height = int(params.Get('height', -1))
                 except:
                     log.error("Could not extract width and height from plist / ORG_ATTR comment")
         # If we already have this image then exit out
@@ -280,7 +268,7 @@ class ImageHandler:
                 '''
             img = ttype + ";base64," + util.get_as_base64(img)
         elif url.startswith("file:"):
-            url = url.replace("file:","")
+            url = url.replace("file:", "")
             log.debug("FILE: " + url)
             FMT = '''
                 {}<img src="file://{}" class="centerImage" {}>
@@ -293,7 +281,7 @@ class ImageHandler:
                 if(height > 0):
                     size = [size[0], height, size[2]]
             else:
-                size = (100,100,"png")
+                size = (100, 100, "png")
         else:
             log.debug("local file: " + url)
             FMT = '''
@@ -399,7 +387,7 @@ class ImageHandler:
 
                 if b'<svg' in head:
                     ttype = 'svg'
-                    width, height = (100,100)
+                    width, height = (100, 100)
                     return width, height, ttype
                 if len(head) != 24:
                     return
@@ -434,7 +422,8 @@ class ImageHandler:
                     return
                 return width, height, ttype
         except:
-            return 100,100,'png'
+            return 100, 100, 'png'
+
 
 class OrgCycleImagesCommand(sublime_plugin.TextCommand):
     def OnDone(self):
@@ -446,43 +435,51 @@ class OrgCycleImagesCommand(sublime_plugin.TextCommand):
         self.OnDone()
 
     def OnHidden(self):
-        self.view.run_command("org_show_images",{"onDone": evt.Make(self.OnShown)})
+        self.view.run_command("org_show_images", {"onDone": evt.Make(self.OnShown)})
 
     def run(self, edit, onDone=None):
         self.onDone = onDone
         self.cursor = self.view.sel()[0]
-        self.view.run_command("org_hide_images",{"onDone": evt.Make(self.OnHidden)})
+        self.view.run_command("org_hide_images", {"onDone": evt.Make(self.OnHidden)})
+
 
 class OrgShowImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit,onDone=None):
+    def run(self, edit, onDone=None):
         ImageHandler.show_images(self.view)
         evt.EmitIf(onDone)
 
+
 class OrgHideImagesCommand(sublime_plugin.TextCommand):
-    def run(self, edit,onDone=None):
+    def run(self, edit, onDone=None):
         ImageHandler.hide_images(self.view, edit)
         evt.EmitIf(onDone)
+
 
 class OrgShowImageCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         ImageHandler.show_image_at(self.view)
 
+
 class OrgHideImageCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         ImageHandler.hide_image_at(self.view)
+
 
 # ON LOAD HANDLER: if startup is set we show or hide the images.
 #+STARTUP: inlineimages
 #+STARTUP: noinlineimages
 def get_show_images_default():
-    return sets.Get("startup",["noinlineimages"])
+    return sets.Get("startup", ["noinlineimages"])
+
 
 def get_image_startup(node):
     startupDefault = get_show_images_default()
     return node.startup(startupDefault)
 
+
 def onShutdown():
     ImageHandler.save_cache()
+
 
 def onLoad(view):
     ImageHandler.load_cache()
