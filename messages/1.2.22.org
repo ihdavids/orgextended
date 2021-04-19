@@ -1,5 +1,5 @@
 * 1.2.22
-** TODO Table Bug
+** Table Bug
 	Fixing a remote indexing bug.
 	If the local table does not have enough columns to match your remote index
 	the remote target would get capped to the local width:
@@ -15,3 +15,5 @@
 
     | a |
     #+TBLFM:@1$1=remote('hiya',@1$2)
+
+    After the fix this now reads b

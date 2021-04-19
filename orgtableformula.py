@@ -784,14 +784,19 @@ class Cell:
             return rv
         return False
 
-    def GetRow(self):
+    def GetRow(self,height=None):
         r = None
+        # We have to allow someone to pass in the height
+        # because remote tables don't like to be truncated
+        # to a local tables height!
+        if(height == None):
+            height = self.table.Height()
         if(isinstance(self.r,str)):
             if(self.r == "*"):
                 r = self.table.CurRow()
             elif(self.r.startswith('>')):
                 cnt = len(self.r.strip())
-                r = self.table.Height() - (cnt-1)
+                r = height - (cnt-1)
             elif(self.r.startswith("<")):
                 cnt = len(self.r.strip())
                 r = self.table.StartRow() + (cnt-1)
@@ -808,18 +813,23 @@ class Cell:
             r = self.table.CurRow()
         if(r < 1):
             r = 1
-        if(r > self.table.Height()):
-            r = self.table.Height()
+        if(r > height):
+            r = height
         return r
 
-    def GetCol(self):
+    def GetCol(self,width=None):
         c = None
+        # We have to allow someone to pass in the width
+        # because remote tables don't like to be truncated
+        # to a local tables width!
+        if(width==None):
+            width = self.table.Width()
         if(isinstance(self.c,str)):
             if(self.c == "*"):
                 c = self.table.CurCol()
             elif(self.c.startswith(">")):
                 cnt = len(self.c.strip())
-                c = self.table.Width() - (cnt-1)
+                c = width - (cnt-1)
             elif(self.c.startswith("<")):
                 cnt = len(self.c.strip())
                 c = self.table.StartCol() + (cnt-1)
@@ -836,8 +846,8 @@ class Cell:
             c = self.table.CurCol()
         if(c < 1):
             c = 1
-        if(c > self.table.Width()):
-            c = self.table.Width()
+        if(c > width):
+            c = width
         return c
 
     def GetText(self):
@@ -1498,7 +1508,7 @@ def remote(name,cellRef):
     """
     td = LookupTableFromNamedObject(name)
     if(td):
-        text = td.GetCellText(cellRef.GetRow(),cellRef.GetCol())
+        text = td.GetCellText(cellRef.GetRow(td.Height()),cellRef.GetCol(td.Width()))
         return text
     return "<UNK REF>"
 
