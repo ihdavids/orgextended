@@ -237,6 +237,7 @@ def Erase(view, reg, onDone=None):
 def InsertEnd(view, text, onDone=None): 
     view.run_command("org_internal_insert", {"location": view.size(), "text": text, "onDone": onDone})
 
+# Takes a filename and returns it with a path relative to our view
 @add_method(sublime.View)
 def RelativeTo(view, filepath):
     fp = filepath.strip()
@@ -244,6 +245,14 @@ def RelativeTo(view, filepath):
     if(len(fp) > 2 and fp[0] == '/' or fp[1] == ':'):
         return fp
     return os.path.normpath(os.path.join(os.path.dirname(view.file_name()), fp))
+
+# Returns path as a relative path relative to the current view
+@add_method(sublime.View)
+def MakeRelativeToMe(view, path):
+    current_directory = os.path.dirname(view.file_name())
+    return os.path.relpath(path, current_directory)
+
+# ============================================================
 
 @add_method(sublime.Region)
 def IncEnd(reg): 

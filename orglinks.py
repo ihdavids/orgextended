@@ -1,37 +1,17 @@
 import sublime
 import sublime_plugin
-import datetime
 import re
-from pathlib import Path
 import os
-import fnmatch
-import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
 import OrgExtended.orgutil.util as util
 from OrgExtended.orgutil.util import *
-import OrgExtended.orgutil.navigation as nav
-import OrgExtended.orgutil.template as templateEngine
 import logging
-import sys
-import traceback 
-import OrgExtended.orgfolding as folding
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
-import OrgExtended.orgcapture as capture
 import OrgExtended.orgextension as ext
-import subprocess
-import glob
-import datetime
-from collections import defaultdict, deque
-import threading
-import io
-from subprocess import Popen, PIPE
+from collections import defaultdict
 import struct
 import imghdr
-import unicodedata
-from collections import Counter
-from operator import itemgetter
-import base64
 import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
@@ -497,27 +477,29 @@ class OrgLinkToFileCommand(sublime_plugin.TextCommand):
     def on_done(self, index, modifiers=None):
         if(index >= 0):
             f = self.files[index]
-            link = self.__RelativePath(f[0])
+            link = self.view.MakeRelativeToMe(f[0])
             desc = os.path.basename(link)
             if(len(f) > 1):
                 desc = f[1]
-            data = r"[[file:{link}][{desc}]]".format(link=link, desc=desc)
+            indent = ""
+            node = db.Get().AtInView(self.view)
+            if(node):
+                indent = node.indent()
+            data = r"{indent}[[file:{link}][{desc}]]".format(indent=indent, link=link, desc=desc)
             self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": data})
 
     def run(self, edit):
         self.files = []
         for i in range(0, len(db.Get().Files)):
-            title = " ".join(db.Get().Files[i].org.get_comment("TITLE", ""))
-            tags = " ".join(db.Get().Files[i].org.get_comment("ROAM_TAGS", "")).strip()
-            if(tags != ""):
-                title = "(" + tags + ") " + title
+            title = " ".join(db.Get().Files[i].org.get_comment("TITLE", "")).strip()
+            useRoamTags = sets.Get("linkFindUseRoamTags",True)
+            if(useRoamTags):
+                tags = " ".join(db.Get().Files[i].org.get_comment("ROAM_TAGS", "")).strip()
+                if(tags != ""):
+                    title = "(" + tags + ") " + title
             filename = db.Get().Files[i].filename
             if(title != ""):
                 self.files.append([filename, title])
             else:
                 self.files.append([filename])
         self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
-
-    def __RelativePath(self, path):
-        current_directory = os.path.dirname(self.view.file_name())
-        return os.path.relpath(path, current_directory)

@@ -17,3 +17,11 @@
     #+TBLFM:@1$1=remote('hiya',@1$2)
 
     After the fix this now reads b
+
+** Link Insertion
+	- Thanks to waynezhang link insertion using "Link To File" or the autocomplete
+	  method now inserts relative paths relative to the current file.
+	- The title of the link reflects the #+TITLE: field in the file is present.
+	- "linkFindUseRoamTags": False will turn off visualization of ROAM_TAGS in quick panel
+	  if desired. (NOTE they do not appear in the search unless you have them in the file)
+

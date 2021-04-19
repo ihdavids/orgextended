@@ -2723,7 +2723,7 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             for i in range(0,len(db.Get().Files)):
                 filename = db.Get().Files[i].filename
                 if(re.search(".*"+pp+".*",filename)):
-                    self.files.append([os.path.basename(filename),"file:"+filename+"][$0"])
+                    self.files.append([os.path.basename(filename),"file:"+self.view.MakeRelativeToMe(filename)+"][$0"])
         if(int(sublime.version()) <= 4096):
             return (self.files,sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_WORD_COMPLETIONS)
         else:
