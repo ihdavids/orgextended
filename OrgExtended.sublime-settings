@@ -9,6 +9,13 @@
     "enable_table_editor": true,
     "table_editor_syntax": "EmacsOrgMode",
 
+    // We turn on the autocompletions feature
+    // So we can show filenames in links
+    "auto_complete": true,
+    "auto_complete_selector": "text.orgmode",
+    //"auto_complete_commit_on_tab": true,
+    "auto_complete_use_index": true,
+
     // These source block handlers are built in to org mode. If you want to replace them with your own
     // version:
     // 1. write a handler in Packages/User/orgsrc folder

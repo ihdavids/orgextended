@@ -1,0 +1,19 @@
+* 1.2.21
+** Html Exporter
+	- Exporting source blocks that do not have handlers was generating an error
+
+** Early Preview of Latex Exporter
+	- An early perview of a latex exporter.
+	- Many of the basic org data types work already.
+	- Thanks to FleurDePassion for his time in helping work on this.
+
+** Links To Files in OrgDirs
+
+	New command: quick panel based insertion of links to files
+
+	"Org Link To File" 
+
+	This was requested by: [[https://github.com/ihdavids/orgextended/issues/30][Autocompletion of Links]] 
+
+	In addition to the quick insert autocompletion during link insertion also tries to help with mapping to local files if possible. You can turn off autocomplete
+	in the settings file if you are finding it annoying.

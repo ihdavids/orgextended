@@ -2694,6 +2694,33 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             return tableCache.GetTable(self.view)
         return None
 
+    def on_query_completions(self, prefix, locations):
+        if not self.view.match_selector(locations[0], "text.orgmode"):
+            return []
+        self.files = []
+        if(self.view.match_selector(locations[0],"orgmode.link")):
+            line = self.view.substr(self.view.line(locations[0]))
+            lastsq = len(line)-1
+            pp = None
+            for i in range(len(line)-1,0,-1):
+                if(line[i] == ']'):
+                    lastsq = i
+                if(line[i] == '[' and i > 0 and line[i-1] == '['):
+                    pp = line[i+1:lastsq]
+                    break
+            if(None == pp):
+                return []
+            for i in range(0,len(db.Get().Files)):
+                filename = db.Get().Files[i].filename
+                if(re.search(".*"+pp+".*",filename)):
+                    self.files.append([os.path.basename(filename),"file:"+filename+"][$0"])
+        if(int(sublime.version()) <= 4096):
+            return (self.files,sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_WORD_COMPLETIONS)
+        else:
+            return (self.files,sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_WORD_COMPLETIONS|sublime.DYNAMIC_COMPLETIONS)
+
+        
+
     def on_selection_modified(self):
         global highlightEnabled
         if(not highlightEnabled):

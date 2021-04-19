@@ -23,6 +23,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_link",  "operator": "equal", "operand": true },
+            { "key": "auto_complete_visible", "operator": "equal", "operand": false},
             { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
@@ -78,7 +79,7 @@
     // Core OrgMode Behaviour
     //{ "keys": ["enter"],             "command": "orgmode_toggle_checkbox",         "context": [{ "key": "selector", "operator": "equal", "operand": "orgmode.checkbox" }]},
     //{ "keys": ["enter"],             "command": "orgmode_recalc_checkbox_summary", "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.checkbox.summary" }]},
-    { "keys": ["enter"],             "command": "org_open_link",                   "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link" }]},
+    { "keys": ["enter"],             "command": "org_open_link",                   "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link" },{ "key": "auto_complete_visible", "operator": "equal", "operand": false}]},
     { "keys": ["enter"],             "command": "orgmode_cycle_internal_link",     "context": [{ "key": "selector", "operator": "equal", "operand":  "orgmode.link.internal" }]},
     { "keys": ["ctrl+enter"],        "command": "org_generic_insert",              "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},
     { "keys": ["ctrl+shift+enter"],  "command": "org_generic_insert_aux",          "context": [{ "key": "selector", "operator": "equal", "operand":  "text.orgmode" }]},

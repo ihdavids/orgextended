@@ -491,3 +491,29 @@ def onLoad(view):
         startup = get_image_startup(file.org[0])
         if(Startup.inlineimages in startup):
             ImageHandler.show_images(view)
+
+
+class OrgLinkToFileCommand(sublime_plugin.TextCommand):
+    def on_done(self,index,modifiers=None):
+        if(index >= 0):
+            f = self.files[index]
+            link = f[0]
+            desc = os.path.basename(link)
+            if(len(f) > 1):
+                desc = f[1]
+            data = r"[[file:{link}][{desc}]]".format(link=link,desc=desc)
+            self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": data})
+    def run(self, edit):
+        self.files = []
+        for i in range(0,len(db.Get().Files)):
+            title = " ".join(db.Get().Files[i].org.get_comment("TITLE",""))
+            tags = " ".join(db.Get().Files[i].org.get_comment("ROAM_TAGS","")).strip()
+            if(tags != ""):
+                title = "(" + tags + ") " + title
+            filename = db.Get().Files[i].filename
+            if(title != ""):
+                self.files.append( [filename,title] )
+            else:
+                self.files.append([filename])
+        self.view.window().show_quick_panel(self.files,self.on_done,-1,-1)
+
