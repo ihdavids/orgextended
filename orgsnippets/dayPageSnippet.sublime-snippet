@@ -1,0 +1,17 @@
+<snippet>
+    <content><![CDATA[
+* NOTE ${1:HEADING}
+  :PROPERTIES:
+  :FROM:    [[file:${ORG_FILENAME}:${ORG_LINENUM}][Source]]
+  :CREATED: $ORG_INACTIVE_DATE
+  :END:
+  $0
+  #+begin_src ${2:cpp}
+  $ORG_SELECTION
+  #+end_src
+
+]]></content>
+    <tabTrigger>capture_heading</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>Capture Heading</description>
+</snippet>
