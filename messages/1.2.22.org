@@ -1,0 +1,17 @@
+* 1.2.22
+** TODO Table Bug
+	Fixing a remote indexing bug.
+	If the local table does not have enough columns to match your remote index
+	the remote target would get capped to the local width:
+
+	Note the a in the second table, it should have been a b, this is because we are
+	trying to access column 2 remotely but our local table only has 1 column.
+
+	The temporary fix was to add another column.
+
+    #+NAME: hiya
+    | a | b | c |
+    | 1 | 2 |   |
+
+    | a |
+    #+TBLFM:@1$1=remote('hiya',@1$2)
