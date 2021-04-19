@@ -283,6 +283,9 @@
     // Should we execute our source blocks on export?
     "htmlExecuteSourceOnExport": true,
 
+    // Include roam tag in description when inserting file link
+    "insertRoamTagToFileLink": true,
+
     // LaTeX path for Org Export File As Pdf
     // "latex2Pdf": "C:\\texlive\\2021\\bin\\win32\\pdflatex.exe",
     // LateX SRC_BLOC - LaTex Listing package language matching
