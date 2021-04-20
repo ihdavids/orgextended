@@ -154,7 +154,9 @@
 
     // Day Page
     {"caption": "Org Day Page Create",         "command": "org_day_page_create"               },
-
+    {"caption": "Org Day Page Previous",       "command": "org_day_page_previous"             },
+    {"caption": "Org Day Page Next",           "command": "org_day_page_next"                 },
+    
     // Internal Maintenance Commands
     //{"caption": "Org Output Table Docs",       "command": "org_doc_table"                     },
     //{"caption": "Org Internal Syntax Gen",     "command": "org_regen_syntax_template"         },

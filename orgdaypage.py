@@ -29,6 +29,14 @@ def dayPageGetDateString(dt):
     formatStr = sets.Get("dayPageNameFormat","%a_%Y_%m_%d")
     return dt.strftime(formatStr)
 
+def dayPageFilenameToDateTime(view):
+    filename = view.file_name()
+    if(not filename):
+        return None
+    formatStr = sets.Get("dayPageNameFormat","%a_%Y_%m_%d")
+    filename = os.path.splitext(os.path.basename(filename))[0]
+    return datetime.datetime.strptime(filename,formatStr)
+
 def dayPageGetName(dt):
     return os.path.join(dayPageGetPath(),dayPageGetDateString(dt) + ".org")
 
@@ -42,6 +50,7 @@ def dayPageInsertSnippet(view,dt):
     ai = view.settings().get('auto_indent')
     view.settings().set('auto_indent',False)
     window.focus_view(view)
+    # NeoVintageous users probably prefern not to have to hit insert when editing things.
     view.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
     now  = dt
     inow = orgdate.OrgDate.format_date(now, False)
@@ -67,6 +76,73 @@ def dayPageInsertSnippet(view,dt):
         })
     view.settings().set('auto_indent',ai)
 
+def dayPageCreateOrOpen(dt):
+    dpPath      = dayPageGetName(dt)
+    dateString  = dayPageGetDateString(dt)
+    didCreate   = False
+    if(not os.path.exists(dpPath)):
+        with open(dpPath,"w") as f:
+            f.write("")
+            didCreate = True
+    tview = sublime.active_window().open_file(dpPath, sublime.ENCODED_POSITION)
+    if(didCreate):
+        dayPageInsertSnippet(tview,dt)
+
+class OrgDayPagePreviousCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+
+    def run(self, edit, onDone=None):
+        self.edit   = edit
+        self.onDone = onDone
+        self.dt     = datetime.datetime.now()
+        dt          = dayPageFilenameToDateTime(self.view)
+        maxScan     = 90
+        for i in range(maxScan):
+            dt = dt - datetime.timedelta(days=1)
+            if(sets.Get("dayPageCreateOldPages",False)):
+                dayPageCreateOrOpen(dt)
+                break
+            else:
+                fn = dayPageGetName(dt)
+                if(os.path.exists(fn)):
+                    tview = sublime.active_window().open_file(fn, sublime.ENCODED_POSITION)
+                    sublime.active_window().focus_view(tview)
+                    break
+                else:
+                    #log.warning("Day page does not exist: " + fn)
+                    pass
+
+class OrgDayPageNextCommand(sublime_plugin.TextCommand):
+    def OnDone(self):
+        evt.EmitIf(self.onDone)
+
+    def run(self, edit, onDone=None):
+        self.edit   = edit
+        self.onDone = onDone
+        self.now    = datetime.datetime.now()
+        dt          = dayPageFilenameToDateTime(self.view)
+        maxScan     = 90
+        for i in range(maxScan):
+            dt = dt + datetime.timedelta(days=1)
+            if(dt.date() < self.now.date()):
+                fn = dayPageGetName(dt)
+                if(os.path.exists(fn)):
+                    tview = sublime.active_window().open_file(fn, sublime.ENCODED_POSITION)
+                    sublime.active_window().focus_view(tview)
+                    break
+                else:
+                    #log.warning("Day page does not exist: " + fn)
+                    pass
+            elif(dt.date() == self.now.date()):
+                dayPageCreateOrOpen(dt)
+                break
+            else:
+                fn = dayPageGetName(dt)
+                log.error(" Create day page in the future? " + fn)
+                break
+
+
 class OrgDayPageCreateCommand(sublime_plugin.TextCommand):
     def OnDone(self):
         evt.EmitIf(self.onDone)
@@ -75,15 +151,6 @@ class OrgDayPageCreateCommand(sublime_plugin.TextCommand):
         self.edit   = edit
         self.onDone = onDone
         self.dt     = datetime.datetime.now()
-        dpPath      = dayPageGetName(self.dt)
-        dateString  = dayPageGetDateString(self.dt)
-        didCreate   = False
-        if(not os.path.exists(dpPath)):
-            with open(dpPath,"w") as f:
-                f.write("")
-                didCreate = True
-        tview = sublime.active_window().open_file(dpPath, sublime.ENCODED_POSITION)
-        if(didCreate):
-            dayPageInsertSnippet(tview,self.dt)
+        dayPageCreateOrOpen(self.dt)
         self.OnDone()
 

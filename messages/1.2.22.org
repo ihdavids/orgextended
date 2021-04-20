@@ -25,3 +25,47 @@
 	- "linkFindUseRoamTags": False will turn off visualization of ROAM_TAGS in quick panel
 	  if desired. (NOTE they do not appear in the search unless you have them in the file)
 
+** Capture
+	- Somehow the snippets folder was not renamed orgsnippets when I normalized
+	  my extension folder names. This means that while my local snippets were working
+	  none of the default ones that come with the package were working.
+	  Hopefully this has been fixed.
+
+** Day Page
+	- I am moving the day page feature forward a little bit.
+	- Do not forget to set the "dayPagePath" setting if using this feature
+	- "Org Day Page Create" is really going to be more of a
+	  goto today. It will create the day page or open it.
+	- Create also now uses a snippet that is keyed off of:
+	  This should be the filename of a snippet file that lives in your
+	  orgsnippets folder. (without the .sublime-snippet extension)
+
+ 	  #+BEGIN_EXAMPLE
+ 	    "dayPageSnippet": "dayPageSnippet",
+ 	  #+END_EXAMPLE 
+
+ 	  This snippet will get expanded into the file on creation as a means
+ 	  of authoring a new day. Symbols exist to help in your snippet authoring 
+ 	  the list of symbols is similar to the capture templates.
+
+ 	  Two new symbols exist for use in your snippet:
+ 	  ORG_FILENAME is the filename without the org extension and
+ 	  ORG_AUTHOR is your username.
+
+    - Day Page Filenames are now configurable
+      They use the python strftime syntax for defining the filename:
+
+      Note changing this with pre-existing content will likely have consequences
+      when searching old files.
+
+    	#+BEGIN_EXAMPLE
+    	  "dayPageNameFormat": "%a_%Y_%m_%d",
+    	#+END_EXAMPLE
+    - New Commands:
+
+    	Lets you cycle through your day pages in sequence.
+
+    	#+BEGIN_EXAMPLE
+    	  Org Day Page Next
+    	  Org Day Page Previous
+    	#+END_EXAMPLE

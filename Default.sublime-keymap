@@ -114,6 +114,10 @@
     { "keys": ["alt+o", "y", "s"],       "command": "org_copy_subtree",              "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
     { "keys": ["alt+o", "y", "e"],       "command": "org_copy_entity",               "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]},
 
+    // DAYPAGE
+    { "keys": ["alt+o", "d", "n"],       "command": "org_day_page_next",             "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": ["alt+o", "d", "p"],       "command": "org_day_page_previous",         "context": [{ "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": ["alt+o", "d", "c"],       "command": "org_day_page_create",                                                                             },
     // TABLES
     { "keys": ["alt+o", "t", "a"],       "command": "table_editor_align", "context":
         [
@@ -276,6 +280,12 @@
     { "keys": [" ", "y", "s"],       "command": "org_copy_subtree",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "y", "e"],       "command": "org_copy_entity",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "f", "o"],       "command": "org_fold_all_but_me",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    
+    // DAYPAGE
+    { "keys": [" ", "d", "n"],       "command": "org_day_page_next",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "d", "p"],       "command": "org_day_page_previous",         "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "d", "c"],       "command": "org_day_page_create",           "context": [{"key": "vi_command_mode_aware"}]  },
+
     // ORG AGENDA
     { "keys": [" ", "o", "a"],       "command": "org_agenda_custom_view",        "context": [{"key": "vi_command_mode_aware"}]  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },

@@ -16,104 +16,8 @@
     //"auto_complete_commit_on_tab": true,
     "auto_complete_use_index": true,
 
-    // These source block handlers are built in to org mode. If you want to replace them with your own
-    // version:
-    // 1. write a handler in Packages/User/orgsrc folder
-    // 2. remove them from your list in your settings file.
-    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot", "cmd", "sh", "javascript"],
-    // These are source block aliases for languages listed in the builtinSourceBlockHandlers
-    "builtinSourceBlockAliases": {
-        "bash":  "sh",
-        "bat":   "cmd",
-        "js":    "javascript"
-    },
-
-	// The quick capture buffer gets this name
-	"captureBufferName": "*capture*",
-
-    // Captures go into this file for refiling later.
-    "refile": "D:\\Build\\notes\\refile.org",
-
-    // Org Capture templates $0 is where the cursor ends up.
-    "captureTemplates":
-    [
-    	//{
-    	//	"name": "Todo",
-    	//	"template": 
-		//		"* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
-    	//},
-        {
-            "name":    "Todo",
-            "type":    "entry",
-            "snippet": "todo_heading",
-            "target": ["file","{refile}"],
-        },
-        {
-            "name":    "Note",
-            "type":    "entry",
-            "snippet": "note_heading",
-            "target": ["file","{refile}"],
-        },
-        {
-            "name":    "Capture",
-            "type":    "entry",
-            "snippet": "capture_heading",
-            "target": ["file","{refile}"],
-        },
-    	{
-            // This is what I am heading towards.
-            // TODO:
-            // - types
-            // - snippet insertion for the template
-            // - target selection methods
-            // - properties insertion.
-            // - better capture buffer (not a panel)
-    		"name": "Meeting",
-            // types:
-            // entry      - An Org mode node, with a headline. Will be filed as the child of the target entry or as a top-level entry
-            // item       - A plain list item, placed in the first plain list at the target location
-            // checkitem  - A checkbox item. This only differs from the plain list item by the default template
-            // table-line - A new line in the first table at the target location. Where exactly the line will be inserted depends on the properties :prepend and :table-line-pos (see below)
-            // plain      - Text to be inserted as it is.
-            "type": "entry",
-            // targets: 
-            // file           - text appened at end of file.
-            // id             - text appened to existing org id in db
-            // file+headline  - unique headline in file
-            // file+olp       - full path to headline
-            // file+regexp    - heading is a match to the regexp
-            // file+datetree  - This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
-            // clock          - insert under current item being clocked.
-            // function <name>- generic function to find location for you
-            "target": ["file","{refile}"],
-            "snippet": "meeting_heading",
-
-            // This can be panel or direct
-            // Panel will open up a panel that copies its contents to your target when
-            // the panel loses focus. Direct will open up the actual file at your traget
-            // during the capture
-            "openas": "panel",
-
-    		//"template": "* MEETING $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
-            // prepend - Normally new captured information will be appended at the target location (last child, last table line, last list item, …). Setting this property changes that.
-            // immediate-finish - When set, do not offer to edit the information, just file it away immediately. This makes sense if the template only needs information that can be added automatically.
-            // empty-lines - Set this to the number of lines to insert before and after the new item. Default 0, and the only other common value is 1.
-            // clock-in - Start the clock in this item.
-            // clock-keep - Keep the clock running when filing the captured entry.
-            // clock-resume - If starting the capture interrupted a clock, restart that clock when finished with the capture. Note that clock-keep has precedence over clock-resume. When setting both to non-nil, the current clock will run and the previous one will not be resumed.
-            // time-prompt - Prompt for a date/time to be used for date/week trees and when filling the template. Without this property, capture uses the current date and time. Even if this property has not been set, you can force the same behavior by calling org-capture with a C-1 prefix argument.
-            // tree-type - When week, make a week tree instead of the month tree, i.e., place the headings for each day under a heading with the current ISO week.
-            // unnarrowed - Do not narrow the target buffer, simply show the full buffer. Default is to narrow it so that you only see the new material.
-            // table-line-pos - Specification of the location in the table where the new line should be inserted. It should be a string like ‘II-3’ meaning that the new line should become the third line before the second horizontal separator line.
-            // kill-buffer - If the target file was not yet visited when capture was invoked, kill the buffer again after capture is completed.
-            // no-save - Do not save the target file after finishing the capture.
-            "properties":
-                [
-
-                ],
-    	}    	
-    ],
-    
+    // ============================================================
+    // ORG DIRS:
     // Where are your org files?
     "orgDirs": [
         "c:\\Users\\ian\\notes"
@@ -162,11 +66,6 @@
     //       properly
     "archive": "%s_archive::* Archive",
 
-    // We follow the same sort of syntax as the normal orgmode for todos.
-    // Right now I don't support logging tags on these, but that will come.
-    // I don't have smart syntax highlighting on these. The grammar file gives
-    // me some basic highlighting.
-    "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"],
 
     // When looking for images in org files, where might those images be located?
     // The first path in this list is where generated images will be placed.
@@ -188,9 +87,96 @@
     "resolver.local_file.force_into_sublime":"'*.txt', '*.org', '*.py', '*.rb', '*.html', '*.css', '*.js', '*.php', '*.c', '*.cpp', '*.h', '*.png', '*.jpg', '*.gif', '*.cs'",
     //"resolver.local_file.pattern":"^(file:)?(?P<filepath>.+?)(?::(?P<row>\\d+)(?::(?P<col>\\d+))?)?$",
 
-    // For the plantuml source blocks, where is planuml found?
-    "plantuml": "D:\\Build\\.imacs\\plantuml.jar",
+    // ============================================================
+    // CAPTURE
+    // The quick capture buffer gets this name
+    "captureBufferName": "*capture*",
 
+    // Captures go into this file for refiling later.
+    "refile": "D:\\Build\\notes\\refile.org",
+
+    // Org Capture templates $0 is where the cursor ends up.
+    "captureTemplates":
+    [
+        //{
+        //  "name": "Todo",
+        //  "template": 
+        //      "* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+        //},
+        {
+            "name":    "Todo",
+            "type":    "entry",
+            "snippet": "todo_heading",
+            "target": ["file","{refile}"],
+        },
+        {
+            "name":    "Note",
+            "type":    "entry",
+            "snippet": "note_heading",
+            "target": ["file","{refile}"],
+        },
+        {
+            "name":    "Capture",
+            "type":    "entry",
+            "snippet": "capture_heading",
+            "target": ["file","{refile}"],
+        },
+        {
+            // This is what I am heading towards.
+            // TODO:
+            // - types
+            // - snippet insertion for the template
+            // - target selection methods
+            // - properties insertion.
+            // - better capture buffer (not a panel)
+            "name": "Meeting",
+            // types:
+            // entry      - An Org mode node, with a headline. Will be filed as the child of the target entry or as a top-level entry
+            // item       - A plain list item, placed in the first plain list at the target location
+            // checkitem  - A checkbox item. This only differs from the plain list item by the default template
+            // table-line - A new line in the first table at the target location. Where exactly the line will be inserted depends on the properties :prepend and :table-line-pos (see below)
+            // plain      - Text to be inserted as it is.
+            "type": "entry",
+            // targets: 
+            // file           - text appened at end of file.
+            // id             - text appened to existing org id in db
+            // file+headline  - unique headline in file
+            // file+olp       - full path to headline
+            // file+regexp    - heading is a match to the regexp
+            // file+datetree  - This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
+            // clock          - insert under current item being clocked.
+            // function <name>- generic function to find location for you
+            "target": ["file","{refile}"],
+            "snippet": "meeting_heading",
+
+            // This can be panel or direct
+            // Panel will open up a panel that copies its contents to your target when
+            // the panel loses focus. Direct will open up the actual file at your traget
+            // during the capture
+            "openas": "panel",
+
+            //"template": "* MEETING $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
+            // prepend - Normally new captured information will be appended at the target location (last child, last table line, last list item, …). Setting this property changes that.
+            // immediate-finish - When set, do not offer to edit the information, just file it away immediately. This makes sense if the template only needs information that can be added automatically.
+            // empty-lines - Set this to the number of lines to insert before and after the new item. Default 0, and the only other common value is 1.
+            // clock-in - Start the clock in this item.
+            // clock-keep - Keep the clock running when filing the captured entry.
+            // clock-resume - If starting the capture interrupted a clock, restart that clock when finished with the capture. Note that clock-keep has precedence over clock-resume. When setting both to non-nil, the current clock will run and the previous one will not be resumed.
+            // time-prompt - Prompt for a date/time to be used for date/week trees and when filling the template. Without this property, capture uses the current date and time. Even if this property has not been set, you can force the same behavior by calling org-capture with a C-1 prefix argument.
+            // tree-type - When week, make a week tree instead of the month tree, i.e., place the headings for each day under a heading with the current ISO week.
+            // unnarrowed - Do not narrow the target buffer, simply show the full buffer. Default is to narrow it so that you only see the new material.
+            // table-line-pos - Specification of the location in the table where the new line should be inserted. It should be a string like ‘II-3’ meaning that the new line should become the third line before the second horizontal separator line.
+            // kill-buffer - If the target file was not yet visited when capture was invoked, kill the buffer again after capture is completed.
+            // no-save - Do not save the target file after finishing the capture.
+            "properties":
+                [
+
+                ],
+        }       
+    ],
+
+    // ============================================================   
+    // AGENDA
     // What does the composite agenda view show?
     // You can add your own views but that is done through code.
     // Right now I ONLY have this one composite view.
@@ -223,6 +209,14 @@
     // or keep them?
     "clockingSubMinuteClocks": true,
     
+    // We follow the same sort of syntax as the normal orgmode for todos.
+    // Right now I don't support logging tags on these, but that will come.
+    // I don't have smart syntax highlighting on these. The grammar file gives
+    // me some basic highlighting.
+    "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"],
+
+    // ============================================================   
+    // NOTIFICATION THREAD
     // This is the template used to notify outside of sublime on org notifications 
     //"ExternalNotificationCommand": ["C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", "-ExecutionPolicy", "Unrestricted", ".\\balloontip.ps1", "\"{todo}\"" , "\"{time}\""]
 
@@ -233,6 +227,7 @@
     // How often to check if an event is up? (in minutes)
     "noticePeriod": 1,
 
+    // ============================================================   
     // Pandoc export uses these to determine the style and the location of pandoc executable
     // "PandocPath": "C:\Program Files\Pandoc\pandoc.exe",
     // "PandocStyle": "blocky",
@@ -260,13 +255,17 @@
     // Some people may find this jarring so it is hidden behind an option for now.
     //"onFocusRespectStartupFolds": true,
 
-    // These are the default state for all source execution. You can change the defaults by changing this plist
-    "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
-
+    // ============================================================
     // DAY PAGE
     // Path where we would like day pages created
     //"dayPagePath": "PATH",
+    // The name of your new day page snippet (without the file extention!)
+    //"dayPageSnippet": "filename",
+    // How should we name day pages? NOTE: This format is how we find old day pages
+    // This means if you change this we may not be able to find old content.
+    //"dayPageNameFormat": "%a_%Y_%m_%d",
 
+    // ============================================================
     // Source Block Handler Paths
     // We do not automatically locate these at the moment.
     //"nodejsPath": "C:\\Program Files\\nodejs\\node.exe",
@@ -275,6 +274,23 @@
     //"plantuml":   "C:\\Path\\To\\Plantuml.jar",
     //"ditaa":      "C:\\Path\\To\\Ditaa.jar",
     //"gnuplot":    "C:\Program Files\gnuplot\bin\gnuplot.exe"
+    // For the plantuml source blocks, where is planuml found?
+    "plantuml": "D:\\Build\\.imacs\\plantuml.jar",
+
+    // These source block handlers are built in to org mode. If you want to replace them with your own
+    // version:
+    // 1. write a handler in Packages/User/orgsrc folder
+    // 2. remove them from your list in your settings file.
+    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "powershell", "python", "gnuplot", "cmd", "sh", "javascript"],
+    // These are source block aliases for languages listed in the builtinSourceBlockHandlers
+    "builtinSourceBlockAliases": {
+        "bash":  "sh",
+        "bat":   "cmd",
+        "js":    "javascript"
+    },
+
+    // These are the default state for all source execution. You can change the defaults by changing this plist
+    "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
 
     // During Html export some language types we skip exporting source by default unless the user
     // has explicitly overriden the export. This option lets you control which languages we do that for.
