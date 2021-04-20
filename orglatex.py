@@ -940,7 +940,7 @@ class LatexDoc(exp.OrgExporter):
         #log.debug(o.split('\n') + e.split('\n'))
 
 # ============================================================
-class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
+class OrgExportFileAsPdfCommand(sublime_plugin.TextCommand):
 
     def OnDoneSourceBlockExecution(self):
         # Reload if necessary
@@ -954,6 +954,7 @@ class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
             self.helper    = exp.OrgExportHelper(self.view,self.index)
             self.helper.Run(outputFilename, self.doc)
             self.doc.Execute()
+            # TODO: Delete the tex file
         finally:    
             evt.EmitIf(self.onDone)
 
@@ -975,3 +976,37 @@ class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
         else:
             self.OnDoneSourceBlockExecution()
 
+# ============================================================
+class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
+
+    def OnDoneSourceBlockExecution(self):
+        # Reload if necessary
+        self.file = db.Get().FindInfo(self.view)
+        self.doc  = None
+        self.docClass = exp.GetGlobalOption(self.file,"LATEX_CLASS","latexClass","article").lower()
+        try:
+            outputFilename = exp.ExportFilename(self.view,".tex",self.suffix)
+            self.doc       = LatexDoc(outputFilename,self.file)
+            self.doc.setClass(self.docClass)
+            self.helper    = exp.OrgExportHelper(self.view,self.index)
+            self.helper.Run(outputFilename, self.doc)
+        finally:    
+            evt.EmitIf(self.onDone)
+
+
+    def run(self,edit, onDone=None, index=None, suffix=""):
+        self.file = db.Get().FindInfo(self.view)
+        self.onDone = onDone
+        self.suffix = suffix
+        if(index != None):
+            self.index = index
+        else:
+            self.index = None
+        if(None == self.file):
+            log.error("Not an org file? Cannot build reveal document")
+            evt.EmitIf(onDone)  
+            return
+        if(sets.Get("latexExecuteSourceOnExport",False)):
+            self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
+        else:
+            self.OnDoneSourceBlockExecution()
