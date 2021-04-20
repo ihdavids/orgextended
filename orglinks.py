@@ -481,6 +481,10 @@ class OrgLinkToFileCommand(sublime_plugin.TextCommand):
             desc = os.path.basename(link)
             if(len(f) > 1):
                 desc = f[1]
+                includeRoamTag = sets.Get("insertRoamTagToFileLink", True)
+                if includeRoamTag is False:
+                    log.error(self.rawTitles[f[0]])
+                    desc = self.rawTitles[f[0]]
             indent = ""
             node = db.Get().AtInView(self.view)
             if(node):
@@ -490,14 +494,16 @@ class OrgLinkToFileCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.files = []
+        self.rawTitles = {}
         for i in range(0, len(db.Get().Files)):
+            filename = db.Get().Files[i].filename
             title = " ".join(db.Get().Files[i].org.get_comment("TITLE", "")).strip()
-            useRoamTags = sets.Get("linkFindUseRoamTags",True)
+            self.rawTitles[filename] = title
+            useRoamTags = sets.Get("linkFindUseRoamTags", True)
             if(useRoamTags):
                 tags = " ".join(db.Get().Files[i].org.get_comment("ROAM_TAGS", "")).strip()
                 if(tags != ""):
                     title = "(" + tags + ") " + title
-            filename = db.Get().Files[i].filename
             if(title != ""):
                 self.files.append([filename, title])
             else:
