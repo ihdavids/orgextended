@@ -61,8 +61,8 @@
     	#+BEGIN_EXAMPLE
     	  "dayPageNameFormat": "%a_%Y_%m_%d",
     	#+END_EXAMPLE
-    - New Commands:
 
+    - New Commands:
     	Lets you cycle through your day pages in sequence.
 
     	#+BEGIN_EXAMPLE
