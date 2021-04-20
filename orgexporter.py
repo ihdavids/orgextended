@@ -455,6 +455,21 @@ class TblFmStripper(StripParser):
     def __init__(self,doc):
         super(TblFmStripper,self).__init__(RE_TBLFM,doc)
 
+RE_ATTR_HTML = re.compile(r"^\s*[#][+](ATTR_HTML|attr_html)[:].*")
+class AttrHtmlStripper(StripParser):
+    def __init__(self,doc):
+        super(AttrHtmlStripper,self).__init__(RE_ATTR_HTML,doc)
+
+RE_ATTR_ORG = re.compile(r"^\s*[#][+](ATTR_ORG|attr_org)[:].*")
+class AttrOrgStripper(StripParser):
+    def __init__(self,doc):
+        super(AttrOrgStripper,self).__init__(RE_ATTR_ORG,doc)
+
+RE_KEYWORDSTRIP = re.compile(r"^\s*[#][+](PRIORITIES|priorities)[:].*")
+class KeywordStripper(StripParser):
+    def __init__(self,doc):
+        super(KeywordStripper,self).__init__(RE_KEYWORDSTRIP,doc)
+
 RE_SCHEDULING_LINE = re.compile(r"^\s*(SCHEDULED|CLOSED|DEADLINE|CLOCK)[:].*")
 class SchedulingStripper(StripParser):
     def __init__(self,doc):
@@ -553,3 +568,22 @@ RE_LATEX_CLASS_OPTIONS = regex.compile(r"^\s*[#][+](LATEX_CLASS_OPTIONS|latex_cl
 class LatexClassOptionsParser(LineParser):
     def __init__(self,doc):
         super(LatexClassOptionsParser,self).__init__(RE_LATEX_CLASS_OPTIONS,doc)
+
+RE_SETUPFILE = regex.compile(r"^\s*[#][+](SETUPFILE|setupfile)[:]\s*(?P<data>.*)")
+class SetupFileParser(LineParser):
+    def __init__(self,doc):
+        super(SetupFileParser,self).__init__(RE_SETUPFILE,doc)
+    def Handle(self, lines, orgnode):
+        for line in lines:
+            m = self.sre.search(line)
+            if(m):
+                filename = m.group('data').strip()
+                try:
+                    with open(filename,"r") as f:
+                        for setupline in f:
+                            yield setupline
+                except:
+                    log.warning("Setup file not found: " + str(filename))
+                continue
+            yield line
+

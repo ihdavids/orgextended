@@ -327,6 +327,7 @@ class LatexNameParser(exp.NameParser):
     def HandleLine(self,m,l,n):
         self.e.doc.append(r"\label{{{data}}}".format(data=m.group('data')))
 
+
 class LatexMathParser(exp.MathParser):
     def __init__(self,doc):
         super(LatexMathParser,self).__init__(doc)
@@ -380,6 +381,13 @@ class LatexVerbatimParser(exp.VerbatimParser):
         super(LatexVerbatimParser,self).__init__(doc)
     def HandleSegment(self,m,l,n):
         self.e.doc.append(self.sre.sub(r"\\texttt{\g<data>}",m.group()))
+
+RE_LATEXKEYWORD = regex.compile(r"^\s*\\newline\s*$")
+class LatexKeywordParser(exp.SubLineParser):
+    def __init__(self,doc):
+        super(LatexKeywordParser,self).__init__(RE_LATEXKEYWORD,doc)
+    def HandleSegment(self,m,l,orgnode):
+        self.e.doc.append(m.group().strip())
 
 # Simple links are easy. The hard part is images, includes and results
 class LatexLinkParser(exp.LinkParser):
@@ -459,6 +467,7 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}")
         #self.pre.append(r"\usepackage{flafter}") 
         self.nodeParsers = [
+        exp.SetupFileParser(self),
         exp.CaptionAttributeParser(self),
         LatexTableBlockState(self),
         LatexSourceBlockState(self),
@@ -473,6 +482,9 @@ class LatexDoc(exp.OrgExporter):
         exp.DrawerBlockState(self),
         exp.SchedulingStripper(self),
         exp.TblFmStripper(self),
+        exp.AttrHtmlStripper(self),
+        exp.AttrOrgStripper(self),
+        exp.KeywordStripper(self),
         LatexLinkParser(self),
         LatexHrParser(self),
         LatexNameParser(self),
@@ -487,6 +499,7 @@ class LatexDoc(exp.OrgExporter):
         LatexStrikethroughParser(self),
         LatexCodeParser(self),
         LatexVerbatimParser(self),
+        LatexKeywordParser(self),
         LatexTargetParser(self)
         ]
 
