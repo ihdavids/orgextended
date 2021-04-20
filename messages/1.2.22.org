@@ -77,3 +77,5 @@
 	- $expr$ will export properly in latex
 	- Slightly improved spacing in latex documents
 	- Fixed a bug with the segment parser and secments right at the start of a line
+	- Better stripping of html attributes
+	- Added first try at SetupFile tag.
