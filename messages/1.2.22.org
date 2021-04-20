@@ -69,3 +69,8 @@
     	  Org Day Page Next
     	  Org Day Page Previous
     	#+END_EXAMPLE
+
+** Latex Exporter
+	- NAME now exports a label like it should
+	- LATEX_HEADER tag should now add to the latex preamble
+	- LATEX_CLASS_OPTIONS now adds an option next to the documentclass

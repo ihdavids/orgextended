@@ -371,7 +371,7 @@ class SubLineParser:
             llen = len(self.e.doc)
             for m in self.sre.finditer(line):
                 s,e = m.span()
-                if(s > start):
+                if(s >= start):
                     segment = line[start:s]
                     yield segment
                     start = e
@@ -522,6 +522,11 @@ class TargetParser(SubLineParser):
     def __init__(self,doc):
         super(TargetParser,self).__init__(RE_TARGET,doc)
 
+RE_MATH = regex.compile(r"\$(?P<data>.+?)\$")
+class MathParser(SubLineParser):
+    def __init__(self,doc):
+        super(MathParser,self).__init__(RE_MATH,doc)
+
 RE_EMPTY = re.compile(r"^\s*$")
 class EmptyParser(LineParser):
     def __init__(self,doc):
@@ -534,3 +539,17 @@ class ActiveDateParser(LineParser):
 class InactiveDateParser(LineParser):
     def __init__(self,doc):
         super(InactiveDateParser,self).__init__(date.gene_timestamp_regex('inactive'),doc)
+
+class NameParser(LineParser):
+    def __init__(self,doc):
+        super(NameParser,self).__init__(RE_NAME,doc)
+
+RE_LATEX_HEADER = regex.compile(r"^\s*[#][+](LATEX_HEADER|latex_header)[:]\s*(?P<data>.*)")
+class LatexHeaderParser(LineParser):
+    def __init__(self,doc):
+        super(LatexHeaderParser,self).__init__(RE_LATEX_HEADER,doc)
+
+RE_LATEX_CLASS_OPTIONS = regex.compile(r"^\s*[#][+](LATEX_CLASS_OPTIONS|latex_class_options)[:]\s*(?P<data>.*)")
+class LatexClassOptionsParser(LineParser):
+    def __init__(self,doc):
+        super(LatexClassOptionsParser,self).__init__(RE_LATEX_CLASS_OPTIONS,doc)

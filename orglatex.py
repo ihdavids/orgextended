@@ -321,11 +321,23 @@ class LatexHrParser(exp.HrParser):
     def HandleLine(self,m,l,n):
         self.e.doc.append(r"\newline\noindent\rule{\textwidth}{0.5pt}")
 
+class LatexNameParser(exp.NameParser):
+    def __init__(self,doc):
+        super(LatexNameParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r"\label{{{data}}}".format(data=m.group('data')))
+
+class LatexMathParser(exp.MathParser):
+    def __init__(self,doc):
+        super(LatexMathParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(r"\({data}\)".format(data=m.group('data')))
+
 class LatexEmptyParser(exp.EmptyParser):
     def __init__(self,doc):
         super(LatexEmptyParser,self).__init__(doc)
     def HandleLine(self,m,l,n):
-        self.e.doc.append(r"\newline")
+        self.e.doc.append(r"\leavevmode\newline")
 
 class LatexActiveDateParser(exp.EmptyParser):
     def __init__(self,doc):
@@ -395,6 +407,18 @@ class LatexTargetParser(exp.TargetParser):
     def HandleSegment(self,m,l,n):
         self.e.doc.append(r"\label{{{data}}}".format(data=m.group('data')))
 
+class LatexLatexHeaderParser(exp.LatexHeaderParser):
+    def __init__(self,doc):
+        super(LatexLatexHeaderParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.pre.append(m.group('data').strip())
+
+class LatexLatexClassOptionsParser(exp.LatexClassOptionsParser):
+    def __init__(self,doc):
+        super(LatexLatexClassOptionsParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.documentclass += m.group('data').strip()
+
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
@@ -451,8 +475,12 @@ class LatexDoc(exp.OrgExporter):
         exp.TblFmStripper(self),
         LatexLinkParser(self),
         LatexHrParser(self),
-        #LatexEmptyParser(self),
+        LatexNameParser(self),
+        LatexLatexHeaderParser(self),
+        LatexLatexClassOptionsParser(self),
+        LatexEmptyParser(self),
         LatexActiveDateParser(self),
+        LatexMathParser(self),
         LatexBoldParser(self),
         LatexItalicsParser(self),
         LatexUnderlineParser(self),
