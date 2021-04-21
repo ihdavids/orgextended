@@ -465,7 +465,7 @@ class AttrOrgStripper(StripParser):
     def __init__(self,doc):
         super(AttrOrgStripper,self).__init__(RE_ATTR_ORG,doc)
 
-RE_KEYWORDSTRIP = re.compile(r"^\s*[#][+](PRIORITIES|priorities)[:].*")
+RE_KEYWORDSTRIP = re.compile(r"^\s*[#][+](PRIORITIES|priorities|PLOT|plot)[:].*")
 class KeywordStripper(StripParser):
     def __init__(self,doc):
         super(KeywordStripper,self).__init__(RE_KEYWORDSTRIP,doc)
@@ -587,3 +587,26 @@ class SetupFileParser(LineParser):
                 continue
             yield line
 
+RE_RESULTS = regex.compile(r"^\s*[#][+](RESULTS|results)[:]\s*(?P<data>.*)")
+class ResultsParser(LineParser):
+    def __init__(self,doc):
+        super(ResultsParser,self).__init__(RE_RESULTS,doc)
+    def Handle(self, lines, orgnode):
+        skip = False
+        for line in lines:
+            if(skip):
+                if(line.strip() == ""):
+                    skip = False
+                elif(RE_ENDSRC.search(line) or RE_END_DRAWER_LINE.search(line)):
+                    skip = False
+                    continue
+            m = self.sre.search(line)
+            if(m):
+                if(hasattr(self.e.doc,'sparams')):
+                    exp = self.e.doc.sparams.Get("exports","")
+                    if(exp == 'code' or exp == 'non'):
+                        skip = True 
+                        continue
+                else:
+                    continue
+            yield line

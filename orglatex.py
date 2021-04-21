@@ -116,6 +116,8 @@ class LatexSourceBlockState(exp.SourceBlockState):
         p = type('', (), {})() 
         src.BuildFullParamList(p,language,paramstr,orgnode)
         exp = p.params.Get("exports",None)
+        # Have to pass on parameter to the results block
+        self.e.sparams = p
         if(isinstance(exp,list) and len(exp) > 0):
             exp = exp[0]
         if(exp == 'results' or exp == 'none'):
@@ -389,6 +391,34 @@ class LatexKeywordParser(exp.SubLineParser):
     def HandleSegment(self,m,l,orgnode):
         self.e.doc.append(m.group().strip())
 
+def FindImageFile(view, url):
+    # ABS
+    if(os.path.isabs(url)):
+        return url
+    # Relative
+    if(view != None):
+        curDir = os.path.dirname(view.file_name())
+        filename = os.path.join(curDir, url)
+        if(os.path.isfile(filename)):
+            return filename
+    # In search path
+    searchHere = sets.Get("imageSearchPath",[])
+    for direc in searchHere:
+        filename = os.path.join(direc, url)
+        if(os.path.isfile(filename)):
+            return filename
+    searchHere = sets.Get("orgDirs",[])
+    for direc in searchHere:
+        filename = os.path.join(direc, "images", url) 
+        if(os.path.isfile(filename)):
+            return filename
+
+def IsImageFile(fn):
+    # Todo make this configurable
+    if(fn.endswith(".gif") or fn.endswith(".png") or fn.endswith(".jpg") or fn.endswith(".svg")):
+        return True
+    return False
+
 # Simple links are easy. The hard part is images, includes and results
 class LatexLinkParser(exp.LinkParser):
     def __init__(self,doc):
@@ -399,14 +429,35 @@ class LatexLinkParser(exp.LinkParser):
         if(desc):
             desc = self.e.Escape(desc.strip())
         if(link.startswith("file:")):
-            link = re.sub(r'^file:','',link)  
-        link = re.sub(r"[:][:][^/].*","",link)
-        link = link.replace("\\","/")
-        text = m.group()
-        if(desc):
-            self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
+            link = re.sub(r'^file:','',link)
+        view = sublime.active_window().active_view()
+        imgFile = FindImageFile(view,link)
+        if(imgFile and os.path.isfile(imgFile) and IsImageFile(imgFile)):
+            relPath = view.MakeRelativeToMe(imgFile)
+            imagePath = os.path.dirname(relPath)
+            imageToken = os.path.splitext(os.path.basename(relPath))[0]
+            # The figures let this float around to much. I can't control the positioning with
+            # that. Also the scale is crazy at 1.0. So I auto scale to .5? Probably not the best choice.
+            # Attributes will solve this at some point.
+            #self.e.doc.append(r"\begin{figure}")
+            self.e.doc.append(r"\includegraphics[scale=.5]{{{name}}}".format(name=imageToken))
+            #self.e.doc.append(r"\end{figure}")
+            if(not imagePath in self.e.imagepaths):
+                self.e.imagepaths.append(imagePath)
         else:
-            self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=self.e.Escape(link)))
+            if(link.startswith("http")):
+                if(desc):
+                    self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
+                else:
+                    self.e.doc.append(r"\url{{{link}}}".format(link=link))
+            else:
+                link = re.sub(r"[:][:][^/].*","",link)
+                link = link.replace("\\","/")
+                text = m.group()
+                if(desc):
+                    self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
+                else:
+                    self.e.doc.append(r"\url{{{link}}}".format(link=link))
 
 # <<TARGET>>
 class LatexTargetParser(exp.TargetParser):
@@ -430,7 +481,9 @@ class LatexLatexClassOptionsParser(exp.LatexClassOptionsParser):
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
+        self.sparams = None
         self.documentclass = r'\documentclass{article}'
+        self.imagepaths = []
         self.pre      = []
         self.doc      = []
         self.attribs  = {}
@@ -469,6 +522,7 @@ class LatexDoc(exp.OrgExporter):
         self.nodeParsers = [
         exp.SetupFileParser(self),
         exp.CaptionAttributeParser(self),
+        exp.ResultsParser(self),
         LatexTableBlockState(self),
         LatexSourceBlockState(self),
         LatexDynamicBlockState(self),
@@ -524,7 +578,18 @@ class LatexDoc(exp.OrgExporter):
         self.documentclass = r'\documentclass{{{docclass}}}'.format(docclass=className)
 
     def BuildDoc(self):
-        out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n' + r'\begin{document}' + '\n' + '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
+        imagepaths = ""
+        if(len(self.imagepaths) > 0):
+            imagepaths = r"\graphicspath{"
+            for i in self.imagepaths:
+                item = i.replace("\\","/").strip()
+                if(not item.endswith("/")):
+                    item += "/"
+                if(not item.startswith(".")):
+                    item = "./" + item
+                imagepaths += "{" + item + "}"
+            imagepaths += "}"
+        out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n'+ imagepaths +"\n" +  r'\begin{document}' + '\n' +  '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
         return out
 
     # Document header metadata should go in here
@@ -931,7 +996,9 @@ class LatexDoc(exp.OrgExporter):
         except:
             startupinfo = None
         # cwd=working_dir, env=my_env,
-        cwd = os.path.join(sublime.packages_path(),"User") 
+        #cwd = os.path.join(sublime.packages_path(),"User") 
+        view = sublime.active_window().active_view()
+        cwd = os.path.dirname(view.file_name())
         popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         #popen.wait()
         (o,e) = popen.communicate()
