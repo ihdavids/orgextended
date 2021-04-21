@@ -10,3 +10,4 @@
 	- Results have the results header stripped properly now
 	  A first stab at :exports keyword
 	  (not really well tested yet)
+	- More keywords that should be removed are stripped out. 
