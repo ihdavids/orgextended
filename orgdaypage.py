@@ -40,16 +40,13 @@ def dayPageFilenameToDateTime(view):
 def dayPageGetName(dt):
     return os.path.join(dayPageGetPath(),dayPageGetDateString(dt) + ".org")
 
-def dayPageInsertSnippet(view,dt):
-    window   = view.window()
+
+def OnLoaded(view,dt):
     snippet  = sets.Get("dayPageSnippet","dayPageSnippet")
     snipName = ext.find_extension_file('orgsnippets',snippet,'.sublime-snippet')
     if(snipName == None):
         log.error(" Could not locate snippet file: " + str(snippet) + ".sublime-snippet using default")
         snipName = ext.find_extension_file('orgsnippets','dayPageSnippet.sublime-snippet')
-    ai = view.settings().get('auto_indent')
-    view.settings().set('auto_indent',False)
-    window.focus_view(view)
     # NeoVintageous users probably prefern not to have to hit insert when editing things.
     view.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
     now  = dt
@@ -62,6 +59,7 @@ def dayPageInsertSnippet(view,dt):
     # TM_CURRENT_WORD - Word under cursor when snippet was triggered
     # TM_SELECTED_TEXT - Selected text when snippet was triggered
     # TM_CURRENT_LINE - Line of snippet when snippet was triggered
+    #insert_snippet {"name": "Packages/OrgExtended/orgsnippets/page.sublime-snippet"}
     view.run_command("insert_snippet",
         { "name" : snipName
         , "ORG_INACTIVE_DATE": inow
@@ -76,6 +74,19 @@ def dayPageInsertSnippet(view,dt):
         })
     view.settings().set('auto_indent',ai)
 
+def LoadedCheck(view,dt):
+    if(view.is_loading()):
+        sublime.set_timeout(lambda: LoadedCheck(view,dt),1)
+    else:
+        OnLoaded(view,dt)
+
+def dayPageInsertSnippet(view,dt):
+    window   = view.window()
+    ai = view.settings().get('auto_indent')
+    view.settings().set('auto_indent',False)
+    window.focus_view(view)
+    LoadedCheck(view,dt)
+
 def dayPageCreateOrOpen(dt):
     dpPath      = dayPageGetName(dt)
     dateString  = dayPageGetDateString(dt)
@@ -85,7 +96,7 @@ def dayPageCreateOrOpen(dt):
             f.write("")
             didCreate = True
     tview = sublime.active_window().open_file(dpPath, sublime.ENCODED_POSITION)
-    if(didCreate):
+    if(True or didCreate):
         dayPageInsertSnippet(tview,dt)
 
 class OrgDayPagePreviousCommand(sublime_plugin.TextCommand):
