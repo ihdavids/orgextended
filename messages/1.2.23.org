@@ -1,0 +1,9 @@
+* 1.2.23
+** Day Page
+	- Bugfix - Create was subject to 
+	  a timing problem that would stop it from expanding the snippet.
+	  This has been fixed.
+
+** Latex Preview
+	- We continue to move the latex exporter forward with
+	  image support
