@@ -465,7 +465,7 @@ class AttrOrgStripper(StripParser):
     def __init__(self,doc):
         super(AttrOrgStripper,self).__init__(RE_ATTR_ORG,doc)
 
-RE_KEYWORDSTRIP = re.compile(r"^\s*[#][+](PRIORITIES|priorities|PLOT|plot)[:].*")
+RE_KEYWORDSTRIP = re.compile(r"^\s*[#][+](COLUMNS|columns|PRIORITIES|priorities|PLOT|plot|TODO|todo|TAGS|tags|PROPERTY|property)[:].*")
 class KeywordStripper(StripParser):
     def __init__(self,doc):
         super(KeywordStripper,self).__init__(RE_KEYWORDSTRIP,doc)
