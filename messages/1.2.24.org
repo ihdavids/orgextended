@@ -5,3 +5,6 @@
 	  day page a disturbing leftover from a previous debugging session.
 ** Latex
 	- Improved output parsing in list contents  
+	- Images have some ATTRS_LATEX support
+	- table of contenst is included
+	
