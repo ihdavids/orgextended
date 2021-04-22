@@ -550,6 +550,7 @@ class LatexAttributeParser(exp.AttributeParser):
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
         super(LatexDoc, self).__init__(filename, file, **kwargs)
+        self.file = file
         self.sparams = None
         self.documentclass = r'\documentclass{article}'
         self.imagepaths = []
@@ -659,7 +660,14 @@ class LatexDoc(exp.OrgExporter):
                     item = "./" + item
                 imagepaths += "{" + item + "}"
             imagepaths += "}"
-        out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n'+ imagepaths +"\n" +  r'\begin{document}' + '\n' +  '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
+        toc = [r"\maketitle",r"\tableofcontents"]
+        ops = self.file.org.get_comment("OPTIONS",None)
+        if(ops and "toc:nil" in ops):
+            toc = toc.remove(r"\tableofcontents")
+        if(ops and "title:nil" in ops):
+            toc = toc.remove(r"\maketitle")
+        print(str(toc))
+        out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n'+ imagepaths +"\n" +  r'\begin{document}' + '\n' + "\n".join(toc) + '\n' + '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
         return out
 
     # Document header metadata should go in here
