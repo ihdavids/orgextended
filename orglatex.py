@@ -25,6 +25,7 @@ import OrgExtended.orgnotifications as notice
 import OrgExtended.orgextension as ext
 import OrgExtended.orgsourceblock as src
 import OrgExtended.orgexporter as exp
+import OrgExtended.orgplist as plist
 import yaml
 import sys
 import subprocess
@@ -426,6 +427,14 @@ def IsImageFile(fn):
         return True
     return False
 
+def AddOption(p,name,ops):
+    val = p.Get(name,None)
+    if(val):
+        if(ops != ""):
+            ops += ","
+        ops += name + "=" + val.strip() 
+    return ops
+
 # Simple links are easy. The hard part is images, includes and results
 class LatexLinkParser(exp.LinkParser):
     def __init__(self,doc):
@@ -440,27 +449,67 @@ class LatexLinkParser(exp.LinkParser):
         view = sublime.active_window().active_view()
         imgFile = FindImageFile(view,link)
         if(imgFile and os.path.isfile(imgFile) and IsImageFile(imgFile)):
-            print("IMAGE FILE: " + str(imgFile) + " <= " + str(link))
             relPath = view.MakeRelativeToMe(imgFile)
             imagePath = os.path.dirname(relPath)
             imageToken = os.path.splitext(os.path.basename(relPath))[0]
             # The figures let this float around to much. I can't control the positioning with
             # that. Also the scale is crazy at 1.0. So I auto scale to .5? Probably not the best choice.
             # Attributes will solve this at some point.
-            #self.e.doc.append(r"\begin{figure}")
-            self.e.doc.append(r"\includegraphics[scale=.5]{{{name}}}".format(name=imageToken))
-            #self.e.doc.append(r"\end{figure}")
+            attr = self.e.GetAttrib("attr_latex")
+            optionsOp = ""
+            floatOp = None
+            figure = "figure"
+            align  = "center"
+            figureext = ""
+            if(attr):
+                p = plist.PList.createPList(attr)
+            else:
+                p = plist.PList.createPList("")
+            ops = p.Get("options",None)
+            if(ops):
+                optionsOp = ops
+            caption = self.e.GetAttrib("caption")
+            cc = p.Get("caption",None)
+            if(cc):
+                caption = cc
+            optionsOp = AddOption(p,"width",optionsOp)
+            optionsOp = AddOption(p,"height",optionsOp)
+            optionsOp = AddOption(p,"scale",optionsOp)
+            val = p.Get("center",None)
+            if(val and val == "nil"):
+                align = None
+            if(optionsOp == ""):
+                optionsOp = r"width=.8\linewidth"
+            if(caption and not floatOp):
+                floatOp = "t"
+            if(floatOp and floatOp != "nil"):
+                if(floatOp == "multicolumn"):
+                    figure = "figure*"
+                elif(floatOp == "sideways"):
+                    figure = "sidewaysfigure" 
+                elif(floatOp == "wrap"):
+                    figure = "wrapfigure"
+                    figureext = "{l}"
+                placement = p.Get("placement",None)
+                if(placement):
+                    figureext = placement
+                self.e.doc.append(r"\begin{{{figure}}}{figureext}".format(figure=figure,figureext=figureext))
+                if(align == "center"):
+                    self.e.doc.append(r"\centering")
+            self.e.doc.append(r"\includegraphics[{options}]{{{name}}}".format(name=imageToken,options=optionsOp))
+            if(caption):
+                self.e.doc.append(r"\caption{{{caption}}}".format(caption=caption))
+            if(floatOp and floatOp != "nil"):
+                self.e.doc.append(r"\end{{{figure}}}".format(figure=figure))
             if(not imagePath in self.e.imagepaths):
                 self.e.imagepaths.append(imagePath)
         else:
-            print("LINK: " + link)
             if(link.startswith("http")):
                 if(desc):
                     self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
                 else:
                     self.e.doc.append(r"\url{{{link}}}".format(link=link))
             elif("/" not in link and "\\" not in link and "." not in link):
-                print("HYPERREF")
                 if(desc):
                     self.e.doc.append(r"\hyperref[{link}]{{{desc}}}".format(link=link,desc=desc))
                 else:
@@ -492,6 +541,11 @@ class LatexLatexClassOptionsParser(exp.LatexClassOptionsParser):
         super(LatexLatexClassOptionsParser,self).__init__(doc)
     def HandleLine(self,m,l,n):
         self.e.documentclass += m.group('data').strip()
+
+RE_ATTR_LATEX = regex.compile(r"^\s*[#][+]ATTR_LATEX[:]\s*(?P<data>.*)")
+class LatexAttributeParser(exp.AttributeParser):
+    def __init__(self,doc):
+        super(LatexAttributeParser,self).__init__('attr_latex',RE_ATTR_LATEX,doc)
 
 class LatexDoc(exp.OrgExporter):
     def __init__(self,filename,file,**kwargs):
@@ -537,6 +591,7 @@ class LatexDoc(exp.OrgExporter):
         self.nodeParsers = [
         exp.SetupFileParser(self),
         exp.CaptionAttributeParser(self),
+        LatexAttributeParser(self),
         exp.ResultsParser(self),
         LatexTableBlockState(self),
         LatexSourceBlockState(self),
