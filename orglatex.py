@@ -661,12 +661,35 @@ class LatexDoc(exp.OrgExporter):
                 imagepaths += "{" + item + "}"
             imagepaths += "}"
         toc = [r"\maketitle",r"\tableofcontents"]
+        # Use our options to control the title and toc
         ops = self.file.org.get_comment("OPTIONS",None)
-        if(ops and "toc:nil" in ops):
-            toc = toc.remove(r"\tableofcontents")
-        if(ops and "title:nil" in ops):
-            toc = toc.remove(r"\maketitle")
-        print(str(toc))
+        if(ops):
+            ops = " ".join(ops)
+            ops = ops.strip().split(" ")
+            if("toc:nil" in ops):
+                toc.remove(r"\tableofcontents")
+            if("title:nil" in ops):
+                toc.remove(r"\maketitle")
+            if("author:nil" in ops):
+                for l in self.pre:
+                    if(l.startswith("\\author")):
+                        self.pre.remove(l)
+                        break
+            if("date:nil" in ops):
+                for l in self.pre:
+                    if(l.startswith("\\date")):
+                        self.pre.remove(l)
+                        break
+                self.pre.append("\\date{}")
+            for t in ops:
+                if(t.startswith("toc:")):
+                    v = t.split(":")[1].strip()
+                    try:
+                        v = int(v)
+                        if(v > 0):
+                            toc.insert(0,"\\setcounter{{tocdepth}}{{{num}}}".format(num=v))
+                    except:
+                        pass
         out = self.documentclass + '\n' + '\n'.join(self.pre) + '\n'+ imagepaths +"\n" +  r'\begin{document}' + '\n' + "\n".join(toc) + '\n' + '\n'.join(self.doc) + '\n' + r'\end{document}' + '\n'
         return out
 
