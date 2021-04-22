@@ -52,6 +52,8 @@ def OnLoaded(view,dt):
     now  = dt
     inow = orgdate.OrgDate.format_date(now, False)
     anow = orgdate.OrgDate.format_date(now, True)
+    ai = view.settings().get('auto_indent')
+    view.settings().set('auto_indent',False)
     # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
     # OTHER VARIABLES:
     # TM_FULLNAME - Users full name
@@ -82,8 +84,6 @@ def LoadedCheck(view,dt):
 
 def dayPageInsertSnippet(view,dt):
     window   = view.window()
-    ai = view.settings().get('auto_indent')
-    view.settings().set('auto_indent',False)
     window.focus_view(view)
     LoadedCheck(view,dt)
 
@@ -96,7 +96,7 @@ def dayPageCreateOrOpen(dt):
             f.write("")
             didCreate = True
     tview = sublime.active_window().open_file(dpPath, sublime.ENCODED_POSITION)
-    if(True or didCreate):
+    if(didCreate):
         dayPageInsertSnippet(tview,dt)
 
 class OrgDayPagePreviousCommand(sublime_plugin.TextCommand):
