@@ -232,9 +232,10 @@ class LatexUnorderedListBlockState(exp.UnorderedListBlockState):
         self.e.doc.append(r"    \begin{itemize}")
     def HandleExiting(self, m, l , orgnode):
         self.e.doc.append(r"     \end{itemize}")
-    def HandleItem(self,m,l, orgnode):
-        data = self.e.Escape(m.group('data'))
-        self.e.doc.append(r"     \item {content}".format(content=data))
+    def StartHandleItem(self,m,l, orgnode):
+        #data = self.e.Escape(m.group('data'))
+        #self.e.doc.append(r"     \item {content}".format(content=data))
+        self.e.doc.append(r"     \item ")
 
 class LatexOrderedListBlockState(exp.OrderedListBlockState):
     def __init__(self,doc):
@@ -243,9 +244,10 @@ class LatexOrderedListBlockState(exp.OrderedListBlockState):
         self.e.doc.append(r"    \begin{enumerate}")
     def HandleExiting(self, m, l , orgnode):
         self.e.doc.append(r"     \end{enumerate}")
-    def HandleItem(self,m,l, orgnode):
-        data = self.e.Escape(m.group('data'))
-        self.e.doc.append(r"     \item {content}".format(content=data))
+    def StartHandleItem(self,m,l, orgnode):
+        #data = self.e.Escape(m.group('data'))
+        #self.e.doc.append(r"     \item {content}".format(content=data))
+        self.e.doc.append(r"     \item ")
 
 class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
     def __init__(self,doc):
@@ -254,16 +256,23 @@ class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
         self.e.doc.append(r"    \begin{todolist}")
     def HandleExiting(self, m, l , orgnode):
         self.e.doc.append(r"     \end{todolist}")
-    def HandleItem(self,m,l, orgnode):
-        data = self.e.Escape(m.group('data'))
+    def StartHandleItem(self,m,l, orgnode):
+        #data = self.e.Escape(m.group('data'))
         state = m.group('state')
         if(state == 'x'):
-            self.e.doc.append(r"     \item[\wontfix] {content}".format(content=data))
+            self.e.doc.append(r"     \item[\wontfix] ")
         elif(state == '-'):
-            self.e.doc.append(r"     \item {content}".format(content=data))
+            self.e.doc.append(r"     \item ")
             #self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
         else:
-            self.e.doc.append(r"     \item {content}".format(content=data))
+            self.e.doc.append(r"     \item ")
+        #if(state == 'x'):
+        #    self.e.doc.append(r"     \item[\wontfix] {content}".format(content=data))
+        #elif(state == '-'):
+        #    self.e.doc.append(r"     \item {content}".format(content=data))
+        #    #self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
+        #else:
+        #    self.e.doc.append(r"     \item {content}".format(content=data))
 
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
@@ -287,7 +296,6 @@ class LatexTableBlockState(exp.TableBlockState):
         if(tds):
             self.HandleData(tds,True)
     def HandleExiting(self, m, l , orgnode):
-        print("EXIT")
         self.e.doc.append(r"    \hline")
         self.e.doc.append(r"    \end{tabular}")
         self.e.doc.append(r"    \end{table}")
@@ -310,7 +318,6 @@ class LatexTableBlockState(exp.TableBlockState):
             haveTableHeader = True
 
     def HandleIn(self,l, orgnode):
-        print("IN")
         if(RE_TABLE_SEPARATOR.search(l)):
             self.e.doc.append(r'    \hline')
         else:
@@ -433,6 +440,7 @@ class LatexLinkParser(exp.LinkParser):
         view = sublime.active_window().active_view()
         imgFile = FindImageFile(view,link)
         if(imgFile and os.path.isfile(imgFile) and IsImageFile(imgFile)):
+            print("IMAGE FILE: " + str(imgFile) + " <= " + str(link))
             relPath = view.MakeRelativeToMe(imgFile)
             imagePath = os.path.dirname(relPath)
             imageToken = os.path.splitext(os.path.basename(relPath))[0]
@@ -445,11 +453,18 @@ class LatexLinkParser(exp.LinkParser):
             if(not imagePath in self.e.imagepaths):
                 self.e.imagepaths.append(imagePath)
         else:
+            print("LINK: " + link)
             if(link.startswith("http")):
                 if(desc):
                     self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
                 else:
                     self.e.doc.append(r"\url{{{link}}}".format(link=link))
+            elif("/" not in link and "\\" not in link and "." not in link):
+                print("HYPERREF")
+                if(desc):
+                    self.e.doc.append(r"\hyperref[{link}]{{{desc}}}".format(link=link,desc=desc))
+                else:
+                    self.e.doc.append(r"\hyperref[{link}]{{{desc}}}".format(link=link,desc=self.e.Escape(link)))
             else:
                 link = re.sub(r"[:][:][^/].*","",link)
                 link = link.replace("\\","/")
@@ -539,12 +554,12 @@ class LatexDoc(exp.OrgExporter):
         exp.AttrHtmlStripper(self),
         exp.AttrOrgStripper(self),
         exp.KeywordStripper(self),
+        LatexEmptyParser(self),
         LatexLinkParser(self),
         LatexHrParser(self),
         LatexNameParser(self),
         LatexLatexHeaderParser(self),
         LatexLatexClassOptionsParser(self),
-        LatexEmptyParser(self),
         LatexActiveDateParser(self),
         LatexMathParser(self),
         LatexBoldParser(self),
@@ -702,6 +717,7 @@ class LatexDoc(exp.OrgExporter):
                 #link = self.TexFullEscape(link)
                 link = link.replace("\\","/")
                 if(desc):
+                    traceback.print_stack()
                     text = RE_LINK.sub(r"\\ref{{{link}}}{{{desc}}}".format(link=link,desc=desc),text)
                 else:
                     text = RE_LINK.sub(r"\\ref{{{link}}}".format(link=link),text)

@@ -1,0 +1,7 @@
+* 1.2.24
+** Day Page
+	- Fixed small exception with create
+	- Fixed inserting templates when moving back and forth to current
+	  day page a disturbing leftover from a previous debugging session.
+** Latex
+	- Improved output parsing in list contents  

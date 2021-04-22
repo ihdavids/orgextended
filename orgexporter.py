@@ -298,7 +298,12 @@ class ListBlockState:
                 elif(thisIndent < curIndent and inList > 1):
                     inList -= 1
                     self.HandleExiting(m,l,orgnode)
-                self.HandleItem(m,l,orgnode)
+                startItem = len(self.e.doc)
+                self.StartHandleItem(m,l,orgnode)
+                yield m.group('data')
+                self.EndHandleItem(m,l,orgnode)
+                self.e.doc[startItem] = "".join(self.e.doc[startItem:])
+                del self.e.doc[-2:]
                 continue
             elif(inList):
                 while(inList > 0):
@@ -310,8 +315,10 @@ class ListBlockState:
         while(inList > 0):
             inList -= 1
             self.HandleExiting(m,l,orgnode)
-    def HandleItem(self, m, line, orgnode):
-        pass
+    def StartHandleItem(self, m, line, orgnode):
+        self.e.doc.append("")
+    def EndHandleItem(self,m,line,orgnode):
+        self.e.doc.append("")
     def HandleExiting(self, m, line, orgnode):
         pass
     def HandleEntering(self, m, line, orgnode):
@@ -358,6 +365,24 @@ class LineParser:
             yield line
     def HandleLine(self,m,l,orgnode):
         pass
+
+# This parser expects the item to live and consume the entire line
+# Match will replace the entire line
+class NotInBlockLineParser:
+    def __init__(self,sre,doc):
+        self.sre      = sre
+        self.e        = doc
+    def Handle(self, lines, orgnode):
+        for line in lines:
+            if(not self.e.AmInBlock()):
+                m = self.sre.search(line)
+                if(m):
+                    self.HandleLine(m,line,orgnode)
+                    continue
+            yield line
+    def HandleLine(self,m,l,orgnode):
+        pass
+
 # This parser expects a match to be "within" a line.
 # This is complicated because we may still have to foward off
 # the other portions of the line 
@@ -373,12 +398,18 @@ class SubLineParser:
                 s,e = m.span()
                 if(s >= start):
                     segment = line[start:s]
-                    yield segment
+                    if(segment.strip() == ""):
+                        self.e.doc.append(segment)
+                    else:
+                        yield segment
                     start = e
                 self.HandleSegment(m,line,orgnode)
             if(start != 0 and len(line) > start):
                 segment = line[start:]
-                yield segment
+                if(segment.strip() == ""):
+                    self.e.doc.append(segment)
+                else:
+                    yield segment
             elif(start == 0):
                 yield line
             # We generated more than one line here! need to collapse
@@ -475,17 +506,17 @@ class SchedulingStripper(StripParser):
     def __init__(self,doc):
         super(SchedulingStripper,self).__init__(RE_SCHEDULING_LINE,doc)
 
-RE_UL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+(?P<data>.+)")
+RE_UL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>-|[+])\s+(?P<data>.+)")
 class UnorderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(UnorderedListBlockState,self).__init__(RE_UL,doc)
 
-RE_CL   = re.compile(r"^(?P<indent>\s*)(-|[+])\s+\[(?P<state>[ xX-])\]\s+(?P<data>.+)")
+RE_CL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>(-|[+])\s+\[(?P<state>[ xX-])\])\s+(?P<data>.+)")
 class CheckboxListBlockState(ListBlockState):
     def __init__(self,doc):
         super(CheckboxListBlockState,self).__init__(RE_CL,doc)
 
-RE_OL   = re.compile(r"^(?P<indent>\s*)[0-9]+[).]\s+(?P<data>.+)")
+RE_OL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>[0-9]+[).])\s+(?P<data>.+)")
 class OrderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(OrderedListBlockState,self).__init__(RE_OL,doc)
@@ -543,7 +574,7 @@ class MathParser(SubLineParser):
         super(MathParser,self).__init__(RE_MATH,doc)
 
 RE_EMPTY = re.compile(r"^\s*$")
-class EmptyParser(LineParser):
+class EmptyParser(NotInBlockLineParser):
     def __init__(self,doc):
         super(EmptyParser,self).__init__(RE_EMPTY,doc)
 
