@@ -2,3 +2,8 @@
 ** Latex Preview
 	- more #+OPTIONS: controls
 	  date:nil toc:nil toc:2 author:nil title:nil
+	- Table export supports some ATTR_LATEX options:
+	  :environment bmatrix :mode math 
+** Hide Images
+	- This was removing indent for some reason
+	  which was disconcerting.
