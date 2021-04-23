@@ -361,9 +361,10 @@ class ImageHandler:
             region = img_regs[0]
             rel_p = view.substr(region)
             if(util.is_image(rel_p)):
-                line_region = view.line(region)
-                line_str = view.substr(line_region)
-                view.replace(edit, line_region, line_str.strip())
+                pass
+                #line_region = view.line(region)
+                #line_str = view.substr(line_region)
+                #view.replace(edit, line_region, line_str.strip())
         VIEWS_WITH_IMAGES.discard(view.id())
 
     @staticmethod
