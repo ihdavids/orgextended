@@ -424,7 +424,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         now = datetime.datetime.now()
         inow = orgdate.OrgDate.format_date(now, False)
         anow = orgdate.OrgDate.format_date(now, True)
-        # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
+        # "Packages/OrgExtended/orgsnippets/"+snippet+".sublime-snippet"
         # OTHER VARIABLES:
         # TM_FULLNAME - Users full name
         # TM_FILENAME - File name of the file being edited

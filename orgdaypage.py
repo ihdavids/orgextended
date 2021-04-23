@@ -54,7 +54,7 @@ def OnLoaded(view,dt):
     anow = orgdate.OrgDate.format_date(now, True)
     ai = view.settings().get('auto_indent')
     view.settings().set('auto_indent',False)
-    # "Packages/OrgExtended/snippets/"+snippet+".sublime-snippet"
+    # "Packages/OrgExtended/orgsnippets/"+snippet+".sublime-snippet"
     # OTHER VARIABLES:
     # TM_FULLNAME - Users full name
     # TM_FILENAME - File name of the file being edited

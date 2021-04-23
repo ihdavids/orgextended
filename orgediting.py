@@ -593,7 +593,7 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
             self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
-        self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str(level)+".sublime-snippet"})
+        self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/orgsnippets/heading"+str(level)+".sublime-snippet"})
         sublime.active_window().active_view().settings().set('auto_indent',ai)
         
 class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
@@ -627,7 +627,7 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
             self.view.insert(edit,self.view.sel()[0].begin(),'\n')
         ai = sublime.active_window().active_view().settings().get('auto_indent')
         self.view.settings().set('auto_indent',False)
-        self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/snippets/heading"+str((level+1))+".sublime-snippet"})
+        self.view.run_command("insert_snippet", {"name" : "Packages/OrgExtended/orgsnippets/heading"+str((level+1))+".sublime-snippet"})
         sublime.active_window().active_view().settings().set('auto_indent',ai)
         evt.EmitIf(onDone)
 
