@@ -236,7 +236,12 @@ class LatexUnorderedListBlockState(exp.UnorderedListBlockState):
     def StartHandleItem(self,m,l, orgnode):
         #data = self.e.Escape(m.group('data'))
         #self.e.doc.append(r"     \item {content}".format(content=data))
-        self.e.doc.append(r"     \item ")
+        definit = m.group('definition')
+        if(definit):
+            self.e.doc.append(r"     \item``{definition}'' ".format(definition=definit))
+        else:
+            self.e.doc.append(r"     \item ")
+
 
 class LatexOrderedListBlockState(exp.OrderedListBlockState):
     def __init__(self,doc):
@@ -248,7 +253,11 @@ class LatexOrderedListBlockState(exp.OrderedListBlockState):
     def StartHandleItem(self,m,l, orgnode):
         #data = self.e.Escape(m.group('data'))
         #self.e.doc.append(r"     \item {content}".format(content=data))
-        self.e.doc.append(r"     \item ")
+        definit = m.group('definition')
+        if(definit):
+            self.e.doc.append(r"     \item``{definition}'' ".format(definition=definit))
+        else:
+            self.e.doc.append(r"     \item ")
 
 class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
     def __init__(self,doc):
@@ -278,28 +287,83 @@ class LatexCheckboxListBlockState(exp.CheckboxListBlockState):
 class LatexTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
         super(LatexTableBlockState,self).__init__(doc)
+        self.tablecnt = 1
     def HandleEntering(self,m,l,orgnode):
+        attr = self.e.GetAttrib("attr_latex")
+        floatOp = None
+        align  = "center"
+        self.modeDelimeterStart = ""
+        self.modeDelimeterEnd   = ""
+        self.environment = "tabular"
+        self.figure = "center"
+        figureext = ""
+        if(attr):
+            p = plist.PList.createPList(attr)
+        else:
+            p = plist.PList.createPList("")
+        caption = self.e.GetAttrib("caption")
+        cc = p.Get("caption",None)
+        if(cc):
+            caption = cc
+        self.environment = GetOption(p,"environment",self.environment)
+        mode = GetOption(p,"mode",None)
+        if(mode == "math"):
+            self.modeDelimeterStart = r"\["
+            self.modeDelimeterEnd   = r"\]"
+        if(mode == "inline-math"):
+            self.modeDelimeterStart = r"\("
+            self.modeDelimeterEnd   = r"\)"
+        val = p.Get("center",None)
+        if(val and val == "nil"):
+            align = None
+        floatOp = GetOption(p,"float",None)
+        if(caption and not floatOp):
+            floatOp = "t"
+        if(floatOp and floatOp != "nil"):
+            if(floatOp):
+                self.figure = "table"
+                figureext = "[!htp]"
+            if(floatOp == "multicolumn"):
+                self.figure = "table*"
+            elif(floatOp == "sideways"):
+                self.figure = "sidewaysfigure" 
+            elif(floatOp == "wrap"):
+                self.figure = "wrapfigure"
+                figureext = "{l}"
+            placement = p.Get("placement",None)
+            if(placement):
+                figureext = placement
         tabledef = ""
         tds = None
         if(not RE_TABLE_SEPARATOR.search(l)):
             tds = l.split('|')
             if(len(tds) > 1):
-                tabledef = ("|c" * (len(tds)-2)) + "|"
-        self.e.doc.append(r"    \begin{table}[!htp]")
-        if(self.e.GetAttrib('caption')):
+                if(mode == "math"):
+                    tabledef = ""
+                else:
+                    tabledef = "{" + ("|c" * (len(tds)-2)) + "|}" 
+        self.e.doc.append(r"    \begin{{{figure}}}{figureext}".format(figure=self.figure,figureext=figureext))
+        if(caption):
             self.e.doc.append(r"    \caption{{{caption}}}".format(caption=self.e.GetAttrib('caption')))
             #self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
             #self.tableIndex += 1
-            self.e.ClearAttrib()
-        self.e.doc.append(r"    \centering\renewcommand{\arraystretch}{1.2}")
-        self.e.doc.append(r"    \begin{{tabular}}{{{tabledef}}}".format(tabledef=tabledef))
-        self.e.doc.append(r"    \hline") 
+        if(align == "center" and self.environment == 'tabular'):
+            self.e.doc.append(r"    \centering\renewcommand{\arraystretch}{1.2}")
+        self.e.doc.append(self.modeDelimeterStart)
+        self.e.doc.append(r"    \begin{{{environment}}}{tabledef}".format(tabledef=tabledef,environment=self.environment))
+        self.e.ClearAttrib()
+        if(self.environment == 'tabular'):
+            self.e.doc.append(r"    \hline") 
         if(tds):
             self.HandleData(tds,True)
     def HandleExiting(self, m, l , orgnode):
-        self.e.doc.append(r"    \hline")
-        self.e.doc.append(r"    \end{tabular}")
-        self.e.doc.append(r"    \end{table}")
+        if(self.environment == 'tabular'):
+            self.e.doc.append(r"    \hline") 
+        self.e.doc.append(r"    \end{{{environment}}}".format(environment=self.environment))
+        self.e.doc.append(self.modeDelimeterEnd)
+        self.e.doc.append(r"    \label{{table:{cnt}}}".format(cnt=self.tablecnt))
+        self.e.doc.append(r"    \end{{{figure}}}".format(figure=self.figure))
+        self.tablecnt += 1
 
     def HandleData(self,tds,head=False): 
         if(len(tds) > 3):
@@ -310,7 +374,7 @@ class LatexTableBlockState(exp.TableBlockState):
                 if(not first):
                     line += " & "
                 first = False
-                if(head):
+                if(head and self.environment == 'tabular'):
                     line += r"\textbf{{{data}}}".format(data=self.e.Escape(td))
                 else:
                     line += self.e.Escape(td)
@@ -343,6 +407,18 @@ class LatexMathParser(exp.MathParser):
         super(LatexMathParser,self).__init__(doc)
     def HandleSegment(self,m,l,n):
         self.e.doc.append(r"\({data}\)".format(data=m.group('data')))
+
+class LatexInlineMathParser(exp.InlineMathParser):
+    def __init__(self,doc):
+        super(LatexInlineMathParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(r"\({data}\)".format(data=m.group('data')))
+
+class LatexEqMathParser(exp.EqMathParser):
+    def __init__(self,doc):
+        super(LatexEqMathParser,self).__init__(doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(r"\[{data}\]".format(data=m.group('data')))
 
 class LatexEmptyParser(exp.EmptyParser):
     def __init__(self,doc):
@@ -435,6 +511,12 @@ def AddOption(p,name,ops):
         ops += name + "=" + val.strip() 
     return ops
 
+def GetOption(p,name,ops):
+    val = p.Get(name,None)
+    if(val):
+        return val.strip()
+    return ops
+
 # Simple links are easy. The hard part is images, includes and results
 class LatexLinkParser(exp.LinkParser):
     def __init__(self,doc):
@@ -522,6 +604,7 @@ class LatexLinkParser(exp.LinkParser):
                     self.e.doc.append(r"\href{{{link}}}{{{desc}}}".format(link=link,desc=desc))
                 else:
                     self.e.doc.append(r"\url{{{link}}}".format(link=link))
+        self.e.ClearAttrib()
 
 # <<TARGET>>
 class LatexTargetParser(exp.TargetParser):
@@ -574,6 +657,8 @@ class LatexDoc(exp.OrgExporter):
         self.pre.append(r"\usepackage{rotating}")
         self.pre.append(r"\usepackage{textcomp}")
         self.pre.append(r"\usepackage{capt-of}")
+        self.pre.append(r"\usepackage{amsmath}")
+        self.pre.append(r"\usepackage{amssymb}")
         # Needed for strikethrough
         self.pre.append(r"\usepackage[normalem]{ulem}")
         # Checkbox Setup
@@ -618,6 +703,8 @@ class LatexDoc(exp.OrgExporter):
         LatexLatexClassOptionsParser(self),
         LatexActiveDateParser(self),
         LatexMathParser(self),
+        LatexInlineMathParser(self),
+        LatexEqMathParser(self),
         LatexBoldParser(self),
         LatexItalicsParser(self),
         LatexUnderlineParser(self),

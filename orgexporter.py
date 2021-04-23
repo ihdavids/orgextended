@@ -506,7 +506,7 @@ class SchedulingStripper(StripParser):
     def __init__(self,doc):
         super(SchedulingStripper,self).__init__(RE_SCHEDULING_LINE,doc)
 
-RE_UL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>-|[+])\s+(?P<data>.+)")
+RE_UL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>-|[+])\s+((?P<definition>[a-zA-Z0-9_-]+?)\s*[:][:]\s*)?(?P<data>.+)")
 class UnorderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(UnorderedListBlockState,self).__init__(RE_UL,doc)
@@ -516,7 +516,7 @@ class CheckboxListBlockState(ListBlockState):
     def __init__(self,doc):
         super(CheckboxListBlockState,self).__init__(RE_CL,doc)
 
-RE_OL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>[0-9]+[).])\s+(?P<data>.+)")
+RE_OL   = re.compile(r"^(?P<indent>\s*)(?P<listprefix>[0-9]+[).])\s+((?P<definition>[a-zA-Z0-9_-]+?)\s*[:][:]\s*)?(?P<data>.+)")
 class OrderedListBlockState(ListBlockState):
     def __init__(self,doc):
         super(OrderedListBlockState,self).__init__(RE_OL,doc)
@@ -572,6 +572,16 @@ RE_MATH = regex.compile(r"\$(?P<data>.+?)\$")
 class MathParser(SubLineParser):
     def __init__(self,doc):
         super(MathParser,self).__init__(RE_MATH,doc)
+
+RE_INLMATH = regex.compile(r"\\\((?P<data>.+?)\\\)")
+class InlineMathParser(SubLineParser):
+    def __init__(self,doc):
+        super(InlineMathParser,self).__init__(RE_INLMATH,doc)
+
+RE_EQMATH = regex.compile(r"\\\[(?P<data>.+?)\\\]")
+class EqMathParser(SubLineParser):
+    def __init__(self,doc):
+        super(EqMathParser,self).__init__(RE_EQMATH,doc)
 
 RE_EMPTY = re.compile(r"^\s*$")
 class EmptyParser(NotInBlockLineParser):
