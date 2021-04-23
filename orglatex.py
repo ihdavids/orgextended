@@ -110,6 +110,40 @@ class LatexSourceBlockState(exp.SourceBlockState):
         super(LatexSourceBlockState,self).__init__(doc)
         self.skipSrc = False
 
+    def HandleOptions(self):
+        attr = self.e.GetAttrib("attr_latex")
+        optionsOp = ""
+        floatOp = None
+        if(attr):
+            p = plist.PList.createPList(attr)
+        else:
+            p = plist.PList.createPList("")
+        ops = p.Get("options",None)
+        if(ops):
+            optionsOp = ops
+        caption = self.e.GetAttrib("caption")
+        cc = p.Get("caption",None)
+        if(cc):
+            caption = cc
+        floatOp = GetOption(p,"float",None)
+        if(caption and not floatOp):
+            floatOp = "t"
+        if(floatOp and floatOp != "nil"):
+            if(floatOp == "multicolumn"):
+                figure = "figure*"
+            elif(floatOp == "sideways"):
+                figure = "sidewaysfigure" 
+            elif(floatOp == "wrap"):
+                figure = "wrapfigure"
+                figureext = "{l}"
+        if(optionsOp.strip() != ""):
+            optionsOp = "[" + optionsOp + "]"
+        # There is a discrepancy between orgmode docs and
+        # actual emacs export.. I need to figure this out so
+        # nuke it for now till I understand it
+        optionsOp = ""
+        return (optionsOp,floatOp,caption)
+
     def HandleEntering(self, m, l, orgnode):
         self.skipSrc = False
         language = m.group('lang')
@@ -130,14 +164,18 @@ class LatexSourceBlockState(exp.SourceBlockState):
             self.skipSrc = True
             return
         attribs = ""
+        self.options, self.float, self.caption = self.HandleOptions()
+        self.e.doc.append(r"  \begin{center}")
+        self.e.doc.append(r"  \centering")
         if(haveLang(language)):
-            self.e.doc.append(r"  \begin{{lstlisting}}[language={{{lang}}}]".format(lang=mapLanguage(language)))
+            self.e.doc.append(r"  \begin{options}{{lstlisting}}[language={{{lang}}}]".format(options=self.options,lang=mapLanguage(language)))
         else:
-            self.e.doc.append(r"  \begin{lstlisting}")
+            self.e.doc.append(r"  \begin{options}{{lstlisting}}".format(options=self.options))
 
     def HandleExiting(self, m, l , orgnode):
         if(not self.skipSrc):
             self.e.doc.append(r"  \end{lstlisting}")
+            self.e.doc.append(r"  \end{center}")
         skipSrc = False
 
     def HandleIn(self,l, orgnode):
