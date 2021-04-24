@@ -1,0 +1,4 @@
+* 1.2.27
+** LaTeX Exporter
+	- LATEX: and @@ @@ support in the latex exporter.
+	- Something went wrong with 1.2.26, People are downloading 1.1.13 instead... I don't know why. Pushing another version in the hopes this fixes it.
