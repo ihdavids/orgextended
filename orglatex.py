@@ -663,6 +663,22 @@ class LatexLatexClassOptionsParser(exp.LatexClassOptionsParser):
     def HandleLine(self,m,l,n):
         self.e.documentclass += m.group('data').strip()
 
+# Outputs latex verbatim but in a line
+RE_LATEX_SUBLATEX = regex.compile(r"[@][@](?P<data>.*)[@][@]")
+class LatexLatexSubLatexParser(exp.SubLineParser):
+    def __init__(self,doc):
+        super(LatexLatexSubLatexParser,self).__init__(RE_LATEX_SUBLATEX, doc)
+    def HandleSegment(self,m,l,n):
+        self.e.doc.append(m.group('data').strip())
+
+# Line of latex gets emitted
+RE_LATEX_LATEX = regex.compile(r"^\s*[#][+]LATEX[:]\s*(?P<data>.*)")
+class LatexLatexLatexParser(exp.LineParser):
+    def __init__(self,doc):
+        super(LatexLatexLatexParser,self).__init__(RE_LATEX_LATEX, doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(m.group('data').strip())
+
 RE_ATTR_LATEX = regex.compile(r"^\s*[#][+]ATTR_LATEX[:]\s*(?P<data>.*)")
 class LatexAttributeParser(exp.AttributeParser):
     def __init__(self,doc):
@@ -739,8 +755,10 @@ class LatexDoc(exp.OrgExporter):
         LatexNameParser(self),
         LatexLatexHeaderParser(self),
         LatexLatexClassOptionsParser(self),
+        LatexLatexLatexParser(self),
         LatexActiveDateParser(self),
         LatexMathParser(self),
+        LatexLatexSubLatexParser(self),
         LatexInlineMathParser(self),
         LatexEqMathParser(self),
         LatexBoldParser(self),
