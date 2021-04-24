@@ -510,3 +510,33 @@ class OrgLinkToFileCommand(sublime_plugin.TextCommand):
             else:
                 self.files.append([filename])
         self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
+
+class OrgJumpToBacklinksCommand(sublime_plugin.TextCommand):
+    def on_done(self, index, modifiers=None):
+        return
+        if(index >= 0):
+            f = self.files[index]
+            link = self.view.MakeRelativeToMe(f[0])
+            desc = os.path.basename(link)
+            if(len(f) > 1):
+                desc = f[1]
+                includeRoamTag = sets.Get("insertRoamTagToFileLink", True)
+                if includeRoamTag is False:
+                    log.error(self.rawTitles[f[0]])
+                    desc = self.rawTitles[f[0]]
+            indent = ""
+            node = db.Get().AtInView(self.view)
+            if(node):
+                indent = node.indent()
+            data = r"{indent}[[file:{link}][{desc}]]".format(indent=indent, link=link, desc=desc)
+            self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": data})
+
+    def run(self, edit):
+        self.files = []
+        self.rawTitles = {}
+        fi = db.Get().FindInfo(self.view)
+        bl = fi.backLinks
+        for l in bl:
+            link = bl[l]
+            self.files.append(link.desc if link.desc else link.link)
+        self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)

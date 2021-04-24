@@ -1151,22 +1151,21 @@ class OrgRootNode(OrgBaseNode):
     def setFile(self, file):
         self.file = file
 
-RE_PROTO = re.compile(r"^[a-zA-Z]+[:]")
+RE_PROTO = re.compile(r"^[a-zA-Z][a-zA-Z]+[:]")
 class OrgLink:
     def __init__(self, link, desc, row):
-        self.link = link.strip()
-        self.desc = desc.strip()
+        self.link = link.strip() if link else link
+        self.desc = desc.strip() if desc else desc
         self.row  = row
-        if(link.startswith("file:")):
-            link = link[5:]
+        if(self.link and self.link.startswith("file:")):
+            self.link = self.link[5:]
 
     def IsFile(self):
         if(self.link.startswith("http")):
             return False
-        return RE_PROTO.search(self.link)
+        return not RE_PROTO.search(self.link)
 
-    @property
-    def link(self)
+
 
 class OrgNode(OrgBaseNode):
 

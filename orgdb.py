@@ -27,6 +27,7 @@ class FileInfo:
         self.key      = file.lower() if file else None
         self.change_count = 0
         self.org.setFile(self)
+        self.backLinks = {}
         displayFn = self.key
         oldLen = len(displayFn) if displayFn else 0
         if(not displayFn):
@@ -53,6 +54,21 @@ class FileInfo:
             displayFn = displayFn[1:]
         self.displayName = displayFn
 
+    def AddBacklink(self, link):
+        self.backLinks[link.link] = link
+
+    def RebuildBacklinks(self):
+        links = self.org.env.links
+        for link in links:
+            if(link.IsFile()):
+                f = link.link
+                if(not os.path.isabs(f)):
+                    f = os.path.normpath(os.path.join(os.path.dirname(self.filename),f))
+                ifo = Get().FindInfo(f)
+                print("TRIED TO BACKLINK: " + str(f))
+                if(ifo):
+                    ifo.AddBacklink(link)
+
     def Root(self):
         return self.org[0]
         
@@ -62,10 +78,12 @@ class FileInfo:
         self.org.setFile(self)
         # Keep track of last change count.
         self.change_count = view.change_count()
+        self.RebuildBacklinks()
 
     def Reload(self):
         self.org = loader.load(self.filename)
         self.org.setFile(self)
+        self.RebuildBacklinks()
 
     def ResetChangeCount(self):
         self.change_count = 0
@@ -228,6 +246,7 @@ class OrgDb:
         if(fi != None):
             fi.Reload()
             self.RebuildIds()
+            fi.RebuildBacklinks()
             return fi
         else:
             rv = self.LoadNew(fileOrView)
@@ -255,6 +274,7 @@ class OrgDb:
             self.Files = []
         self.Files.append(fi)
         self.SortFiles()
+        fi.RebuildBacklinks()
 
     def SortFiles(self):
         self.Files.sort(key=lambda x: x.key) 
