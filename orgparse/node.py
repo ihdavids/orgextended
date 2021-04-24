@@ -249,10 +249,15 @@ class OrgEnv(object):
         self._nodes = []
         self._targets = {}
         self._names = {}
+        self._links = []
         self.properties = []
         self.customids = {}
         self.ids = {}
         self.NamedObjects = {}
+
+    @property
+    def links(self):
+        return self._links
 
     @property
     def targets(self):
@@ -1146,6 +1151,22 @@ class OrgRootNode(OrgBaseNode):
     def setFile(self, file):
         self.file = file
 
+RE_PROTO = re.compile(r"^[a-zA-Z]+[:]")
+class OrgLink:
+    def __init__(self, link, desc, row):
+        self.link = link.strip()
+        self.desc = desc.strip()
+        self.row  = row
+        if(link.startswith("file:")):
+            link = link[5:]
+
+    def IsFile(self):
+        if(self.link.startswith("http")):
+            return False
+        return RE_PROTO.search(self.link)
+
+    @property
+    def link(self)
 
 class OrgNode(OrgBaseNode):
 
@@ -1243,6 +1264,7 @@ class OrgNode(OrgBaseNode):
         # each line. The problem is that we can't
         # tell the offset from the heading
         gen = self._iparse_sdc(ilines)
+        gen = self._iparse_links(gen, ilines)
         gen = self._iparse_names(gen, ilines)
         gen = self._iparse_clock(gen, ilines)
         gen = self._iparse_tables(gen, ilines)
@@ -1400,6 +1422,16 @@ class OrgNode(OrgBaseNode):
             else:
                 yield line
         for line in ilines:
+            yield line
+    
+    def _iparse_links(self, ilines, at):
+        #self.env._links
+        RE_LINK = re.compile(r"\[\[(?P<link>[^\]]+)\](\[(?P<desc>[^\]]+)\])?\]")
+        for line in ilines:
+            for m in RE_LINK.finditer(line):
+                row = self._start + at.offset
+                link = OrgLink(m.group('link'), m.group('desc'), row)
+                self.env._links.append(link)
             yield line
 
     def _iparse_drawers(self, ilines, at):
