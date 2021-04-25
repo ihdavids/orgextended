@@ -31,6 +31,13 @@ def CreateOrFindUniqueViewNamed(name, syntax):
     view.set_name(name)
     view.set_syntax_file("Packages/OrgExtended/{}.sublime-syntax".format(syntax))
     return view
+    
+def IsViewActuallyActive(name):
+    win = sublime.active_window()
+    for view in win.views():
+        if view.name() == name:
+            return True
+    return False
 
 def MoveViewToOtherGroup(view,myview):
     window = sublime.active_window()
@@ -67,6 +74,8 @@ class UniqueView:
             MoveViewToOtherGroup(self._view,curview)
         self._view.set_read_only(True)
         self._view.set_scratch(True)
+        # View mappings is required so we can return the 
+        # UniqueView rather than the view
         ViewMappings[name] = self
 
     @property
@@ -75,11 +84,11 @@ class UniqueView:
 
     @staticmethod
     def Get(name,syntax="OrgExtended",reuse=True,curview=None):
-        if(name in ViewMappings):
+        if(name in ViewMappings and IsViewActuallyActive(name)):
             return ViewMappings[name]
         else:
             return UniqueView(name,syntax,reuse,curview)
 
     @staticmethod
     def IsShowing(name):
-        return name in ViewMappings
+        return IsViewActuallyActive(name)
