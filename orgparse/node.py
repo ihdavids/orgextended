@@ -1153,12 +1153,18 @@ class OrgRootNode(OrgBaseNode):
 
 RE_PROTO = re.compile(r"^[a-zA-Z][a-zA-Z]+[:]")
 class OrgLink:
-    def __init__(self, link, desc, row):
+    def __init__(self, text, link, desc, row):
+        self.text = text
         self.link = link.strip() if link else link
         self.desc = desc.strip() if desc else desc
         self.row  = row
         if(self.link and self.link.startswith("file:")):
             self.link = self.link[5:]
+        linkifo = self.link.split('::')
+        self.link = linkifo[0]
+        self.localTarget = None 
+        if(len(linkifo) > 1):
+            self.localTarget = linkifo[1]
 
     def IsFile(self):
         if(self.link.startswith("http")):
@@ -1429,7 +1435,7 @@ class OrgNode(OrgBaseNode):
         for line in ilines:
             for m in RE_LINK.finditer(line):
                 row = self._start + at.offset
-                link = OrgLink(m.group('link'), m.group('desc'), row)
+                link = OrgLink(line, m.group('link'), m.group('desc'), row)
                 self.env._links.append(link)
             yield line
 

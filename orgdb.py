@@ -27,7 +27,6 @@ class FileInfo:
         self.key      = file.lower() if file else None
         self.change_count = 0
         self.org.setFile(self)
-        self.backLinks = {}
         displayFn = self.key
         oldLen = len(displayFn) if displayFn else 0
         if(not displayFn):
@@ -54,9 +53,6 @@ class FileInfo:
             displayFn = displayFn[1:]
         self.displayName = displayFn
 
-    def AddBacklink(self, link):
-        self.backLinks[link.link] = link
-
     def RebuildBacklinks(self):
         links = self.org.env.links
         for link in links:
@@ -64,10 +60,8 @@ class FileInfo:
                 f = link.link
                 if(not os.path.isabs(f)):
                     f = os.path.normpath(os.path.join(os.path.dirname(self.filename),f))
-                ifo = Get().FindInfo(f)
+                Get().AddBacklink(f, link, self)
                 print("TRIED TO BACKLINK: " + str(f))
-                if(ifo):
-                    ifo.AddBacklink(link)
 
     def Root(self):
         return self.org[0]
@@ -174,7 +168,21 @@ class OrgDb:
         self.ids          = []
         self.idmaps       = {}
         self.tags = set()
+        self.backlinks = {}
 
+    def GetBacklinks(self, view):
+        fn = view.file_name()
+        if( fn in self.backlinks):
+            l = self.backlinks[fn]
+            return l
+        return None
+
+    def AddBacklink(self, f, link, fi):
+        link.fromFile   = fi
+        link.targetName = f
+        if(not f in self.backlinks):
+            self.backlinks[f] = []
+        self.backlinks[f].append(link)
 
     def OnTags(self, tags):
         for i in tags:
@@ -335,11 +343,14 @@ class OrgDb:
                         log.warning('could not add org path: {} - does not seem to exist'.format(orgPath))
                         continue
                     try:
+                        print("TRYING: " + str(orgPath))
+                        print("SUFFIX: " + str(suffix))
                         for path in Path(orgPath).glob(suffix):
                             if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
                                 continue
                             try:
                                 filename = str(path)
+                                log.debug("PARSING: " + filename)
                                 file = FileInfo(filename,loader.load(filename), self.orgPaths)
                                 self.AddFileInfo(file)
                             except Exception as e:

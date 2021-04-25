@@ -534,9 +534,14 @@ class OrgJumpToBacklinksCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.files = []
         self.rawTitles = {}
-        fi = db.Get().FindInfo(self.view)
-        bl = fi.backLinks
-        for l in bl:
-            link = bl[l]
-            self.files.append(link.desc if link.desc else link.link)
-        self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
+        bl = db.Get().GetBacklinks(self.view)
+        if(bl):
+            for l in bl:
+                title = l.fromFile.org.get_comment("TITLE",[""])[0]
+                desc = l.desc if l.desc else ""
+                if(title.strip() != ""):
+                    desc = title + ": " + desc
+                self.files.append([desc, l.link])
+            self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
+            return
+        print("NO BACKLINKS")
