@@ -50,6 +50,7 @@
     {"caption": "Org Hide Image",              "command": "org_hide_image"              },
     {"caption": "Org Link To File",            "command": "org_link_to_file"            },
     {"caption": "Org Jump To Backlink",        "command": "org_jump_to_backlinks"       },
+    {"caption": "Org Show Backlinks",          "command": "org_show_backlinks"          },
     {"caption": "Org Insert Heading Sibling",  "command": "org_insert_heading_sibling"  },
     {"caption": "Org Insert Heading Child",    "command": "org_insert_heading_child"    },
     {"caption": "Org Insert Date Inactive",    "command": "org_insert_date_inactive"    },

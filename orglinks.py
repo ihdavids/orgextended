@@ -17,6 +17,7 @@ import yaml
 import OrgExtended.orgneovi as nvi
 import OrgExtended.pymitter as evt
 from   OrgExtended.orgplist import *
+import OrgExtended.orguniqueview as uview
 
 try:
     import importlib
@@ -513,29 +514,16 @@ class OrgLinkToFileCommand(sublime_plugin.TextCommand):
 
 class OrgJumpToBacklinksCommand(sublime_plugin.TextCommand):
     def on_done(self, index, modifiers=None):
-        return
         if(index >= 0):
-            f = self.files[index]
-            link = self.view.MakeRelativeToMe(f[0])
-            desc = os.path.basename(link)
-            if(len(f) > 1):
-                desc = f[1]
-                includeRoamTag = sets.Get("insertRoamTagToFileLink", True)
-                if includeRoamTag is False:
-                    log.error(self.rawTitles[f[0]])
-                    desc = self.rawTitles[f[0]]
-            indent = ""
-            node = db.Get().AtInView(self.view)
-            if(node):
-                indent = node.indent()
-            data = r"{indent}[[file:{link}][{desc}]]".format(indent=indent, link=link, desc=desc)
-            self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": data})
+            f = self.links[index]
+            fname = f.fromFile.filename + ":" + str(f.row)
+            self.view.window().open_file(fname, sublime.ENCODED_POSITION)
 
     def run(self, edit):
         self.files = []
-        self.rawTitles = {}
         bl = db.Get().GetBacklinks(self.view)
         if(bl):
+            self.links = bl
             for l in bl:
                 title = l.fromFile.org.get_comment("TITLE",[""])[0]
                 desc = l.desc if l.desc else ""
@@ -544,4 +532,44 @@ class OrgJumpToBacklinksCommand(sublime_plugin.TextCommand):
                 self.files.append([desc, l.link])
             self.view.window().show_quick_panel(self.files, self.on_done, -1, -1)
             return
-        print("NO BACKLINKS")
+        log.debug("NO BACKLINKS")
+
+class OrgShowBacklinksCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        bl = db.Get().GetBacklinks(self.view)
+        if(bl):
+            self.uv = uview.UniqueView("Backlinks","OrgExtended")
+            out = str(len(bl)) + " Backlinks\n"
+            files = {}
+            for l in bl:
+                title = l.fromFile.org.get_comment("TITLE",[""])[0]
+                if(title.strip() == ""):
+                    title = l.desc
+                    if(not title):
+                        title = l.link
+                if(not title in files):
+                    files[title] = []
+                files[title].append(l)
+            keys = list(files.keys())
+            keys.sort()
+            for k in keys:
+                out += "\n"
+                flist = files[k]
+                flist = sorted(flist,key=lambda x: x.row)
+                f = flist[0] 
+                fn = f.fromFile.filename
+                out += "* {}\n".format(k)
+                for f in flist:
+                    desc = f.desc
+                    if(not desc):
+                        desc = f.link
+                    out += "  - [[file:{}::{}][{}]]\n".format(fn,f.row,desc)
+                    if(f.linktext != f.text and (len(f.linktext)+5) < len(f.text)):
+                        out += "    " + f.text.strip() + "\n"
+            self.uv.view.set_read_only(False)
+            self.uv.view.run_command("org_internal_insert", {"location": 0, "text": out + "\n"})
+            self.uv.view.set_read_only(True)
+            self.uv.view.run_command("org_fold_all_links")
+            return
+        log.debug("NO BACKLINKS")
+        

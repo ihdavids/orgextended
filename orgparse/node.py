@@ -1153,8 +1153,9 @@ class OrgRootNode(OrgBaseNode):
 
 RE_PROTO = re.compile(r"^[a-zA-Z][a-zA-Z]+[:]")
 class OrgLink:
-    def __init__(self, text, link, desc, row):
+    def __init__(self, text, link, desc, row, linktext):
         self.text = text
+        self.linktext = linktext
         self.link = link.strip() if link else link
         self.desc = desc.strip() if desc else desc
         self.row  = row
@@ -1435,7 +1436,7 @@ class OrgNode(OrgBaseNode):
         for line in ilines:
             for m in RE_LINK.finditer(line):
                 row = self._start + at.offset
-                link = OrgLink(line, m.group('link'), m.group('desc'), row)
+                link = OrgLink(line, m.group('link'), m.group('desc'), row, m.group())
                 self.env._links.append(link)
             yield line
 

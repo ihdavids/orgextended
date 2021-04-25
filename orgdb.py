@@ -61,7 +61,7 @@ class FileInfo:
                 if(not os.path.isabs(f)):
                     f = os.path.normpath(os.path.join(os.path.dirname(self.filename),f))
                 Get().AddBacklink(f, link, self)
-                print("TRIED TO BACKLINK: " + str(f))
+                #print("TRIED TO BACKLINK: " + str(f))
 
     def Root(self):
         return self.org[0]
@@ -182,6 +182,11 @@ class OrgDb:
         link.targetName = f
         if(not f in self.backlinks):
             self.backlinks[f] = []
+        for i in range(len(self.backlinks[f])):
+            ff = self.backlinks[f][i]
+            if(link.row == ff.row):
+                self.backlinks[f][i] = link
+                return
         self.backlinks[f].append(link)
 
     def OnTags(self, tags):
@@ -343,8 +348,6 @@ class OrgDb:
                         log.warning('could not add org path: {} - does not seem to exist'.format(orgPath))
                         continue
                     try:
-                        print("TRYING: " + str(orgPath))
-                        print("SUFFIX: " + str(suffix))
                         for path in Path(orgPath).glob(suffix):
                             if OrgDb.IsExcluded(str(path), self.orgExcludePaths, self.orgExcludeFiles):
                                 continue
@@ -550,7 +553,7 @@ class OrgDb:
 
     def FindNodeByAnyId(self, id):
         v = self.FindByAnyId(id)
-        print(str(v))
+        #print(str(v))
         if(v and v[0]):
             return v[0].At(v[1])
         return None
