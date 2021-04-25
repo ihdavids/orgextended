@@ -309,4 +309,11 @@
     //     "python":  "Python",
     //     "lua":   "[5.2]Lua",
     // },
+
+    // ============================================================
+    // BACKLINKS
+    //
+    // Turn this off if you do not want the system to try to auto
+    // update backlinks for you in the backlinks display
+    "backlinksUpdate": true,
 }

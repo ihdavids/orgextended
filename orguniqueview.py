@@ -32,16 +32,41 @@ def CreateOrFindUniqueViewNamed(name, syntax):
     view.set_syntax_file("Packages/OrgExtended/{}.sublime-syntax".format(syntax))
     return view
 
+def MoveViewToOtherGroup(view,myview):
+    window = sublime.active_window()
+    if (window.num_groups() < 2):
+        #self.window.run_command('clone_file')
+        window.set_layout({
+            "cols": [0.0, 0.5, 1.0],
+            "rows": [0.0, 1.0],
+            "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+            })
+        mygroup    = 0
+        othergroup = 1
+    else:
+        window.focus_view(view)
+        mygroup    = 1
+        othergroup = 0
+        if (window.get_view_index(myview)[0] == 0):
+            othergroup = 1
+            mygroup    = 0
+    window.focus_view(view)
+    window.run_command('move_to_group', {'group': othergroup})
+    window.run_command('focus_group', {'group': mygroup})
+    window.focus_view(myview)
+
 class UniqueView:
-    def __init__(self, name, syntax, reuse=False):
+    def __init__(self, name, syntax, reuse=False,curview=None):
         self.name = name
         if(reuse):
             self._view = CreateOrFindUniqueViewNamed(name,syntax=syntax)
         else:
             self._view = CreateUniqueViewNamed(name,syntax=syntax)
+        self._view.set_name(self.name)
+        if(curview != None):
+            MoveViewToOtherGroup(self._view,curview)
         self._view.set_read_only(True)
         self._view.set_scratch(True)
-        self._view.set_name(self.name)
         ViewMappings[name] = self
 
     @property
@@ -49,8 +74,12 @@ class UniqueView:
         return self._view
 
     @staticmethod
-    def Get(name,syntax="OrgExtended",reuse=True):
+    def Get(name,syntax="OrgExtended",reuse=True,curview=None):
         if(name in ViewMappings):
             return ViewMappings[name]
         else:
-            return UniqueView(name,syntax,reuse)
+            return UniqueView(name,syntax,reuse,curview)
+
+    @staticmethod
+    def IsShowing(name):
+        return name in ViewMappings

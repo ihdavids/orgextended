@@ -19,6 +19,7 @@ import OrgExtended.orgextension as ext
 import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgduration as orgduration
 import OrgExtended.orgtableplot as orgplot
+import OrgExtended.orglinks as olinks
 import math
 import random
 import ast
@@ -2779,6 +2780,10 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         r = self.preRow
         rc = (r in self.hlines)
         return rc
+
+    def on_activated(self):
+        if(sets.Get("backlinksUpdate",True)):
+            olinks.UpdateBacklinksForDisplay(self.view)
 
     def on_text_command(self, command_name, args=None):
         if('table_editor' in command_name):
