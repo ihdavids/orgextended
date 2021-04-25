@@ -1,7 +1,17 @@
 * 1.2.28
 ** Backlinks Experimentation
-	Org Roam is a very powerful package. I am nowhere near supporting the power and flexibility of that package.
-	That said, I am experimenting with some of the features.
+	Org Roam is a very powerful package. I am nowhere near supporting the power pretty views and flexibility of that package.
+	That said, I am experimenting with the backlinks feature. This release has an experimental version of the org-roam backlinks
+	view. These are links that are referencing your current document in your orgDirs not links that this document references. 
+
 
 	- Org Jump To Backlinks - is a new quick menu command that shows the links referencing your current file and lets you jump to them.
 	- Org Show Backlinks - is a new command that pops up a panel with the backlinks to the file you are currently looking at.
+
+	This is an experimental feature. It automatically tries to keep the backlinks display visible but this is somewhat challenging with the existing
+	sublime API. You can turn this off if it is causing you problems:
+
+	Turn off the attempts to update the backlinks display using the following option in your settings file:
+	#+BEGIN_EXAMPLE
+	 "backlinksUpdate": false, 
+	#+END_EXAMPLE

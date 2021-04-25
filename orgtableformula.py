@@ -2786,11 +2786,8 @@ class TableEventListener(sublime_plugin.ViewEventListener):
         if(not self.updating and util.isPotentialOrgFile(self.view.file_name()) and sets.Get("backlinksUpdate",True)):
             # We do this to avoid recursive update on refocus
             self.updating = True
-            print("TRYING TO UPDATE")
             olinks.UpdateBacklinksForDisplay(self.view)
             self.updating = False
-        else:
-            print("NOT UPDATING")
 
     def on_text_command(self, command_name, args=None):
         if('table_editor' in command_name):
