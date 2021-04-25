@@ -534,42 +534,47 @@ class OrgJumpToBacklinksCommand(sublime_plugin.TextCommand):
             return
         log.debug("NO BACKLINKS")
 
+
+def BuildBacklinksDisplay(view):
+    bl = db.Get().GetBacklinks(view)
+    if(bl):
+        out = str(len(bl)) + " Backlinks\n"
+        files = {}
+        for l in bl:
+            title = l.fromFile.org.get_comment("TITLE",[""])[0]
+            if(title.strip() == ""):
+                title = l.desc
+                if(not title):
+                    title = l.link
+            if(not title in files):
+                files[title] = []
+            files[title].append(l)
+        keys = list(files.keys())
+        keys.sort()
+        for k in keys:
+            out += "\n"
+            flist = files[k]
+            flist = sorted(flist,key=lambda x: x.row)
+            f = flist[0] 
+            fn = f.fromFile.filename
+            out += "* {}\n".format(k)
+            for f in flist:
+                desc = f.desc
+                if(not desc):
+                    desc = f.link
+                out += "  - [[file:{}::{}][{}]]\n".format(fn,f.row,desc)
+                if(f.linktext != f.text and (len(f.linktext)+5) < len(f.text)):
+                    out += "    " + f.text.strip() + "\n"
+        return out
+    return "0 Backlinks"
+
 class OrgShowBacklinksCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        out = BuildBacklinksDisplay(self.view)
         bl = db.Get().GetBacklinks(self.view)
-        if(bl):
-            self.uv = uview.UniqueView("Backlinks","OrgExtended")
-            out = str(len(bl)) + " Backlinks\n"
-            files = {}
-            for l in bl:
-                title = l.fromFile.org.get_comment("TITLE",[""])[0]
-                if(title.strip() == ""):
-                    title = l.desc
-                    if(not title):
-                        title = l.link
-                if(not title in files):
-                    files[title] = []
-                files[title].append(l)
-            keys = list(files.keys())
-            keys.sort()
-            for k in keys:
-                out += "\n"
-                flist = files[k]
-                flist = sorted(flist,key=lambda x: x.row)
-                f = flist[0] 
-                fn = f.fromFile.filename
-                out += "* {}\n".format(k)
-                for f in flist:
-                    desc = f.desc
-                    if(not desc):
-                        desc = f.link
-                    out += "  - [[file:{}::{}][{}]]\n".format(fn,f.row,desc)
-                    if(f.linktext != f.text and (len(f.linktext)+5) < len(f.text)):
-                        out += "    " + f.text.strip() + "\n"
-            self.uv.view.set_read_only(False)
-            self.uv.view.run_command("org_internal_insert", {"location": 0, "text": out + "\n"})
-            self.uv.view.set_read_only(True)
-            self.uv.view.run_command("org_fold_all_links")
-            return
-        log.debug("NO BACKLINKS")
+        self.uv = uview.UniqueView.Get("Backlinks")
+        self.uv.view.set_read_only(False)
+        self.uv.view.run_command("org_internal_replace", {"start": 0, "end": self.uv.view.size(), "text": out + "\n"})
+        self.uv.view.set_read_only(True)
+        self.uv.view.run_command("org_fold_all_links")
         
