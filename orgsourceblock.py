@@ -1169,6 +1169,7 @@ class OrgExecuteSourceBlock:
                 return
 
             # Run the "writer"
+            self.outputs = "Did not execute, something is wrong!"
             if(hasattr(self.curmod,"Execute")):
                 # Okay now time to replace the contents of the block
                 if(self.source == None):

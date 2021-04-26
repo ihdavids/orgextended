@@ -15,3 +15,30 @@
 	#+BEGIN_EXAMPLE
 	 "backlinksUpdate": false, 
 	#+END_EXAMPLE
+
+** Mermaid Source Blocks
+
+	Setting it up is a bit of a pain:
+
+	1. npm install @mermaid-js/mermaid-cli
+	2. NOTE it gets installed into a node_modules folder. This is REQUIRED!
+	3. Set the mermaid variable in your settings to point to mmdc in the node_modules\.bin\mmdc path
+	4. Ensure node is in your path 
+
+	Then execute this block:
+
+	#+BEGIN_SRC mermaid :file ganttdemo.png
+gantt
+    title A Gantt Diagram
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task           :a1, 2014-01-01, 30d
+    Another task     :after a1  , 20d
+    section Another
+    Task in sec      :2014-01-12  , 12d
+    another task      : 24d
+	 
+	#+END_SRC
+
+   #+RESULTS:
+   [[file:ganttdemo.png]]
