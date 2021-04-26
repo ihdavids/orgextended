@@ -18,6 +18,9 @@
 
 ** Mermaid Source Blocks
 
+	- Syntax is supported if you install the mermaid package
+	- Can be executed to generate diagrams if setup.
+
 	Setting it up is a bit of a pain:
 
 	1. npm install @mermaid-js/mermaid-cli
