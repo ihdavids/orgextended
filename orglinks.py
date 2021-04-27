@@ -589,14 +589,27 @@ class OrgShowBacklinksCommand(sublime_plugin.TextCommand):
         
 class OrgSearchLinksCommand(sublime_plugin.TextCommand):
     def on_done(self, index, modifiers=None):
+        if(self.transientview != None):
+            self.transientview.close()
+            self.transientview = None
         if(index >= 0):
             f = self.lobjs[index]
-            fname = f.inFile.filename + ":" + str(f.row)
+            fname = f.inFile.filename + ":" + str(f.row+1)
             self.view.window().open_file(fname, sublime.ENCODED_POSITION)
+
+    def on_highlighted(self, index, modifiers=None):
+        if(self.transientview != None):
+            self.transientview.close()
+            self.transientview = None
+        if(index >= 0):
+            f = self.lobjs[index]
+            fname = f.inFile.filename + ":" + str(f.row+1)
+            self.transientview = self.view.window().open_file(fname, sublime.ENCODED_POSITION|sublime.TRANSIENT)
 
     def run(self, edit):
         self.links = []
         self.lobjs = []
+        self.transientview = None
         files = db.Get().Files
         if(files):
             for f in files:
@@ -606,5 +619,5 @@ class OrgSearchLinksCommand(sublime_plugin.TextCommand):
                     self.links.append([desc + l.link,f.filename])
                     l.inFile = f
                     self.lobjs.append(l)
-            self.view.window().show_quick_panel(self.links, self.on_done, -1, -1)
+            self.view.window().show_quick_panel(self.links, self.on_done, -1, -1,self.on_highlighted)
             return

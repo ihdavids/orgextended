@@ -1,4 +1,4 @@
-* TODO Things I want [18/42]
+* TODO Things I want [20/42]
 	- [-] Extensibility [1/5]
 		- [x] Avoid reloading when files do not change
 		- [ ] Similar folder names for all extensions in User folder
@@ -147,12 +147,12 @@
 	- [x] Priorities (From format block)
 	- [ ] TODO states are fully dynamic, even in coloring? Not sure I can make that possible.
 	- [ ] Format headings
-	- [ ] Babel execution of src blocks [0/5]
-		- [ ] plantuml and dot integration?
-		- [ ] latex?
-		- [ ] noweb
-		- [ ] naming src blocks
-		- [ ] parameters from tables
+	- [x] Babel execution of src blocks [5/5]
+		- [x] plantuml and dot integration?
+		- [x] latex?
+		- [x] noweb
+		- [x] naming src blocks
+		- [x] parameters from tables
 	- [-] Snippets [2/4]
 		- [x] Src block snippet
 		- [ ] Quote block snippet
@@ -167,7 +167,8 @@
 	- [ ] Persistent folding between open and close
 	- [x] Agenda? Integration with existing plugin?
 	- [ ] Jira integration?
-	- [ ] Google calendar integration?
+	- [x] Google calendar integration?
+		  - This I am going to do by publishing calsync eventually.
 	- [ ] Searching by tag (like occur style?)
 	- [x] Export... probably refer and document using pandoc?
 		- [x] Reveal.js support
