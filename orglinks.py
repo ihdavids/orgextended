@@ -587,3 +587,24 @@ class OrgShowBacklinksCommand(sublime_plugin.TextCommand):
         self.uv.view.set_read_only(True)
         self.uv.view.run_command("org_fold_all_links")
         
+class OrgSearchLinksCommand(sublime_plugin.TextCommand):
+    def on_done(self, index, modifiers=None):
+        if(index >= 0):
+            f = self.lobjs[index]
+            fname = f.inFile.filename + ":" + str(f.row)
+            self.view.window().open_file(fname, sublime.ENCODED_POSITION)
+
+    def run(self, edit):
+        self.links = []
+        self.lobjs = []
+        files = db.Get().Files
+        if(files):
+            for f in files:
+                lnks = f.org.env.links
+                for l in lnks:
+                    desc = l.desc + " : " if l.desc else ""
+                    self.links.append([desc + l.link,f.filename])
+                    l.inFile = f
+                    self.lobjs.append(l)
+            self.view.window().show_quick_panel(self.links, self.on_done, -1, -1)
+            return
