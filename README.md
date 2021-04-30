@@ -49,7 +49,7 @@
   ![Tables](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/table_hacking.gif)
 
   What makes Org Mode so versatile is the deceptive simplicity of the format
-  the flexibility of the simple markup and the the depth of the tools and API's provided around that format.
+  the flexibility of the simple markup and the depth of the tools and API's provided around that format.
 
   At times I have wondered why I shouldn't just use markdown? It is a much more widely popular markup system.
   There is no reason markdown could not be extended to become exactly what Org Mode
