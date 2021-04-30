@@ -1,0 +1,7 @@
+* 1.2.29
+** Links
+	- New command "Org Search Links" searches links across all org files.
+
+** Backlinks
+	- Fixed a bug where folds in the backlinks buffer would get confused.
+	
