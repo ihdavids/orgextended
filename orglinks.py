@@ -572,20 +572,24 @@ def UpdateBacklinksForDisplay(view):
     if(uview.UniqueView.IsShowing("Backlinks")):
         out = BuildBacklinksDisplay(view)
         uv = uview.UniqueView.Get("Backlinks",curview=view)
+        uv.view.run_command("org_remove_all_folds")
         uv.view.set_read_only(False)
         uv.view.run_command("org_internal_replace", {"start": 0, "end": uv.view.size(), "text": out + "\n"})
         uv.view.set_read_only(True)
         uv.view.run_command("org_fold_all_links")
+        uv.view.sel().clear()
 
 class OrgShowBacklinksCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         out = BuildBacklinksDisplay(self.view)
         #bl = db.Get().GetBacklinks(self.view)
         self.uv = uview.UniqueView.Get("Backlinks",curview=self.view)
+        self.uv.view.run_command("org_remove_all_folds")
         self.uv.view.set_read_only(False)
         self.uv.view.run_command("org_internal_replace", {"start": 0, "end": self.uv.view.size(), "text": out + "\n"})
         self.uv.view.set_read_only(True)
         self.uv.view.run_command("org_fold_all_links")
+        self.uv.view.sel().clear()
         
 class OrgSearchLinksCommand(sublime_plugin.TextCommand):
     def on_done(self, index, modifiers=None):
