@@ -78,6 +78,7 @@
 - language: asp
 - language: gnuplot
 - language: mermaid
+- language: awk
 
 
 
