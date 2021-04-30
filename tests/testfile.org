@@ -43,6 +43,7 @@
 #+LANGUAGE: en
 #+DATE:     March 20 2018
 #+EMAIL:    myemail@mydomain.com
+#+OPTIONS: 
 
 * Introduction
   This is a simple test file that has a bunch of the core Org Extended features in it.
@@ -58,6 +59,7 @@
                   <hopefully we will eventually support a self documenting command to let the commands speak for themselves" 
   - Documentation - orgextended_docs is a repo full of orgmode files to help you learn about orgmode. Its not the best, but what I have had time to write.
   - Worklog - Sometimes it can be handy to paruse our worklog to look at what I have been working on recently. "Org Show Worklog" will bring that up for you.
+
  
 * Basic Headings
 
@@ -77,6 +79,7 @@
 ******* Heading 7
 ******** Heading 8
 ********* Heading 9
+
 
 * Tags                                                                    :TAG1:TAG2:
   Tags are a means of filtering your headings in this file or across all your files.
@@ -310,6 +313,7 @@
 
   Here are some examples:
 
+  #+ATTR_LATEX: :options commentstyle=\bfseries
 	#+BEGIN_SRC python
     def func(a):
         print("hello world")
@@ -514,7 +518,9 @@
 
   #+CAPTION:   This is a caption for this image
   #+ATTR_HTML: :width 200
-  [[https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/orgstart.gif]]
+    [[https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/orgstart.gif]]
+
+
 
 * Table Editor
   At the moment I am using the Table Editor plugin for my table navigation, creation and manipulation.
@@ -532,6 +538,7 @@
 
   However, this is just the begining. Tables can act like spreadsheets! 
 
+  #+ATTR_LATEX: :environment pmatrix :mode math
   | a | b |
   | 1 | 5 |
   #+TBLFM:@2$2=$1*5
@@ -686,3 +693,11 @@
 ** TODO Recurring BUT ARCHIVED                                            :ARCHIVED:
     <2021-02-15 Wed 14:40 +1d> 
 
+
+
+$e^{i\pi}+1=0$
+
+
+
+
+[[http://reg.ca]]
