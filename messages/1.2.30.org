@@ -1,0 +1,5 @@
+* 1.2.30
+** Auto Indentation
+   - Not yet perfect but some simple auto indentation rules
+   - begin blocks are automatically indended.
+   - Headings get indentation inserted when you hit enter off them
