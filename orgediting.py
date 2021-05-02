@@ -956,3 +956,7 @@ class OrgLinkToTodayCommand(sublime_plugin.TextCommand):
             self.InsertLink()
 
 
+class OrgEnterOnHeadingCommand(sublime_plugin.TextCommand):
+    def run(self, edit, Indent=1):
+        indent = (" " * Indent) + " "
+        self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": "\n" + indent})
