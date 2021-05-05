@@ -8,6 +8,15 @@
    - notes block added to syntax highlighter
    - <n snippet added as well.
 
+** New Agenda Filter Keyword
+
+   statefilter is a new filter that can help tweak a todo view to only a subset of 
+   open states.
+
+   #+BEGIN_EXAMPLE
+     Loose Tasks: statefilter +TODO +NEXT : tagfilter MyTag
+   #+END_EXAMPLE
+
 ** Known Issues
    - Since the default reveal.js exporter uses a CDN the presenter
      notes are not being shown because the notes.html file is not hosted
