@@ -184,14 +184,12 @@ class OrgInput:
 
 class OrgInputDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        print("DOWN")
         global inputCommand
         if(None != inputCommand and inputCommand):
             inputCommand.down()
 
 class OrgInputUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        print("DOWN")
         global inputCommand
         if(None != inputCommand and inputCommand):
             inputCommand.up()

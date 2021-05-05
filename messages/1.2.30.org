@@ -3,3 +3,14 @@
    - Not yet perfect but some simple auto indentation rules
    - begin blocks are automatically indended.
    - Headings get indentation inserted when you hit enter off them
+
+** BEGIN_NOTES
+   - notes block added to syntax highlighter
+   - <n snippet added as well.
+
+** Known Issues
+   - Since the default reveal.js exporter uses a CDN the presenter
+     notes are not being shown because the notes.html file is not hosted
+     anymore. I will work to fix this in the future.
+
+     (As well as upgrade to the latest reveal.js distribution)

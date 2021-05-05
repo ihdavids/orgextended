@@ -415,11 +415,16 @@ def distanceFromStart(e, hour, minSlot):
 #
 #      Also create a BUNCH of filters that filter by tag, properties
 #      and other things so there are example versions of each.
+#
+# statefilter
+# tagfilter
+# priorityfilter
 class AgendaBaseView:
     def __init__(self, name, setup=True, **kwargs):
         self.name = name
         self.SetTagFilter(kwargs)
         self.SetPriorityFilter(kwargs)
+        self.SetStateFilter(kwargs)
         self.hasclock = "hasclock" in kwargs
         self.hasclose = "hasclose" in kwargs
         self.hasdeadline = "hasdeadline" in kwargs
@@ -438,6 +443,31 @@ class AgendaBaseView:
     def BasicSetup(self):
         self.UpdateNow()
         self.entries = []
+
+    def SetStateFilter(self,kwargs):
+        if("statefilter" in kwargs):
+            self._stateFilter = kwargs["statefilter"]
+        else:
+            self._stateFilter = None
+            return
+        self._inStateTags     = []
+        self._oneofStateTags  = []
+        self._outStateTags    = []
+        tags = self._stateFilter.split(' ')
+        for tag in tags:
+            tag = tag.strip()
+            if not tag or len(tag) <= 0:
+                continue
+            m = RE_IN_OUT_TAG.search(tag)
+            if(m):
+                inout = m.group('inout')
+                tagdata = m.group('tag')
+                if(not inout or inout == '+'):
+                    self._inStateTags.append(tagdata.strip())
+                elif(inout == '|'):
+                    self._oneofStateTags.append(tagdata.strip())
+                else:
+                    self._outStateTags.append(tagdata.strip())
 
     def SetPriorityFilter(self,kwargs):
         if("priorityfilter" in kwargs):
@@ -529,6 +559,20 @@ class AgendaBaseView:
         if(self._oneofPriorityTags and len(self._oneofPriorityTags) > 0 and not any(elem in node.priority for elem in self._oneofPriorityTags)):
             return False
         return True
+    
+    def MatchState(self, node):
+        t = node.todo
+        if(not node.todo):
+            t = ""
+        if(not self._stateFilter):
+            return True
+        if(self._inStateTags and len(self._inStateTags) > 0 and not all(re.search(elem,t) for elem in self._inStateTags)):
+            return False
+        if(self._outStateTags and any(re.search(elem,t) for elem in self._outStateTags)):
+            return False
+        if(self._oneofStateTags and len(self._oneofStateTags) > 0 and not any(re.search(elem,t) for elem in self._oneofStateTags)):
+            return False
+        return True
 
     def SetupView(self):
         self.view = CreateUniqueViewNamed(self.name, self)
@@ -616,7 +660,7 @@ class AgendaBaseView:
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
-                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.FilterEntry(n, file)):
+                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.MatchState(n) and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
     def FilterEntry(self, node, file):
@@ -1391,6 +1435,7 @@ class CalendarViewRegistry:
     def AddView(self,name,cls):
         self.KnownViews[name] = cls
 
+    # ViewName: <NAME> <ARGS> : <NAME> <ARGS>
     def ParseArgs(self, n ):
         tokens = n.split(':')
         name = tokens[0].strip()

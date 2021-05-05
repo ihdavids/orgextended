@@ -1,0 +1,10 @@
+<snippet>
+    <content>
+    <![CDATA[
+#+BEGIN_NOTES
+  $0
+#+END_NOTES]]></content>
+    <tabTrigger>&lt;n</tabTrigger>
+    <scope>text.orgmode</scope>
+    <description>notes block</description>
+</snippet>

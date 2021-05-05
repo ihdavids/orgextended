@@ -280,6 +280,14 @@ contexts:
           captures:
             1: orgmode.fence
           pop: true
+    - match: '(\s*\#\+(BEGIN_NOTES|begin_notes)\s*)'
+      captures:
+        1: constant.other orgmode.fence
+      embed: scope:text.orgmode
+      escape: '(\s*\#\+(END_NOTES|end_notes)\s*)'
+      embed_scope: markup.raw.block orgmode.raw.block
+      escape_captures:
+        1: constant.other orgmode.fence
 
     - match: '(\s*\#\+(BEGIN_EXAMPLE|begin_example)\s*)'
       captures:
