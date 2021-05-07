@@ -86,6 +86,11 @@ RE_RESULTS = re.compile(r"^\s*#\+RESULTS.*")
 
 # <!-- multiple_stores height="50%" width="50%" --> 
 RE_COMMENT_TAG = re.compile(r"^\s*[<][!][-][-]\s+(?P<name>[a-zA-Z0-9_-]+)\s+(?P<props>.*)\s+[-][-][>]")
+#https://cdn.jsdelivr.net/npm/reveal.js@3.8.0/js/reveal.min.js
+cdn = "https://cdn.jsdelivr.net/npm/reveal.js"
+#cdn = "https://cdnjs.cloudflare.com/ajax/libs/reveal.js"
+ver = "@4.1.0"
+cdn = cdn + ver + "/"
 
 
 def mapLanguage(lang):
@@ -108,12 +113,19 @@ class RevealDoc:
 	def AddJs(self,link):
 		self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
 
-	def AddStyle(self,link):
-		self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\">\n")
+	def AddStyle(self,link,id=None):
+		if(id == None):
+			self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\">\n")
+		else:
+			self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\" id=\""+id+"\">\n")
+
+	def AddInlineStyle(self,style):
+		self.fs.write("    <style>{}</style>\n".format(style))
 
 	def StartHead(self):
 		self.fs.write("  <head>\n")
-
+		self.fs.write("  <meta charset=\"utf-8\">\n")
+		self.fs.write("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n")
 	def EndHead(self):
 		self.fs.write("  </head>\n")
 
@@ -198,6 +210,8 @@ class RevealDoc:
 			line = RE_ENDQUOTE.sub(r"</blockquote>",line)
 			line = RE_STARTNOTE.sub(r'<aside class="notes">',line)
 			line = RE_ENDNOTE.sub(r"</aside>",line)
+		if(line.strip() == ""):
+			line = "<br/>"
 		return line
 
 	def SlideBody(self,slide):
@@ -285,7 +299,8 @@ class RevealDoc:
 		self.fs.write("  </div>")
 
 	def Dep(self, file, link, last=False):
-		location = "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/"
+		#location = "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/"
+		location = cdn
 		location = GetGlobalOption(file,"REVEAL_LOCATION","RevealLocation",location)	
 		location = location + "plugin/"
 		comma =","
@@ -293,10 +308,20 @@ class RevealDoc:
 			comma = ""
 		self.fs.write("              { src: '"+location+link+"', async: true }"+comma+"\n") 
 
+	def SDep(self,js):
+		self.fs.write("  <script src=\"{location}plugin/{js}\"></script>\n".format(location=cdn,js=js))
+
 	def RevealScript(self,file):
-		location = "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/"
+		#location = "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/"
+		location = cdn
 		location = GetGlobalOption(file,"REVEAL_LOCATION","RevealLocation",location)	
-		self.fs.write("  <script src=\"{location}js/reveal.js\"></script>\n".format(location=location))
+		self.fs.write("  <script src=\"{location}dist/reveal.min.js\"></script>\n".format(location=location))
+		self.SDep("markdown/markdown.js")
+		self.SDep("highlight/highlight.js")
+		self.SDep("search/search.js")
+		self.SDep("zoom/zoom.js")
+		self.SDep("notes/notes.js")
+		self.SDep("math/math.js")
 		self.fs.write("  <script>\n")
 		#self.fs.write("       Reveal.initialize();\n")
 		self.fs.write("      Reveal.initialize({\n")
@@ -308,15 +333,17 @@ class RevealDoc:
 		self.fs.write("          transitionSpeed: '{transitionSpeed}',\n".format(transitionSpeed=transitionSpeed)) # default/fast/slow
 		#self.fs.write("          showNotes: false,\n")
 		self.fs.write("          dependencies: [\n") 
-		self.Dep(file, "markdown/marked.js")
+		#self.Dep(file, "markdown/marked.js")
 		self.Dep(file, "markdown/markdown.js")
 		self.Dep(file, "highlight/highlight.js")
 		self.Dep(file, "search/search.js")
-		self.Dep(file, "zoom-js/zoom.js")
+		#self.Dep(file, "zoom-js/zoom.js")
+		self.Dep(file, "zoom/zoom.js")
 		self.Dep(file, "notes/notes.js")
 		#self.Dep("print-pdf/print-pdf.min.js")
 		self.Dep(file, "math/math.js",True)
-		self.fs.write("          ]\n") 
+		self.fs.write("          ],\n") 
+		self.fs.write("          plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]\n")
 		self.fs.write("      });\n")
 		self.fs.write("  </script>\n")
 
@@ -343,9 +370,12 @@ class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
 
 		# TODO: Make these configurable about where to pull reveal from.
 		#doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/print/pdf.min.css")
-		doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/reveal.min.css")
-		doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/reset.min.css")
+		doc.AddStyle(cdn + "dist/reset.css")
+		doc.AddStyle(cdn + "dist/reveal.css")
 
+		cssData      = GetGlobalOption(self.file,"REVEAL_CSS","RevealCss",None)
+		if(cssData):
+			doc.AddInlineStyle(cssData)	
 
 
 		# black: Black background, white text, blue links (default theme)
@@ -360,14 +390,17 @@ class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
 		# moon: Dark green background.
 		theme      = GetGlobalOption(self.file,"REVEAL_THEME","RevealTheme","league").lower()
 		# TODO: Validate the theme here.
-		doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/theme/{theme}.min.css".format(theme=theme))
-		doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/print/paper.min.css")
+		doc.AddStyle(cdn + "dist/theme/{theme}.css".format(theme=theme),id="theme")
+		#doc.AddStyle(cdn + "css/print/paper.css")
 
 
 		highlight      = GetGlobalOption(self.file,"REVEAL_HIGHLIGHT","RevealHighlight","zenburn").lower()
 		#doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/css/monokai.min.css")
 		#doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/css/zenburn.min.css")
-		doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/css/{hl}.min.css".format(hl=highlight))
+		#doc.AddStyle("https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/{hl}.css".format(hl=highlight),"highlight-theme")
+		doc.AddStyle(cdn + "plugin/highlight/{hl}.css".format(hl=highlight),"highlight-theme")
+		
+		#doc.AddStyle(cdn + "lib/css/{hl}.css".format(hl=highlight))
 		#doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/font/league-gothic/league-gothic.min.css")
 		#doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/font/source-sans-pro/source-sans-pro.min.css")
 		self.vlevel = int(GetGlobalOption(self.file,"REVEAL_VLEVEL","RevealVLevel",1))
