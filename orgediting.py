@@ -580,7 +580,7 @@ class OrgInsertHeadingSiblingCommand(sublime_plugin.TextCommand):
             reg = curNode.region(self.view,True)  # trim ending whitespace
             if(level == 0):
                 level = 1
-                here = sublime.Region(view.size(),view.size())
+                here = sublime.Region(self.view.size(),self.view.size())
             else:
                 here = sublime.Region(reg.end(),reg.end())
                 text = self.view.substr(self.view.line(here))
