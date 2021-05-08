@@ -11,7 +11,7 @@
       <key>increaseIndentPattern</key>
       <string>(^\s*[#][+]((BEGIN)|(begin)))</string>
       <key>decreaseIndentPattern</key>
-      <string>(^\s*[#][+]((END)|(end))</string>
+      <string>(^\s*[#][+]((END)|(end)))</string>
    </dict>
    <key>uuid</key>
    <string>BC062860-3346-4D3B-8421-C3543F83D11F</string>
