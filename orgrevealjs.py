@@ -393,106 +393,7 @@ class RevealDoc(exp.OrgExporter):
     def FinishDocCustom(self):
         self.fs.write("</html>\n")
 
-
-# Export the entire file using pandoc 
 class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
-
-    def build_head(self, doc):
-        # TODO: Make these configurable about where to pull reveal from.
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/markdown/markdown.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/highlight/highlight.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/search/search.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/zoom-js/zoom.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/notes/notes.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/print-pdf/print-pdf.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/plugin/math/math.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/js/head.min.js")
-        #doc.AddJs("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/js/reveal.min.js")
-
-        # TODO: Make these configurable about where to pull reveal from.
-        #doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/css/print/pdf.min.css")
-        doc.AddStyle(cdn + "dist/reset.css")
-        doc.AddStyle(cdn + "dist/reveal.css")
-
-        cssData      = GetGlobalOption(self.file,"REVEAL_CSS","RevealCss",None)
-        if(cssData):
-            doc.AddInlineStyle(cssData) 
-
-
-        # black: Black background, white text, blue links (default theme)
-        # white: White background, black text, blue links
-        # league: Gray background, white text, blue links (default theme for reveal.js < 3.0.0)
-        # beige: Beige background, dark text, brown links
-        # sky: Blue background, thin dark text, blue links
-        # night: Black background, thick white text, orange links
-        # serif: Cappuccino background, gray text, brown links
-        # simple: White background, black text, blue links
-        # solarized: Cream-colored background, dark green text, blue links
-        # moon: Dark green background.
-        theme      = GetGlobalOption(self.file,"REVEAL_THEME","RevealTheme","league").lower()
-        # TODO: Validate the theme here.
-        doc.AddStyle(cdn + "dist/theme/{theme}.css".format(theme=theme),id="theme")
-        #doc.AddStyle(cdn + "css/print/paper.css")
-
-
-        highlight      = GetGlobalOption(self.file,"REVEAL_HIGHLIGHT","RevealHighlight","zenburn").lower()
-        #doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/css/monokai.min.css")
-        #doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/css/zenburn.min.css")
-        #doc.AddStyle("https://cdn.jsdelivr.net/npm/highlightjs-themes@1.0.0/{hl}.css".format(hl=highlight),"highlight-theme")
-        doc.AddStyle(cdn + "plugin/highlight/{hl}.css".format(hl=highlight),"highlight-theme")
-        
-        #doc.AddStyle(cdn + "lib/css/{hl}.css".format(hl=highlight))
-        #doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/font/league-gothic/league-gothic.min.css")
-        #doc.AddStyle("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0/lib/font/source-sans-pro/source-sans-pro.min.css")
-        self.vlevel = int(GetGlobalOption(self.file,"REVEAL_VLEVEL","RevealVLevel",1))
-
-    def build_slide(self, doc, slide):
-        if(slide.num_children > 0 and self.vlevel == slide.level):
-            doc.StartSlide(slide)
-        doc.StartSlide(slide)
-        doc.SlideHeading(slide)
-        doc.SlideBody(slide)
-        doc.EndSlide()
-        for c in slide.children:
-            self.build_slide(doc, c)
-        if(slide.num_children > 0 and self.vlevel == slide.level):
-            doc.EndSlide()
-
-    def build_slides(self, doc):
-        nodes = self.file.org
-        for slide in nodes.children:
-            self.build_slide(doc, slide)
-
-    def build_pres(self, doc):
-        doc.StartSlides()
-        self.build_slides(doc)
-        doc.EndSlides()
-
-    def build_body(self, doc):
-        doc.StartPres(self.file)
-        self.build_pres(doc)
-        doc.EndPres()
-        doc.RevealScript(self.file)
-
-    def run_old(self,edit):
-        self.file = db.Get().FindInfo(self.view)
-        if(None == self.file):
-            log.debug("Not an org file? Cannot build reveal document")
-            return
-        doc = None
-        try:
-            doc = RevealDoc(RevealFilename(self.view))
-            doc.StartHead()
-            self.build_head(doc)
-            doc.EndHead()
-
-            doc.StartBody()
-            self.build_body(doc)
-            doc.EndBody()
-        finally:    
-            if(None != doc):
-                doc.Close()
-
     def OnDoneSourceBlockExecution(self):
         # Reload if necessary
         self.file = db.Get().FindInfo(self.view)
@@ -500,8 +401,6 @@ class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
         try:
             outputFilename = exp.ExportFilename(self.view,".html",self.suffix)
             self.doc = RevealDoc(outputFilename,self.file)
-            #self.doc       = LatexDoc(outputFilename,self.file)
-            #self.doc.setClass(self.docClass)
             self.helper    = exp.OrgExportHelper(self.view,self.index)
             self.helper.Run(outputFilename, self.doc)
         finally:    
@@ -519,7 +418,7 @@ class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
             log.error("Not an org file? Cannot build reveal document")
             evt.EmitIf(onDone)  
             return
-        if(sets.Get("latexExecuteSourceOnExport",False)):
+        if(sets.Get("revealExecuteSourceOnExport",False)):
             self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
         else:
             self.OnDoneSourceBlockExecution()
