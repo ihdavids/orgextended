@@ -456,6 +456,12 @@ class ExampleBlockState(BlockState):
     def __init__(self,doc):
         super(ExampleBlockState,self).__init__(RE_STARTEXAMPLE, RE_ENDEXAMPLE,doc)
 
+RE_STARTNOTE = re.compile(r"^\s*#\+(BEGIN_NOTES|begin_notes)")
+RE_ENDNOTE = re.compile(r"^\s*#\+(END_NOTES|end_notes)")
+class NotesBlockState(BlockState):
+    def __init__(self,doc):
+        super(NotesBlockState,self).__init__(RE_STARTNOTE, RE_ENDNOTE,doc)
+
 RE_STARTGENERIC = re.compile(r"#\+(BEGIN_|begin_)(?P<data>[a-zA-Z0-9-]+)(\s|$)")
 RE_ENDGENERIC   = re.compile(r"#\+(END_|end_)([a-zA-Z0-9-]+)(\s|$)")
 
