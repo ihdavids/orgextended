@@ -60,10 +60,11 @@ DEFAULT_LINK_RESOLVERS = [
 available_resolvers = ext.find_extension_modules('orgresolver', DEFAULT_LINK_RESOLVERS)
 linkre              = re.compile(r"\[\[([^\[\]]+)\]\s*(\[[^\[\]]*\])?\]")
 
+
 # Returns the url from the full link
 def extract_link_url(str):
     m = linkre.search(str)
-    return m.group(1)
+    return m.group(1) if m is not None else str
 
 def extract_link_url_from_region(view, region):
     return extract_link_url(view.substr(region))
