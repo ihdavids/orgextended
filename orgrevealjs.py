@@ -917,10 +917,13 @@ class OrgExportFileRevealJsCommand(sublime_plugin.TextCommand):
         finally:    
             evt.EmitIf(self.onDone)
 
+
     def run(self,edit, onDone=None, index=None, suffix=""):
         self.file = db.Get().FindInfo(self.view)
         self.onDone = onDone
         self.suffix = suffix
+        global cdn        
+        cdn = GetGlobalOption(self.file,"REVEAL_LOCATION","RevealLocation",cdn)
         if(index != None):
             self.index = index
         else:
