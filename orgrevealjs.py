@@ -824,44 +824,9 @@ class RevealDoc(exp.OrgExporter):
         level = slide.level + 1
         self.doc.append("      <h{level}>{heading}</h{level}>".format(level=level,heading=heading))
 
-
-    def EscAndLinks(self, l):
-        line = html.escape(l)
-        m = RE_LINK.search(line)
-        if(m):
-            link = m.group('link').strip()
-            desc = m.group('desc')
-            if(not desc):
-                desc = link
-            else:
-                desc = desc.strip()
-            if(link.endswith(".png") or link.endswith(".jpg") or link.endswith(".gif")):
-                if(link.startswith("file:")):
-                    link = re.sub(r'^file:','',link)    
-                extradata = ""  
-                if(self.commentName and self.commentName in link):
-                    extradata =  " " + self.commentData
-                    self.commentName = None
-                line = RE_LINK.sub("<img src=\"{link}\" alt=\"{desc}\"{extradata}>".format(link=link,desc=desc,extradata=extradata),line)
-            else:
-                line = RE_LINK.sub("<a href=\"{link}\">{desc}</a>".format(link=link,desc=desc),line)
-        else:
-            line = RE_BOLD.sub(r"<b>\1</b>",line)
-            line = RE_ITALICS.sub(r"<i>\1</i>",line)
-            line = RE_UNDERLINE.sub(r"<u>\1</u>",line)
-            line = RE_STRIKETHROUGH.sub(r"<strike>\1</strike>",line)
-            line = RE_VERBATIM.sub(r"<pre>\1</pre>",line)
-            line = RE_CODE.sub(r"<code>\1</code>",line)
-            line = RE_STARTQUOTE.sub(r"<blockquote>",line)
-            line = RE_ENDQUOTE.sub(r"</blockquote>",line)
-            line = RE_STARTNOTE.sub(r'<aside class="notes">',line)
-            line = RE_ENDNOTE.sub(r"</aside>",line)
-        if(line.strip() == ""):
-            line = "<br/>"
-        return line
-
     def TexFullEscape(self,text):
         return html.escape(text)
+
     def NodeBody(self,n):
         ilines = n._lines[1:]
         for parser in self.nodeParsers:
@@ -869,76 +834,6 @@ class RevealDoc(exp.OrgExporter):
         for line in ilines:
             self.doc.append(self.TexFullEscape(line))
         return
-        inDrawer = False
-        inUl     = False
-        inSrc    = False
-        skipSrc  = False
-        for l in slide._lines[1:]:
-            if(inDrawer):
-                if(RE_END_DRAWER_LINE.search(l)):
-                    inDrawer = False
-                continue
-            if(inSrc):
-                if(RE_ENDSRC.search(l)):
-                    inSrc = False
-                    if(skipSrc):
-                        skipSrc = False
-                        continue
-                    self.doc.append("    </code></pre>")
-                    continue
-                else:
-                    if(not skipSrc):
-                        self.doc.append("     " + l + "\n")
-                    continue
-            m = RE_STARTSRC.search(l)
-            if(m):
-                inSrc = True
-                if(m.group('lang') == 'plantuml'):
-                    skipSrc = True
-                    continue
-                paramstr = l[len(m.group(0)):]
-                params = {}
-                for ps in RE_FN_MATCH.finditer(paramstr):
-                    params[ps.group(1)] = ps.group(2)
-                attribs = ""
-                if("data-noescape" in params):
-                    attribs += " data-noescape"
-                if("data-trim" in params):
-                    attribs += " data-trim"
-                if("data-line-numbers" in params):
-                    attribs += " data-line-numbers=\"{nums}\"".format(nums=params["data-line-numbers"])
-                self.doc.append("    <pre><code language=\"{language}\" {attribs}>".format(language=mapLanguage(m.group('lang')),attribs=attribs))
-                continue
-            if(RE_DRAWER_LINE.search(l)):
-                inDrawer = True
-                continue
-            if(RE_SCHEDULING_LINE.search(l)):
-                continue
-            if(RE_RESULTS.search(l)):
-                continue
-            m = RE_COMMENT_TAG.search(l)
-            if(m):
-                self.commentData = m.group('props')
-                self.commentName = m.group('name')
-                continue
-            m = RE_UL.search(l)
-            if(m):
-                if(not inUl):
-                    self.doc.write("     <ul>")
-                    inUl = True
-                data = self.EscAndLinks(m.group('data'))
-                self.doc.append("     <li>{content}</li>".format(content=data))
-                continue
-            elif(inUl):
-                inUl = False
-                self.doc.append("     </ul>")
-            line = self.EscAndLinks(l)
-            self.doc.append("     " + line)
-        if(inUl):
-            inUl = False
-            self.doc.append("     </ul>")
-
-        pass
 
     def StartBody(self):
         self.doc.append("  <body style=\"transition: -webkit-transform 0.8s ease 0s; transform-origin: 0px 0px;\">")
