@@ -1172,6 +1172,15 @@ class LooseTasksView(TodoView):
 
 
 # ================================================================================
+class DoneTasksView(TodoView):
+    def __init__(self, name, setup=True, **kwargs):
+        super(LooseTasksView, self).__init__(name, setup, **kwargs)
+
+    def FilterEntry(self, n, filename):
+        rc = IsDone(n)
+        return rc
+
+# ================================================================================
 class NextTasksProjectsView(TodoView):
     def __init__(self, name, setup=True, **kwargs):
         super(NextTasksProjectsView, self).__init__(name, setup, **kwargs)
@@ -1431,6 +1440,7 @@ class CalendarViewRegistry:
         self.AddView("Meetings", MeetingView)
         self.AddView("Phone", PhoneView)
         self.AddView("Week", WeekView)
+        self.AddView("Done", DoneTasksView)
 
     def AddView(self,name,cls):
         self.KnownViews[name] = cls
