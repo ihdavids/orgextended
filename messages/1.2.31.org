@@ -1,0 +1,21 @@
+* 1.2.31
+** Insert Heading
+	Slight improvement to DWIM behaviour
+	File with no headings will behave a little better on insertion.
+** RevealJs Exporter
+   	- Converted RevealJs exporter to use version 4.1.0 
+   	- Converted RevealJs exporter to use new export framework written for the latex exporter
+   	- New global option for CDN:
+
+   	  #+BEGIN_EXAMPLE
+   	    "RevealLocation": "https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/",
+   	  #+END_EXAMPLE
+
+   	- Switched CDNs from cdnjs to jsdelivr to get presenters notes working again.
+
+** Show Inline Images
+   	- Improvement when unadorned http links are next to images Show Images would not work
+   	  Thanks to waynezhang for this bugfix.
+
+** Indentation Rules Improvement
+    - Fixing small bug with indent rules regexs.
