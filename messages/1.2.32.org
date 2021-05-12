@@ -5,4 +5,5 @@
 ** Insert Sibling Heading
    - If the next line has spaces the inserted heading could have spaces which is not a good idea.
      This is now stripped properly.
-     
+** Agenda
+   - durationfilter added -2w filters items 2 weeks ago from right now. 
