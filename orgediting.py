@@ -626,6 +626,13 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
                 text = self.view.substr(self.view.line(here))
                 if(text.strip() != ""):
                     needsNewline = True
+        if(not needsNewline):
+            ll = self.view.line(reg.end())
+            text = self.view.substr(ll)
+            if(text.strip() == "" and len(text) > 0):
+                # This is an empty line! Have to work at the front of this line!
+                # Or we will insert to an odd location!
+                reg = sublime.Region(ll.start(), ll.start())
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)

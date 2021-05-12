@@ -270,7 +270,12 @@ class OrgDate(object):
             td = o.timedelta()
             return OrgDate(self._start - td,self._end - td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
         return self 
-        pass
+
+    def before(self, duration):
+        return self._start <= (datetime.datetime.now() + duration.timedelta())
+    
+    def after(self, duration):
+        return self._end >= (datetime.datetime.now() - duration.timedelta())
 
     @staticmethod
     def format_date(now, active):

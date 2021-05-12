@@ -9,6 +9,7 @@ import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
+import OrgExtended.orgduration as dur
 import logging
 import sys
 import traceback 
@@ -425,6 +426,7 @@ class AgendaBaseView:
         self.SetTagFilter(kwargs)
         self.SetPriorityFilter(kwargs)
         self.SetStateFilter(kwargs)
+        self.SetDurationFilter(kwargs)
         self.hasclock = "hasclock" in kwargs
         self.hasclose = "hasclose" in kwargs
         self.hasdeadline = "hasdeadline" in kwargs
@@ -443,6 +445,28 @@ class AgendaBaseView:
     def BasicSetup(self):
         self.UpdateNow()
         self.entries = []
+
+    def SetDurationFilter(self,kwargs):
+        self._beforeDuration     = []
+        self._afterDuration      = []
+        if("durationfilter" in kwargs):
+            self._durationFilter = kwargs["durationfilter"]
+        else:
+            self._durationFilter = None
+            return
+        tags = self._durationFilter.split(' ')
+        for tag in tags:
+            tag = tag.strip()
+            if not tag or len(tag) <= 0:
+                continue
+            m = RE_IN_OUT_TAG.search(tag)
+            if(m):
+                inout = m.group('inout')
+                tagdata = m.group('tag')
+                if(not inout or inout == '+'):
+                    self._beforeDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
+                else:
+                    self._afterDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
 
     def SetStateFilter(self,kwargs):
         if("statefilter" in kwargs):
@@ -573,6 +597,23 @@ class AgendaBaseView:
         if(self._oneofStateTags and len(self._oneofStateTags) > 0 and not any(re.search(elem,t) for elem in self._oneofStateTags)):
             return False
         return True
+    
+    def MatchDuration(self, node):
+        t = node.closed
+        if(t and self._afterDuration and any(t.after(elem) for elem in self._afterDuration)):
+            return False
+        if(self._beforeDuration):
+            s = node.scheduled
+            d = node.deadline
+            ts = node.timestamps
+            if(s and any(s and s.before(elem) for elem in self._beforeDuration)):
+                return True
+            if(d and any(d and d.before(elem) for elem in self._beforeDuration)):
+                return True
+            if(ts and len(ts) > 0 and any(ts[0] and ts[0].before(elem) for elem in self._beforeDuration)):
+                return True
+            return False
+        return True
 
     def SetupView(self):
         self.view = CreateUniqueViewNamed(self.name, self)
@@ -660,7 +701,7 @@ class AgendaBaseView:
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
-                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.MatchState(n) and self.FilterEntry(n, file)):
+                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.MatchState(n) and self.MatchDuration(n) and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
     def FilterEntry(self, node, file):
@@ -1174,7 +1215,7 @@ class LooseTasksView(TodoView):
 # ================================================================================
 class DoneTasksView(TodoView):
     def __init__(self, name, setup=True, **kwargs):
-        super(LooseTasksView, self).__init__(name, setup, **kwargs)
+        super(DoneTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
         rc = IsDone(n)

@@ -1,0 +1,8 @@
+* 1.2.32
+** Agenda
+   - Done - a new view that lists done tasks
+	 WATCH OUT this can be massive! Use this with other fileters.
+** Insert Sibling Heading
+   - If the next line has spaces the inserted heading could have spaces which is not a good idea.
+     This is now stripped properly.
+     
