@@ -427,6 +427,7 @@ class AgendaBaseView:
         self.SetPriorityFilter(kwargs)
         self.SetStateFilter(kwargs)
         self.SetDurationFilter(kwargs)
+        self.SetDateFilter(kwargs)
         self.hasclock = "hasclock" in kwargs
         self.hasclose = "hasclose" in kwargs
         self.hasdeadline = "hasdeadline" in kwargs
@@ -543,22 +544,54 @@ class AgendaBaseView:
                 else:
                     self._outtags.append(tagdata.strip())
 
+    def SetDateFilter(self, kwargs):
+        self._startDoneDateComparator = None
+        self._endDoneDateComparator = None
+
+        if "datefilter" not in kwargs:
+            return
+
+        DATE_PATTERN = "([><=]+)(\d+)"
+        datefilter = kwargs["datefilter"].split(" ")
+        for cond in datefilter:
+            match = re.search(DATE_PATTERN, cond)
+            if match is None:
+                continue
+            operator = match.group(1)
+            date_str = match.group(2)
+
+            try:
+                date = dp.parse(date_str)
+            except:
+                log.error("Failed to parse datefilter")
+                continue
+
+            if operator == ">":
+                self._startDoneDateComparator = lambda d, date=date: d is not None and date < d
+            if operator == ">=":
+                self._startDoneDateComparator = lambda d, date=date: d is not None and date <= d
+            if operator == "<":
+                self._endDoneDateComparator = lambda d, date=date: d is not None and d < date
+            if operator == "<=":
+                date = date + datetime.timedelta(days=1)
+                self._endDoneDateComparator = lambda d, date=date: d is not None and d < date
+
     def MatchHas(self, node):
-        if(self.hasclock and not n.clock):
+        if(self.hasclock and not node.clock):
             return False
-        if(self.hasdeadline and not n.deadline):
+        if(self.hasdeadline and not node.deadline):
             return False
-        if(self.hasclose and not n.closed):
+        if(self.hasclose and not node.closed):
             return False
-        if(self.hasschedule and not n.scheduled):
+        if(self.hasschedule and not node.scheduled):
             return False
-        if(self.noclock and n.clock):
+        if(self.noclock and node.clock):
             return False
-        if(self.nodeadline and n.deadline):
+        if(self.nodeadline and node.deadline):
             return False
-        if(self.noclose and n.closed):
+        if(self.noclose and node.closed):
             return False
-        if(self.noschedule and n.scheduled):
+        if(self.noschedule and node.scheduled):
             return False
         return True
 
@@ -612,6 +645,17 @@ class AgendaBaseView:
                 return True
             if(ts and len(ts) > 0 and any(ts[0] and ts[0].before(elem) for elem in self._beforeDuration)):
                 return True
+            return False
+        return True
+
+    def MatchDate(self, node):
+        start = node.closed.start
+        end = node.closed.end if node.closed.end is not None else start
+        if self._startDoneDateComparator is not None \
+                and not self._startDoneDateComparator(start):
+            return False
+        if self._endDoneDateComparator is not None \
+                and not self._endDoneDateComparator(end):
             return False
         return True
 
@@ -701,7 +745,13 @@ class AgendaBaseView:
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)
             for n in file.org[1:]:
-                if(self.MatchHas(n) and self.MatchPriorities(n) and self.MatchTags(n) and self.MatchState(n) and self.MatchDuration(n) and self.FilterEntry(n, file)):
+                if(self.MatchHas(n)
+                   and self.MatchPriorities(n)
+                   and self.MatchTags(n)
+                   and self.MatchState(n)
+                   and self.MatchDuration(n)
+                   and self.MatchDate(n)
+                   and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
     def FilterEntry(self, node, file):
