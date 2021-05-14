@@ -470,8 +470,7 @@ class GenericBlockState(BlockState):
         super(GenericBlockState,self).__init__(RE_STARTGENERIC, RE_ENDGENERIC,doc)
 
 RE_TABLE_ROW = re.compile(r"^\s*[|]")
-RE_NOT_TABLE_ROW = re.compile(r"^\s*[^| ]")
-
+RE_NOT_TABLE_ROW = re.compile(r"^\s*[^| \t]")
 class TableBlockState(BlockState):
     def __init__(self,doc):
         super(TableBlockState,self).__init__(RE_TABLE_ROW, RE_NOT_TABLE_ROW,doc,True)
