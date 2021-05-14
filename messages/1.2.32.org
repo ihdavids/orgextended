@@ -2,10 +2,18 @@
 ** Agenda
    - Done - a new view that lists done tasks
 	 WATCH OUT this can be massive! Use this with other fileters.
+
 ** Insert Sibling Heading
    - If the next line has spaces the inserted heading could have spaces which is not a good idea.
      This is now stripped properly.
+
 ** Agenda
    - durationfilter added -2w filters items 2 weeks ago from right now. 
-** Agenda
-   - datefilter to filter done task by date range like >=20210501 <=20210531
+   - datefilter allows you to filter by absolute date range >=20210501 <=20210531
+   - hasclose and other attributes were not handled properly as filter keywords, this has been fixed.
+
+** Reveal Exporter
+   - Tables are now actually supported
+
+** Exporting
+   - Tables had a bug if tabs were present in front of the table.
