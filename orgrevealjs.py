@@ -317,19 +317,27 @@ class HtmlCheckboxListBlockState(exp.CheckboxListBlockState):
     def EndHandleItem(self,m,l,orgnode):
         self.e.doc.append("    </input>")
 
-class LatexTableBlockState(exp.TableBlockState):
+
+RE_TABLE_SEPARATOR = re.compile(r"^\s*[|][-]")
+class HtmlTableBlockState(exp.TableBlockState):
     def __init__(self,doc):
-        super(LatexTableBlockState,self).__init__(doc)
+        super(HtmlTableBlockState,self).__init__(doc)
         self.tablecnt = 1
+
+    def WriteRow(self,l,orgnode):
+        tds = None
+        if(not RE_TABLE_SEPARATOR.search(l)):
+          tds = l.split('|')
+          if(len(tds) > 3):
+            self.e.doc.append("    <tr>")
+            for td in tds[1:-1]:
+              self.e.doc.append("     <th>{0}</th>".format(self.e.TextFullEscape(td)))
+            self.e.doc.append("    </tr>")
+        else:
+            self.e.doc.append("")
+
     def HandleEntering(self,m,l,orgnode):
-        attr = self.e.GetAttrib("attr_latex")
-        floatOp = None
-        align  = "center"
-        self.modeDelimeterStart = ""
-        self.modeDelimeterEnd   = ""
-        self.environment = "tabular"
-        self.figure = "center"
-        figureext = ""
+        attr = self.e.GetAttrib("attr_html")
         if(attr):
             p = plist.PList.createPList(attr)
         else:
@@ -338,89 +346,18 @@ class LatexTableBlockState(exp.TableBlockState):
         cc = p.Get("caption",None)
         if(cc):
             caption = cc
-        self.environment = GetOption(p,"environment",self.environment)
-        mode = GetOption(p,"mode",None)
-        if(mode == "math"):
-            self.modeDelimeterStart = r"\["
-            self.modeDelimeterEnd   = r"\]"
-        if(mode == "inline-math"):
-            self.modeDelimeterStart = r"\("
-            self.modeDelimeterEnd   = r"\)"
-        val = p.Get("center",None)
-        if(val and val == "nil"):
-            align = None
-        floatOp = GetOption(p,"float",None)
-        if(caption and not floatOp):
-            floatOp = "t"
-        if(floatOp and floatOp != "nil"):
-            if(floatOp):
-                self.figure = "table"
-                figureext = "[!htp]"
-            if(floatOp == "multicolumn"):
-                self.figure = "table*"
-            elif(floatOp == "sideways"):
-                self.figure = "sidewaysfigure" 
-            elif(floatOp == "wrap"):
-                self.figure = "wrapfigure"
-                figureext = "{l}"
-            placement = p.Get("placement",None)
-            if(placement):
-                figureext = placement
-        tabledef = ""
-        tds = None
-        if(not RE_TABLE_SEPARATOR.search(l)):
-            tds = l.split('|')
-            if(len(tds) > 1):
-                if(mode == "math"):
-                    tabledef = ""
-                else:
-                    tabledef = "{" + ("|c" * (len(tds)-2)) + "|}" 
-        self.e.doc.append(r"    \begin{{{figure}}}{figureext}".format(figure=self.figure,figureext=figureext))
+        self.e.doc.append("  <table>")
         if(caption):
-            self.e.doc.append(r"    \caption{{{caption}}}".format(caption=self.e.GetAttrib('caption')))
-            #self.fs.write("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tableIndex,caption=self.caption))
-            #self.tableIndex += 1
-        if(align == "center" and self.environment == 'tabular'):
-            self.e.doc.append(r"    \centering\renewcommand{\arraystretch}{1.2}")
-        self.e.doc.append(self.modeDelimeterStart)
-        self.e.doc.append(r"    \begin{{{environment}}}{tabledef}".format(tabledef=tabledef,environment=self.environment))
+          self.e.doc.append("    <caption class=\"t-above\"><span class=\"table-number\">Table {index}:</span>{caption}</caption>".format(index=self.tablecnt,caption=caption))
+        self.WriteRow(l,orgnode)
         self.e.ClearAttrib()
-        if(self.environment == 'tabular'):
-            self.e.doc.append(r"    \hline") 
-        if(tds):
-            self.HandleData(tds,True)
+
     def HandleExiting(self, m, l , orgnode):
-        if(self.environment == 'tabular'):
-            self.e.doc.append(r"    \hline") 
-        self.e.doc.append(r"    \end{{{environment}}}".format(environment=self.environment))
-        self.e.doc.append(self.modeDelimeterEnd)
-        self.e.doc.append(r"    \label{{table:{cnt}}}".format(cnt=self.tablecnt))
-        self.e.doc.append(r"    \end{{{figure}}}".format(figure=self.figure))
+        self.e.doc.append("  </table>")
         self.tablecnt += 1
 
-    def HandleData(self,tds,head=False): 
-        if(len(tds) > 3):
-            # An actual table row, build a row
-            first = True
-            line = "    "
-            for td in tds[1:-1]:
-                if(not first):
-                    line += " & "
-                first = False
-                if(head and self.environment == 'tabular'):
-                    line += r"\textbf{{{data}}}".format(data=self.e.Escape(td))
-                else:
-                    line += self.e.Escape(td)
-            line += " \\\\"
-            self.e.doc.append(line)
-            haveTableHeader = True
-
     def HandleIn(self,l, orgnode):
-        if(RE_TABLE_SEPARATOR.search(l)):
-            self.e.doc.append(r'    \hline')
-        else:
-            tds = l.split('|')
-            self.HandleData(tds)
+        self.WriteRow(l, orgnode)
 
 class RevealHrParser(exp.HrParser):
     def __init__(self,doc):
@@ -664,7 +601,7 @@ class RevealDoc(exp.OrgExporter):
         RevealAttributeParser(self),
         exp.ResultsParser(self),
         HtmlCommentParser(self),
-        LatexTableBlockState(self),
+        HtmlTableBlockState(self),
         HtmlSourceBlockState(self),
         HtmlDynamicBlockState(self),
         HtmlQuoteBlockState(self),
@@ -824,7 +761,7 @@ class RevealDoc(exp.OrgExporter):
         level = slide.level + 1
         self.doc.append("      <h{level}>{heading}</h{level}>".format(level=level,heading=heading))
 
-    def TexFullEscape(self,text):
+    def TextFullEscape(self,text):
         return html.escape(text)
 
     def NodeBody(self,n):
@@ -832,7 +769,7 @@ class RevealDoc(exp.OrgExporter):
         for parser in self.nodeParsers:
             ilines = parser.Handle(ilines,n)
         for line in ilines:
-            self.doc.append(self.TexFullEscape(line))
+            self.doc.append(self.TextFullEscape(line))
         return
 
     def StartBody(self):
