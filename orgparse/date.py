@@ -271,11 +271,12 @@ class OrgDate(object):
             return OrgDate(self._start - td,self._end - td if self._end else None,self._active,self.repeat_rule,self.warn_rule)
         return self 
 
-    def before(self, duration):
+    def before_duration(self, duration):
         return self._start <= (datetime.datetime.now() + duration.timedelta())
     
-    def after(self, duration):
-        return self._end >= (datetime.datetime.now() - duration.timedelta())
+    def after_duration(self, duration):
+        end = self._end if self._end is not None else self._start
+        return end >= (datetime.datetime.now() - duration.timedelta())
 
     @staticmethod
     def format_date(now, active):
