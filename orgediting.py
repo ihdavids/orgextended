@@ -106,7 +106,8 @@ def ShouldClose(node, fromState, toState):
     #       into this as well!
     toState = toState.strip()
     startup = node.root.startup()
-    if(IsDoneState(node, toState) and Startup.logdone in startup):
+    logDone = sets.Get("logDone",None)
+    if(IsDoneState(node, toState) and (Startup.logdone in startup or logDone)):
         return True
 
 def InsertRecurrence(view, node, fromState, toState, onDone=None):
