@@ -51,6 +51,9 @@
     //    #+STARTUP: noinlineimages
     "startup": ["showall", "noinlineimages"],
 
+    // override for logdone. Will force CLOSED: entries even if it is not in your startup.
+    //"logdone": true,
+
     // Used in the tag selector for the font to use in the popup
     //"input_font_face": "Arial",
 
