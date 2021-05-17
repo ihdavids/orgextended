@@ -614,7 +614,7 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
         if(not curNode):
             level = 1
             l = self.view.line(self.view.size())
-            reg = sublime.Region(l.start(),l.start())
+            reg = sublime.Region(l.begin(),l.begin())
             reg  = here
         else:
             level = curNode.level
@@ -633,7 +633,7 @@ class OrgInsertHeadingChildCommand(sublime_plugin.TextCommand):
             if(text.strip() == "" and len(text) > 0):
                 # This is an empty line! Have to work at the front of this line!
                 # Or we will insert to an odd location!
-                reg = sublime.Region(ll.start(), ll.start())
+                reg = sublime.Region(ll.begin(), ll.begin())
         self.view.sel().clear()
         self.view.sel().add(reg.end())
         self.view.show(here)
@@ -656,7 +656,7 @@ class OrgInsertTextAsChildHeadingCommand(sublime_plugin.TextCommand):
         if(not curNode):
             level = 1
             l = self.view.line(self.view.size())
-            reg = sublime.Region(l.start(),l.start())
+            reg = sublime.Region(l.begin(),l.begin())
             reg  = here
         else:
             level = curNode.level
