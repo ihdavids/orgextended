@@ -25,6 +25,7 @@ import OrgExtended.orgnotifications as notice
 import OrgExtended.orgextension as ext
 import OrgExtended.orgsourceblock as src
 import OrgExtended.orgexporter as exp
+import OrgExtended.orghtmlexporter as hexp
 import yaml
 import sys
 import subprocess
@@ -223,62 +224,140 @@ def GetStyleData(style, file):
   d2 = GetStyleRelatedPropertyData(file, "HtmlCss", "HTML_CSS")
   return d1 + d2
 
+class HtmlHrParser(exp.HrParser):
+    def __init__(self,doc):
+        super(HtmlHrParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r"<hr/>")
+
+class HtmlNameParser(exp.NameParser):
+    def __init__(self,doc):
+        super(HtmlNameParser,self).__init__(doc)
+    def HandleLine(self,m,l,n):
+        self.e.doc.append(r"<a name=\"{data}\"/>".format(data=m.group('data')))
+
+
+RE_ATTR_HTML = regex.compile(r"^\s*[#][+]ATTR_HTML[:]\s*(?P<data>.*)")
+class HtmlAttributeParser(exp.AttributeParser):
+    def __init__(self,doc):
+        super(HtmlAttributeParser,self).__init__('attr_html',RE_ATTR_HTML,doc)
+
 class HtmlDoc(exp.OrgExporter):
   def __init__(self, filename, file,**kwargs):
     super(HtmlDoc, self).__init__(filename, file, **kwargs)
-    self.fs.write("<!DOCTYPE html>\n")
-    self.fs.write("<!-- exported by orgextended html exporter -->\n")
+    self.pre      = []
+    self.doc      = []
+    self.attribs  = {}
+    self.amInBlock = False
+    self.pre.append("<!DOCTYPE html>\n")
+    self.pre.append("<!-- exported by orgextended html exporter -->\n")
     if(self.language):
-      self.fs.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"{language}\" xml:lang=\"{language}\">".format(language=self.language))
+      self.pre.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"{language}\" xml:lang=\"{language}\">".format(language=self.language))
     else: 
-      self.fs.write("<html lang=\"en\" class>\n")
+      self.pre.append("<html lang=\"en\" class>\n")
     self.commentName = None
     self.figureIndex = 1
-    self.tableIndex = 1
+    self.tableIndex  = 1
+    self.nodeParsers = [
+    exp.SetupFileParser(self),
+    exp.CaptionAttributeParser(self),
+    HtmlAttributeParser(self),
+    exp.ResultsParser(self),
+    hexp.HtmlCommentParser(self),
+    hexp.HtmlTableBlockState(self),
+    hexp.HtmlSourceBlockState(self),
+    hexp.HtmlDynamicBlockState(self),
+    hexp.HtmlQuoteBlockState(self),
+    hexp.HtmlExampleBlockState(self),
+    hexp.HtmlNotesBlockState(self),
+    hexp.HtmlCheckboxListBlockState(self),
+    hexp.HtmlUnorderedListBlockState(self),
+    hexp.HtmlOrderedListBlockState(self),
+    hexp.HtmlExportBlockState(self),
+    hexp.HtmlGenericBlockState(self),
+    exp.DrawerBlockState(self),
+    exp.SchedulingStripper(self),
+    exp.TblFmStripper(self),
+    exp.AttrHtmlStripper(self),
+    exp.AttrOrgStripper(self),
+    exp.KeywordStripper(self),
+    hexp.HtmlEmptyParser(self),
+    hexp.HtmlLinkParser(self),
+    HtmlHrParser(self),
+    HtmlNameParser(self),
+    hexp.HtmlHtmlHtmlParser(self),
+    hexp.HtmlActiveDateParser(self),
+    hexp.HtmlBoldParser(self),
+    hexp.HtmlItalicsParser(self),
+    hexp.HtmlUnderlineParser(self),
+    hexp.HtmlStrikethroughParser(self),
+    hexp.HtmlCodeParser(self),
+    hexp.HtmlVerbatimParser(self),
+    hexp.HtmlTargetParser(self)
+    ]
+  def SetAmInBlock(self,inBlock):
+      self.amInBlock = inBlock
+
+  def AmInBlock(self):
+      return self.amInBlock
+
+  def AddAttrib(self,name,val):
+      if(type(val) == str):
+          self.attribs[name] = val.strip()
+      else:
+          self.attribs[name] = val
+    
+  def GetAttrib(self,name):
+      if(name in self.attribs):
+          return self.attribs[name]
+      return None
+
+  def ClearAttrib(self):
+      self.attribs.clear()
 
   def AddJs(self,link):
-    self.fs.write("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
+    self.pre.append("    <script type=\"text/javascript\" src=\"" + link + "\"></script>\n")
 
   def AddStyle(self,link):
-    self.fs.write("    <link rel=\"stylesheet\" href=\""+link+"\"></link>\n")
+    self.pre.append("    <link rel=\"stylesheet\" href=\""+link+"\"></link>\n")
 
   def AddInlineStyle(self,content):
     # <style>
     #    BLOCK
     # </style> 
-    self.fs.write("   <style>\n{0}\n   </style>\n".format(content))
+    self.pre.append("   <style>\n{0}\n   </style>\n".format(content))
 
   def InsertJs(self,content):
     # <style>
     #    BLOCK
     # </style> 
-    self.fs.write("   <script>\n{0}\n   </script>\n".format(content))
+    self.doc.append("   <script>\n{0}\n   </script>\n".format(content))
 
   def StartHead(self):
-    self.fs.write("  <head>\n")
+    self.pre.append("  <head>\n")
 
   def EndHead(self):
     data = GetHeaderData(self.style, self.file)
-    self.fs.write(data)
-    self.fs.write("  </head>\n")
+    self.pre.append(data)
+    self.pre.append("  </head>\n")
 
   def AddExportMetaCustom(self):
     if(self.title):
-      self.fs.write("<title>{title}</title>".format(title=self.title))
+      self.pre.append("<title>{title}</title>".format(title=self.title))
     if(self.author):
-      self.fs.write("<meta name=\"author\" content=\"{author}\" />".format(author=self.author))
+      self.pre.append("<meta name=\"author\" content=\"{author}\" />".format(author=self.author))
 
   def StartDocument(self, file):
-    self.fs.write("  <div class=\"ready\">\n")
+    self.doc.append("  <div class=\"ready\">\n")
 
   def EndDocument(self):
-    self.fs.write("  </div>\n")
+    self.doc.append("  </div>\n")
 
   def StartNodes(self):
-    self.fs.write("    <div class=\"orgmode\">\n")
+    self.doc.append("    <div class=\"orgmode\">\n")
 
   def EndNodes(self):
-    self.fs.write("    </div>\n")
+    self.doc.append("    </div>\n")
 
   # Per slide properties
   #:PROPERTIES:
@@ -288,22 +367,22 @@ class HtmlDoc(exp.OrgExporter):
     properties = ""
     for prop in n.properties:
       properties = "{0} {1}=\"{2}\"".format(properties, prop, n.properties[prop])
-    self.fs.write("      <section {0}>\n".format(properties))
+    self.doc.append("      <section {0}>\n".format(properties))
 
   def StartNodeBody(self, n):
     level = n.level + 1
-    self.fs.write("      <div class=\"node-body h{level}\">\n".format(level=level))
+    self.doc.append("      <div class=\"node-body h{level}\">\n".format(level=level))
 
   def EndNodeBody(self,n):
-    self.fs.write("      </div>\n")
+    self.doc.append("      </div>\n")
 
   def EndNode(self,n):
-    self.fs.write("      </section>\n")
+    self.doc.append("      </section>\n")
 
   def NodeHeading(self,n):
     heading = html.escape(n.heading)
     level = n.level + 1
-    self.fs.write("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
+    self.doc.append("      <h{level} class=\"collapsible\">{heading}</h{level}>\n".format(level=level,heading=heading))
 
   def ClearAttributes(self):
     self.attrs = {}
@@ -386,6 +465,12 @@ class HtmlDoc(exp.OrgExporter):
     return line
 
   def NodeBody(self,slide):
+    ilines = n._lines[1:]
+    for parser in self.nodeParsers:
+        ilines = parser.Handle(ilines,n)
+    for line in ilines:
+        self.doc.append(self.TextFullEscape(line))
+    return
     inDrawer = False
     inResults= False
     inUl     = 0
@@ -543,34 +628,39 @@ class HtmlDoc(exp.OrgExporter):
     pass
 
   def StartBody(self):
-    self.fs.write("  <body>\n")
+    self.doc.append("  <body>\n")
     data = GetHeadingData(self.style, self.file)
     if(data):
-      self.fs.write(data)
+      self.doc.append(data)
 
   def EndBody(self):
     data = GetFootingData(self.style, self.file)
     if(data):
-      self.fs.write(data)
-    self.fs.write("  </body>\n")
+      self.doc.append(data)
+    self.doc.append("  </body>\n")
 
   def InsertScripts(self,file):
     self.InsertJs(GetHighlightJs())
-    self.fs.write("<script>hljs.initHighlightingOnLoad();</script>\n")
+    self.doc.append("<script>hljs.initHighlightingOnLoad();</script>\n")
     self.InsertJs(GetCollapsibleCode())
 
   def Postamble(self):
-    self.fs.write("<div id=\"postamble\" class=\"status\">")
+    self.doc.append("<div id=\"postamble\" class=\"status\">")
     if(self.date):
-      self.fs.write("<p class=\"date\">Date: {date}</p>".format(date=self.date))
+      self.doc.append("<p class=\"date\">Date: {date}</p>".format(date=self.date))
     if(self.author):
-      self.fs.write("<p class=\"author\">Author: {author}</p>".format(author=self.author))
-    self.fs.write("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
-    self.fs.write("</div>")
+      self.doc.append("<p class=\"author\">Author: {author}</p>".format(author=self.author))
+    self.doc.append("<p class=\"date\">Created: {date}</p>".format(date=str(datetime.datetime.now())))
+    self.doc.append("</div>")
+
+  def BuildDoc(self):
+      out = '\n'.join(self.pre) + '\n' + '\n'.join(self.doc) + '\n'
+      return out
 
   def FinishDocCustom(self):
     self.Postamble()
-    self.fs.write("</html>\n")
+    self.doc.append("</html>\n")
+    self.fs.write(self.BuildDoc())
 
 class HtmlExportHelper(exp.OrgExportHelper):
   def __init__(self,view,index):
