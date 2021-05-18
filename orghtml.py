@@ -464,10 +464,13 @@ class HtmlDoc(exp.OrgExporter):
       line = exp.RE_HR.sub(r'<hr>',line)
     return line
 
+  def TextFullEscape(self,text):
+      return html.escape(text)
+
   def NodeBody(self,slide):
-    ilines = n._lines[1:]
+    ilines = slide._lines[1:]
     for parser in self.nodeParsers:
-        ilines = parser.Handle(ilines,n)
+        ilines = parser.Handle(ilines, slide)
     for line in ilines:
         self.doc.append(self.TextFullEscape(line))
     return

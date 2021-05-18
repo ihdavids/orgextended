@@ -227,21 +227,21 @@ class HtmlCheckboxListBlockState(exp.CheckboxListBlockState):
     def __init__(self,doc):
         super(HtmlCheckboxListBlockState,self).__init__(doc)
     def HandleEntering(self,m,l,orgnode):
-        self.e.doc.append(r"    \begin{todolist}")
+        self.e.doc.append(r"    <ul>")
     def HandleExiting(self, m, l , orgnode):
-        self.e.doc.append(r"     \end{todolist}")
+        self.e.doc.append(r"     </ul>")
     def StartHandleItem(self,m,l, orgnode):
         #data = self.e.Escape(m.group('data'))
         state = m.group('state')
         if(state == 'x'):
-            self.e.doc.append(r"     <input type=\"checkbox\" checked>")
+            self.e.doc.append("     <li><input type=\"checkbox\" checked>")
         elif(state == '-'):
-            self.e.doc.append(r"     <input type=\"checkbox\"> ")
-            #self.e.doc.append(r"     \item[\inp] {content}".format(content=data))
+            self.e.doc.append("     <li><input type=\"checkbox\"> ")
+            #self.e.doc.append("     \item[\inp] {content}".format(content=data))
         else:
-            self.e.doc.append(r"     <input type=\"checkbox\"> ")
+            self.e.doc.append("     <li><input type=\"checkbox\"> ")
     def EndHandleItem(self,m,l,orgnode):
-        self.e.doc.append("    </input>")
+        self.e.doc.append("    </li></input>")
 
 
 RE_TABLE_SEPARATOR = re.compile(r"^\s*[|][-]")
