@@ -234,7 +234,7 @@ class HtmlNameParser(exp.NameParser):
     def __init__(self,doc):
         super(HtmlNameParser,self).__init__(doc)
     def HandleLine(self,m,l,n):
-        self.e.doc.append(r"<a name=\"{data}\"/>".format(data=m.group('data')))
+        self.e.doc.append("<a name=\"{data}\"/>".format(data=m.group('data')))
 
 
 RE_ATTR_HTML = regex.compile(r"^\s*[#][+]ATTR_HTML[:]\s*(?P<data>.*)")
