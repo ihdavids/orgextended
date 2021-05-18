@@ -630,20 +630,20 @@ class AgendaBaseView:
         if(self._oneofStateTags and len(self._oneofStateTags) > 0 and not any(re.search(elem,t) for elem in self._oneofStateTags)):
             return False
         return True
-    
+
     def MatchDuration(self, node):
         t = node.closed
-        if(t and self._afterDuration and any(t.after(elem) for elem in self._afterDuration)):
+        if(t and self._afterDuration and any(not t.after_duration(elem) for elem in self._afterDuration)):
             return False
-        if(self._beforeDuration):
+        if self._beforeDuration:
             s = node.scheduled
             d = node.deadline
-            ts = node.timestamps
-            if(s and any(s and s.before(elem) for elem in self._beforeDuration)):
+            ts = node.get_timestamps()
+            if(s and any(s and s.before_duration(elem) for elem in self._beforeDuration)):
                 return True
-            if(d and any(d and d.before(elem) for elem in self._beforeDuration)):
+            if(d and any(d and d.before_duration(elem) for elem in self._beforeDuration)):
                 return True
-            if(ts and len(ts) > 0 and any(ts[0] and ts[0].before(elem) for elem in self._beforeDuration)):
+            if(ts and len(ts) > 0 and any(ts[0] and ts[0].before_duration(elem) for elem in self._beforeDuration)):
                 return True
             return False
         return True
