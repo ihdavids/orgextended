@@ -229,17 +229,28 @@ class HtmlCheckboxListBlockState(exp.CheckboxListBlockState):
     def HandleEntering(self,m,l,orgnode):
         self.e.doc.append(r"    <ul>")
     def HandleExiting(self, m, l , orgnode):
-        self.e.doc.append(r"     </ul>")
+        self.e.doc.append(r"    </ul>")
     def StartHandleItem(self,m,l, orgnode):
         #data = self.e.Escape(m.group('data'))
         state = m.group('state')
-        if(state == 'x'):
-            self.e.doc.append("     <li><input type=\"checkbox\" checked>")
-        elif(state == '-'):
-            self.e.doc.append("     <li><input type=\"checkbox\"> ")
-            #self.e.doc.append("     \item[\inp] {content}".format(content=data))
+        definit = m.group('definition')
+        if(definit):
+            #self.e.doc.append(r"     <li><b>{definition}</b> ".format(definition=definit))
+            if(state == 'x'):
+                self.e.doc.append("     <li><input type=\"checkbox\" checked><b>{definition}</b> ".format(definition=definit))
+            elif(state == '-'):
+                self.e.doc.append("     <li><input type=\"checkbox\"><b>{definition}</b> ".format(definition=definit))
+                #self.e.doc.append("     \item[\inp] {content}".format(content=data))
+            else:
+                self.e.doc.append("     <li><input type=\"checkbox\"><b>{definition}</b> ".format(definition=definit))
         else:
-            self.e.doc.append("     <li><input type=\"checkbox\"> ")
+            if(state == 'x'):
+                self.e.doc.append("     <li><input type=\"checkbox\" checked>")
+            elif(state == '-'):
+                self.e.doc.append("     <li><input type=\"checkbox\"> ")
+                #self.e.doc.append("     \item[\inp] {content}".format(content=data))
+            else:
+                self.e.doc.append("     <li><input type=\"checkbox\"> ")
     def EndHandleItem(self,m,l,orgnode):
         self.e.doc.append("    </li></input>")
 
