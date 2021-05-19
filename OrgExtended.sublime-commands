@@ -143,6 +143,7 @@
     {"caption": "Org Plot Table",              "command": "org_plot_table"                    },
     {"caption": "Org Execute All Tables",      "command": "org_execute_all_tables"            },
     {"caption": "Org Execute Formula",         "command": "org_execute_formula"               },
+    {"caption": "Org Edit Formula",            "command": "org_edit_formula_for_cell"         },
 
     // Internal Mechanics
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },

@@ -653,7 +653,8 @@ def formula_sources(expr):
 
 # ============================================================
 class Formula:
-    def __init__(self,expr, reg, formatters, table):
+    def __init__(self,raw, expr, reg, formatters, table):
+        self.raw = raw
         self.table = table
         self.formatters = formatters
         self.printfout = None
@@ -2175,6 +2176,7 @@ def create_table(view, at=None):
             las = xline.split('::')
             index = 0
             for fm in formula:
+                raw = fm.strip()
                 formatters = fm.split(';')
                 if(len(formatters) > 1):
                     fm = formatters[0]
@@ -2182,7 +2184,7 @@ def create_table(view, at=None):
                 else:
                     formatters = ""
                 fend = lastend+len(las[index])
-                td.formulas.append(Formula(fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend)),formatters,td))
+                td.formulas.append(Formula(raw,fm, sublime.Region(view.text_point(formulaRow,lastend),view.text_point(formulaRow,fend)),formatters,td))
                 index += 1
                 lastend = fend + 2
         td.BuildCellToFormulaMap()
@@ -2379,6 +2381,7 @@ def create_table_from_node(node, row):
             las = xline.split('::')
             index = 0
             for fm in formula:
+                raw = fm.strip()
                 formatters = fm.split(';')
                 if(len(formatters) > 1):
                     fm = formatters[0]
@@ -2386,7 +2389,7 @@ def create_table_from_node(node, row):
                 else:
                     formatters = ""
                 fend = lastend+len(las[index])
-                td.formulas.append(Formula(fm, None,formatters,td))
+                td.formulas.append(Formula(raw,fm, None,formatters,td))
                 index += 1
                 lastend = fend + 2
         td.BuildCellToFormulaMap()
@@ -2585,6 +2588,22 @@ class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
             formulaIdx = td.GetFormulaAt()
             if(None != formulaIdx):
                 td.HighlightFormula(formulaIdx)
+
+
+# ================================================================================
+class OrgEditFormulaForCellCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        print("HERE")
+        global tableCache
+        td = tableCache.GetTable(self.view)
+        if(td):
+            td.ClearAllRegions()
+            formulaIdx = td.GetFormulaAt()
+            if(None != formulaIdx):
+                r,c = td.CursorToCell()
+                fml = td.GetFormula(formulaIdx)
+                reg = td.FindCellRegion(r,c)
+                self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(fml.raw), "onDone": onDone})
 
 # ================================================================================
 class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
