@@ -570,7 +570,7 @@ def formula_rowcol(expr,table):
     return (None, None, None)
 
 def isNumeric(v):
-    return v.lstrip('-').lstrip('+').isnumeric()
+    return v.strip().lstrip('-').lstrip('+').isnumeric()
 
 def isFunc(v):
     return 'ridx()' in v or 'cidx()' in v
@@ -611,8 +611,8 @@ def replace_cell_references(expr):
                     else:
                         expr = RE_TARGET_A.sub(' getcolcell(\'' + str(col) + '\'' +","+cs+ ') ' + end,expr,1)
             else:
-                rowmarkers = '' if not isNumeric(row) or isFunc(row) else '\''
-                colmarkers = '' if not isNumeric(col) or isFunc(col) else '\''
+                rowmarkers = '' if isNumeric(row) or isFunc(row) else '\''
+                colmarkers = '' if isNumeric(col) or isFunc(col) else '\''
                 cs = '1' if cs else '0'
                 rs = '1' if rs else '0'
                 expr = RE_TARGET_A.sub(' getcell(' + rowmarkers + str(row) + rowmarkers + "," + rs + "," + colmarkers + str(col) + colmarkers + "," + cs + ") " + end,expr,1)

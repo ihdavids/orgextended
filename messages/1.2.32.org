@@ -26,3 +26,13 @@
    #+BEGIN_EXAMPLE
      "logDone": true,
    #+END_EXAMPLE
+
+** Tables
+   Found a bug with complete relative syntax.
+   They were always evaluating to 1,1 in the table.
+
+   This has been fixed.
+
+   #+BEGIN_EXAMPLE
+     @-1$+1 
+   #+END_EXAMPLE
