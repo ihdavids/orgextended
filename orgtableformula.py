@@ -1839,6 +1839,20 @@ class TableDef(simpev.SimpleEval):
 
     def GetFormula(self,i):
         return self.formulas[i]
+    
+    def AddTemporaryFormula(self,fm):
+        raw = fm.strip()
+        formatters = fm.split(';')
+        if(len(formatters) > 1):
+            fm = formatters[0]
+            formatters = formatters[1]
+        else:
+            formatters = ""
+        self.formulas.append(Formula(raw,fm, sublime.Region(self.view.text_point(0,0),self.view.text_point(0,0)),formatters,self))
+        return len(self.formulas)-1
+
+    def RemoveTemporaryFormula(self):
+        del self.formulas[len(self.formulas)-1]
 
     def FormulaTarget(self, i):
         dm = self.formulas[i]
@@ -2618,7 +2632,53 @@ class OrgClearCellCommand(sublime_plugin.TextCommand):
             r,c = td.CursorToCell()
             reg = td.FindCellRegion(r,c)
             self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": "", "onDone": evt.Make(self.on_done)})
-            
+
+# ================================================================================
+class OrgExecOnColumnCommand(sublime_plugin.TextCommand):
+    def on_reformat(self):
+        self.td.RecalculateTableDimensions()
+        self.process_next()
+
+    def on_done_cell(self):
+        self.view.sel().clear()
+        self.view.sel().add(self.result[3])
+        #self.view.run_command('table_editor_next_field')
+        self.view.run_command('table_editor_align')
+        sublime.set_timeout(self.on_reformat,1)
+
+    def process_next(self):
+        self.result = next(self.it,None)
+        if(None == self.result):
+            self.on_done()
+            return
+        r,c,val,reg,fmt = self.result
+        if(val and isinstance(val,float) and fmt and "%" in fmt):
+            val = fmt % val
+            #print("REPLACING WITH: " + str(val))
+        self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
+
+    def on_expr(self,text):
+        if(text.strip() != ""):
+            idx=self.td.AddTemporaryFormula("@"+str(self.r) + "$" + str(self.c) + ".." +"@"+str(self.td.Height()) + "$" + str(self.c) + "=" + text)
+            if(None != idx):
+                self.it = SingleFormulaIterator(self.td, idx)
+                self.process_next()
+
+    def on_done(self):
+        self.view.run_command('table_editor_align')
+        self.RemoveTemporaryFormula()
+        evt.EmitIf(self.onDone)
+
+    def run(self,edit,onDone=None):
+        global tableCache
+        self.onDone = onDone
+        td = tableCache.GetTable(self.view)
+        if(td):
+            self.td = td
+            td.ClearAllRegions()
+            self.r,self.c = td.CursorToCell()
+            self.view.window().show_input_panel("Expr: ","", self.on_expr, None, None)
+
 # ================================================================================
 class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
     def on_reformat(self):

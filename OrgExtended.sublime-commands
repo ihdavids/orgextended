@@ -145,6 +145,7 @@
     {"caption": "Org Execute Formula",         "command": "org_execute_formula"               },
     {"caption": "Org Edit Table Formula",      "command": "org_edit_formula_for_cell"         },
     {"caption": "Org Clear Table Cell",        "command": "org_clear_cell"                    },
+    {"caption": "Org Table Exec Below",        "command": "org_exec_on_column"                },
 
     // Internal Mechanics
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },
