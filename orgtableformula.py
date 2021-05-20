@@ -2593,7 +2593,6 @@ class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
 # ================================================================================
 class OrgEditFormulaForCellCommand(sublime_plugin.TextCommand):
     def run(self,edit,onDone=None):
-        print("HERE")
         global tableCache
         td = tableCache.GetTable(self.view)
         if(td):
@@ -2605,6 +2604,21 @@ class OrgEditFormulaForCellCommand(sublime_plugin.TextCommand):
                 reg = td.FindCellRegion(r,c)
                 self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(fml.raw), "onDone": onDone})
 
+# ================================================================================
+class OrgClearCellCommand(sublime_plugin.TextCommand):
+    def on_done(self):
+        self.view.run_command('table_editor_align')
+        evt.EmitIf(self.onDone)
+    def run(self,edit,onDone=None):
+        global tableCache
+        self.onDone = onDone
+        td = tableCache.GetTable(self.view)
+        if(td):
+            td.ClearAllRegions()
+            r,c = td.CursorToCell()
+            reg = td.FindCellRegion(r,c)
+            self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": "", "onDone": evt.Make(self.on_done)})
+            
 # ================================================================================
 class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
     def on_reformat(self):

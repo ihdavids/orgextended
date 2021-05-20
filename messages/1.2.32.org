@@ -36,3 +36,18 @@
    #+BEGIN_EXAMPLE
      @-1$+1 
    #+END_EXAMPLE
+
+*** New Table Commands
+   
+    Will pull the active formula for the current cell into the current cell.
+    Facilitating editing.
+
+    #+BEGIN_EXAMPLE
+      Org Edit Table Formula
+    #+END_EXAMPLE
+
+    Will clear the current cell
+
+    #+BEGIN_EXAMPLE
+      Org Clear Table Cell
+    #+END_EXAMPLE
