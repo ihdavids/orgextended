@@ -84,8 +84,6 @@
   
   The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
 
-  The full documentation for this plugin can be found at: [Docs](https://github.com/ihdavids/orgextended_docs)
-
 # Thank You
   I have shamelessly built this plugin on the backs of some excellent plugins and libraries.
 
