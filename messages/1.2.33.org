@@ -1,1 +1,7 @@
 * 1.2.33
+** Editing
+   - Tag insertion could not insert tags on headings with colons
+     this has now been fixed.
+     [[https://github.com/ihdavids/orgextended/issues/38][Issue]] 
+
+     
