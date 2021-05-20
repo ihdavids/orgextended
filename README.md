@@ -46,7 +46,11 @@
 
   Or to help me manipulate tables of data:
 
-  ![Tables](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/table_hacking.gif)
+  ![Tables](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/table_hacking.gif) 
+
+  Or build document diagrams:
+
+  ![Diagrams](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/diagrams_plantuml.gif) 
 
   What makes Org Mode so versatile is the deceptive simplicity of the format
   the flexibility of the simple markup and the depth of the tools and API's provided around that format.
