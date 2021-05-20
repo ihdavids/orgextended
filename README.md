@@ -53,7 +53,7 @@
   ![Diagrams](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/creating_diagrams.gif) 
 
 
-  Or build presentations with revealjs:
+  Or build presentations with revealjs, html or pdfs with latex:
 
   ![Presentations](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/revealjs.gif) 
 
