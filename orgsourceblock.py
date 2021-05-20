@@ -32,7 +32,7 @@ RE_HEADING = re.compile(r"^[*]+\s+")
 RE_PROPERTY_DRAWER = re.compile(r"^\s*[:][a-zA-Z0-9]+[:]\s*$")
 RE_END_PROPERTY_DRAWER = re.compile(r"^\s*[:](END|end)[:]\s*$")
 RE_BLOCK = re.compile(r"^\s*\#\+(BEGIN_|begin_)[a-zA-Z]+\s+")
-RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s+")
+RE_END_BLOCK = re.compile(r"^\s*\#\+(END_|end_)[a-zA-Z]+\s*")
 RE_IS_BLANK_LINE = re.compile(r"^\s*$")
 RE_FAIL = re.compile(r"\b([Ff][Aa][Ii][Ll][Ee][Dd])|([Ff][Aa][Ii][Ll][Uu][Rr][Ee][Ss]?)|([Ff][Aa][Ii][Ll])|([Ee][Rr][Rr][Oo][Rr][Ss]?)\b")
 RE_HEADER_PARAMS = re.compile(r"^\s*\#\+(HEADER|header)[:]\s*(?P<params>.*)$")
@@ -776,12 +776,18 @@ def FindResults(self,edit,at,checkSilent=True):
                 return True
             else:
                 break
-        if(inResults and not inPropertyDrawer and RE_PROPERTY_DRAWER.search(line)):
-            inPropertyDrawer = True
-            continue
-        if(inResults and not inBlock and RE_BLOCK.search(line)):
-            inBlock = True
-            continue
+        if(RE_PROPERTY_DRAWER.search(line)):
+            if(inResults and not inPropertyDrawer):
+                inPropertyDrawer = True
+                continue
+            else:
+                break
+        if(RE_BLOCK.search(line)):
+            if(inResults and not inBlock):
+                inBlock = True
+                continue
+            else:
+                break
         if(inResults and not inBlock and not inPropertyDrawer and inResults and RE_IS_BLANK_LINE.search(line)):
             EndResults(self,rw)
             return True

@@ -37,6 +37,21 @@
      @-1$+1 
    #+END_EXAMPLE
 
+   Known issue:
+   ------------
+   Complex expansions are not working:
+
+   @int($-1)$1
+   This would look up the row from the neighboring cell
+
+   There is a workaround for now till I can improve the parser
+
+   getcell(int($-1), 1, 1, 0)
+            |        |  |  not relative
+            |        |  column 1
+            |        relative offset
+            grab value 1 cell to the left, ensure it is an int
+
 *** New Table Commands
    
     The following will pull the active formula for the current cell into the current cell.
@@ -59,4 +74,7 @@
       Org Table Exec Below
     #+END_EXAMPLE
 
+*** Babel Preview
+    - Improved results block discovery previously results might confuse a source block
+      as being part of the results.
 
