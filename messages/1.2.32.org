@@ -1,13 +1,11 @@
 * 1.2.32
-** Agenda
-   - Done - a new view that lists done tasks
-	 WATCH OUT this can be massive! Use this with other filters.
-
 ** Insert Sibling Heading
    - If the next line has spaces the inserted heading could have spaces which is not a good idea.
      This is now stripped properly.
 
 ** Agenda
+   - Done - a new view that lists done tasks
+    WATCH OUT this can be massive! Use this with other filters.
    - durationfilter added -2w filters items 2 weeks ago from right now. 
      a negative duration value will filter against CLOSED values while a positive will filter
      against SCHEDULED and DEADLINE values.
