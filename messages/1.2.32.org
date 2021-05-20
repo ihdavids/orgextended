@@ -39,15 +39,24 @@
 
 *** New Table Commands
    
-    Will pull the active formula for the current cell into the current cell.
+    The following will pull the active formula for the current cell into the current cell.
     Facilitating editing.
 
     #+BEGIN_EXAMPLE
       Org Edit Table Formula
     #+END_EXAMPLE
 
-    Will clear the current cell
+    The following will clear the current cell
 
     #+BEGIN_EXAMPLE
       Org Clear Table Cell
     #+END_EXAMPLE
+
+    The following will run a temporary formula on the cells on and below the cursor
+    which can be handy when fixing up a table.
+
+    #+BEGIN_EXAMPLE
+      Org Table Exec Below
+    #+END_EXAMPLE
+
+
