@@ -52,6 +52,12 @@
 
   ![Diagrams](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/diagrams_plantuml.gif) 
 
+
+  Or build presentations with revealjs:
+
+  ![Presentations](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/revealjs.gif) 
+
+
   What makes Org Mode so versatile is the deceptive simplicity of the format
   the flexibility of the simple markup and the depth of the tools and API's provided around that format.
 
