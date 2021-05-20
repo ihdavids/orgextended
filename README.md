@@ -50,7 +50,7 @@
 
   Or build document diagrams:
 
-  ![Diagrams](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/diagrams_plantuml.gif) 
+  ![Diagrams](https://raw.githubusercontent.com/ihdavids/orgextended_docs/master/images/creating_diagrams.gif) 
 
 
   Or build presentations with revealjs:
