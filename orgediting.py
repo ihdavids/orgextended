@@ -787,7 +787,7 @@ class OrgInsertClosedCommand(sublime_plugin.TextCommand):
             self.view.insert(edit, l.end() + addnl, nl + node.indent() + "CLOSED: "+toInsert+"\n")
 
 # ================================================================================
-RE_TAGS = re.compile(r'^(?P<heading>[*]+[^:]+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
+RE_TAGS = re.compile(r'^(?P<heading>[*]+((?![ \t][:]).)+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
     def OnDone(self, text):
         if(not text):
@@ -797,7 +797,7 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
             if not text in node.tags:
                 (region, line) = self.view.getLineAndRegion(node.start_row)
                 m = RE_TAGS.search(line)
-                if(m.group('tags') != None):
+                if(m and m.group('tags') != None):
                     tags = m.group('tags') + text + ":"
                 else:
                     tags = "    :" + text + ":" 
