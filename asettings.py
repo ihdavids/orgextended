@@ -9,7 +9,7 @@ import OrgExtended.orgutil.template as temp
 
 log = logging.getLogger(__name__)
 
-defaultTodoStates = ["TODO(!)", "NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"]
+defaultTodoStates = ["TODO", "NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"]
 daysOfWeek = ["sun","mon","tue","wed","th","fri","sat"]
 
 
