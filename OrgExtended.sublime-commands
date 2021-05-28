@@ -170,4 +170,9 @@
     //{"caption": "Org Test Thing",              "command": "org_show_item"                     },
     //{"caption": "Org Test Durations",          "command": "org_test_duration"                 },
     //{"caption": "Org Test PLists",             "command": "org_plist_test"                    },
+
+    // Beancount
+    {"caption": "Org Beancount Create",         "command": "beancount_new_file"                  },
+    {"caption": "Org Beancount Transaction",    "command": "beancount_new_transaction"           },
+
 ]

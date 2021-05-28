@@ -5,6 +5,8 @@ name: orgdatepicker
 file_extensions:
   - orgdatepicker
 scope: source.orgdatepicker
+version: 2
+hidden: true
 contexts:
   main:
     # filename and line location

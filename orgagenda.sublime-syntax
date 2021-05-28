@@ -1,10 +1,12 @@
-%YAML1.2
+%YAML 1.2
 ---
 # See http://www.sublimetext.com/docs/3/syntax.html
 name: orgagenda
 file_extensions:
   - orgagenda
 scope: source.orgagenda
+version: 2
+hidden: true
 contexts:
   main:
     # filename and line location

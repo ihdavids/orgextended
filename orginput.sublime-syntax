@@ -5,6 +5,8 @@ name: orginput
 file_extensions:
   - orginput
 scope: source.orginput
+version: 2
+hidden: true
 contexts:
   main:
     - match: '.*'

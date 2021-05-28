@@ -1,0 +1,311 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: OrgBeancount
+file_extensions:
+  - orgbeancount
+version: 2
+extends: Packages/OrgExtended/OrgExtended.sublime-syntax
+scope: source.orgbeancount text.orgmode
+contexts:
+  comment:
+    # Comment
+    - match: ;.*
+      scope: comment.line.beancount
+  comments:
+    - match: (?<=\s)(;.*)(?=\n)
+      captures:
+        1: comment.line.beancount
+  illegal:
+    - match: ([^\s])
+      scope: invalid.illegal.unrecognized.beancount
+  amount:
+    - match: ([\-|\+]?)((?:\d|\d[\d,]*\d)(?:\.\d*)?)\s*([A-Z][A-Z0-9\'\.\_\-]{0,22}[A-Z0-9])
+      captures:
+        1: keyword.operator.modifier.beancount
+        2: constant.numeric.currency.beancount
+        3: entity.type.commodity.beancount
+      scope: meta.amount.beancount
+  commodity:
+    - match: ([A-Z][A-Z0-9\'\.\_\-]{0,22}[A-Z0-9])
+      scope: entity.type.commodity.beancount
+  cost:
+    - match: \{\{?
+      captures:
+        0: keyword.operator.assignment.beancount
+      push:
+        - meta_scope: meta.cost.beancount
+        - include: amount
+        - include: date
+        - match: \,
+          scope: punctuation.separator.beancount
+        - include: illegal
+        - match: \}\}?
+          captures:
+            0: keyword.operator.assignment.beancount
+          pop: true
+  date:
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})
+      scope: meta.date.beancount
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+  flag:
+    - match: (?<=\s)([*!&amp;#?%PSTCURM])
+      scope: keyword.other.beancount
+  link:
+    - match: (?<=\s)(\^)([A-Za-z0-9\-_/.]+)(?=\s)
+      captures:
+        1: keyword.operator.link.beancount
+        2: markup.underline.link.beancount
+  meta:
+    - match: ^\s*([a-z][A-Za-z0-9\-]+)([:])\s
+      captures:
+        1: keyword.operator.directive.beancount
+        2: punctuation.separator.beancount
+      push:
+        - meta_scope: meta.meta.beancount
+        - include: string
+        - include: comments
+        - include: illegal
+        - match: \n
+          pop: true
+  posting:
+    - match: ^\s+(?=([A-Z\!]))
+      push:
+        - meta_scope: meta.posting.beancount
+        - include: meta
+        - include: comments
+        - include: flag
+        - include: account
+        - include: amount
+        - include: cost
+        - include: date
+        - include: price
+        - include: illegal
+        - match: (?=(^\s*$|^\S|^\s*[A-Z]))
+          pop: true
+  price:
+    - match: \@\@?
+      captures:
+        0: keyword.operator.assignment.beancount
+      push:
+        - meta_scope: meta.price.beancount
+        - include: amount
+        - include: illegal
+        - match: (?=(;|\n))
+          pop: true
+  string:
+    - match: \"
+      push:
+        - meta_scope: string.quoted.double.beancount
+        - match: \\.
+          scope: constant.character.escape.beancount
+        - match: \"
+          pop: true
+  tag:
+    - match: (?<=\s)(#)([A-Za-z0-9\-_/.]+)(?=\s)
+      captures:
+        1: keyword.operator.tag.beancount
+        2: entity.name.tag.beancount
+  account:
+    # Account
+    - match: ([A-Z][A-Za-z0-9\-]+)(:)
+      captures:
+        1: constant.language.beancount
+        2: punctuation.separator.beancount
+      push:
+        - meta_scope: meta.account.beancount
+        # Sub Accounts
+        - match: ([A-Z][A-Za-z0-9\-]+)([:]?)
+          captures:
+            1: variable.account.beancount
+            2: punctuation.separator.beancount
+          push:
+            - match: ([:]?)|(\s)
+              pop: true
+            - include: illegal
+            - include: $self
+        - match: \s
+          pop: true
+  main:
+    - meta_append: true
+    # Tag directive
+    - match: ^(poptag|pushtag)\s+(#)([A-Za-z0-9\-_/.]+) 
+      captures:
+        1: support.function.beancount
+        2: keyword.operator.tag.beancount
+        3: entity.name.tag.beancount 
+      push:
+        - meta_scope: meta.directive.tag.beancount
+        - include: comment
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true 
+    # Include
+    - match: ^(include)\s+(\".*\")
+      captures:
+        1: support.function.beancount
+        2: string.quoted.double.beancount
+      push:
+        - meta_scope: meta.directive.include.beancount
+        - include: comment
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true 
+    # Option directive
+    - match: ^(option)\s+(\".*\")\s+(\".*\")
+      captures:
+        1: support.function.beancount
+        2: support.variable.beancount
+        3: support.quoted.double.beancount
+      push:
+        - meta_scope: meta.directive.option.beancount
+        - include: comment
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Plugin
+    - match: ^(plugin)\s+(\"(.*)\")\s+(\".*\")
+      captures:
+        1: support.function.beancount
+        2: support.quoted.double.beancount
+        3: entity.name.function.beancount
+        4: string.quoted.double.beancount
+      push:
+        - meta_scope: keyword.operator.directive.beancount
+        - include: comment
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Open/Close/Pad directive
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s+(open|close|pad)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comment
+        - include: illegal
+        - include: account
+        - include: commodity
+        - match: \,
+          scope: punctuation.separator.beancount
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Event directive
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s(event)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comment
+        - include: meta
+        - include: string
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Commodity directive
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s(commodity)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comments
+        - include: meta
+        - include: commodity
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Note/Document directive
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s(note|document)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comments
+        - include: meta
+        - include: account
+        - include: string
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Price directives
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s(price)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comments
+        - include: meta
+        - include: commodity
+        - include: amount
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Balance directives
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s(balance)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+      push:
+        - meta_scope: meta.directive.dated.beancount
+        - include: comments
+        - include: meta
+        - include: account
+        - include: amount
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true
+    # Transaction directive
+    - match: ([0-9]{4})([\-|/])([0-9]{2})([\-|/])([0-9]{2})\s+(txn|[*!&amp;#?%PSTCURM])(?:\s+(".*")(?=\s+"))?\s+(".*?")(?=((?:\s+#[a-zA-z\-]+(?=\s))*(?:\s+\^[a-zA-z\-\.]+(?=\s))*(?:\s+;\s*.*)?)\s)
+      captures:
+        1: constant.numeric.date.year.beancount
+        2: punctuation.separator.beancount
+        3: constant.numeric.date.month.beancount
+        4: punctuation.separator.beancount
+        5: constant.numeric.date.day.beancount
+        6: support.function.directive.beancount
+        7: string.quoted.tiers.beancount
+        8: string.quoted.narration.beancount}       
+      push:
+        - meta_scope: meta.directive.transaction.beancount
+        - include: comments
+        - include: posting
+        - include: meta
+        - include: tag
+        - include: link
+        - include: illegal
+        - match: (?=(^\s*$|^\S))
+          pop: true

@@ -5,6 +5,8 @@ name: orgdateeditor
 file_extensions:
   - orgdateeditor
 scope: source.orgdateeditor
+version: 2
+hidden: true
 contexts:
   main:
     # filename and line location
