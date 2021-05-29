@@ -4,6 +4,10 @@
      this has now been fixed.
      [[https://github.com/ihdavids/orgextended/issues/38][Issue]] 
 
+*** Indenting
+    An attempt to improve heading indentation with exiting content. We will see how this
+    new attempt plays out.
+
 ** Syntax Highlighting
    - Internal syntaxes are now hidden.
    - Syntaxes are now marked as version 2 which may improve perf.
@@ -27,9 +31,9 @@
      this is a bit non standard.
    - this is now configurable and by default we are now
      logging into a LOGBOOK drawer which is more orgmode standard.
-     
+
      Use the following to preserve the old behaviour:
      #+BEGIN_EXAMPLE
         "clockInPropertyBlock": true,
      #+END_EXAMPLE 
-     
+   

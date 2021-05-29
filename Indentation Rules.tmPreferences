@@ -9,7 +9,7 @@
    <key>settings</key>
    <dict>
       <key>increaseIndentPattern</key>
-      <string>(^\s*[#][+]((BEGIN)|(begin)))</string>
+      <string>(^\s*[#][+]((BEGIN)|(begin)))|(^\s*[*]+ )</string>
       <key>decreaseIndentPattern</key>
       <string>(^\s*[#][+]((END)|(end)))</string>
    </dict>
