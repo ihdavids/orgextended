@@ -4,4 +4,23 @@
      this has now been fixed.
      [[https://github.com/ihdavids/orgextended/issues/38][Issue]] 
 
+** Syntax Highlighting
+   - Internal syntaxes are now hidden.
+   - Syntaxes are now marked as version 2 which may improve perf.
+
+** Org Beancount Experiment
+   This is a bit of a departure from org's primary purpose.
+   I however use beancount and beancount is designed to work
+   inside other markup languages like markdown and... orgmode!
+
+   Due to how packages and syntaxes work I have not found a good
+   way to create an amalgamated syntax without doing inside the
+   orgmode package. So... here we are. By default we highlight
+   .orgbeancount files.
+
+   This also adds a snippet for inserting a transaction with
+   some additional metadata. My hope is to eventually facilitate
+   babel and beancount. 
+
+
      

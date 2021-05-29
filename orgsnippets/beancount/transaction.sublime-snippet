@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[
+${YEAR}-${MONTH}-${1:DAY} * "${2:Name}" "${3:Description}"
+  ${4:From}																			${5:Amount} ${DEFAULT_CURRENCY}
+  ${6:To}
+
+$0
+]]></content>
+    <tabTrigger>StartTransaction</tabTrigger>
+    <scope>source.beancount</scope>
+    <description>Start Transaction</description>
+</snippet>
