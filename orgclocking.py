@@ -23,7 +23,6 @@ log = logging.getLogger(__name__)
 
 
 
-
 class ClockManager:
 	Clock = None
 
@@ -85,7 +84,10 @@ class ClockManager:
 			if(file):
 				dt = datetime.datetime.now()
 				ClockManager.ClockInRecord(file, node, dt)
-				props.AddProperty(view, node, "CLOCK", ClockManager.FormatClock(dt) + "--")
+				if(sets.Get("clockInPropertyBlock",False)):
+					props.AddProperty(view, node, "CLOCK", ClockManager.FormatClock(dt) + "--")
+				else:
+					props.AddLogbook(view, node, "CLOCK:", ClockManager.FormatClock(dt) + "--")
 
 	@staticmethod
 	def ClockOut(view):
@@ -101,9 +103,15 @@ class ClockManager:
 			# Should we keep clocking entries less than a minute?
 			shouldKeep = sets.Get("clockingSubMinuteClocks",True)
 			if(not shouldKeep and duration.seconds < 60):
-				props.RemoveProperty(view, node, "CLOCK")
+				if(sets.Get("clockInPropertyBlock",False)):
+					props.RemoveProperty(view, node, "CLOCK")
+				else:
+					props.RemoveLogbook(view, node, r"CLOCK:")
 			else:
-				props.UpdateProperty(view, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+				if(sets.Get("clockInPropertyBlock",False)):
+					props.UpdateProperty(view, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+				else:
+					props.UpdateLogbook(view, node, "CLOCK:", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
 			ClockManager.ClearClock()
 		else:
 			log.error("Failed to clock out, couldn't find node")
@@ -156,12 +164,18 @@ class OrgRecalculateClockCommand(sublime_plugin.TextCommand):
 	def run(self,edit):
 		node = db.Get().AtInView(self.view)
 		clockList = copy.copy(node.clock)
-		print(str(clockList))
-		print(str(len(clockList)))
-		props.RemoveAllInstances(self.view, node, "CLOCK")
-		print(str(clockList))
-		print(str(len(clockList)))
+		log.debug(str(clockList))
+		log.debug(str(len(clockList)))
+		if(sets.Get("clockInPropertyBlock",False)):
+			props.RemoveAllInstances(self.view, node, "CLOCK")
+		else:
+			props.RemoveAllLogbookInstances(self.view, node, r"^\s*CLOCK:")
+		log.debug(str(clockList))
+		log.debug(str(len(clockList)))
 		for clock in clockList:
 			# File is reloaded have to regrab node
 			node = db.Get().At(self.view, node.start_row)
-			props.AddProperty(self.view, node, "CLOCK", clock.format_clock_str())	
+			if(sets.Get("clockInPropertyBlock",False)):
+				props.AddProperty(self.view, node, "CLOCK", clock.format_clock_str())
+			else:
+				props.AddLogbook(self.view, node, "CLOCK:", clock.format_clock_str())

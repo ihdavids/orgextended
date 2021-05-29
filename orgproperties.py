@@ -136,7 +136,7 @@ def UpdateProperty(view, node, key, value, onDone=None):
     InsertDrawerIfNotPresent(view, node, ":PROPERTIES:", evt.Make(OnDrawer))
 
 
-def UpdateLogbook(view, node, key, value):
+def UpdateLogbook(view, node, key, value, onDone=None):
     if(InsertDrawerIfNotPresent(view, node, ":LOGBOOK:")):
         # File is reloaded have to regrab node
         node = db.Get().At(view, node.start_row)
@@ -152,22 +152,18 @@ def UpdateLogbook(view, node, key, value):
         line = view.getLine(row)
         m = extract.search(line)
         if(m != None):
-            k = m.group(1).strip()
-            v = m.group(2).strip()
-            if(k.lower() == lkey):
-                mrow = row
-                break
-
+            mrow = row
+            break
     level = node.level
     indent = "   " + (" " * level)
     # We found our property, replace it!
     if(mrow != None):
         pt = view.text_point(mrow, 0)
         rw = view.line(pt)
-        view.run_command("org_internal_replace", {"start": rw.begin(), "end": rw.end(), "text": indent + str(key) + " " + str(value)})
+        view.run_command("org_internal_replace", {"start": rw.begin(), "end": rw.end(), "text": indent + str(key) + " " + str(value), "onDone": onDone})
     # Otherwise add a new property
     else:
-        AddLogbook(view, node, key, value)
+        AddLogbook(view, node, key, value, onDone)
 
 def RemoveProperty(view, node, key):
     if(not node or not node.property_drawer_location):
@@ -195,9 +191,41 @@ def RemoveProperty(view, node, key):
         return True
     return False
 
+def RemoveLogbook(view, node, key):
+    if(not node):
+        return False
+    drawer = node.get_drawer("LOGBOOK")
+    if(not drawer):
+        return False
+    loc    = drawer['loc']
+    start  = loc[0]
+    end    = loc[1]
+    lkey   = key.lower()
+    mrow   = None
+    # Work backwards, want to find the latest incarnation of this
+    for row in range(end-1, start, -1):
+        line = view.getLine(row)
+        m = re.search(key,line)
+        if(m != None):
+            mrow = row
+            break
+    # We found our property, erase it!
+    if(mrow != None):
+        pt = view.text_point(mrow, 0)
+        rw = view.line(pt)
+        view.run_command("org_internal_erase", {"start": rw.begin(), "end": (rw.end()+1)})
+        drawer['loc'] = (start,end-1)
+        return True
+    return False
+
 # Removes all instances of a named property from the drawer.
 def RemoveAllInstances(view, node, key):
     while(RemoveProperty(view, node, key)):
+        pass
+
+# Removes all instances of a named logbook entry from the drawer.
+def RemoveAllLogbookInstances(view, node, key):
+    while(RemoveLogbook(view, node, key)):
         pass
 
 # Insert a new drawer into the node.

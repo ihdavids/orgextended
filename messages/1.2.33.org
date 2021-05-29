@@ -22,5 +22,14 @@
    some additional metadata. My hope is to eventually facilitate
    babel and beancount. 
 
-
+** Clocking
+   - I was logging clock entries into the PROPERTIES drawer.
+     this is a bit non standard.
+   - this is now configurable and by default we are now
+     logging into a LOGBOOK drawer which is more orgmode standard.
+     
+     Use the following to preserve the old behaviour:
+     #+BEGIN_EXAMPLE
+        "clockInPropertyBlock": true,
+     #+END_EXAMPLE 
      
