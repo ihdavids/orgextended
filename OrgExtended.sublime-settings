@@ -278,6 +278,7 @@
     //"ditaa":      "C:\\Path\\To\\Ditaa.jar",
     //"mermaid":      "C:\\Path\\To\\mmdc",
     //"gnuplot":    "C:\Program Files\gnuplot\bin\gnuplot.exe"
+    //"perlPath":   "<pathtoperlexe>",
     // For the plantuml source blocks, where is planuml found?
     "plantuml": "D:\\Build\\.imacs\\plantuml.jar",
 
@@ -286,7 +287,7 @@
     // version:
     // 1. write a handler in Packages/User/orgsrc folder
     // 2. remove them from your list in your settings file.
-    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "mermaid", "powershell", "python", "gnuplot", "cmd", "sh", "javascript"],
+    "builtinSourceBlockHandlers": ["plantuml", "graphviz", "ditaa", "mermaid", "powershell", "python", "gnuplot", "cmd", "sh", "javascript", "perl"],
     // These are source block aliases for languages listed in the builtinSourceBlockHandlers
     "builtinSourceBlockAliases": {
         "bash":  "sh",
