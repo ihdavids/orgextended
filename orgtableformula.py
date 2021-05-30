@@ -1743,6 +1743,12 @@ class TableDef(simpev.SimpleEval):
                 if(reg):
                     style = "orgagenda.week." + str(color)
                     self.view.add_regions("cell_"+str(cc[0])+"_"+str(cc[1]),[reg],style,"",sublime.DRAW_NO_FILL)
+    
+    def HighlightCell(self, r,c , color):
+        reg = self.FindCellRegion(r,c)
+        if(reg):
+            style = "orgagenda.week." + str(color)
+            self.view.add_regions("cell_"+str(r)+"_"+str(c),[reg],style,"",sublime.DRAW_NO_FILL)
 
     def HighlightFormulaRegion(self,i,color=3):
         style = "orgagenda.week." + str(color)
@@ -2593,6 +2599,17 @@ class OrgHighlightFormulaCommand(sublime_plugin.TextCommand):
                 td.HighlightFormula(i)
 
 # ================================================================================
+class OrgHighlightCellCommand(sublime_plugin.TextCommand):
+    def run(self,edit):
+        if(not sets.Get("tableShowCursor", True)):
+            return
+        global tableCache
+        td = tableCache.GetTable(self.view)
+        if(td):
+            r,c = td.CursorToCell()
+            td.HighlightCell(r, c, 10)
+
+# ================================================================================
 class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
     def run(self,edit):
         global tableCache
@@ -2839,6 +2856,7 @@ class TableEventListener(sublime_plugin.ViewEventListener):
             self.showing = True
         elif(isTable(self.view)):
             self.view.run_command("org_highlight_formula_from_cell")
+            self.view.run_command("org_highlight_cell")
             if(not self.at):
                 self.at = self.view.sel()[0].begin()
             self.showing = True

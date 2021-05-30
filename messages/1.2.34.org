@@ -1,3 +1,10 @@
 * 1.2.34
 ** Active Table Cell Highlight
+   Show cursor for current cell.
+
+   Use the following option to turn this off if
+   it is causing you problems.
    
+   #+BEGIN_EXAMPLE
+     "tableShowCursor": false,
+   #+END_EXAMPLE
