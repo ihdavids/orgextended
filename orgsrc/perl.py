@@ -63,7 +63,7 @@ def PreProcessSourceFile(cmd):
             elif(isinstance(v,str)):
                 out += "$" + str(k) + " = \"" + str(v) + "\";\n"
         cmd.source = out + cmd.source
-        print("OUT: " + str(cmd.source))
+        #print("OUT: " + str(cmd.source))
 
 
 def Extension(cmd):
