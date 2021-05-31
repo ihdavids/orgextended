@@ -4,7 +4,16 @@
 
    Use the following option to turn this off if
    it is causing you problems.
-   
+
    #+BEGIN_EXAMPLE
      "tableShowCursor": false,
    #+END_EXAMPLE
+
+** Babel Preview
+   - Perl is now supported. Like the other languages you have to
+   	 tell the language handler where your perl interpreter can be found
+   	 with:
+
+   	 #+BEGIN_QUOTE
+   	   "perlPath": "<path to perl interpreter",
+   	 #+END_QUOTE

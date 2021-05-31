@@ -28,7 +28,7 @@ def HandleValue(cmd):
         for o in outs:
             out += " " + o + "\n"
         out += '}\n'
-        out += "@orgExtendedWrapperVar = OrgExtendedJavascriptWrapperFunction();\nprint \"RETURNVALUESTART\n\";\nprint \"$orgExtendedWrapperVar\";\nprint \"\n\";\nprint \"RETURNVALUEEND\n\";\n"
+        out += "$orgExtendedWrapperVar = OrgExtendedPerlWrapperFunction();\nprint \"RETURNVALUESTART\n\";\nprint \"$orgExtendedWrapperVar\";\nprint \"\n\";\nprint \"RETURNVALUEEND\n\";\n"
         cmd.source = out
 
 def PreProcessSourceFile(cmd):
