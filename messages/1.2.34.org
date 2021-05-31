@@ -17,3 +17,32 @@
    	 #+BEGIN_QUOTE
    	   "perlPath": "<path to perl interpreter",
    	 #+END_QUOTE
+
+  	#+NAME: input-table
+  	| a | b | c |
+  	| 1 | 2 | 3 |
+  
+  	#+BEGIN_SRC perl :var DATA=input-table :results table
+    	foreach(my $m = 0; $m <= $#DATA; $m++)
+    	{   
+      		for(my $n = 0; $n <= $#{$DATA[$m]} ; $n++)
+      		{  
+        		print "$DATA[$m][$n] ";  
+      		}  
+      		print "\n";  
+    	} 
+  	#+END_SRC
+  	#+RESULTS:
+  	| a | b | c |
+  	| 1 | 2 | 3 |
+
+  	I am certainly not a perl master, if someone wants to tweak my perl
+  	integration please be my guest.
+
+  	#+BEGIN_SRC perl :results value
+    	return "Hello world"
+  	#+END_SRC
+  	#+RESULTS:
+  	: Hello world
+
+
