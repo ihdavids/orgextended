@@ -67,6 +67,22 @@ def find_parent(view, region):
         # return the parent we found.
         return view.line(view.text_point(row,0))
 
+def find_heading(view, region):
+    row, col = view.rowcol(region.begin())
+    row -= 1
+    found = False
+    while row >= 0:
+        point = view.text_point(row, 0)
+        content = view.substr(view.line(point))
+        if len(content.strip()):
+            if RE_HEADING.search(content) and get_summary(view, view.line(point)):
+                found = True
+                break
+        row -= 1
+    if found:
+        # return the heading we found.
+        return view.line(view.text_point(row,0))
+
 def find_children(view, region, cre = checkbox_regex, includeSiblings=False, recursiveChildFind=False):
     row, col = view.rowcol(region.begin())
     line = view.line(region)
@@ -198,7 +214,7 @@ def recalc_summary(view, region):
     # print ('checked_children: ' + str(checked_children) + ', num_children: ' + str(num_children))
     return (num_children, checked_children)
 
-def update_line(view, edit, region, parent_update=True):
+def update_line(view, edit, region, parent_update=True, children_update=False):
     #print ('update_line', self.view.rowcol(region.begin())[0]+1)
     (num_children, checked_children) = recalc_summary(view, region)
     # No children we don't have to update anything else.
@@ -215,16 +231,22 @@ def update_line(view, edit, region, parent_update=True):
     toggle_checkbox(view, edit, region, newstate)
     # update region summary
     update_summary(view, edit, region, checked_children, num_children)
-    children = find_children(view, region)
-    for child in children:
-        line = view.line(child)
-        summary = get_summary(view, view.line(child))
-        if summary:
-            return update_line(view, edit, line, parent_update=False)
+    if children_update:
+        children = find_children(view, region)
+        for child in children:
+            line = view.line(child)
+            summary = get_summary(view, view.line(child))
+            if summary:
+                return update_line(view, edit, line, parent_update=False, children_update=True)
     if parent_update:
         parent = find_parent(view, region)
         if parent:
             update_line(view, edit, parent)
+        else:
+            # ok, no parent, but may be there is heading with summary?
+            heading = find_heading(view, region)
+            if heading and get_summary(view, heading):
+                update_line(view, edit, heading, parent_update=False)
     return True
 
 def update_summary(view, edit, region, checked_children, num_children):
@@ -258,11 +280,23 @@ def toggle_checkbox(view, edit, region, checked=None, recurse_up=False, recurse_
         children = find_children(view, region)
         for child in children:
             toggle_checkbox(view, edit, child, check_state, recurse_down=True)
+            if (get_summary(view, child)):
+                update_line(view, edit, child, parent_update=False)
+
+    if get_summary(view, region):
+        (num_children, checked_children) = recalc_summary(view, region)
+        update_summary(view, edit, region, checked_children, num_children)
+
     if recurse_up:
         # update parent
         parent = find_parent(view, region)
         if parent:
             update_line(view, edit, parent)
+        else:
+            # ok, no parent, but may be there is heading with summary?
+            heading = find_heading(view, region)
+            if heading and get_summary(view, heading):
+                update_line(view, edit, heading, parent_update=False)
 
 def is_checkbox(view, sel):
     names = view.scope_name(sel.end())
@@ -426,7 +460,6 @@ class OrgToggleCheckboxCommand(sublime_plugin.TextCommand):
                 continue
             line     = view.line(sel.end())
             toggle_checkbox(view, edit, line, recurse_up=True, recurse_down=True)
-        recalculate_all_checkbox_summaries(self.view, edit)
 
 
 class OrgRecalcCheckboxSummaryCommand(sublime_plugin.TextCommand):
