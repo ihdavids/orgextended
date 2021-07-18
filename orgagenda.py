@@ -1358,7 +1358,7 @@ class CompositeViewListener(sublime_plugin.ViewEventListener):
         self.clear_phantoms()
     
     def on_hover(self, point, hover_zone):
-        if(not hasattr(self,agenda) or self.agenda == None):
+        if(not hasattr(self,'agenda') or self.agenda == None):
             return
         if(hover_zone == sublime.HOVER_TEXT):
             row,col = self.view.rowcol(point)
