@@ -10,7 +10,7 @@ import OrgExtended.orgutil.template as temp
 log = logging.getLogger(__name__)
 
 defaultTodoStates = ["TODO", "NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"]
-daysOfWeek = ["sun","mon","tue","wed","th","fri","sat"]
+weekdayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
 class ASettings:
@@ -119,15 +119,9 @@ def GetInt(name, defaultValue):
 	except:
 		return defaultValue
 
-# Will return a date or an index as an integer where 0 means Sunday
-# and so on in the week.
-def GetDateAsIndex(name, defaultValue):
-	global daysOfWeek
-	val = Get(name, defaultValue)
-	if(RepresentsInt(val)):
-		return int(val) % 7
-	val = val.lower()
-	for i in range(0,len(daysOfWeek)):
-		if daysOfWeek[i] in val:
-			return i
-	return 0
+def GetWeekdayIndexByName(name):
+    try:
+        weekdayIndex = weekdayNames.index(name)
+    except:
+        weekdayIndex = 6
+    return weekdayIndex

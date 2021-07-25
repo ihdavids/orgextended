@@ -784,8 +784,8 @@ def IsAfterNow(ts, now):
 class CalendarView(AgendaBaseView):
     def __init__(self, name, setup=True,**kwargs):
         super(CalendarView, self).__init__(name, setup, **kwargs)
-        dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
-        self.dv = dpick.DateView("orgagenda.now",firstDayOffset = dayOffset)
+        firstDayIndex = sets.GetWeekdayIndexByName(sets.Get("firstDayOfWeek","Sunday"))
+        self.dv = dpick.DateView("orgagenda.now",firstDayIndex = firstDayIndex)
 
     def UpdateNow(self, now=None):
         if(now == None):
@@ -981,22 +981,15 @@ class WeekView(AgendaBaseView):
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
         self.InsertTimeHeading(edit,self.now.hour)
-        toHighlight = []
         #print(str(self.now))
         wday   = self.now.weekday()
-        # Adjust for Sunday being day 6 and we start with dunday
-        if(wday >= 6):
-            wday = -1
-        wstart = self.now + datetime.timedelta(days=-(wday+1))
-        dayNames  = ["Sun","Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
-        dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
+        firstDayIndex = sets.GetWeekdayIndexByName(sets.Get("firstDayOfWeek", "Sunday"))
+        wstart = self.now + datetime.timedelta(days=firstDayIndex-wday)
+        dayNames  = sets.Get("weekViewDayNames",["Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun"])
         numDays   = sets.Get("agendaWeekViewNumDays",7)
         for i in range(0,numDays):
-            index = dayOffset + i
-            if(index == 0):
-                self.InsertDay(dayNames[index % len(dayNames)], wstart, edit)
-            else:
-                self.InsertDay(dayNames[index % len(dayNames)], wstart + datetime.timedelta(days=index) , edit)
+            index = (firstDayIndex + i) % len(dayNames)
+            self.InsertDay(dayNames[index], wstart + datetime.timedelta(days=i), edit)
 
     def FilterEntry(self, n, filename):
         rc = (not self.onlyTasks or (IsTodo(node) or IsDone(n))) and not IsProject(n) and HasTimestamp(n)

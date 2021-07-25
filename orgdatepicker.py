@@ -22,7 +22,7 @@ def CreateUniqueViewNamed(name, mapped=None):
 	return view
 
 class DateView:
-	def __init__(self, dayhighlight=None,firstDayOffset=0):
+	def __init__(self, dayhighlight=None,firstDayIndex=0):
 		self.months = []
 		self.columnsPerMonth = 30                     # 7 * 3 = 21 + 9
 		self.columnsInDay    = 2  
@@ -35,7 +35,7 @@ class DateView:
 		self.startrow        = 0
 		self.endrow          = 7
 		self.dayhighlight    = dayhighlight
-		self.firstdayoffset  = firstDayOffset
+		self.firstdayindex   = firstDayIndex
 
 
 	def SetView(self, view):
@@ -166,9 +166,8 @@ class DateView:
 		return (month, year)
 
 	def Render(self,now):
-		days = [calendar.SUNDAY, calendar.MONDAY, calendar.TUESDAY, calendar.WEDNESDAY, calendar.THURSDAY, calendar.FRIDAY, calendar.SATURDAY]
-		offset = self.firstdayoffset % 7
-		firstDay = days[offset]
+		days = [calendar.MONDAY, calendar.TUESDAY, calendar.WEDNESDAY, calendar.THURSDAY, calendar.FRIDAY, calendar.SATURDAY, calendar.SUNDAY]
+		firstDay = days[self.firstdayindex]
 		c = calendar.TextCalendar(firstDay)
 		str = c.formatmonth(now.year, now.month)
 		calendar.setfirstweekday(firstDay)
@@ -217,8 +216,8 @@ class DateView:
 
 
 class DatePicker:
-	def __init__(self,firstDayOffset=0):
-		self.dateView = DateView(None, firstDayOffset)
+	def __init__(self,firstDayIndex=0):
+		self.dateView = DateView(None, firstDayIndex)
 		self.months = []
 
 	def on_done(self, text):
@@ -351,6 +350,6 @@ class OrgDatePickerNextMonthCommand(sublime_plugin.TextCommand):
 
 def Pick(onDone):
 	global datePicker
-	dayOffset = sets.GetDateAsIndex("firstDayOfWeek","Sunday")
-	datePicker = DatePicker(dayOffset)
+	firstDayIndex = sets.GetWeekdayIndexByName(sets.Get("firstDayOfWeek","Sunday"))
+	datePicker = DatePicker(firstDayIndex)
 	datePicker.Show(datetime.datetime.now(), onDone)
