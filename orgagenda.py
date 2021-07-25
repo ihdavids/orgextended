@@ -184,11 +184,20 @@ def IsTodaysDate(check, today):
 
 def IsInMonthCheck(t, now):
     if(IsRawDate(t)):
-        if (t.month >= (now.month-1) and t.month <= (now.month+1)):
-            return t
+        dateT = t
     else:
-        if (t.start.month >= (now.month-1) and t.start.month <= (now.month+1)):
-            return t.start
+        dateT = datetime.date(t.start.year, t.start.month, t.start.day)
+
+    if (dateT.year == now.year):
+        if (dateT.month >= (now.month-1) and dateT.month <= (now.month+1)):
+            return True
+        else:
+            return False
+    if (dateT.year == now.year + 1) and (dateT.month == 0 and now.month == 11):
+        return True
+    if (dateT.year == now.year - 1) and (dateT.month == 11 and now.month == 0):
+        return True
+    return False
 
 def IsInMonth(n, now):
     if(not n):
