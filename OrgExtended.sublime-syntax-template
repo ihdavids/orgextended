@@ -6,6 +6,7 @@ file_extensions:
   - org_archive
 # Generic parent scope of the file
 scope: text.orgmode
+version: 2
 
 variables:
   datetime: "<\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2}(-\\d{2}\\:\\d{2})?)?\\s*([+]*\\d[wdmy])?>"
