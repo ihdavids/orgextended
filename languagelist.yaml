@@ -34,6 +34,7 @@
 - language: rust
 - language: sql
 - language: r(\s|$)
+  source: r
 - language: html
   text: html.basic
 - language: go

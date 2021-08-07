@@ -789,7 +789,7 @@ contexts:
         2: orgmode.fence.sourceblock
         3: keyword orgmode.fence.language
         4: orgmode.fence.sourceblock
-      embed: scope:source.r(\s|$)
+      embed: scope:source.r
       escape: '{{endsrc}}'
       embed_scope: orgmode.sourceblock.content markup.raw.block orgmode.raw.block
       escape_captures:
@@ -799,7 +799,7 @@ contexts:
         1: keyword orgmode.fence.language
         3: markup.raw.block comment
         4: constant.other
-      embed: scope:source.r(\s|$)
+      embed: scope:source.r
       scope: orgmode.sourceblock.inline
       escape: '(\})'
       escape_captures:
