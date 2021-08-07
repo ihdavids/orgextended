@@ -45,4 +45,16 @@
   	#+RESULTS:
   	: Hello world
 
+*** R
+   The R language in source blocks was not marked up properly.
+
+** Agenda
+   Files outside of orgDir were being included in the agenda.
+   A request was made to fix this. The old behaviour can be toggled
+   using the following:
+
+   #+BEGIN_SRC js
+        "agendaIncludeFilesOutsideOrgDir": true     
+   #+END_SRC
+
 

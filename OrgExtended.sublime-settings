@@ -199,6 +199,10 @@
     // Configure the agenda header format
     //"agendaHeaderFormat": "%A \t%d %B %Y",
 
+    // Include files outside of orgDirs in the agenda
+    // (open files etc)
+    "agendaIncludeFilesOutsideOrgDir": false,
+
     // Day view starts at 6am and ends at 7pm
     "agendaDayStartTime": 6,
     "agendaDayEndTime": 19,  
