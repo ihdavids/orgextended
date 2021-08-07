@@ -1241,7 +1241,7 @@ class TodoView(AgendaBaseView):
         self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, n.todo, n.heading))
 
     def FilterEntry(self, n, filename):
-        return IsTodo(n) and not IsProject(n)
+        return IsTodo(n) and not IsProject(n) and not IsArchived(n)
 
 # ================================================================================
 class ProjectsView(TodoView):
@@ -1249,7 +1249,7 @@ class ProjectsView(TodoView):
         super(ProjectsView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsProject(n) and not IsBlockedProject(n)
+        return IsProject(n) and not IsBlockedProject(n) and not IsArchived(n)
 
 # ================================================================================
 class BlockedProjectsView(TodoView):
@@ -1257,7 +1257,7 @@ class BlockedProjectsView(TodoView):
         super(BlockedProjectsView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsBlockedProject(n)
+        return IsBlockedProject(n) and not IsArchived(n)
 
 # ================================================================================
 class LooseTasksView(TodoView):
@@ -1265,7 +1265,7 @@ class LooseTasksView(TodoView):
         super(LooseTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        rc = IsTodo(n) and not IsProject(n) and not IsProjectTask(n)
+        rc = IsTodo(n) and not IsProject(n) and not IsProjectTask(n) and not IsArchived(n)
         return rc
 
 
@@ -1275,7 +1275,7 @@ class DoneTasksView(TodoView):
         super(DoneTasksView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        rc = IsDone(n)
+        rc = IsDone(n) and not IsArchived(n)
         return rc
 
 # ================================================================================
@@ -1304,7 +1304,7 @@ class NextTasksProjectsView(TodoView):
             self.entries.append(e)
                     
     def FilterEntry(self, n, filename):
-        return IsProject(n) and not IsBlockedProject(n)
+        return IsProject(n) and not IsBlockedProject(n) and not IsArchived(n)
 
 
 # ================================================================================
@@ -1313,7 +1313,7 @@ class NoteView(TodoView):
         super(NoteView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsNote(n) and not IsProject(n) and not IsProjectTask(n)
+        return IsNote(n) and not IsProject(n) and not IsProjectTask(n) and not IsArchived(n)
 
 # ================================================================================
 class PhoneView(TodoView):
@@ -1321,7 +1321,7 @@ class PhoneView(TodoView):
         super(PhoneView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsPhone(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
+        return IsPhone(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n) and not IsArchived(n)
 
 # ================================================================================
 class MeetingView(TodoView):
@@ -1329,7 +1329,7 @@ class MeetingView(TodoView):
         super(MeetingView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
-        return IsMeeting(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n)
+        return IsMeeting(n) and not IsProject(n) and not IsProjectTask(n) and self.MatchTags(n) and not IsArchived(n)
 
 # ================================================================================
 class CompositeViewListener(sublime_plugin.ViewEventListener):
