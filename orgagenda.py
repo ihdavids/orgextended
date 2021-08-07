@@ -319,7 +319,10 @@ def IsInHour(n, hour, today):
     if(n.scheduled and n.scheduled.has_time()):
         if(n.scheduled.repeating):
             next = n.scheduled.next_repeat_from(today)
-            return next.hour == hour
+            if next.hour == hour:
+                return next
+            else:
+                return None
         s = EnsureDateTime(n.scheduled.start)
         e = EnsureDateTime(n.scheduled.end)
         if(IsInHourBracket(s,e,hour)):
@@ -740,7 +743,11 @@ class AgendaBaseView:
         pass
 
     def FilterEntries(self):
-        for file in db.Get().Files:
+        allowOutsideOrgDir = sets.Get("agendaIncludeFilesOutsideOrgDir", False)
+        for file in db.Get().Files: 
+            # Skip over files not in orgDir
+            if(not file.isOrgDir and not allowOutsideOrgDir):
+                continue
             #if(not "habits" in file.filename):
             #    continue
             #print("AGENDA: " + file.filename + " " + file.key)

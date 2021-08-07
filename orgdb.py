@@ -22,6 +22,7 @@ headingRe = re.compile("^([*]+) (.+)")
 
 class FileInfo:
     def __init__(self, file, parsed, orgPaths):
+        self.isOrgDir = False
         self.org      = parsed
         self.filename = file
         self.key      = file.lower() if file else None
@@ -355,6 +356,7 @@ class OrgDb:
                                 filename = str(path)
                                 log.debug("PARSING: " + filename)
                                 file = FileInfo(filename,loader.load(filename), self.orgPaths)
+                                file.isOrgDir = True
                                 self.AddFileInfo(file)
                             except Exception as e:
                                 #x = sys.exc_info()
@@ -372,6 +374,7 @@ class OrgDb:
                 try:
                     filename = str(path)
                     file = FileInfo(filename,loader.load(filename), self.orgPaths)
+                    file.isOrgDir = True
                     self.AddFileInfo(file)
                 except Exception as e:
                     #x = sys.exc_info()
