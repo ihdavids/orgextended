@@ -36,6 +36,7 @@ class FileInfo:
         for prefix in orgPaths:
             displayFn = displayFn.replace(prefix,"") 
             displayFn = displayFn.replace(prefix.lower(),"")
+        self.isOrgDir = displayFn != self.key
         # Max Slashes!
         # No prefixes. We should count the slashes and truncate
         # if there are to many.
