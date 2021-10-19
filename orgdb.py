@@ -67,6 +67,10 @@ class FileInfo:
 
     def Root(self):
         return self.org[0]
+
+    def RootInView(self, view, db):
+        self.ReloadIfChanged(view, db)
+        return self.Root()
         
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
@@ -425,6 +429,12 @@ class OrgDb:
     def AtPt(self, view, pt):
         file = self.FindInfo(view)
         return file.AtPt(view, pt, self)
+
+    def RootInView(self, view):
+        file = self.FindInfo(view)
+        if file:
+            return file.RootInView(view, self)
+        return None
 
     def AtRegion(self, view, reg):
         file = self.FindInfo(view)

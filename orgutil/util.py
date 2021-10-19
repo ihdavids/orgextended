@@ -234,6 +234,10 @@ def Erase(view, reg, onDone=None):
     view.run_command("org_internal_erase", {"start": reg.begin(),"end": reg.end(), "onDone": onDone})
 
 @add_method(sublime.View)
+def EraseAll(view, onDone=None): 
+    view.run_command("org_internal_erase", {"start": 0,"end": view.size(), "onDone": onDone})
+
+@add_method(sublime.View)
 def InsertEnd(view, text, onDone=None): 
     view.run_command("org_internal_insert", {"location": view.size(), "text": text, "onDone": onDone})
 

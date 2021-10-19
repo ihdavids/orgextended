@@ -175,4 +175,9 @@
     {"caption": "Org Beancount Create",         "command": "beancount_new_file"                  },
     {"caption": "Org Beancount Transaction",    "command": "beancount_new_transaction"           },
 
+    // Trello:
+    // Trello commands allow you to 2 way sync with a trello board. It does however require
+    // that you have the Trello package installed as I parasitically use that package.
+    {"caption": "Org Trello Sync Board",        "command": "org_trello_sync_board"            },
+
 ]
