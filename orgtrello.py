@@ -82,10 +82,25 @@ try:
             v.InsertEnd("\n")
             for l in board.lists:
                 v.InsertEnd("* {} {}\n".format("DONE" if l.closed else "TODO",l.name))
+                v.InsertEnd("  :PROPERTIES:\n")
+                v.InsertEnd("    :TRELLOID: {}\n".format(l._id))
+                v.InsertEnd("  :END:\n")
                 for c in l.cards:
-                    v.InsertEnd("** {} {}                       \n".format("DONE" if c.closed else "TODO", c.name, c.labels if c.labels else ""))
+                    v.InsertEnd("** {} {}{}\n".format("DONE" if c.closed else "TODO", c.name.ljust(70), (":" + ":".join([str(x['color']) for x in c.labels]) + ":") if c.labels else ""))
+                    v.InsertEnd("   :PROPERTIES:\n")
+                    v.InsertEnd("     :TRELLOID: {}\n".format(c._id))
+                    v.InsertEnd("     :URL: [[{}][Card]]\n".format(c.short_url))
+                    #print("LEN OF MEMBERS: " + str(len(c.members)))
+                    #if(len(c.members) > 0):
+                    #v.InsertEnd("     :MEMBERS: {}\n".format(",".join(c.members)))
+                    v.InsertEnd("     :MEMBERS: {}\n".format(",".join([x.username for x in c.members])))
+                    v.InsertEnd("   :END:\n")
                     if(c.desc):
-                        v.InsertEnd("   " + c.desc.replace("\n","\n   "))
+                        v.InsertEnd("   " + c.desc.replace("\n","\n   ") + "\n")
+                    comments = c.comments()
+                    for com in comments:
+                        v.InsertEnd("*** From {}\n".format(com["username"]))
+                        v.InsertEnd("    {}\n".format(com["text"]))
 
 
 
