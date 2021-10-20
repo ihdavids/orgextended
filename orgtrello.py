@@ -90,10 +90,9 @@ try:
                     v.InsertEnd("   :PROPERTIES:\n")
                     v.InsertEnd("     :TRELLOID: {}\n".format(c._id))
                     v.InsertEnd("     :URL: [[{}][Card]]\n".format(c.short_url))
-                    #print("LEN OF MEMBERS: " + str(len(c.members)))
-                    #if(len(c.members) > 0):
-                    #v.InsertEnd("     :MEMBERS: {}\n".format(",".join(c.members)))
-                    v.InsertEnd("     :MEMBERS: {}\n".format(",".join([x.username for x in c.members])))
+                    print("LEN OF MEMBERS: " + str(len(c.members)))
+                    if(len(c.members) > 0):
+                        v.InsertEnd("     :MEMBERS: {}\n".format(",".join([x.username for x in c.members])))
                     v.InsertEnd("   :END:\n")
                     if(c.desc):
                         v.InsertEnd("   " + c.desc.replace("\n","\n   ") + "\n")
