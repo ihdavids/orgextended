@@ -10,6 +10,9 @@ try:
     import OrgExtended.orgdb as db
     from OrgExtended.orgutil.addmethod import *
     import OrgExtended.orgparse.node as node
+    import OrgExtended.orgparse.date as odate
+    import datetime
+    import dateutil.parser as dp
 
     def CreateUniqueViewNamed(name):
         # Return the view if it exists
@@ -77,6 +80,7 @@ try:
                 self.CreateBoardInView(v, board)
 
         def CreateBoardInView(self, v, board):
+            print(board.goo())
             v.InsertEnd("#+TITLE: Trello - {}\n".format(board.name))
             v.InsertEnd("#+TRELLO: {}\n".format(board._id))
             v.InsertEnd("\n")
@@ -86,7 +90,10 @@ try:
                 v.InsertEnd("    :TRELLOID: {}\n".format(l._id))
                 v.InsertEnd("  :END:\n")
                 for c in l.cards:
+                    print(c.goo())
                     v.InsertEnd("** {} {}{}\n".format("DONE" if c.closed else "TODO", c.name.ljust(70), (":" + ":".join([str(x['color']) for x in c.labels]) + ":") if c.labels else ""))
+                    if(c.due != None):
+                        v.InsertEnd("   SCHEDULED: {}\n".format(odate.OrgDate.format_date(dp.parse(c.due),True)))
                     v.InsertEnd("   :PROPERTIES:\n")
                     v.InsertEnd("     :TRELLOID: {}\n".format(c._id))
                     v.InsertEnd("     :URL: [[{}][Card]]\n".format(c.short_url))
@@ -97,7 +104,6 @@ try:
                         v.InsertEnd("   " + c.desc.replace("\n","\n   ") + "\n")
                     clists = c.checklists
                     for clist in clists:
-                        print(clist.goo())
                         v.InsertEnd("*** {} [%]\n".format(clist.name))
                         for it in clist.checkItems:
                             v.InsertEnd("    - [{}] {}\n".format(' ' if it.state == 'incomplete' else 'x',it.name))
