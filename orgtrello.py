@@ -90,16 +90,23 @@ try:
                     v.InsertEnd("   :PROPERTIES:\n")
                     v.InsertEnd("     :TRELLOID: {}\n".format(c._id))
                     v.InsertEnd("     :URL: [[{}][Card]]\n".format(c.short_url))
-                    print("LEN OF MEMBERS: " + str(len(c.members)))
                     if(len(c.members) > 0):
                         v.InsertEnd("     :MEMBERS: {}\n".format(",".join([x.username for x in c.members])))
                     v.InsertEnd("   :END:\n")
                     if(c.desc):
                         v.InsertEnd("   " + c.desc.replace("\n","\n   ") + "\n")
+                    clists = c.checklists
+                    for clist in clists:
+                        print(clist.goo())
+                        v.InsertEnd("*** {} [%]\n".format(clist.name))
+                        for it in clist.checkItems:
+                            v.InsertEnd("    - [{}] {}\n".format(' ' if it.state == 'incomplete' else 'x',it.name))
                     comments = c.comments()
                     for com in comments:
                         v.InsertEnd("*** From {}\n".format(com["username"]))
                         v.InsertEnd("    {}\n".format(com["text"]))
+            v.run_command('org_recalc_all_checkbox_summaries')
+            v.run_command('org_fold_all')
 
 
 
