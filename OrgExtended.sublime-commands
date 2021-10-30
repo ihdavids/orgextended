@@ -177,7 +177,11 @@
 
     // Trello:
     // Trello commands allow you to 2 way sync with a trello board. It does however require
-    // that you have the Trello package installed as I parasitically use that package.
+    // that you have the Trello package installed as I parasitically uses that package.
     {"caption": "Org Trello Sync Board",        "command": "org_trello_sync_board"            },
+    
+    // Asana:
+    // Asana commands allow you to 2 way sync with an asana project.
+    {"caption": "Org Asana Sync Board",        "command": "org_asana_sync_board"            },
 
 ]
