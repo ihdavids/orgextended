@@ -35,35 +35,43 @@ try:
         globalStartup = sets.Get("trello",defaultVal)
         return self.list_comment("TRELLO", globalStartup)
 
-    class OrgTrelloSyncBoardCommand(TrelloCommand):
+    class OrgTrelloBaseCommand(TrelloCommand):
         def work(self, connection):
             try:
+                self.Member = connection.me
+                # Grab the boards list. We will use thit to try to match up
+                # with current document for a board update OR for authoring a new board
+                # page interactively.
+                self.Boards = self.Member.boards
+                self.Board = None
+                node = db.Get().RootInView(self.view)
+                if(node != None):
+                    trellotag = node.trellotag()
+                    if(len(trellotag != 0)):
+                        # TODO: Edit check?
+                        #       I shouldn't do this if you have edits to the
+                        #       current buffer
+                        self.BoardId = trellotag[0]
+                        self.Board   = self.Member.get_board(self.BoardId)
                 self.safe_work(connection)
             except requests.exceptions.HTTPError as e:
                 self.show_token_expired_help(e)
                 raise e
-
         def safe_work(self, connection):
-            self.Member = connection.me
-            # Grab the boards list. We will use thit to try to match up
-            # with current document for a board update OR for authoring a new board
-            # page interactively.
-            self.Boards = self.Member.boards
-            node = db.Get().RootInView(self.view)
+            # Override me
+            pass
+
+
+
+    class OrgTrelloSyncBoardCommand(OrgTrelloBaseCommand):
+        def safe_work(self, connection):
             update = False
-            if(node != None):
-                trellotag = node.trellotag()
-                if(len(trellotag != 0)):
-                    update = True
-                    # TODO: Edit check?
-                    #       I shouldn't do this if you have edits to the
-                    #       current buffer
-                    board_id = trellotag[0]
-                    board = self.Member.get_board(board_id)
-                    # Clear current view
-                    self.view.EraseAll()
-                    # Rebuild the board in this view.
-                    self.CreateBoardInView(self.view, board)
+            if(self.Board != None):
+                update = True
+                # Clear current view
+                self.view.EraseAll()
+                # Rebuild the board in this view.
+                self.CreateBoardInView(self.view, board)
             if(not update):
                 self.AuthorNewBoard()
 
@@ -115,6 +123,9 @@ try:
             v.run_command('org_fold_all')
 
 
+    class OrgTrelloAddCardCommand(OrgTrelloBaseCommand):
+        def safe_work(self, connection):
+            pass
 
 
 except ImportError as err:
