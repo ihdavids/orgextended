@@ -88,7 +88,7 @@ try:
                 self.CreateBoardInView(v, board)
 
         def CreateBoardInView(self, v, board):
-            print(board.goo())
+            #print(board.goo())
             v.InsertEnd("#+TITLE: Trello - {}\n".format(board.name))
             v.InsertEnd("#+TRELLO: {}\n".format(board._id))
             v.InsertEnd("\n")
@@ -98,7 +98,7 @@ try:
                 v.InsertEnd("    :TRELLOID: {}\n".format(l._id))
                 v.InsertEnd("  :END:\n")
                 for c in l.cards:
-                    print(c.goo())
+                    #print(c.goo())
                     v.InsertEnd("** {} {}{}\n".format("DONE" if c.closed else "TODO", c.name.ljust(70), (":" + ":".join([str(x['color']) for x in c.labels]) + ":") if c.labels else ""))
                     if(c.due != None):
                         v.InsertEnd("   SCHEDULED: {}\n".format(odate.OrgDate.format_date(dp.parse(c.due),True)))

@@ -9,6 +9,12 @@
 *** SubHeading
 
 ** Initial Trello Support
+   Org is an interchange format and can be used like markdown to export to other formats. It is also a great way to store notes and other todos.
+   that said, sometimes you have to work in other systems, like trello, but still want Org goodness. This is an experimental export feature from
+   Trello to a local org file. This is not only a handy backup but I am hoping I might evolve this into a 2 way sync.
+   This builds on and requires the existing Trello package, you will need it to be able to use the new Trello sync features herein.
+
    - Ability to author an org file from a trello board. This requires that you have installed the Trello package and set it up.
      Running "Org Trello Sync Board" Will let you select a board and generate an org file from it.
    - Eventually I would like this to be a 2 way sync but that is going to take a bit more work. 
+
