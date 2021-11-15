@@ -10,3 +10,8 @@ def add_method(cls):
     def decorator(func):
         setattr(cls, func.__name__, func)
     return decorator
+
+def add_property_getter(cls, pname):
+    def decorator(func):
+        setattr(cls, pname, property(func))
+    return decorator
