@@ -4,6 +4,7 @@ try:
     from Trello.trello import TrelloCommand
     import requests
     from Trello.trello import TrelloCommand
+    from Trello.lib.trollop.lib import *
     from Trello.trello_cache import TrelloCache
     from Trello.operations import BoardOperation, CardOperation
     import OrgExtended.orgutil.util as util
@@ -27,6 +28,23 @@ try:
         view.set_syntax_file("Packages/OrgExtended/OrgExtended.sublime-syntax")
         return view
 
+    # @add_property_getter(Card, "due")
+    # def cardDue(self):
+    #     if(not hasattr(self,"_due")):
+    #         self._due = DateField("due")
+    #     return self._due
+
+    # @add_property_getter(CheckItem, "due")
+    # def checkItemDue(self):
+    #     if(not hasattr(self,"_due")):
+    #         self._due = DateField("due")
+    #     return self._due
+    
+    # @add_property_getter(CheckItem, "state")
+    # def checkItemState(self):
+    #     if(not hasattr(self,"_state")):
+    #         self._state = Field("state")
+    #     return self._state
 
     @add_method(node.OrgBaseNode)
     def trellotag(self, defaultVal = None):
@@ -99,9 +117,12 @@ try:
                 v.InsertEnd("  :END:\n")
                 for c in l.cards:
                     #print(c.goo())
-                    v.InsertEnd("** {} {}{}\n".format("DONE" if c.closed else "TODO", c.name.ljust(70), (":" + ":".join([str(x['color']) for x in c.labels]) + ":") if c.labels else ""))
+                    if(not hasattr(c,"due")):
+                        c.due = c._data['due']
+                        #c.due = DateField('due')
+                    v.InsertEnd("** {} {}{}\n".format("DONE" if c.closed else "TODO", c.name.ljust(70), (":" + ":".join([str(x['color']) for x in c.labels]) + ":") if c.labels else ""))                    
                     if(c.due != None):
-                        v.InsertEnd("   SCHEDULED: {}\n".format(odate.OrgDate.format_date(dp.parse(c.due),True)))
+                        v.InsertEnd("   SCHEDULED: {}\n".format(odate.OrgDate.format_date(dp.parse(str(c.due)),True)))
                     v.InsertEnd("   :PROPERTIES:\n")
                     v.InsertEnd("     :TRELLOID: {}\n".format(c._id))
                     v.InsertEnd("     :URL: [[{}][Card]]\n".format(c.short_url))
@@ -112,9 +133,15 @@ try:
                         v.InsertEnd("   " + c.desc.replace("\n","\n   ") + "\n")
                     clists = c.checklists
                     for clist in clists:
-                        v.InsertEnd("*** {} [%]\n".format(clist.name))
+                        clist.rname = clist._data['name']
+                        v.InsertEnd("*** {} [%]\n".format(clist.rname))
                         for it in clist.checkItems:
-                            v.InsertEnd("    - [{}] {}\n".format(' ' if it.state == 'incomplete' else 'x',it.name))
+                            if not hasattr(it,'state'):
+                                it.state = it._data['state']
+                                #it.state = Field('state')
+                            if not hasattr(it,'rname'):
+                                it.rname = it._data['name']
+                            v.InsertEnd("    - [{}] {}\n".format(' ' if it.state == 'incomplete' else 'x',it.rname))
                     comments = c.comments()
                     for com in comments:
                         v.InsertEnd("*** From {}\n".format(com["username"]))
