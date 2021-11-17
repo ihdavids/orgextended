@@ -1,14 +1,16 @@
 * 1.2.35
 ** Bold Italic etc only on word boundaries
-   - Emacs only supports these types on word boundaries:
+   - Emacs org mode only supports formatting on propper word boundaries:
+
       _THIS_SHOULD_NOT_BE_HIGHLIGHTED_
       _THISSHOULDBE_
 
       /This/Is/Not/Italics/
       /This is italics/
-*** SubHeading
 
-** Initial Trello Support
+      I have adjusted the grammar to avoid formatting improperly.
+
+** Experimental Trello Export
    Org is an interchange format and can be used like markdown to export to other formats. It is also a great way to store notes and other todos.
    that said, sometimes you have to work in other systems, like trello, but still want Org goodness. This is an experimental export feature from
    Trello to a local org file. This is not only a handy backup but I am hoping I might evolve this into a 2 way sync.
@@ -16,5 +18,13 @@
 
    - Ability to author an org file from a trello board. This requires that you have installed the Trello package and set it up.
      Running "Org Trello Sync Board" Will let you select a board and generate an org file from it.
+   - The command will not be present if you have not setup the Trello package.
    - Eventually I would like this to be a 2 way sync but that is going to take a bit more work. 
 
+** Day Page Extension
+   - The day page system got a bit of a facelift.
+   - dayPageMode: "week" Will now flip the system to have one page per week rather than a page per day. NOTE: The page will always be the monday of
+     every week.
+   - dayPageCopyOpenTasks:true will now copy any unfinished todo's from the previous page to today when you create a new day page.
+   - dayPageArchiveOld:true will add an archive tag to the previous day when you start a new day page. 
+   

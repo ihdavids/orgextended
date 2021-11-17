@@ -266,11 +266,22 @@
     // DAY PAGE
     // Path where we would like day pages created
     //"dayPagePath": "PATH",
+    //
     // The name of your new day page snippet (without the file extention!)
     //"dayPageSnippet": "filename",
+    //
     // How should we name day pages? NOTE: This format is how we find old day pages
     // This means if you change this we may not be able to find old content.
     //"dayPageNameFormat": "%a_%Y_%m_%d",
+    //
+    // Do you want to use one page per day or one page per week?
+    // This only impacts the creation of a page not existing pages.
+    // set to "week" if you would like one page per week.
+    //"dayPageMode": "day",
+    //
+    // When in week mode what day should be the official day for your
+    // logs?
+    //"dayPageModeWeekDay": "Monday",
 
     // ============================================================
     // Source Block Handler Paths

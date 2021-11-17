@@ -9,6 +9,7 @@ import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 import OrgExtended.orgextension as ext
 import OrgExtended.orgparse.date as orgdate
+import OrgExtended.orgdb as db
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +43,8 @@ def dayPageGetName(dt):
 
 
 def OnLoaded(view,dt):
+    view.sel().clear()    
+    view.sel().add(0)
     snippet  = sets.Get("dayPageSnippet","dayPageSnippet")
     snipName = ext.find_extension_file('orgsnippets',snippet,'.sublime-snippet')
     if(snipName == None):
@@ -82,10 +85,56 @@ def LoadedCheck(view,dt):
     else:
         OnLoaded(view,dt)
 
+def LoadedCheck2(view,dt, onDone):
+    if(view.is_loading()):
+        sublime.set_timeout(lambda: onDone(view,dt),1)
+    else:
+        onDone(view,dt)
+
 def dayPageInsertSnippet(view,dt):
     window   = view.window()
     window.focus_view(view)
     LoadedCheck(view,dt)
+
+def dayPageFindOldPage(dt):
+    maxScan     = 90
+    for i in range(maxScan):
+        dt = dt - datetime.timedelta(days=1)
+        fn = dayPageGetName(dt)
+        if(os.path.exists(fn)):
+            return fn
+    return None
+
+def dayPageArchiveOld(dt):
+    fn = dayPageFindOldPage(dt)
+    if(fn == None):
+        return
+    f = db.Get().FindFileByFilename(os.path.basename(fn))
+    if(f == None):
+        return
+    if(f.org[0].set_comment("FILETAGS","ARCHIVE")):
+        f.Save()
+
+def IsTodo(n):
+    return n.todo and n.todo in n.env.todo_keys
+
+def dayPageCopyOpenTasks(tview, dt):
+    fn = dayPageFindOldPage(dt)
+    if(fn == None):
+        return
+    f = db.Get().FindFileByFilename(os.path.basename(fn))
+    if(f == None):
+        return
+    out = ""
+    for h in f.org[0].children:
+        if IsTodo(h):
+            for line in h._lines:
+                out += line + "\n"
+    if(out != ""):
+        LoadedCheck2(tview, dt, lambda a,b: tview.run_command("org_internal_insert", {"location": 0, "text": out, "onDone": evt.Make(lambda : dayPageInsertSnippet(tview, dt))}))
+    else:
+        dayPageInsertSnippet(tview,dt)
+    pass
 
 def dayPageCreateOrOpen(dt):
     dpPath      = dayPageGetName(dt)
@@ -97,7 +146,12 @@ def dayPageCreateOrOpen(dt):
             didCreate = True
     tview = sublime.active_window().open_file(dpPath, sublime.ENCODED_POSITION)
     if(didCreate):
-        dayPageInsertSnippet(tview,dt)
+        if(sets.Get("dayPageArchiveOld", True)):
+            dayPageArchiveOld(dt)
+        if(sets.Get("dayPageCopyOpenTasks", True)):
+            dayPageCopyOpenTasks(tview, dt)
+        else:
+            dayPageInsertSnippet(tview,dt)
 
 class OrgDayPagePreviousCommand(sublime_plugin.TextCommand):
     def OnDone(self):
@@ -162,6 +216,18 @@ class OrgDayPageCreateCommand(sublime_plugin.TextCommand):
         self.edit   = edit
         self.onDone = onDone
         self.dt     = datetime.datetime.now()
+
+        change = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+        if(sets.Get("dayPageMode","day") == "week"):
+            firstDay = sets.Get("dayPageModeWeekDay","Monday").lower()
+            startAt = [idx for idx, element in enumerate(change) if element.startswith(firstDay)]
+            if(len(startAt) > 0):
+                startAt = startAt[0]
+            else:
+                startAt = 0
+            offset = (self.dt.weekday() - startAt)
+            if(offset != 0):
+                self.dt = self.dt - datetime.timedelta(days=offset)
         dayPageCreateOrOpen(self.dt)
         self.OnDone()
 
