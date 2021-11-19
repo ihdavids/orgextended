@@ -138,6 +138,26 @@ class DateView:
 		self.ReShow()
 		self.HighlightDay(self.cdate.start)
 
+	def MoveCDateToNextHour(self):
+		self.cdate.add_hours(1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
+	def MoveCDateToPrevHour(self):
+		self.cdate.add_hours(-1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+	
+	def MoveCDateToNextMinute(self):
+		self.cdate.add_minutes(1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
+	def MoveCDateToPrevMinute(self):
+		self.cdate.add_minutes(-1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
 	def ReShow(self):
 		if(self.cdate == None):
 			return
@@ -200,7 +220,7 @@ class DateView:
 		row = self.startrow
 		clock = None
 		if(self.timeView):
-			clock = aclock.draw_clock(now,30,25)
+			clock = aclock.draw_clock(now,30,26)
 		for i in range(0,25):
 			line = "{0:90}".format(" ")
 			pt = self.output.text_point(row,0)
@@ -215,7 +235,7 @@ class DateView:
 			lreg = self.output.line(pt)
 			lreg = sublime.Region(lreg.begin(), lreg.end() + 1)
 			self.output.ReplaceRegion(lreg, line + "\n")
-			print(line)
+			#print(line)
 
 
 		self.HighlightDay(now)
@@ -285,6 +305,23 @@ class DatePicker:
 	def MovePrevMonth(self):
 		self.dateView.MoveCDateToPrevMonth()
 		self.RefreshInputPanelFromDateView()
+	
+	def MoveNextHour(self):
+		self.dateView.MoveCDateToNextHour()
+		self.RefreshInputPanelFromDateView()
+
+	def MovePrevHour(self):
+		self.dateView.MoveCDateToPrevHour()
+		self.RefreshInputPanelFromDateView()
+
+	def MoveNextMinute(self):
+		self.dateView.MoveCDateToNextMinute()
+		self.RefreshInputPanelFromDateView()
+
+	def MovePrevMinute(self):
+		self.dateView.MoveCDateToPrevMinute()
+		self.RefreshInputPanelFromDateView()
+
 
 	def Show(self,now, onDone):
 		self.onDone	= onDone
@@ -358,6 +395,26 @@ class OrgDatePickerNextMonthCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		global datePicker
 		datePicker.MoveNextMonth()
+
+class OrgDatePickerNextHourCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MoveNextHour()
+
+class OrgDatePickerPrevHourCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MovePrevHour()
+
+class OrgDatePickerNextMinuteCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MoveNextMinute()
+
+class OrgDatePickerPrevMinuteCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MovePrevMinute()
 
 def Pick(onDone):
 	global datePicker

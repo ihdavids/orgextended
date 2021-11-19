@@ -360,12 +360,16 @@
 
 
     // ORG DATE PICKER
-    { "keys": [">"],                 "command": "org_date_picker_next_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["<"],                 "command": "org_date_picker_prev_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["ctrl+,"],            "command": "org_date_picker_prev_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["ctrl+."],            "command": "org_date_picker_next_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["alt+,"],             "command": "org_date_picker_prev_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["alt+."],             "command": "org_date_picker_next_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": [">"],                 "command": "org_date_picker_next_day",         "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["<"],                 "command": "org_date_picker_prev_day",         "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+,"],            "command": "org_date_picker_prev_week",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+."],            "command": "org_date_picker_next_week",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+,"],             "command": "org_date_picker_prev_month",       "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+."],             "command": "org_date_picker_next_month",       "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+shift+,"],      "command": "org_date_picker_prev_hour",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+shift+."],      "command": "org_date_picker_next_hour",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+shift+,"],       "command": "org_date_picker_prev_minute",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+shift+."],       "command": "org_date_picker_next_minute",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
     // ORG INPUT SELECTOR
     { "keys": ["down"],             "command": "org_input_down",                "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
     { "keys": ["up"],               "command": "org_input_up",                  "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  }

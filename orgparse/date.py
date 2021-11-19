@@ -576,6 +576,16 @@ class OrgDate(object):
             self._end += datetime.timedelta(days=inc)
         # TODO: Handle recurrence rules
 
+    def add_hours(self, inc):
+        self._start += datetime.timedelta(hours=inc)
+        if(self._end):
+            self._end += datetime.timedelta(hours=inc)
+    
+    def add_minutes(self, inc):
+        self._start += datetime.timedelta(minutes=inc)
+        if(self._end):
+            self._end += datetime.timedelta(minutes=inc)
+
     @staticmethod
     def date_add_months(sourcedate,months):
         month = sourcedate.month - 1 + months
