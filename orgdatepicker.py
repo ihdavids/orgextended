@@ -5,6 +5,7 @@ import datetime
 from OrgExtended.orgparse.date import *
 import OrgExtended.pymitter as evt
 import OrgExtended.asettings as sets
+import OrgExtended.orgutil.asciiclock as aclock
 
 def CreateUniqueViewNamed(name, mapped=None):
 	# Close the view if it exists
@@ -22,7 +23,7 @@ def CreateUniqueViewNamed(name, mapped=None):
 	return view
 
 class DateView:
-	def __init__(self, dayhighlight=None,firstDayOffset=0):
+	def __init__(self, dayhighlight=None,firstDayOffset=0, timeView=False):
 		self.months = []
 		self.columnsPerMonth = 30                     # 7 * 3 = 21 + 9
 		self.columnsInDay    = 2  
@@ -36,6 +37,7 @@ class DateView:
 		self.endrow          = 7
 		self.dayhighlight    = dayhighlight
 		self.firstdayoffset  = firstDayOffset
+		self.timeView        = timeView
 
 
 	def SetView(self, view):
@@ -143,7 +145,7 @@ class DateView:
 		if(now == None):
 			return
 		mid = (now.month - self.midmonth + 1)
-		if(mid < 0 or mid > 2):
+		if(mid < 0 or mid > 2 or self.timeView):
 			self.Render(now)
 			self.ResetRenderState()
 
@@ -196,16 +198,25 @@ class DateView:
 		l = max(len(m1),len(m2),len(m3))
 		self.endrow = self.startrow + l
 		row = self.startrow
-		for i in range(0,l):
+		clock = None
+		if(self.timeView):
+			clock = aclock.draw_clock(now,30,25)
+		for i in range(0,25):
+			line = "{0:90}".format(" ")
 			pt = self.output.text_point(row,0)
 			row += 1
-			ml1 = m1[i] if i < len(m1) else ""
-			ml2 = m2[i] if i < len(m2) else ""
-			ml3 = m3[i] if i < len(m3) else ""
-			line = "{0:30}{1:30}{2:30}".format(ml1,ml2,ml3)
+			if(i < l):
+				ml1 = m1[i] if i < len(m1) else ""
+				ml2 = m2[i] if i < len(m2) else ""
+				ml3 = m3[i] if i < len(m3) else ""
+				line = "{0:30}{1:30}{2:30}".format(ml1,ml2,ml3)
+			if(self.timeView):
+				line += clock.get_row(i+2)	
 			lreg = self.output.line(pt)
 			lreg = sublime.Region(lreg.begin(), lreg.end() + 1)
 			self.output.ReplaceRegion(lreg, line + "\n")
+			print(line)
+
 
 		self.HighlightDay(now)
 
@@ -217,7 +228,7 @@ class DateView:
 
 class DatePicker:
 	def __init__(self,firstDayOffset=0):
-		self.dateView = DateView(None, firstDayOffset)
+		self.dateView = DateView(None, firstDayOffset, True)
 		self.months = []
 
 	def on_done(self, text):
