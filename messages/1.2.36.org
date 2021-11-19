@@ -6,5 +6,13 @@
 	- Added Ctrl+Shift+. and Ctrl+Shift+, to change the active hour
 	- Added Alt+Shift+. and Alt+Shift+, to change the active minute
 	- Clock disappears if we failed to parse a time out of your date string.
-	
-	
+	- I have added REALLY basic duration capabilities to the date picker.
+
+		#+BEGIN_SRC org
+			1d    -- Will select a date tomorrow at the current time.
+			3h    -- Will select a time 3h from now. 	  
+		#+END_SRC	
+
+	This is still nowhere NEAR: https://orgmode.org/manual/The-date_002ftime-prompt.html
+	But I am slowly working in that direction. Hopefully one day we will have a date picker that
+	that is as powerful and flexible as the full orgmode version.	
