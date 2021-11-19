@@ -235,6 +235,10 @@ def draw_clock(now, cols, lines):
     if cols < 25 or lines < 25:
         print('Too little columns/lines for print out the clock!')
         return None
+    # Yes we want just plain date not
+    # datetime here to match.
+    if type(now) == datetime.date:
+        return None
     # prepare chars
     single_line_border_chars = ('.', '-', '.', '|', ' ', '|', '`', '-', "'")
     second_hand_char = '.'

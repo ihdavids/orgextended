@@ -230,7 +230,7 @@ class DateView:
 				ml2 = m2[i] if i < len(m2) else ""
 				ml3 = m3[i] if i < len(m3) else ""
 				line = "{0:30}{1:30}{2:30}".format(ml1,ml2,ml3)
-			if(self.timeView):
+			if(clock and self.timeView):
 				line += clock.get_row(i+2)	
 			lreg = self.output.line(pt)
 			lreg = sublime.Region(lreg.begin(), lreg.end() + 1)

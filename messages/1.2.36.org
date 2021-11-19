@@ -1,3 +1,10 @@
 * 1.2.36
 ** Improved DatePicker
-	- Working to improve the datepicker to support times
+	- Working to improve the datepicker a bit, there is sooo much functionality that org offers here
+	  and I only support a tiny fraction of the abilities.
+	- Added clock to demonstrate current time to the datepicker.
+	- Added Ctrl+Shift+. and Ctrl+Shift+, to change the active hour
+	- Added Alt+Shift+. and Alt+Shift+, to change the active minute
+	- Clock disappears if we failed to parse a time out of your date string.
+	
+	
