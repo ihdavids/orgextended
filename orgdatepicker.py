@@ -6,6 +6,7 @@ from OrgExtended.orgparse.date import *
 import OrgExtended.pymitter as evt
 import OrgExtended.asettings as sets
 import OrgExtended.orgutil.asciiclock as aclock
+import OrgExtended.orgduration as orgduration
 
 def CreateUniqueViewNamed(name, mapped=None):
 	# Close the view if it exists
@@ -263,7 +264,13 @@ class DatePicker:
 
 	def on_changed(self, text):
 		#print("CHANGED: " + text)
-		self.dateView.cdate = OrgDateFreeFloating.from_str(text)
+		duration = orgduration.OrgDuration.Parse(text)
+		# We allow duration syntax 3h
+		if(duration):
+			now = OrgDateFreeFloating(datetime.datetime.now())
+			self.dateView.cdate = now + duration
+		else:	
+			self.dateView.cdate = OrgDateFreeFloating.from_str(text)
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)
 		self.dateView.ReShow()
