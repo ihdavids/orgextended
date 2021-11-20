@@ -90,6 +90,8 @@ class DateView:
 		regs.append(reg)
 		self.output.add_regions(key,regs,highlight,"",drawtype)	
 
+	def ClearDayHighlights(self,key):
+		self.output.erase_regions(key)
 
 	def MapRowColToDate(self,row,col):
 		weekid   = int(row - self.headingLines)
@@ -160,7 +162,6 @@ class DateView:
 		self.cdate.add_minutes(-1)
 		self.ReShow()
 		self.HighlightDay(self.cdate.start)
-		self.AddToDayHighlights(datetime.datetime.now(), "today","orgagenda.block.1", sublime.DRAW_NO_FILL)
 
 	def ReShow(self):
 		if(self.cdate == None):
@@ -172,6 +173,7 @@ class DateView:
 		if(mid < 0 or mid > 2 or self.timeView):
 			self.Render(now)
 			self.ResetRenderState()
+			self.ClearDayHighlights("today")
 			self.AddToDayHighlights(datetime.datetime.now(), "today",todayHighlight, sublime.DRAW_NO_FILL)
 
 	@staticmethod
@@ -271,8 +273,13 @@ class DatePicker:
 		duration = orgduration.OrgDuration.Parse(text,True)
 		if(not duration):
 			duration = orgduration.OrgDuration.ParseWeekDayOffset(text)
+		if(not duration):
+			duration = orgduration.OrgDuration.ParseMonthOffset(text)
 		# We allow duration syntax 3h
-		if(text.isnumeric()):
+		if(text == "." or text == "+0"):
+			now = datetime.datetime.now()
+			self.dateView.cdate = OrgDateFreeFloating(now)
+		elif(text.isnumeric()):
 			# We assume this is a day of the month (this month or next)
 			now = datetime.datetime.now()
 			cday = int(text)
@@ -286,9 +293,9 @@ class DatePicker:
 			self.dateView.cdate = now + duration
 		else:
 			self.dateView.cdate = OrgDateFreeFloating.from_str(text)
+		self.dateView.ReShow()
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)
-		self.dateView.ReShow()
 
 	def MapRowColToNewDate(self,row,col):
 		time     = self.dateView.cdate.start.time()

@@ -161,6 +161,36 @@ class OrgDuration:
             mtot += float(offset)*1440
             return OrgDuration(mtot)
         return None
+    
+    @staticmethod
+    def ParseMonthOffset(txt: str):
+        if(len(txt) < 3):
+            return None
+        change = ["january","febuary","march","april","may","june","july","august","september","october","november","december"]
+        tokens = txt.split(' ')
+        monthOffset = 0
+        dayOffset   = 0
+
+        month = datetime.datetime.now().month
+        day   = datetime.datetime.now().day
+        for token in tokens:
+            tk = token.lower()
+            monthCheck = [idx for idx, element in enumerate(change) if element.startswith(tk)]
+            if(len(monthCheck) > 0):
+               monthOffset = (monthCheck[0] + 1) 
+            if tk.isnumeric():
+                dayOffset = int(tk)
+        if(monthOffset == 0 and dayOffset == 0):
+            return None
+        if(dayOffset == 0):
+            dayOffset = day
+        dt = datetime.datetime.now().replace(month=monthOffset,day=dayOffset)
+        offset = dt - datetime.datetime.now()
+        mtot = 0.0
+        if((offset.total_seconds() / 60.0) != 0):
+            mtot += offset.total_seconds() / 60.0
+            return OrgDuration(mtot)
+        return None
 
     @staticmethod
     def ParseInt(d: int):
