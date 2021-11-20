@@ -264,12 +264,23 @@ class DatePicker:
 
 	def on_changed(self, text):
 		#print("CHANGED: " + text)
-		duration = orgduration.OrgDuration.Parse(text)
+		duration = orgduration.OrgDuration.Parse(text,True)
+		if(not duration):
+			duration = orgduration.OrgDuration.ParseWeekDayOffset(text)
 		# We allow duration syntax 3h
-		if(duration):
+		if(text.isnumeric()):
+			# We assume this is a day of the month (this month or next)
+			now = datetime.datetime.now()
+			cday = int(text)
+			if(cday > now.day):
+				now = now.replace(day=cday)
+			else:
+				now = now.replace(month=now.month+1,day=cday)
+			self.dateView.cdate = OrgDateFreeFloating(now)
+		elif(duration):
 			now = OrgDateFreeFloating(datetime.datetime.now())
 			self.dateView.cdate = now + duration
-		else:	
+		else:
 			self.dateView.cdate = OrgDateFreeFloating.from_str(text)
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)

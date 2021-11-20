@@ -103,34 +103,64 @@ class OrgDuration:
         return OrgDuration(td.days*1440 + (td.seconds/60.0))
 
     @staticmethod
-    def Parse(txt: str):
+    def Parse(txt: str, need: bool = False):
         m = RE_DURATION_PARSER.search(txt)
         if(m):
             mtot = 0.0
+            got = False
             y = m.group('years')
             if(y):
                 mtot += float(y)*525600.0
+                got = True
             d = m.group('days')
             if(d):
                 mtot += float(d)*1440
+                got = True
             h = m.group('hours')
             if(h):
                 mtot += float(h)*60
+                got = True
             mins = m.group('mins')
             if(mins):
                 mtot += float(mins)
+                got = True
             h = m.group('thours')
             if(h):
                 mtot += float(h)*60
+                got = True
             mins = m.group('tmins')
             if(mins):
                 mtot += float(mins)
+                got = True
             secs = m.group('tsecs')
             if(secs):
                 mtot += float(secs)*0.01666667
-            return OrgDuration(mtot)
+                got = True
+            if(got or not need):
+                return OrgDuration(mtot)
         return None
 
+    @staticmethod
+    def ParseWeekDayOffset(txt: str):
+        if(len(txt) < 3):
+            return None
+        change = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+        nextDay = txt.lower()
+        nextOf = [idx for idx, element in enumerate(change) if element.startswith(nextDay)]
+        if(len(nextOf) > 0):
+            nextOf = nextOf[0]
+        else:
+            return None
+        wd = datetime.datetime.now().weekday()
+        if(wd >= nextOf):
+            offset = 7-wd + nextOf
+        else:
+            offset = nextOf - wd
+        mtot = 0.0
+        if(offset != 0):
+            mtot += float(offset)*1440
+            return OrgDuration(mtot)
+        return None
 
     @staticmethod
     def ParseInt(d: int):

@@ -11,6 +11,8 @@
 		#+BEGIN_SRC org
 			1d    -- Will select a date tomorrow at the current time.
 			3h    -- Will select a time 3h from now. 	  
+			4     -- Will select the next day 4 of the month in the future.
+			Fri   -- Jump to the next friday from curren day
 		#+END_SRC	
 
 	This is still nowhere NEAR: https://orgmode.org/manual/The-date_002ftime-prompt.html
