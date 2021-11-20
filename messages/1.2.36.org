@@ -1,5 +1,5 @@
 * 1.2.36
-** Improved DatePicker
+** Slightly Improved DatePicker
 	- Working to improve the datepicker a bit, there is sooo much functionality that org offers here
 	  and I only support a tiny fraction of the abilities.
 	- Added clock to demonstrate current time to the datepicker.
