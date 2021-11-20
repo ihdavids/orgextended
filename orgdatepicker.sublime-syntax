@@ -23,6 +23,6 @@ contexts:
       scope: comment orgdatepicker.timetick
 
     - match: 'O'
-      scope: region.redish orgdatepicker.hourhand
+      scope: orgagenda.block.1 orgdatepicker.hourhand
     - match: 'o'
-      scope: region.greenish orgdatepicker.minutehand
+      scope: orgagenda.block.2 orgdatepicker.minutehand
