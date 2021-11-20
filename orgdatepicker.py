@@ -8,6 +8,8 @@ import OrgExtended.asettings as sets
 import OrgExtended.orgutil.asciiclock as aclock
 import OrgExtended.orgduration as orgduration
 
+todayHighlight="orgagenda.block.1"
+
 def CreateUniqueViewNamed(name, mapped=None):
 	# Close the view if it exists
 	win = sublime.active_window()
@@ -158,6 +160,7 @@ class DateView:
 		self.cdate.add_minutes(-1)
 		self.ReShow()
 		self.HighlightDay(self.cdate.start)
+		self.AddToDayHighlights(datetime.datetime.now(), "today","orgagenda.block.1", sublime.DRAW_NO_FILL)
 
 	def ReShow(self):
 		if(self.cdate == None):
@@ -169,6 +172,7 @@ class DateView:
 		if(mid < 0 or mid > 2 or self.timeView):
 			self.Render(now)
 			self.ResetRenderState()
+			self.AddToDayHighlights(datetime.datetime.now(), "today",todayHighlight, sublime.DRAW_NO_FILL)
 
 	@staticmethod
 	def NextMonth(now):

@@ -271,7 +271,7 @@ def draw_clock(now, cols, lines):
         ascii_canvas.add_nine_patch_rect(int(center_x + left_pos + 5), int(center_y - 1), 4, 3, single_line_border_chars)
         ascii_canvas.add_text(int(center_x + left_pos + 1 + 5), int(center_y), now.strftime('%d'))
     # add clock hands
-    draw_second_hand(ascii_canvas, now.second, second_hand_length, fill_char=second_hand_char)
+    #draw_second_hand(ascii_canvas, now.second, second_hand_length, fill_char=second_hand_char)
     draw_minute_hand(ascii_canvas, now.minute, minute_hand_length, fill_char=minute_hand_char)
     draw_hour_hand(ascii_canvas, now.hour, now.minute, hour_hand_length, fill_char=hour_hand_char)
     # print out canvas
