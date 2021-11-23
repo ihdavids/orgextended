@@ -97,10 +97,10 @@ def Get(name, defaultValue, formatDictionary = None):
 		formatDict.update(formatDictionary)
 
 	if(str == type(rv)):
-		formatter = temp.TemplateFormatter()
+		formatter = temp.TemplateFormatter(Get)
 		rv  = formatter.format(rv, **formatDict)
 	if(list == type(rv)):
-		formatter = temp.TemplateFormatter()
+		formatter = temp.TemplateFormatter(Get)
 		rv = [ (formatter.format(r, **formatDict) if str == type(r) else r) for r in rv ]
 	return rv
 
@@ -131,3 +131,13 @@ def GetDateAsIndex(name, defaultValue):
 		if daysOfWeek[i] in val:
 			return i
 	return 0
+
+# ================================================================================
+class OrgTestTemplateCommand(sublime_plugin.TextCommand):
+	def run(self, edit, onDone=None):
+		v = temp.ExpandTemplate(self.view, "DATE: {date} TIME: {time} DT: {datetime} FILE: {file.lower:call}")
+		print(str(v))
+		formatDict = { "aaa":     str(datetime.date.today()),}
+		formatter = temp.TemplateFormatter(Get)
+		rv  = formatter.format("{aaa} {archive}", **formatDict)
+		print(str(rv))

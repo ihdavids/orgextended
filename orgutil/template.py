@@ -5,19 +5,29 @@ import datetime
 import re
 
 
-
 cur1 = re.compile('\\$0')
 
 # A really quick and dirty template mechanism.
 # Stolen from: https://makina-corpus.com/blog/metier/2016/the-worlds-simplest-python-template-engine
 class TemplateFormatter(string.Formatter):
+    def __init__(self, resolver=None):
+        super(TemplateFormatter, self).__init__()
+        self.resolver = resolver
     # {stringVal.upper:call} - make a function call to upper method 
     def format_field(self, value, spec):
         if spec == 'call':
             return value()
         else:
             return super(TemplateFormatter, self).format_field(value, spec)
-
+    def get_value(self, key, args, kwargs):
+        if(str(key)):
+            if(key in kwargs):
+                return kwargs[key]
+            if(self.resolver):
+                return str(self.resolver(key,None))
+            return None
+        else:
+            return args[key]
 
 
 def ExpandTemplate(view, template, format={}):

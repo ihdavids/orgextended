@@ -21,6 +21,7 @@ import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props
 import OrgExtended.pymitter as evt
+import OrgExtended.orgdaypage as daypage
 import time
 
 log = logging.getLogger(__name__)
@@ -42,9 +43,10 @@ def GetCapturePath(view, template):
     file = None
     at = None
     if('file' in target[0]):
-        temp = templateEngine.TemplateFormatter()
+        temp = templateEngine.TemplateFormatter(sets.Get)
         tempDict = {
-            'refile' : sets.Get('refile','')
+            'refile' : sets.Get('refile',''),
+            'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
         } 
         filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
     if('id' == target[0]):

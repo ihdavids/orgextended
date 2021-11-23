@@ -17,6 +17,21 @@ log = logging.getLogger(__name__)
 # olBc has not really gotten back to me on the subject and I think
 # dailies makes a lot of sense.
 
+def dayPageGetToday():
+    dt     = datetime.datetime.now()
+    change = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+    if(sets.Get("dayPageMode","day") == "week"):
+        firstDay = sets.Get("dayPageModeWeekDay","Monday").lower()
+        startAt = [idx for idx, element in enumerate(change) if element.startswith(firstDay)]
+        if(len(startAt) > 0):
+            startAt = startAt[0]
+        else:
+            startAt = 0
+        offset = (dt.weekday() - startAt)
+        if(offset != 0):
+            dt = dt - datetime.timedelta(days=offset)
+    return dt
+
 def dayPageGetPath():
     dpPath = sets.Get("dayPagePath",None)
     if(dpPath == None):
@@ -208,6 +223,7 @@ class OrgDayPageNextCommand(sublime_plugin.TextCommand):
                 break
 
 
+
 class OrgDayPageCreateCommand(sublime_plugin.TextCommand):
     def OnDone(self):
         evt.EmitIf(self.onDone)
@@ -215,19 +231,7 @@ class OrgDayPageCreateCommand(sublime_plugin.TextCommand):
     def run(self, edit, onDone=None):
         self.edit   = edit
         self.onDone = onDone
-        self.dt     = datetime.datetime.now()
-
-        change = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
-        if(sets.Get("dayPageMode","day") == "week"):
-            firstDay = sets.Get("dayPageModeWeekDay","Monday").lower()
-            startAt = [idx for idx, element in enumerate(change) if element.startswith(firstDay)]
-            if(len(startAt) > 0):
-                startAt = startAt[0]
-            else:
-                startAt = 0
-            offset = (self.dt.weekday() - startAt)
-            if(offset != 0):
-                self.dt = self.dt - datetime.timedelta(days=offset)
+        self.dt = dayPageGetToday()
         dayPageCreateOrOpen(self.dt)
         self.OnDone()
 
