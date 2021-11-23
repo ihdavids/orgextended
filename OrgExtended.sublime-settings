@@ -149,6 +149,11 @@
             // file+datetree  - This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
             // clock          - insert under current item being clocked.
             // function <name>- generic function to find location for you
+            // BUILD IN SYMBOLS:
+            // {date}         - current date
+            // {time}         - current time
+            // {file}         - current filename
+            // {daypage}.     - todays daypage (if setup)
             "target": ["file","{refile}"],
             "snippet": "meeting_heading",
 
