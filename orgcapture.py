@@ -49,6 +49,21 @@ def GetCapturePath(view, template):
             'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
         } 
         filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
+    if('file+headline' in target[0]):
+        temp = templateEngine.TemplateFormatter(sets.Get)
+        tempDict = {
+            'refile' : sets.Get('refile',''),
+            'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
+        } 
+        filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
+        headline = None
+        if(len(target) > 2):
+            headline = templateEngine.ExpandTemplate(view, target[2], tempDict)[0]
+        file = db.Get().LoadNew(filename)
+        if(file and headline):
+            at = file.FindOrCreateNode(headline)
+            if(at):
+                at = at.end_row
     if('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
         if(file == None):
@@ -391,8 +406,8 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             prefix = ""
             if(self.openas):
                 insertAt = captureFile.At(at)
-                self.pt = panel.text_point(insertAt.end_row+1,0)
-                self.insertRow = insertAt.end_row+1
+                self.pt = panel.text_point(insertAt.end_row,0)
+                self.insertRow = insertAt.end_row
                 linev = panel.line(self.pt)
                 linetxt = panel.substr(linev)
                 if(linetxt and not linetxt.strip() == ""):

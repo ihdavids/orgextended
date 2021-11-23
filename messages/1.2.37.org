@@ -12,3 +12,9 @@
         ...
         "target": ["file","{mysym}"],
     #+END_SRC
+
+** Capture
+   Added file+headline to capture templates.
+   #+BEGIN_SRC js
+   "target": ["file+headline","{myfile}","MyHeadline"]
+   #+END_SRC

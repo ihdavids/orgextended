@@ -136,6 +136,10 @@ class FileInfo:
             if(heading == n.full_heading):
                 return n
 
+        for n in self.org[1:]:
+            if(heading == n.heading):
+                return n
+
         # Okay got here and didn't find the node, have to make it.
         m = headingRe.search(heading)
         if(m == None):

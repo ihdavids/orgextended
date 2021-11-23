@@ -143,7 +143,7 @@
             // targets: 
             // file           - text appened at end of file.
             // id             - text appened to existing org id in db
-            // file+headline  - unique headline in file
+            // file+headline  - unique headline in file ["file+headline","filename","headline"]
             // file+olp       - full path to headline
             // file+regexp    - heading is a match to the regexp
             // file+datetree  - This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
