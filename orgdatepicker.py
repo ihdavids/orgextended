@@ -226,9 +226,11 @@ class DateView:
 		self.endrow = self.startrow + l
 		row = self.startrow
 		clock = None
+		endrange = l
 		if(self.timeView):
 			clock = aclock.draw_clock(now,30,26)
-		for i in range(0,25):
+			endrange = 25
+		for i in range(0,endrange):
 			line = "{0:90}".format(" ")
 			pt = self.output.text_point(row,0)
 			row += 1
