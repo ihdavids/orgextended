@@ -287,7 +287,13 @@
     // When in week mode what day should be the official day for your
     // logs?
     //"dayPageModeWeekDay": "Monday",
-
+    //
+    // Close out the previous day with a #+FILETAGS: ARCHIVE tag when
+    // a new day page is created 
+    //"dayPageArchiveOld": true,
+    //
+    // Copy tasks in a TODO state from the previous day to a new day page.
+    //"dayPageCopyOpenTasks": true,
     // ============================================================
     // Source Block Handler Paths
     // We do not automatically locate these at the moment.

@@ -102,7 +102,7 @@ def LoadedCheck(view,dt):
 
 def LoadedCheck2(view,dt, onDone):
     if(view.is_loading()):
-        sublime.set_timeout(lambda: onDone(view,dt),1)
+        sublime.set_timeout(lambda: LoadedCheck2(view,dt),1)
     else:
         onDone(view,dt)
 
@@ -136,9 +136,11 @@ def IsTodo(n):
 def dayPageCopyOpenTasks(tview, dt):
     fn = dayPageFindOldPage(dt)
     if(fn == None):
+        dayPageInsertSnippet(tview,dt)
         return
     f = db.Get().FindFileByFilename(os.path.basename(fn))
     if(f == None):
+        dayPageInsertSnippet(tview,dt)
         return
     out = ""
     for h in f.org[0].children:
