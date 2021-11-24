@@ -48,14 +48,15 @@ def GetCapturePath(view, template):
             'refile' : sets.Get('refile',''),
             'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
         } 
-        filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
+        filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
     if('file+headline' in target[0]):
         temp = templateEngine.TemplateFormatter(sets.Get)
         tempDict = {
             'refile' : sets.Get('refile',''),
             'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
         } 
-        filename = templateEngine.ExpandTemplate(view, target[1], tempDict)[0]
+        filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
+        print(filename)
         headline = None
         if(len(target) > 2):
             headline = templateEngine.ExpandTemplate(view, target[2], tempDict)[0]

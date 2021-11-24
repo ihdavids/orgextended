@@ -30,7 +30,7 @@ class TemplateFormatter(string.Formatter):
             return args[key]
 
 
-def ExpandTemplate(view, template, format={}):
+def ExpandTemplate(view, template, format={},resolver=None):
     # Supported expansions
     formatDict = {
     "date": str(datetime.date.today()),
@@ -44,7 +44,7 @@ def ExpandTemplate(view, template, format={}):
     if(format != None):
         formatDict.update(format) 
 
-    formatter = TemplateFormatter()
+    formatter = TemplateFormatter(resolver)
     template  = formatter.format(template, **formatDict)
 
     global cur1
