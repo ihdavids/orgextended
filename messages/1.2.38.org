@@ -4,3 +4,4 @@
 ** Capture
    - Fixed symbol expansion of filenames
    - Indent fix when inserting at the end of the buffer
+   - file+headline improved insertion
