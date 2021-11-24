@@ -56,15 +56,14 @@ def GetCapturePath(view, template):
             'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
         } 
         filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
-        print(filename)
         headline = None
         if(len(target) > 2):
-            headline = templateEngine.ExpandTemplate(view, target[2], tempDict)[0]
+            headline = templateEngine.ExpandTemplate(view, target[2], tempDict, sets.Get)[0]
         file = db.Get().LoadNew(filename)
         if(file and headline):
             at = file.FindOrCreateNode(headline)
             if(at):
-                at = at.end_row
+                at = at.local_end_row
     if('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
         if(file == None):
@@ -411,7 +410,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 self.insertRow = insertAt.end_row
                 linev = panel.line(self.pt)
                 linetxt = panel.substr(linev)
-                if(linetxt and not linetxt.strip() == ""):
+                if((linetxt and not linetxt.strip() == "") or at == 0 or (insertAt and panel.lastRow() == insertAt.end_row)):
                     prefix = "\n"
                     self.pt = linev.end()
                     self.insertRow += 1
@@ -427,7 +426,12 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 self.panel = panel
                 self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:
-                self.insert_snippet(index)
+                if(prefix != ""):
+                    self.index = index
+                    self.panel = panel
+                    self.panel.Insert(self.pt, prefix, evt.Make(self.on_added_stars))
+                else:
+                    self.insert_snippet(index)
 
     def insert_snippet(self, index):
         window = self.view.window()
