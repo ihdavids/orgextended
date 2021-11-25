@@ -56,6 +56,14 @@ def GetCaptureFileAndParam(view, template, target):
         headline = templateEngine.ExpandTemplate(view, target[2], tempDict, sets.Get)[0]
     return (filename, headline)
 
+def FindNodeByPath(n, target, idx):
+    if(idx >= len(target)):
+        return n
+    for c in n.children:
+        if(c.heading == target[idx]):
+            return FindNodeByPath(c, target, idx+1)
+    return None
+
 def GetCapturePath(view, template):
     target    = ['file', '{refile}']
     if 'target' in template:
@@ -85,6 +93,12 @@ def GetCapturePath(view, template):
                         at = row
                         break
                     row += 1
+    if('file+olp' in target[0]):
+        filename, reg = GetCaptureFileAndParam(view, template, target)
+        file = db.Get().LoadNew(filename)
+        n = FindNodeByPath(file.org,target,2)
+        if(n):
+            at = n.local_end_row
     if('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
         if(file == None):
