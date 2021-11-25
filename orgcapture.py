@@ -35,6 +35,27 @@ def GetViewById(id):
             return v
     return None
 
+def GetDict():
+    tempDict = {
+        'refile' : sets.Get('refile',''),
+        'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
+    } 
+    return tempDict
+
+def GetCaptureFile(view, template, target):
+    temp = templateEngine.TemplateFormatter(sets.Get)
+    filename = templateEngine.ExpandTemplate(view, target[1], GetDict(), sets.Get)[0]
+    return filename
+
+def GetCaptureFileAndParam(view, template, target):
+    temp = templateEngine.TemplateFormatter(sets.Get)
+    tempDict = GetDict()
+    filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
+    headline = None
+    if(len(target) > 2):
+        headline = templateEngine.ExpandTemplate(view, target[2], tempDict, sets.Get)[0]
+    return (filename, headline)
+
 def GetCapturePath(view, template):
     target    = ['file', '{refile}']
     if 'target' in template:
@@ -43,27 +64,27 @@ def GetCapturePath(view, template):
     file = None
     at = None
     if('file' in target[0]):
-        temp = templateEngine.TemplateFormatter(sets.Get)
-        tempDict = {
-            'refile' : sets.Get('refile',''),
-            'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
-        } 
-        filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
+        filename = GetCaptureFile(view, template, target)
     if('file+headline' in target[0]):
-        temp = templateEngine.TemplateFormatter(sets.Get)
-        tempDict = {
-            'refile' : sets.Get('refile',''),
-            'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
-        } 
-        filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
-        headline = None
-        if(len(target) > 2):
-            headline = templateEngine.ExpandTemplate(view, target[2], tempDict, sets.Get)[0]
+        filename, headline = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
         if(file and headline):
             at = file.FindOrCreateNode(headline)
             if(at):
                 at = at.local_end_row
+    if('file+regexp' in target[0]):
+        filename, reg = GetCaptureFileAndParam(view, template, target)
+        file = db.Get().LoadNew(filename)
+        if(file and reg):
+            r = re.compile(reg)
+            row = 0
+            for n in file.org:
+                for line in n._lines:
+                    m = r.search(line)
+                    if(m):
+                        at = row
+                        break
+                    row += 1
     if('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
         if(file == None):
