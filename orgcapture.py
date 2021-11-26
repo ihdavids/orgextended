@@ -434,7 +434,7 @@ class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
             self.view.window().show_quick_panel(temps, self.on_done_base_st3, -1, -1)
 
 def IsType(val,template):
-    return 'type' in template and template['type'] == val
+    return 'type' in template and template['type'].strip() == val
 
 # Capture some text into our refile org file
 class OrgCaptureCommand(OrgCaptureBaseCommand):
@@ -464,7 +464,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         linev = self.panel.line(self.pt)
         linetxt = self.panel.substr(linev)
         self.panel.sel().clear()
-        self.panel.sel().add(linev.begin() + len(linetxt.strip()))
+        self.panel.sel().add(linev.begin() + len(linetxt.rstrip()))
         self.insert_snippet(self.index)
 
     def on_panel_ready(self, index, openas, panel):
@@ -482,10 +482,11 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         panel.settings().set('cap_index',index)
         panel.settings().set('cap_view',self.view.id())
         self.openas = openas
-        if(IsType('plain',template) and not 'snippet' in template):
+        if((IsType('item',template) or IsType('checkitem',template) or IsType('plain',template)) and not 'snippet' in template):
             template['snippet'] = 'plain_template'
             if('template' in template):
                 del template['template']
+
         if('template' in template):
             startPos = self.insert_template(template['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
@@ -497,11 +498,50 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             self.level = 0
             self.pt = None
             prefix = ""
+            preprefix = ""
+            itemtype = '-'
             if(self.openas):
                 insertAt = captureFile.At(at)
                 if(IsType('plain',template)):
                     self.pt = panel.text_point(insertAt.local_end_row,0)
                     self.insertRow = insertAt.local_end_row
+                elif(IsType('checkitem',template)):
+                    # Todo scan for the item
+                    self.insertRow = insertAt.local_end_row
+                    self.pt = panel.text_point(insertAt.local_end_row,0)
+                    checkbox_line_regex   = re.compile(r'^(\s*)([-+])\s*(\[[xX\- ]\])\s+')
+                    haveCheckbox = False
+                    preprefix = " " * (insertAt.level+1)
+                    for row in range(insertAt.start_row, insertAt.local_end_row+1):
+                        pt = panel.text_point(row,0)
+                        line  = panel.substr(panel.line(pt))
+                        m = checkbox_line_regex.search(line)
+                        if(m):
+                            preprefix = m.group(1)
+                            itemtype = m.group(2)
+                            haveCheckbox = True
+                        elif(haveCheckbox):
+                            self.insertRow = row
+                            self.pt = pt
+                            break
+                elif(IsType('item',template)):
+                    self.insertRow = insertAt.local_end_row
+                    self.pt = panel.text_point(insertAt.local_end_row,0)
+                    item_line_regex   = re.compile(r'^(\s*)([-+])\s*[^\[]')
+                    haveCheckbox = False
+                    preprefix = " " * (insertAt.level+1)
+                    for row in range(insertAt.start_row, insertAt.local_end_row+1):
+                        pt = panel.text_point(row,0)
+                        line  = panel.substr(panel.line(pt))
+                        m = item_line_regex.search(line)
+                        if(m):
+                            preprefix = m.group(1)
+                            itemtype = m.group(2)
+                            haveCheckbox = True
+                        elif(haveCheckbox):
+                            self.insertRow = row
+                            self.pt = pt
+                            break
                 else:
                     self.pt = panel.text_point(insertAt.end_row,0)
                     self.insertRow = insertAt.end_row
@@ -523,6 +563,10 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 self.panel = panel
                 if(IsType('plain',template)):
                     self.panel.Insert(self.pt, prefix + (" " * (self.level+1)), evt.Make(self.on_added_stars))
+                elif(IsType('item',template)):
+                    self.panel.Insert(self.pt, prefix + preprefix + itemtype + " ", evt.Make(self.on_added_stars))
+                elif(IsType('checkitem',template)):
+                    self.panel.Insert(self.pt, prefix + preprefix + itemtype + " [ ] ", evt.Make(self.on_added_stars))
                 else:
                     self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:
