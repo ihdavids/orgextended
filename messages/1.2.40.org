@@ -8,3 +8,8 @@
 	Right now bound to:
 	- <space> r f for refile to file.
 	- <space> r r for refile to file and headline
+
+** Capture
+	- Added new capture type: 'plain'
+	  we now support 'entry' and 'plain' Eventually I will add all the capture types
+	  but we are a bit off from that.
