@@ -433,6 +433,8 @@ class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
         else:
             self.view.window().show_quick_panel(temps, self.on_done_base_st3, -1, -1)
 
+def IsType(val,template):
+    return 'type' in template and template['type'] == val
 
 # Capture some text into our refile org file
 class OrgCaptureCommand(OrgCaptureBaseCommand):
@@ -480,6 +482,10 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         panel.settings().set('cap_index',index)
         panel.settings().set('cap_view',self.view.id())
         self.openas = openas
+        if(IsType('plain',template) and not 'snippet' in template):
+            template['snippet'] = 'plain_template'
+            if('template' in template):
+                del template['template']
         if('template' in template):
             startPos = self.insert_template(template['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
@@ -493,8 +499,12 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             prefix = ""
             if(self.openas):
                 insertAt = captureFile.At(at)
-                self.pt = panel.text_point(insertAt.end_row,0)
-                self.insertRow = insertAt.end_row
+                if(IsType('plain',template)):
+                    self.pt = panel.text_point(insertAt.local_end_row,0)
+                    self.insertRow = insertAt.local_end_row
+                else:
+                    self.pt = panel.text_point(insertAt.end_row,0)
+                    self.insertRow = insertAt.end_row
                 linev = panel.line(self.pt)
                 linetxt = panel.substr(linev)
                 if((linetxt and not linetxt.strip() == "") or at == 0 or (insertAt and panel.lastRow() == insertAt.end_row)):
@@ -511,9 +521,14 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
             if(self.openas and self.level > 0):
                 self.index = index
                 self.panel = panel
-                self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
+                if(IsType('plain',template)):
+                    self.panel.Insert(self.pt, prefix + (" " * (self.level+1)), evt.Make(self.on_added_stars))
+                else:
+                    self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:
-                if(prefix != ""):
+                if(IsType('plain',template)):
+                    self.panel.Insert(self.pt, prefix, evt.Make(self.on_added_stars))
+                elif(prefix != ""):
                     self.index = index
                     self.panel = panel
                     self.panel.Insert(self.pt, prefix, evt.Make(self.on_added_stars))
