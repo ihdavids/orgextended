@@ -324,7 +324,30 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             log.error("Failed to archive subtree! Could not find source Node")  
 
 
-        
+def RefileCurNode(view, file, nodeIndex):
+    (curRow,curCol) = view.curRowCol()
+    node = db.Get().At(view, curRow)
+
+    if(node == None):
+        log.error("COULD NOT REFILE: Node at line " + str(curRow) + " not found")
+        return
+    if(nodeIndex == None):
+        log.error("Could not refile node index is out of bounds")
+        return 
+    log.debug("Inserting child into: " + str(nodeIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
+
+    fromFile = db.Get().FindInfo(view)
+    file.org[nodeIndex].insert_child(node)
+    node.remove_node()
+    # Have to save down here in case
+    # file and fromFile are the same!
+    file.Save()
+    file.Reload()
+    fromFile.Save()
+    fromFile.Reload()
+
+# This refile gives you a list of all headings to make it quicker to jump to
+# "That heading" This one is bound to R for really quick refiling.
 class OrgRefileCommand(sublime_plugin.TextCommand):
     def on_done_st4(self,index,modifiers):
         self.on_done(index)
@@ -332,28 +355,7 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
         if(index < 0):
             return
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
-        view = self.view
-        (curRow,curCol) = view.curRowCol()
-        node = db.Get().At(view, curRow)
-
-        #print(str(file.key))
-        if(node == None):
-            log.error("COULD NOT REFILE: Node at line " + str(curRow) + " not found")
-            return
-        if(fileIndex == None):
-            log.error("Could not refile file index is out of bounds")
-            return 
-        log.debug("Inserting child into: " + str(fileIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
-
-        fromFile = db.Get().FindInfo(view)
-        file.org[fileIndex].insert_child(node)
-        node.remove_node()
-        # Have to save down here in case
-        # file and fromFile are the same!
-        file.Save()
-        file.Reload()
-        fromFile.Save()
-        fromFile.Reload()
+        RefileCurNode(self.view, file, fileIndex)
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
@@ -362,6 +364,7 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
+# This refile, files to the end of the file.
 class OrgRefileToFileCommand(sublime_plugin.TextCommand):
     def on_done_st4(self,index,modifiers):
         self.on_done(index)
@@ -370,28 +373,7 @@ class OrgRefileToFileCommand(sublime_plugin.TextCommand):
             return
         file = db.Get().FindFileByIndex(index)
         fileIndex = 0
-        view = self.view
-        (curRow,curCol) = view.curRowCol()
-        node = db.Get().At(view, curRow)
-
-        #print(str(file.key))
-        if(node == None):
-            log.error("COULD NOT REFILE: Node at line " + str(curRow) + " not found")
-            return
-        if(fileIndex == None):
-            log.error("Could not refile file index is out of bounds")
-            return 
-        log.debug("Inserting child into: " + str(fileIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
-
-        fromFile = db.Get().FindInfo(view)
-        file.org[fileIndex].insert_child(node)
-        node.remove_node()
-        # Have to save down here in case
-        # file and fromFile are the same!
-        file.Save()
-        file.Reload()
-        fromFile.Save()
-        fromFile.Reload()
+        RefileCurNode(self.view, file, fileIndex)
 
     def run(self, edit):
         self.headings = db.Get().AllFiles(self.view)
@@ -399,6 +381,36 @@ class OrgRefileToFileCommand(sublime_plugin.TextCommand):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
+
+# This refile version takes a filename prompt first
+# then it shows the headings in the file.
+class OrgRefileToFileAndHeadlineCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifiers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        self.file = db.Get().FindFileByIndex(index)
+        self.headings = db.Get().AllHeadingsForFile(self.file)
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.headings, self.on_done_v2, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.headings, self.on_done_st4_v2, -1, -1)
+
+    def on_done_st4_v2(self,index,modifiers):
+        self.on_done_v2(index)
+    def on_done_v2(self, index):
+        if(index < 0):
+            return
+        RefileCurNode(self.view, self.file, index+1)
+        pass
+
+    def run(self, edit):
+        headings = db.Get().AllFiles(self.view)
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(headings, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(headings, self.on_done_st4, -1, -1)
 
 class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
     def on_done(self, index):

@@ -486,6 +486,23 @@ class OrgDb:
                 headings.append(formattedHeading)
                 count += 1
         return headings
+    
+    def AllHeadingsForFile(self, file):
+        headings = []
+        count = 0
+        f = file.org
+        for n in f[1:]:
+            parents = ""
+            t = n
+            while(type(t.parent) != node.OrgRootNode and t.parent != None):
+                t = t.parent
+                parents = t.heading + ":" + parents 
+            #formattedHeading = "{0:35}::{1}{2}".format(displayFn , parents, n.heading)
+            formattedHeading = "{0}{1}".format(parents,n.heading)
+            #print(formattedHeading)
+            headings.append(formattedHeading)
+            count += 1
+        return headings
 
     # This is paired with FindFileInfo
     def AllFiles(self, view):

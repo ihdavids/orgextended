@@ -1,3 +1,10 @@
 * 1.2.40
 ** Refile Improvements
+	2 new commands for refiling:
+
 	- org_refile_to_file command vs heading, quick refile at end of file.
+	- org_refile_to_file_and_headline - 2 step prompt file + headline
+
+	Right now bound to:
+	- <space> r f for refile to file.
+	- <space> r r for refile to file and headline
