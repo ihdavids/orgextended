@@ -487,6 +487,18 @@ class OrgDb:
                 count += 1
         return headings
 
+    # This is paired with FindFileInfo
+    def AllFiles(self, view):
+        files = []
+        count = 0
+        for o in self.Files:
+            displayFn = o.displayName
+            files.append(displayFn)
+        return files
+
+    def FindFileByIndex(self, index):
+        return self.Files[index]
+
     # This is a pair with AllHeadings, it can go from an index in that BACK to the
     # fileinfo
     def FindFileInfoByAllHeadingsIndex(self, index):

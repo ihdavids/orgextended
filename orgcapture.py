@@ -329,6 +329,8 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
     def on_done_st4(self,index,modifiers):
         self.on_done(index)
     def on_done(self, index):
+        if(index < 0):
+            return
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
         view = self.view
         (curRow,curCol) = view.curRowCol()
@@ -355,6 +357,44 @@ class OrgRefileCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
+
+class OrgRefileToFileCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifiers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        file = db.Get().FindFileByIndex(index)
+        fileIndex = 0
+        view = self.view
+        (curRow,curCol) = view.curRowCol()
+        node = db.Get().At(view, curRow)
+
+        #print(str(file.key))
+        if(node == None):
+            log.error("COULD NOT REFILE: Node at line " + str(curRow) + " not found")
+            return
+        if(fileIndex == None):
+            log.error("Could not refile file index is out of bounds")
+            return 
+        log.debug("Inserting child into: " + str(fileIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
+
+        fromFile = db.Get().FindInfo(view)
+        file.org[fileIndex].insert_child(node)
+        node.remove_node()
+        # Have to save down here in case
+        # file and fromFile are the same!
+        file.Save()
+        file.Reload()
+        fromFile.Save()
+        fromFile.Reload()
+
+    def run(self, edit):
+        self.headings = db.Get().AllFiles(self.view)
         if(int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:

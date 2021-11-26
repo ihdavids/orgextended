@@ -266,6 +266,7 @@
     // ORGMODE BINDINGS
     { "keys": [" ", "t"],            "command": "org_toggle",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}, { "key": "selector", "operator": "not_equal", "operand": "orgmode.table"} ] },
     { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ","r","f"],         "command": "org_refile_to_file",            "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "left"],         "command": "org_change_de_indent",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },

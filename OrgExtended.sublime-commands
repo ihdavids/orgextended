@@ -26,6 +26,7 @@
     {"caption": "Org Fold Contents",           "command": "org_fold_contents"           },
     {"caption": "Org Copy",                    "command": "org_copy"                    },
     {"caption": "Org Refile",                  "command": "org_refile"                  },
+    {"caption": "Org Refile To EOF",           "command": "org_refile_to_file"          },
     {"caption": "Org Archive Subtree",         "command": "org_archive_subtree"         },
     {"caption": "Org Open Refile",             "command": "org_open_refile"             },
     {"caption": "Org Capture",  	           "command": "org_capture"                 },
