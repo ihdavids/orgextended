@@ -482,7 +482,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         panel.settings().set('cap_index',index)
         panel.settings().set('cap_view',self.view.id())
         self.openas = openas
-        if((IsType('item',template) or IsType('checkitem',template) or IsType('plain',template)) and not 'snippet' in template):
+        if((IsType('item',template) or IsType('checkitem',template) or IsType('plain',template) or IsType('table-line',template)) and not 'snippet' in template):
             template['snippet'] = 'plain_template'
             if('template' in template):
                 del template['template']
@@ -542,6 +542,24 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                             self.insertRow = row
                             self.pt = pt
                             break
+                elif(IsType('table-line',template)):
+                    self.insertRow = insertAt.local_end_row
+                    self.pt = panel.text_point(insertAt.local_end_row,0)
+                    table_regex   = re.compile(r'^(\s*)([|])')
+                    have = False
+                    itemtype = '|'
+                    preprefix = " " * (insertAt.level+1)
+                    for row in range(insertAt.start_row, insertAt.local_end_row+1):
+                        pt = panel.text_point(row,0)
+                        line  = panel.substr(panel.line(pt))
+                        m = table_regex.search(line)
+                        if(m):
+                            preprefix = m.group(1)
+                            have = True
+                        elif(have):
+                            self.insertRow = row
+                            self.pt = pt
+                            break
                 else:
                     self.pt = panel.text_point(insertAt.end_row,0)
                     self.insertRow = insertAt.end_row
@@ -567,6 +585,8 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                     self.panel.Insert(self.pt, prefix + preprefix + itemtype + " ", evt.Make(self.on_added_stars))
                 elif(IsType('checkitem',template)):
                     self.panel.Insert(self.pt, prefix + preprefix + itemtype + " [ ] ", evt.Make(self.on_added_stars))
+                elif(IsType('table-line',template)):
+                    self.panel.Insert(self.pt, prefix + preprefix + itemtype, evt.Make(self.on_added_stars))
                 else:
                     self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:

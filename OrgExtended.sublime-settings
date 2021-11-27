@@ -101,11 +101,13 @@
     // Org Capture templates $0 is where the cursor ends up.
     "captureTemplates":
     [
+        // OLD DO NOTE USE TEMPLATE TYPE
         //{
         //  "name": "Todo",
         //  "template": 
         //      "* TODO $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
         //},
+        // PREFER THE SNIPPET TYPE
         {
             "name":    "Todo",
             "type":    "entry",
@@ -125,11 +127,6 @@
             "target": ["file","{refile}"],
         },
         {
-            // This is what I am heading towards.
-            // TODO:
-            // - types
-            // - snippet insertion for the template
-            // - target selection methods
             // - properties insertion.
             // - better capture buffer (not a panel)
             "name": "Meeting",
@@ -141,20 +138,32 @@
             // plain      - Text to be inserted as it is.
             "type": "entry",
             // targets: 
+            // -------------
+            // SUPPORTED:
             // file           - text appened at end of file.
             // id             - text appened to existing org id in db
             // file+headline  - unique headline in file ["file+headline","filename","headline"]
             // file+olp       - full path to headline
             // file+regexp    - heading is a match to the regexp
-            // file+datetree  - This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
             // clock          - insert under current item being clocked.
-            // function <name>- generic function to find location for you
+            // file+datetree  - NOT YET SUPPORTED This target creates a heading in a date tree for today’s date. If the optional outline path is given, the tree will be built under the node it is pointing to
+            // function <name>- NOT YET SUPPORTED generic function to find location for you
             // BUILD IN SYMBOLS:
             // {date}         - current date
             // {time}         - current time
             // {file}         - current filename
             // {daypage}.     - todays daypage (if setup)
+
             "target": ["file","{refile}"],
+            // "target": ["file+headline","{daypage}","Headline Text"],
+            // "target": ["file+olp"     ,"{refile}" ,"Heading 1", "Heading 2", ...],
+
+            // We have:
+            // - todo_heading     - make a todo heading at target
+            // - note_heading     - make a note heading at target
+            // - meeting_heading  - make a meeting heading at target
+            // - plain_template   - just put cursor at target
+            // You can add your own in the orgsnippets folder in Users.
             "snippet": "meeting_heading",
 
             // This can be panel or direct
@@ -163,6 +172,8 @@
             // during the capture
             "openas": "panel",
 
+            // NONE OF THESE ARE CURRENTLY SUPPORTED
+            // HOPEFULLY IN THE FUTURE WE WILL SUPPORT THEM
             //"template": "* MEETING $0\n  :PROPERTIES:\n:CREATED: [{datetime}]\n:END:\n  "
             // prepend - Normally new captured information will be appended at the target location (last child, last table line, last list item, …). Setting this property changes that.
             // immediate-finish - When set, do not offer to edit the information, just file it away immediately. This makes sense if the template only needs information that can be added automatically.
@@ -176,10 +187,7 @@
             // table-line-pos - Specification of the location in the table where the new line should be inserted. It should be a string like ‘II-3’ meaning that the new line should become the third line before the second horizontal separator line.
             // kill-buffer - If the target file was not yet visited when capture was invoked, kill the buffer again after capture is completed.
             // no-save - Do not save the target file after finishing the capture.
-            "properties":
-                [
-
-                ],
+            "properties": [],
         }       
     ],
 

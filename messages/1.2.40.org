@@ -5,7 +5,7 @@
 	- org_refile_to_file command vs heading, quick refile at end of file.
 	- org_refile_to_file_and_headline - 2 step prompt file + headline
 
-	Right now bound to:
+	Right now, for vimmers bound to:
 	- <space> r f for refile to file.
 	- <space> r r for refile to file and headline
 
@@ -13,3 +13,9 @@
 	- Added new capture type: 'plain'
 	  we now support 'entry' and 'plain' Eventually I will add all the capture types
 	  but we are a bit off from that.
+	- Added new capture type: 'item'
+	  This will add at the end of the first list found in the node
+	- Added new capture item: 'checkitem'
+	  This will add at the end of the first checklist found in the node
+	- Added really early attempt at 'table-line'. Not sure if this is sufficient
+	All of the types above only work with the snippet type
