@@ -102,9 +102,9 @@ def GetCapturePath(view, template):
             n = file.org
         # Now we assume this is a date tree. Default is per day.
         t = datetime.datetime.now() 
-        yearformat  = str(t.year)
-        monthformat = t.strftime("%Y-%m %B")
-        dayformat   = t.strftime("%Y-%m-%d %A")
+        yearformat  = t.strftime(GetProp(template, "year-format",  "%Y"))
+        monthformat = t.strftime(GetProp(template, "month-format", "%Y-%m %B"))
+        dayformat   = t.strftime(GetProp(template, "day-format",   "%Y-%m-%d %A"))
         nyear  = None
         nmonth = None
         nday   = None
@@ -482,6 +482,15 @@ class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
 
 def IsType(val,template):
     return 'type' in template and template['type'].strip() == val
+
+def GetProp(template,name,defaultVal=None):
+    if('properties' in template):
+        props = template['properties']
+        if(isinstance(props,dict)):
+            if(name in props):
+                return props[name]
+    return defaultVal
+
 
 # Capture some text into our refile org file
 class OrgCaptureCommand(OrgCaptureBaseCommand):

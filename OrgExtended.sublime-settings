@@ -185,6 +185,14 @@
             // table-line-pos - Specification of the location in the table where the new line should be inserted. It should be a string like ‘II-3’ meaning that the new line should become the third line before the second horizontal separator line.
             // kill-buffer - If the target file was not yet visited when capture was invoked, kill the buffer again after capture is completed.
             // no-save - Do not save the target file after finishing the capture.
+
+            // THESE ARE IMPLEMENTED:
+
+            // These are python date strings and allow you to control the header
+            // format of your datetree
+            // "year-format":  "%Y",          - The root of your datetree * 2021
+            // "month-format": "%Y-%m %B",    - The month section         ** 2021-11 November
+            // "day-format",   "%Y-%m-%d %A", - The day section           *** 2021-11-27 Saturday
             "properties": [],
         }       
     ],

@@ -31,3 +31,13 @@
 
 	  The target should look something like:
       ['file+olp+datetree',"{myfile}","Heading a","Heading b","Heading c"]
+
+      We have 3 non standard properties implemented for datetree:
+
+      #+BEGIN_QUOTE
+        These are python date strings and allow you to control the header
+        format of your datetree
+          "year-format":  "%Y",          - The root of your datetree * 2021
+          "month-format": "%Y-%m %B",    - The month section         ** 2021-11 November
+          "day-format":   "%Y-%m-%d %A", - The day section           *** 2021-11-27 Saturday
+      #+END_QUOTE
