@@ -127,8 +127,6 @@
             "target": ["file","{refile}"],
         },
         {
-            // - properties insertion.
-            // - better capture buffer (not a panel)
             "name": "Meeting",
             // types:
             // entry      - An Org mode node, with a headline. Will be filed as the child of the target entry or as a top-level entry
