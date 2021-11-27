@@ -526,61 +526,11 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                     self.pt = panel.text_point(insertAt.local_end_row,0)
                     self.insertRow = insertAt.local_end_row
                 elif(IsType('checkitem',template)):
-                    # Todo scan for the item
-                    self.insertRow = insertAt.local_end_row
-                    self.pt = panel.text_point(insertAt.local_end_row,0)
-                    checkbox_line_regex   = re.compile(r'^(\s*)([-+])\s*(\[[xX\- ]\])\s+')
-                    haveCheckbox = False
-                    preprefix = " " * (insertAt.level+1)
-                    for row in range(insertAt.start_row, insertAt.local_end_row+1):
-                        pt = panel.text_point(row,0)
-                        line  = panel.substr(panel.line(pt))
-                        m = checkbox_line_regex.search(line)
-                        if(m):
-                            preprefix = m.group(1)
-                            itemtype = m.group(2)
-                            haveCheckbox = True
-                        elif(haveCheckbox):
-                            self.insertRow = row
-                            self.pt = pt
-                            break
+                    preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([-+])\s*(\[[xX\- ]\])\s+'))
                 elif(IsType('item',template)):
                     preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([-+])\s*[^\[]'))
-                    # self.insertRow = insertAt.local_end_row
-                    # self.pt = panel.text_point(insertAt.local_end_row,0)
-                    # item_line_regex   = re.compile(r'^(\s*)([-+])\s*[^\[]')
-                    # haveCheckbox = False
-                    # preprefix = " " * (insertAt.level+1)
-                    # for row in range(insertAt.start_row, insertAt.local_end_row+1):
-                    #     pt = panel.text_point(row,0)
-                    #     line  = panel.substr(panel.line(pt))
-                    #     m = item_line_regex.search(line)
-                    #     if(m):
-                    #         preprefix = m.group(1)
-                    #         itemtype = m.group(2)
-                    #         haveCheckbox = True
-                    #     elif(haveCheckbox):
-                    #         self.insertRow = row
-                    #         self.pt = pt
-                    #         break
                 elif(IsType('table-line',template)):
-                    self.insertRow = insertAt.local_end_row
-                    self.pt = panel.text_point(insertAt.local_end_row,0)
-                    table_regex   = re.compile(r'^(\s*)([|])')
-                    have = False
-                    itemtype = '|'
-                    preprefix = " " * (insertAt.level+1)
-                    for row in range(insertAt.start_row, insertAt.local_end_row+1):
-                        pt = panel.text_point(row,0)
-                        line  = panel.substr(panel.line(pt))
-                        m = table_regex.search(line)
-                        if(m):
-                            preprefix = m.group(1)
-                            have = True
-                        elif(have):
-                            self.insertRow = row
-                            self.pt = pt
-                            break
+                    preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([|])'))
                 else:
                     self.pt = panel.text_point(insertAt.end_row,0)
                     self.insertRow = insertAt.end_row
