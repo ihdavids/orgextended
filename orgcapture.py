@@ -71,6 +71,7 @@ def GetCapturePath(view, template):
     filename = None
     file = None
     at = None
+    toinsert = ""
     if('file' in target[0]):
         filename = GetCaptureFile(view, template, target)
     if('file+headline' in target[0]):
@@ -80,7 +81,7 @@ def GetCapturePath(view, template):
             at = file.FindOrCreateNode(headline)
             if(at):
                 at = at.local_end_row
-    if('file+regexp' in target[0]):
+    elif('file+regexp' in target[0]):
         filename, reg = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
         if(file and reg):
@@ -93,19 +94,65 @@ def GetCapturePath(view, template):
                         at = row
                         break
                     row += 1
-    if('file+olp' in target[0]):
+    elif('file+olp+datetree' in target[0]):
+        filename, reg = GetCaptureFileAndParam(view, template, target)
+        file = db.Get().FindInfo(filename)
+        n = FindNodeByPath(file.org,target,2)
+        if(not n):
+            n = file.org
+        # Now we assume this is a date tree. Default is per day.
+        t = datetime.datetime.now() 
+        yearformat  = str(t.year)
+        monthformat = t.strftime("%Y-%m %B")
+        dayformat   = t.strftime("%Y-%m-%d %A")
+        nyear  = None
+        nmonth = None
+        nday   = None
+        prefix   = ""
+        if(n.level > 0):
+            prefix = "*" * n.level
+        for c in n.children:
+            if(c.heading == yearformat):
+                nyear = c
+                break
+        if(nyear == None):
+            toinsert += "{prefix}* {yearformat}\n".format(prefix=prefix,yearformat=yearformat)
+        else:
+            n = nyear
+            for c in nyear.children:
+                if(c.heading == monthformat):
+                    nmonth = c
+                    break
+        if(nmonth == None):
+            toinsert += "{prefix}** {monthformat}\n".format(prefix=prefix,monthformat=monthformat)
+        else:
+            n = nmonth
+            for c in nmonth.children:
+                if(c.heading == dayformat):
+                    nday = c
+                    break
+        if(nday == None):
+            toinsert += "{prefix}*** {dayformat}\n".format(prefix=prefix,dayformat=dayformat)
+        else:
+            n = nday
+        if(n and toinsert == ""):
+            at = n.local_end_row
+        else:
+            at = n.end_row
+    elif('file+olp' in target[0]):
         filename, reg = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
         n = FindNodeByPath(file.org,target,2)
         if(n):
             at = n.local_end_row
-    if('id' == target[0]):
+
+    elif('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
         if(file == None):
             log.error("Could not find id: " + target[1])
             return
         filename = file.filename
-    if('clock' == target[0]):
+    elif('clock' == target[0]):
         if(not clk.ClockManager.ClockRunning()):
             log.debug("ERROR: clock is not running!")
             raise "ERROR: clock is not running"
@@ -120,13 +167,13 @@ def GetCapturePath(view, template):
         log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename))
     # Now make sure that file is loaded in the DB
     # it might not be in my org path
-    if(file != None):
-        file.Reload()
-    else:
+    if(file == None):
         file = db.Get().LoadNew(filename)
+    else:
+        file = db.Get().FindInfo(filename)
     if(not at and file):
         at = file.org.start_row
-    return (target, filename, file, at)
+    return (target, filename, file, at, toinsert)
 
 
 # This is a bit hokey. We track the last header so
@@ -144,7 +191,7 @@ def onDeactivated(view):
         template  = templates[tempIndex]
         #outpath, outfile = GetCaptureOutput()
         #print('template index was: ' + str(tempIndex))
-        target, capturePath, captureFile, at = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
+        target, capturePath, captureFile, at, toinsert = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
         #refilePath = sets.Get("refile","UNKNOWN")
         #refile = load(refilePath)
         captureFileRoot = None
@@ -472,6 +519,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         self.pt = panel.text_point(insertAt.local_end_row,0)
         #item_line_regex   = re.compile(r'^(\s*)([-+])\s*[^\[]')
         have = False
+        itemtype = '-'
         preprefix = " " * (insertAt.level+1)
         for row in range(insertAt.start_row, insertAt.local_end_row+1):
             pt = panel.text_point(row,0)
@@ -487,16 +535,29 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 break
         return (preprefix, itemtype)
 
-    def on_panel_ready(self, index, openas, panel):
+    def on_panel_ready(self, index, openas, panel,cnt=0):
         self.panel = panel
         global captureBufferName
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
         window = self.view.window()
         template = self.templates[index]
-        target, capturePath, captureFile, at = GetCapturePath(self.view, template)
+        target, capturePath, captureFile, at, toinsert = GetCapturePath(self.view, template)
         if(panel.is_loading()):
             sublime.set_timeout_async(lambda: self.on_panel_ready(index, openas, panel), 100)
             return
+
+        if(toinsert != "" and cnt==0):
+            pt = panel.text_point(at,0)
+            linev = panel.line(pt)
+            linetxt = panel.substr(linev)
+            if((linetxt and not linetxt.strip() == "") or at == 0 or panel.lastRow() == at):
+                toinsert = "\n" + toinsert
+                pt = linev.end()
+            else:
+                pt = linev.begin()
+            panel.Insert(pt, toinsert, evt.Make(lambda: self.on_panel_ready(index,openas,panel,cnt+1)))
+            return
+
         startPos = -1
         # Try to store the capture index
         panel.settings().set('cap_index',index)
@@ -613,7 +674,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
         window = self.view.window()
         template = self.templates[index]
-        target, capturePath, captureFile, at = GetCapturePath(self.view, template)
+        target, capturePath, captureFile, at, toinsert = GetCapturePath(self.view, template)
         openas = False
         if('openas' in template and 'direct' == template['openas']):
             panel = window.open_file(capturePath)
