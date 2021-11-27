@@ -19,3 +19,15 @@
 	  This will add at the end of the first checklist found in the node
 	- Added really early attempt at 'table-line'. Not sure if this is sufficient
 	All of the types above only work with the snippet type
+
+	- Added first stab at 'file+olp+datetree' I only have the full day mode not month or week yet.
+	  The olp part will take a heading and will add something like:
+	  under that heading
+
+	  * 2021
+	  ** 2021-11 November
+	  *** 2021-11-27 Saturday
+	      <your snippet here>
+
+	  The target should look something like:
+      ['file+olp+datetree',"{myfile}","Heading a","Heading b","Heading c"]
