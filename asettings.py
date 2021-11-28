@@ -10,7 +10,7 @@ import OrgExtended.orgutil.template as temp
 log = logging.getLogger(__name__)
 
 defaultTodoStates = ["TODO", "NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"]
-daysOfWeek = ["sun","mon","tue","wed","th","fri","sat"]
+weekdayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
 class ASettings:
@@ -119,6 +119,14 @@ def GetInt(name, defaultValue):
 	except:
 		return defaultValue
 
+
+def GetWeekdayIndexByName(name):
+    try:
+        weekdayIndex = weekdayNames.index(name)
+    except:
+        weekdayIndex = 6
+    return weekdayIndex
+
 # Will return a date or an index as an integer where 0 means Sunday
 # and so on in the week.
 def GetDateAsIndex(name, defaultValue):
@@ -141,3 +149,4 @@ class OrgTestTemplateCommand(sublime_plugin.TextCommand):
 		formatter = temp.TemplateFormatter(Get)
 		rv  = formatter.format("{aaa} {archive}", **formatDict)
 		print(str(rv))
+
