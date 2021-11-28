@@ -53,7 +53,7 @@ class DateView:
 
 	def DateToRegion(self, date):
 		# Convert 
-		monthIndex = (date.month - self.midmonth + 1)
+		monthIndex = (date.month - (self.midmonth) + 1) % 12
 		if(monthIndex < 0 or monthIndex >= len(self.monthdata)):
 			return
 		monthData = self.monthdata[monthIndex]
@@ -252,7 +252,8 @@ class DateView:
 	def ResetRenderState(self):
 		self.output.set_read_only(True)
 		self.output.set_scratch(True)
-		self.output.set_name("DatePicker")
+		if(not self.output.name()):
+			self.output.set_name("DatePicker")
 
 
 class DatePicker:
