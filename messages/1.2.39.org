@@ -1,0 +1,10 @@
+* 1.2.39
+** Improving Org Capture
+   - file+regexp now works for inserting entry's
+   	 no item or anything else, just entry's but it works.
+   	 This searches an org file line by line for the first match.
+   	 ["file+regexp","filename","REGEX"]
+
+   - file+olp - full path in a file. When there are multiple paths
+     this is the safest.
+     ["file+olp","filename","Heading level 1","Heading level 2" ...]

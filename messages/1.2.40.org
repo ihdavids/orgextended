@@ -1,0 +1,43 @@
+* 1.2.40
+** Refile Improvements
+	2 new commands for refiling:
+
+	- org_refile_to_file command vs heading, quick refile at end of file.
+	- org_refile_to_file_and_headline - 2 step prompt file + headline
+
+	Right now, for vimmers bound to:
+	- <space> r f for refile to file.
+	- <space> r r for refile to file and headline
+
+** Capture
+	- Added new capture type: 'plain'
+	  we now support 'entry' and 'plain' Eventually I will add all the capture types
+	  but we are a bit off from that.
+	- Added new capture type: 'item'
+	  This will add at the end of the first list found in the node
+	- Added new capture item: 'checkitem'
+	  This will add at the end of the first checklist found in the node
+	- Added really early attempt at 'table-line'. Not sure if this is sufficient
+	All of the types above only work with the snippet type
+
+	- Added first stab at 'file+olp+datetree' I only have the full day mode not month or week yet.
+	  The olp part will take a heading and will add something like:
+	  under that heading
+
+	  * 2021
+	  ** 2021-11 November
+	  *** 2021-11-27 Saturday
+	      <your snippet here>
+
+	  The target should look something like:
+      ['file+olp+datetree',"{myfile}","Heading a","Heading b","Heading c"]
+
+      We have 3 non standard properties implemented for datetree:
+
+      #+BEGIN_QUOTE
+        These are python date strings and allow you to control the header
+        format of your datetree
+          "year-format":  "%Y",          - The root of your datetree * 2021
+          "month-format": "%Y-%m %B",    - The month section         ** 2021-11 November
+          "day-format":   "%Y-%m-%d %A", - The day section           *** 2021-11-27 Saturday
+      #+END_QUOTE

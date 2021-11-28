@@ -224,24 +224,23 @@ contexts:
     - match: ^\s*Traceback \(most recent call last\):\s*$
       push: pythonstack
 
-    - match: \*[^*]+\*
+    - match: (^|\s)\*[^*]+\*(^|\s)
       scope: markup.bold orgmode.bold
 
-    - match: /[^/]+/
+    - match: (^|\s)(/[^/]+/)($|\s)
       scope: markup.italic orgmode.italics
 
-    - match: _[^_]+_
+    - match: \b(_[^_]+_)\b
       scope: markup.underline orgmode.underline
 
-    - match: \+[^\+]+\+
+    - match: (^|\s)\+[^\+]+\+(^|\s)
       scope: markup.underline orgmode.strikethrough
 
-    - match: ~[^~]+~
+    - match: (^|\s)~[^~]+~(^|\s)
       scope: orgmode.code
 
-    - match: =[^=]+=
+    - match: (^|\s)=[^=]+=(^|\s)
       scope: orgmode.verbatim
-
 
     - match: '<<'
       scope: orgmode.target.bracket

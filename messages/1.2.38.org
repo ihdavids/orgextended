@@ -1,0 +1,7 @@
+* 1.2.38
+** Day Page
+   - Bugfix, regression: snippets were not running when creating a new daypage.
+** Capture
+   - Fixed symbol expansion of filenames
+   - Indent fix when inserting at the end of the buffer
+   - file+headline improved insertion

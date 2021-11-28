@@ -26,6 +26,8 @@
     {"caption": "Org Fold Contents",           "command": "org_fold_contents"           },
     {"caption": "Org Copy",                    "command": "org_copy"                    },
     {"caption": "Org Refile",                  "command": "org_refile"                  },
+    {"caption": "Org Refile To EOF",           "command": "org_refile_to_file"          },
+    {"caption": "Org Refile File and Heading", "command": "org_refile_to_file_and_headline"},
     {"caption": "Org Archive Subtree",         "command": "org_archive_subtree"         },
     {"caption": "Org Open Refile",             "command": "org_open_refile"             },
     {"caption": "Org Capture",  	           "command": "org_capture"                 },
@@ -170,9 +172,15 @@
     //{"caption": "Org Test Thing",              "command": "org_show_item"                     },
     //{"caption": "Org Test Durations",          "command": "org_test_duration"                 },
     //{"caption": "Org Test PLists",             "command": "org_plist_test"                    },
+    //{"caption": "Org Test Template",           "command": "org_test_template"                 },
 
     // Beancount
     {"caption": "Org Beancount Create",         "command": "beancount_new_file"                  },
     {"caption": "Org Beancount Transaction",    "command": "beancount_new_transaction"           },
+
+    // Trello:
+    // Trello commands allow you to 2 way sync with a trello board. It does however require
+    // that you have the Trello package installed as I parasitically use that package.
+    {"caption": "Org Trello Sync Board",        "command": "org_trello_sync_board"            },
 
 ]

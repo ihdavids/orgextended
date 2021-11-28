@@ -235,9 +235,9 @@ def properties_region(self, view):
 
 @add_method(node.OrgBaseNode)
 def fold_drawers(self, view):
-    if(self.property_drawer_location):
+    if(hasattr(self,'property_drawer_location') and self.property_drawer_location):
         view.fold(self.properties_region(view))
-    if(self.drawers):
+    if(hasattr(self,'drawers') and self.drawers):
         for d in self.drawers:
             i = d['loc']
             view.fold(self.create_region_from_item(view, i))

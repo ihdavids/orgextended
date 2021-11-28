@@ -426,7 +426,25 @@ class OrgBaseNode(Sequence):
         if( key in self._special_comments):
             return self._special_comments[key]
         return defaultVal
-    
+   
+    def set_comment(self, key, val):
+        if not key in self._special_comments:
+            self._lines.insert(0,"#+" + key + ": " + val)
+            self._special_comments.setdefault(key, []).append(val)
+            return True
+        else:
+            vl = self._special_comments[key]
+            if val not in vl:
+                for i in range(len(self._lines)):
+                    line = self._lines[i]
+                    if(line.startswith("#+FILETAGS")):
+                        line = line + " " + val
+                        self._lines[i] = line
+                        break
+                self._special_comments.setdefault(key, []).append(val)
+                return True
+        return False
+
     def list_comment(self, key, defaultVal):
         if(defaultVal == None):
             defaultVal = []

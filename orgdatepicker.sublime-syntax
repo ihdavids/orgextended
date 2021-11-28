@@ -18,3 +18,11 @@ contexts:
 
     - match: '(January|February|March|April|May|June|July|August|September|October|November|December)\s*([0-9]+)'
       scope: string.quoted orgdatepicker.monthheader
+
+    - match: '\.|`'
+      scope: comment orgdatepicker.timetick
+
+    - match: 'O'
+      scope: orgagenda.block.1 orgdatepicker.hourhand
+    - match: 'o'
+      scope: orgagenda.block.2 orgdatepicker.minutehand

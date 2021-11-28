@@ -1,0 +1,20 @@
+* 1.2.37
+  - Fixed a bug with agenda having extra spaces after calendar view.
+** dayPage - Capture symbols
+    - added {daypage} symbol as a capture target symbol
+    #+BEGIN_SRC js
+        "target": ["file","{daypage}"],
+    #+END_SRC
+
+    - you can now also set a symbol in your sublime settings file and use it as a target expansion:
+    #+BEGIN_SRC js
+        "mysym": "to use over and over"
+        ...
+        "target": ["file","{mysym}"],
+    #+END_SRC
+
+** Capture
+   Added file+headline to capture templates.
+   #+BEGIN_SRC js
+   "target": ["file+headline","{myfile}","MyHeadline"]
+   #+END_SRC

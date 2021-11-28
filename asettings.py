@@ -97,10 +97,10 @@ def Get(name, defaultValue, formatDictionary = None):
 		formatDict.update(formatDictionary)
 
 	if(str == type(rv)):
-		formatter = temp.TemplateFormatter()
+		formatter = temp.TemplateFormatter(Get)
 		rv  = formatter.format(rv, **formatDict)
 	if(list == type(rv)):
-		formatter = temp.TemplateFormatter()
+		formatter = temp.TemplateFormatter(Get)
 		rv = [ (formatter.format(r, **formatDict) if str == type(r) else r) for r in rv ]
 	return rv
 
@@ -119,9 +119,34 @@ def GetInt(name, defaultValue):
 	except:
 		return defaultValue
 
+
 def GetWeekdayIndexByName(name):
     try:
         weekdayIndex = weekdayNames.index(name)
     except:
         weekdayIndex = 6
     return weekdayIndex
+
+# Will return a date or an index as an integer where 0 means Sunday
+# and so on in the week.
+def GetDateAsIndex(name, defaultValue):
+	global daysOfWeek
+	val = Get(name, defaultValue)
+	if(RepresentsInt(val)):
+		return int(val) % 7
+	val = val.lower()
+	for i in range(0,len(daysOfWeek)):
+		if daysOfWeek[i] in val:
+			return i
+	return 0
+
+# ================================================================================
+class OrgTestTemplateCommand(sublime_plugin.TextCommand):
+	def run(self, edit, onDone=None):
+		v = temp.ExpandTemplate(self.view, "DATE: {date} TIME: {time} DT: {datetime} FILE: {file.lower:call}")
+		print(str(v))
+		formatDict = { "aaa":     str(datetime.date.today()),}
+		formatter = temp.TemplateFormatter(Get)
+		rv  = formatter.format("{aaa} {archive}", **formatDict)
+		print(str(rv))
+

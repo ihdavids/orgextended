@@ -266,6 +266,8 @@
     // ORGMODE BINDINGS
     { "keys": [" ", "t"],            "command": "org_toggle",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}, { "key": "selector", "operator": "not_equal", "operand": "orgmode.table"} ] },
     { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ","r","f"],         "command": "org_refile_to_file",            "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ","r","r"],         "command": "org_refile_to_file_and_headline","context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "left"],         "command": "org_change_de_indent",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
@@ -360,12 +362,16 @@
 
 
     // ORG DATE PICKER
-    { "keys": [">"],                 "command": "org_date_picker_next_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["<"],                 "command": "org_date_picker_prev_day",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["ctrl+,"],            "command": "org_date_picker_prev_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["ctrl+."],            "command": "org_date_picker_next_week",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["alt+,"],             "command": "org_date_picker_prev_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
-    { "keys": ["alt+."],             "command": "org_date_picker_next_month",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": [">"],                 "command": "org_date_picker_next_day",         "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["<"],                 "command": "org_date_picker_prev_day",         "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+,"],            "command": "org_date_picker_prev_week",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+."],            "command": "org_date_picker_next_week",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+,"],             "command": "org_date_picker_prev_month",       "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+."],             "command": "org_date_picker_next_month",       "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+shift+,"],      "command": "org_date_picker_prev_hour",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["ctrl+shift+."],      "command": "org_date_picker_next_hour",        "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+shift+,"],       "command": "org_date_picker_prev_minute",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
+    { "keys": ["alt+shift+."],       "command": "org_date_picker_next_minute",      "context": [{ "key": "eol_selector", "operand": "source.orgdateeditor"}]  },
     // ORG INPUT SELECTOR
     { "keys": ["down"],             "command": "org_input_down",                "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  },
     { "keys": ["up"],               "command": "org_input_up",                  "context": [{ "key": "eol_selector", "operand": "source.orginput"}]  }

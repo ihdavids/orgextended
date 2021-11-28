@@ -1,4 +1,4 @@
-* TODO Things I want [20/42]
+* TODO Things I want [22/47]
 	- [-] Extensibility [1/5]
 		- [x] Avoid reloading when files do not change
 		- [ ] Similar folder names for all extensions in User folder
@@ -17,13 +17,13 @@
 		- [x] Capture using sublime snippets
 		- [ ] Capture panel size controls?
 		- [ ] Capture with view vs panel (better for neovintageous users)
-	- [-] Parsing [4/6]
+	- [-] Parsing [5/6]
 		- [x] Basic file parsing
 		- [x] Tags parsed.
 		- [x] Comments (#+) available
 		- [x] Positions available
 		- [ ] Stripping to keep in memory size down.
-		- [ ] Folding on unsaved files seems to have a problem sometimes
+		- [x] Folding on unsaved files seems to have a problem sometimes
 	- [-] Refiling [2/3]
 		- [x] Basic Refile support
 		- [x] Basic Copy support
@@ -84,22 +84,22 @@
 		- [x] custom_id links work
 		- [ ] Write a page about personal wikis
 		- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
-	- [-] Formatting [4/8]
+	- [-] Formatting [7/8]
 		- [x] Basic syntax highlighting
 		- [x] Priority blocks
-		- [ ] Smarter heading blocks
+		- [x] Smarter heading blocks
 		- [x] Fix priority highlighting.
 		- [x] Property drawers vs tags.
-		- [ ] Strings?
-		- [ ] Finish the babel work.
+		- [x] Strings?
+		- [x] Finish the babel work.
 		- [ ] Htmlify
-	- [-] Tables [16/23]
+	- [-] Tables [21/23]
 		- [x] Basic table editing (Table Edit?)
 		- [x] Syntax highlighting of tables
 		- [x] Formula highlighting in tables
 		- [ ] Bold headers in tables
 		- [x] Table formats
-		- [ ] Table parameters to execution blocks
+		- [x] Table parameters to execution blocks
 		- [x] Relative offsets in tables
 		- [x] In cell formulas
 		- [x] From edge symbols
@@ -113,10 +113,10 @@
 		- [x] Extensible functions for tables
 		- [x] Documentation page for tables
 		- [ ] Extensible symbols for tables
-		- [ ] Advanced table features
-		- [ ] Gnu Plot Support
-		- [ ] Table cache handles multiple files.
-		- [ ] Remote keyword handles tables in other files.
+		- [x] Advanced table features
+		- [x] Gnu Plot Support
+		- [x] Table cache handles multiple files.
+		- [x] Remote keyword handles tables in other files.
 	- [x] Checkbox summary updating
 		- [x] Recursive mode for checkbox summaries (1.1.19)
 	- [x] Checkbox percentages
@@ -141,6 +141,7 @@
 	    - [ ] Fully customizable
 	    - [x] Mac Support
 	    - [ ] Linux Support
+	    - [ ] More testing doesn't pop up all the time!
 	- [ ] Logging [0/2]
 		- [ ] Todo state controls (Markup @ symbol etc.)
 		- [ ] Logging and notes on certain state transitions.
@@ -164,7 +165,7 @@
 	- [x] Color highlighting for #+ symbols
 	- [x] Image display? Is that possible?
 	- [x] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
-	- [ ] Persistent folding between open and close
+	- [x] Persistent folding between open and close
 	- [x] Agenda? Integration with existing plugin?
 	- [ ] Jira integration?
 	- [x] Google calendar integration?
@@ -177,6 +178,14 @@
 	- [ ] Column view (Is this possible in sublime?)
 	- [ ] Effort Estimate
 	- [x] Vintageous bindings
+
+* TODO DatePicker
+	- [ ] Support +XXX versions of commands
+	- [ ] Support Expanding dates inline in buffer from date text (like a snippet)
+	- [ ] Support Scrolling on dates with hotkeys
+	- [x] Support Prettier clock
+	- [ ] Better colors for clock
+
 
 * TODO Next
 ** TODO Agenda

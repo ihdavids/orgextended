@@ -67,6 +67,10 @@ class FileInfo:
 
     def Root(self):
         return self.org[0]
+
+    def RootInView(self, view, db):
+        self.ReloadIfChanged(view, db)
+        return self.Root()
         
     def LoadS(self,view):
         bufferContents = view.substr(sublime.Region(0, view.size()))
@@ -130,6 +134,10 @@ class FileInfo:
     def FindOrCreateNode(self, heading):
         for n in self.org[1:]:
             if(heading == n.full_heading):
+                return n
+
+        for n in self.org[1:]:
+            if(heading == n.heading):
                 return n
 
         # Okay got here and didn't find the node, have to make it.
@@ -426,6 +434,12 @@ class OrgDb:
         file = self.FindInfo(view)
         return file.AtPt(view, pt, self)
 
+    def RootInView(self, view):
+        file = self.FindInfo(view)
+        if file:
+            return file.RootInView(view, self)
+        return None
+
     def AtRegion(self, view, reg):
         file = self.FindInfo(view)
         return file.AtRegion(view, reg)
@@ -472,6 +486,35 @@ class OrgDb:
                 headings.append(formattedHeading)
                 count += 1
         return headings
+    
+    def AllHeadingsForFile(self, file):
+        headings = []
+        count = 0
+        f = file.org
+        for n in f[1:]:
+            parents = ""
+            t = n
+            while(type(t.parent) != node.OrgRootNode and t.parent != None):
+                t = t.parent
+                parents = t.heading + ":" + parents 
+            #formattedHeading = "{0:35}::{1}{2}".format(displayFn , parents, n.heading)
+            formattedHeading = "{0}{1}".format(parents,n.heading)
+            #print(formattedHeading)
+            headings.append(formattedHeading)
+            count += 1
+        return headings
+
+    # This is paired with FindFileInfo
+    def AllFiles(self, view):
+        files = []
+        count = 0
+        for o in self.Files:
+            displayFn = o.displayName
+            files.append(displayFn)
+        return files
+
+    def FindFileByIndex(self, index):
+        return self.Files[index]
 
     # This is a pair with AllHeadings, it can go from an index in that BACK to the
     # fileinfo

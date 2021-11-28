@@ -5,6 +5,10 @@ import datetime
 from OrgExtended.orgparse.date import *
 import OrgExtended.pymitter as evt
 import OrgExtended.asettings as sets
+import OrgExtended.orgutil.asciiclock as aclock
+import OrgExtended.orgduration as orgduration
+
+todayHighlight="orgagenda.block.1"
 
 def CreateUniqueViewNamed(name, mapped=None):
 	# Close the view if it exists
@@ -22,7 +26,7 @@ def CreateUniqueViewNamed(name, mapped=None):
 	return view
 
 class DateView:
-	def __init__(self, dayhighlight=None,firstDayIndex=0):
+	def __init__(self, dayhighlight=None,firstDayIndex=0, timeView=False):
 		self.months = []
 		self.columnsPerMonth = 30                     # 7 * 3 = 21 + 9
 		self.columnsInDay    = 2  
@@ -36,6 +40,8 @@ class DateView:
 		self.endrow          = 7
 		self.dayhighlight    = dayhighlight
 		self.firstdayindex   = firstDayIndex
+		self.timeView        = timeView
+
 
 
 	def SetView(self, view):
@@ -85,6 +91,8 @@ class DateView:
 		regs.append(reg)
 		self.output.add_regions(key,regs,highlight,"",drawtype)	
 
+	def ClearDayHighlights(self,key):
+		self.output.erase_regions(key)
 
 	def MapRowColToDate(self,row,col):
 		weekid   = int(row - self.headingLines)
@@ -136,6 +144,26 @@ class DateView:
 		self.ReShow()
 		self.HighlightDay(self.cdate.start)
 
+	def MoveCDateToNextHour(self):
+		self.cdate.add_hours(1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
+	def MoveCDateToPrevHour(self):
+		self.cdate.add_hours(-1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+	
+	def MoveCDateToNextMinute(self):
+		self.cdate.add_minutes(1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
+	def MoveCDateToPrevMinute(self):
+		self.cdate.add_minutes(-1)
+		self.ReShow()
+		self.HighlightDay(self.cdate.start)
+
 	def ReShow(self):
 		if(self.cdate == None):
 			return
@@ -143,9 +171,11 @@ class DateView:
 		if(now == None):
 			return
 		mid = (now.month - self.midmonth + 1)
-		if(mid < 0 or mid > 2):
+		if(mid < 0 or mid > 2 or self.timeView):
 			self.Render(now)
 			self.ResetRenderState()
+			self.ClearDayHighlights("today")
+			self.AddToDayHighlights(datetime.datetime.now(), "today",todayHighlight, sublime.DRAW_NO_FILL)
 
 	@staticmethod
 	def NextMonth(now):
@@ -195,16 +225,27 @@ class DateView:
 		l = max(len(m1),len(m2),len(m3))
 		self.endrow = self.startrow + l
 		row = self.startrow
-		for i in range(0,l):
+		clock = None
+		endrange = l
+		if(self.timeView):
+			clock = aclock.draw_clock(now,30,26)
+			endrange = 25
+		for i in range(0,endrange):
+			line = "{0:90}".format(" ")
 			pt = self.output.text_point(row,0)
 			row += 1
-			ml1 = m1[i] if i < len(m1) else ""
-			ml2 = m2[i] if i < len(m2) else ""
-			ml3 = m3[i] if i < len(m3) else ""
-			line = "{0:30}{1:30}{2:30}".format(ml1,ml2,ml3)
+			if(i < l):
+				ml1 = m1[i] if i < len(m1) else ""
+				ml2 = m2[i] if i < len(m2) else ""
+				ml3 = m3[i] if i < len(m3) else ""
+				line = "{0:30}{1:30}{2:30}".format(ml1,ml2,ml3)
+			if(clock and self.timeView):
+				line += clock.get_row(i+2)	
 			lreg = self.output.line(pt)
 			lreg = sublime.Region(lreg.begin(), lreg.end() + 1)
 			self.output.ReplaceRegion(lreg, line + "\n")
+			#print(line)
+
 
 		self.HighlightDay(now)
 
@@ -217,7 +258,7 @@ class DateView:
 
 class DatePicker:
 	def __init__(self,firstDayIndex=0):
-		self.dateView = DateView(None, firstDayIndex)
+		self.dateView = DateView(None, firstDayIndex, True)
 		self.months = []
 
 	def on_done(self, text):
@@ -232,10 +273,32 @@ class DatePicker:
 
 	def on_changed(self, text):
 		#print("CHANGED: " + text)
-		self.dateView.cdate = OrgDateFreeFloating.from_str(text)
+		duration = orgduration.OrgDuration.Parse(text,True)
+		if(not duration):
+			duration = orgduration.OrgDuration.ParseWeekDayOffset(text)
+		if(not duration):
+			duration = orgduration.OrgDuration.ParseMonthOffset(text)
+		# We allow duration syntax 3h
+		if(text == "." or text == "+0"):
+			now = datetime.datetime.now()
+			self.dateView.cdate = OrgDateFreeFloating(now)
+		elif(text.isnumeric()):
+			# We assume this is a day of the month (this month or next)
+			now = datetime.datetime.now()
+			cday = int(text)
+			if(cday > now.day):
+				now = now.replace(day=cday)
+			else:
+				now = now.replace(month=now.month+1,day=cday)
+			self.dateView.cdate = OrgDateFreeFloating(now)
+		elif(duration):
+			now = OrgDateFreeFloating(datetime.datetime.now())
+			self.dateView.cdate = now + duration
+		else:
+			self.dateView.cdate = OrgDateFreeFloating.from_str(text)
+		self.dateView.ReShow()
 		if(self.dateView.cdate):
 			self.dateView.HighlightDay(self.dateView.cdate.start)
-		self.dateView.ReShow()
 
 	def MapRowColToNewDate(self,row,col):
 		time     = self.dateView.cdate.start.time()
@@ -274,6 +337,23 @@ class DatePicker:
 	def MovePrevMonth(self):
 		self.dateView.MoveCDateToPrevMonth()
 		self.RefreshInputPanelFromDateView()
+	
+	def MoveNextHour(self):
+		self.dateView.MoveCDateToNextHour()
+		self.RefreshInputPanelFromDateView()
+
+	def MovePrevHour(self):
+		self.dateView.MoveCDateToPrevHour()
+		self.RefreshInputPanelFromDateView()
+
+	def MoveNextMinute(self):
+		self.dateView.MoveCDateToNextMinute()
+		self.RefreshInputPanelFromDateView()
+
+	def MovePrevMinute(self):
+		self.dateView.MoveCDateToPrevMinute()
+		self.RefreshInputPanelFromDateView()
+
 
 	def Show(self,now, onDone):
 		self.onDone	= onDone
@@ -347,6 +427,26 @@ class OrgDatePickerNextMonthCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		global datePicker
 		datePicker.MoveNextMonth()
+
+class OrgDatePickerNextHourCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MoveNextHour()
+
+class OrgDatePickerPrevHourCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MovePrevHour()
+
+class OrgDatePickerNextMinuteCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MoveNextMinute()
+
+class OrgDatePickerPrevMinuteCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		global datePicker
+		datePicker.MovePrevMinute()
 
 def Pick(onDone):
 	global datePicker
