@@ -1,0 +1,7 @@
+* 1.2.41
+	Thank you for the contribution Sinamore:
+
+	- Some small agenda fixes from Sinamore for the agena
+	  when day of week starts on Monday it was showing the wrong week.
+	- Datepicker had problems with date wrap around.
+	- A bug in mouse hovering with hasattr
