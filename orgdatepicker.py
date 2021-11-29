@@ -85,6 +85,9 @@ class DateView:
 
 	def AddToDayHighlights(self, date, key, highlight, drawtype = sublime.DRAW_NO_OUTLINE):
 		reg = self.DateToRegion(date)
+		if(not reg):
+			#print("NO REGION FOR DATE: " + str(date))
+			return
 		regs = self.output.get_regions(key)
 		if not regs:
 			regs = []

@@ -5,3 +5,6 @@
 	- {variable.<function>:call} will call a function on the variable contents (such as upper())
 	- {variable:repeat:string to repeat for {{item}} } assuming variable is a list will output the string expanded per item in the list
 	- {variable:if:string to output} Will output string to output if variable evaluates to true otherwise ""
+** DatePicker
+	- Fixed moving outside of the 3 month range. Highlighting today would fail and date would fail to update properly.
+	
