@@ -1,0 +1,7 @@
+* 1.2.42
+** Template formatter
+	- Small enhancement to template formatting in settings file for capture templates.
+	- Stolen from superformatter a very simple python template expansion tool.
+	- {variable.<function>:call} will call a function on the variable contents (such as upper())
+	- {variable:repeat:string to repeat for {{item}} } assuming variable is a list will output the string expanded per item in the list
+	- {variable:if:string to output} Will output string to output if variable evaluates to true otherwise ""
