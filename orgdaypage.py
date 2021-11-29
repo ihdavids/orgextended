@@ -102,7 +102,7 @@ def LoadedCheck(view,dt):
 
 def LoadedCheck2(view,dt, onDone):
     if(view.is_loading()):
-        sublime.set_timeout(lambda: LoadedCheck2(view,dt),1)
+        sublime.set_timeout(lambda: LoadedCheck2(view,dt,onDone),1)
     else:
         onDone(view,dt)
 
@@ -133,6 +133,17 @@ def dayPageArchiveOld(dt):
 def IsTodo(n):
     return n.todo and n.todo in n.env.todo_keys
 
+def IsDone(n):
+    return n.todo and n.todo in n.env.done_keys
+
+def IsArchived(n):
+    return "ARCHIVE" in n.tags
+
+def EnsureDate(ts):
+    if(isinstance(ts,datetime.datetime)):
+        return ts.date()
+    return ts
+
 def dayPageCopyOpenTasks(tview, dt):
     fn = dayPageFindOldPage(dt)
     if(fn == None):
@@ -153,6 +164,44 @@ def dayPageCopyOpenTasks(tview, dt):
         dayPageInsertSnippet(tview,dt)
     pass
 
+def dayPageCopyOpenPhase(tview,dt):
+    if(sets.Get("dayPageCopyOpenTasks", True)):
+        dayPageCopyOpenTasks(tview, dt)
+    else:
+        dayPageInsertSnippet(tview,dt)
+
+def dayPageCopyTodayTasks(tview, dt):
+    allowOutsideOrgDir = sets.Get("dayPageIncludeFilesOutsideOrgDir", False)
+    out = ""
+    for file in db.Get().Files: 
+        # Skip over files not in orgDir
+        if(not file.isOrgDir and not allowOutsideOrgDir):
+            continue
+        skipTill = 0
+        for i in range(1,len(file.org)):
+            if(i < skipTill):
+                continue
+            n = file.org[i]
+            if(IsTodo(n)):
+                ok = False
+                timestamps = n.get_timestamps(active=True,point=True,range=True)
+                for t in timestamps:
+                    if(t.start.day == dt.day and t.start.month == dt.month and t.start.year == dt.year):
+                        ok = True
+                        break
+                if(n.scheduled and (EnsureDate(n.scheduled.start) < EnsureDate(dt) and not IsDone(n) and not IsArchived(n) or EnsureDate(n.scheduled.start) == EnsureDate(dt))):
+                        ok = True
+                if(n.deadline and (EnsureDate(n.deadline.deadline_start) < EnsureDate(dt) and not IsDone(n) and not IsArchived(n) or EnsureDate(n.deadline.deadline_start) == EnsureDate(dt))):
+                        ok = True
+                if(ok):
+                    for line in n._lines:
+                        out += line + "\n"
+                    skipTill = n.find_last_child_index() + 1
+    if(out != ""):
+        LoadedCheck2(tview, dt, lambda a,b: tview.run_command("org_internal_insert", {"location": 0, "text": out, "onDone": evt.Make(lambda : dayPageCopyOpenPhase(tview, dt))}))
+    else:
+        dayPageCopyOpenPhase(tview,dt)
+
 def dayPageCreateOrOpen(dt):
     dpPath      = dayPageGetName(dt)
     dateString  = dayPageGetDateString(dt)
@@ -165,10 +214,10 @@ def dayPageCreateOrOpen(dt):
     if(didCreate):
         if(sets.Get("dayPageArchiveOld", True)):
             dayPageArchiveOld(dt)
-        if(sets.Get("dayPageCopyOpenTasks", True)):
-            dayPageCopyOpenTasks(tview, dt)
+        if(sets.Get("dayPageCopyTasksForToday", True)):
+            dayPageCopyTodayTasks(tview, dt)
         else:
-            dayPageInsertSnippet(tview,dt)
+            dayPageCopyOpenPhase(tview,dt)
 
 class OrgDayPagePreviousCommand(sublime_plugin.TextCommand):
     def OnDone(self):
