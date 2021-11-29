@@ -170,12 +170,19 @@ def dayPageCopyOpenPhase(tview,dt):
     else:
         dayPageInsertSnippet(tview,dt)
 
-def dayPageCopyTodayTasks(tview, dt):
+def dayPageCopyTodayTasks(path, tview, dt):
     allowOutsideOrgDir = sets.Get("dayPageIncludeFilesOutsideOrgDir", False)
     out = ""
-    for file in db.Get().Files: 
+    for file in db.Get().Files:
+        # Quick out if ARCHIVE is marked on the file
+        globalTags = file.org.list_comment("FILETAGS",[])
+        if("ARCHIVE" in globalTags):
+            continue
         # Skip over files not in orgDir
         if(not file.isOrgDir and not allowOutsideOrgDir):
+            continue
+        # Skip over ourselves.
+        if(path.lower() == file.GetFilename().lower()):
             continue
         skipTill = 0
         for i in range(1,len(file.org)):
@@ -215,7 +222,7 @@ def dayPageCreateOrOpen(dt):
         if(sets.Get("dayPageArchiveOld", True)):
             dayPageArchiveOld(dt)
         if(sets.Get("dayPageCopyTasksForToday", True)):
-            dayPageCopyTodayTasks(tview, dt)
+            dayPageCopyTodayTasks(dpPath, tview, dt)
         else:
             dayPageCopyOpenPhase(tview,dt)
 

@@ -55,6 +55,9 @@ class FileInfo:
             displayFn = displayFn[1:]
         self.displayName = displayFn
 
+    def GetFilename(self):
+        return self.filename
+        
     def RebuildBacklinks(self):
         links = self.org.env.links
         for link in links:
