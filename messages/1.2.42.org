@@ -7,4 +7,11 @@
 	- {variable:if:string to output} Will output string to output if variable evaluates to true otherwise ""
 ** DatePicker
 	- Fixed moving outside of the 3 month range. Highlighting today would fail and date would fail to update properly.
-	
+
+** DayPage
+   New option: "dayPageCopyTasksForToday": True
+   This will copy all todos that would target today to the current daypage. This is experimental and will likely change in the future.
+   Iterating with olBC to get this feature to his liking.
+   The option can scan files in memory but not in your org dir if you turn on: "dayPageIncludeFilesOutsideOrgDir": true
+
+   
