@@ -226,6 +226,12 @@
     "agendaDayStartTime": 6,
     "agendaDayEndTime": 19,  
 
+    // What defines a project?
+    // nested_todo TODO with sub TODO's.
+    // tag         Heading with a :PROJECT: tag
+    // property    Heading with a :PROJECT: True property
+    "agendaProjectIs": "nested_todo",
+
     // If you would like to only see the work week
     // set num days to 5 and the firstDayOfWeek above
     // to Monday

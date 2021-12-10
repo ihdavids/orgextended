@@ -150,30 +150,44 @@ def IsProjectTask(n):
     return (IsTodo(n) and n.parent and not n.parent.is_root() and IsTodo(n.parent)) or (IsTodo(n) and n.parent and n.parent.is_root() and HasChildTasks(n))
 
 def IsBlockedProject(n):
-    if(IsTodo(n) and n.num_children > 0):
-        isProject = False
+    if(IsProject(n) and n.num_children > 0):
         isBlocked = True
         for c in n.children:
-            if(IsTodo(c)):
-                isProject = True
             if(c.todo and c.todo == 'NEXT'):
                 isBlocked = False
-        return isProject and isBlocked
+        return isBlocked
     else:
         return False
 
-def IsProject(n):
-    #if(n.heading == "Project1"):
-    #    print("CHILDREN: " + str(n.num_children))
-    #    for c in n.children:
-    #        print(c.heading)
-    #        if(IsTodo(c)):
-    #            print("FOUND TASK")
+def IsProjectTodoWithTodos(n):
     if(IsTodo(n) and n.num_children > 0):
         for c in n.children:
             if(IsTodo(c)):
                 return True
     return False
+
+def IsProjectTaskWithProjectTag(n):
+    if(n):
+        tags = n.shallow_tags
+        if("PROJECT" in tags or "Project" in tags or "project" in tags):
+            print("PROJ: " + n.heading)
+            return True
+    return False
+
+def IsProjectTaskWithProjectProperty(n):
+    if(n and (n.get_property("PROJECT") or n.get_property("Project") or n.get_property("project"))):
+        return True
+    return False
+
+def IsProject(n):
+    projType = sets.Get("agendaProjectIs", "nested_todo").lower()
+    if(projType == "nested_todo"):
+        return IsProjectTodoWithTodos(n)
+    if(projType == "tag"):
+        return IsProjectTaskWithProjectTag(n)
+    if(projType == "property"):
+        return IsProjectTaskWithProjectProperty(n)
+    return IsProjectTodoWithTodos(n)
 
 def IsTodaysDate(check, today):
     if(not type(check) == datetime.date):
