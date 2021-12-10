@@ -1,5 +1,5 @@
 * 1.2.43
-** Flexible Project Definition
+** Agenda Flexible Project Definition
    New options for defining what a project is.
 
    #+BEGIN_SRC js
@@ -26,3 +26,8 @@
      :PROJECT:
    :END:
    ** TODO Task
+
+** Agenda Projects
+	2 new agenda views:
+	- Not Blocked Projects - Shows projects that are not in the blocked state (have a NEXT task)
+	- Projects             - Shows all projects

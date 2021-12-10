@@ -1265,6 +1265,14 @@ class ProjectsView(TodoView):
         super(ProjectsView, self).__init__(name, setup, **kwargs)
 
     def FilterEntry(self, n, filename):
+        return IsProject(n) and not IsArchived(n)
+
+# ================================================================================
+class NotBlockedProjectsView(TodoView):
+    def __init__(self, name, setup=True, **kwargs):
+        super(ProjectsView, self).__init__(name, setup, **kwargs)
+
+    def FilterEntry(self, n, filename):
         return IsProject(n) and not IsBlockedProject(n) and not IsArchived(n)
 
 # ================================================================================
@@ -1555,6 +1563,8 @@ class CalendarViewRegistry:
         self.AddView("Phone", PhoneView)
         self.AddView("Week", WeekView)
         self.AddView("Done", DoneTasksView)
+        self.AddView("Projects", ProjectsView)
+        self.AddView("Not Blocked Projects", NotBlockedProjectsView)
 
     def AddView(self,name,cls):
         self.KnownViews[name] = cls
