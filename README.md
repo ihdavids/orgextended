@@ -101,7 +101,7 @@
   - sublime_ZK - The inline image preview is entirely due to the Markdown ZK plugin. 
     [ZK](https://github.com/renerocksai/sublime_zk) Thank you renerocksai for pointing out that phantoms can be used for image preview.
   - Table Edit - For now this excellent plugin is a dependency and the basis by which we offer Org style table editing.
-  	In a fiture version we may look to consume the package and own table editing to facilitate expressions and some of the more
+  	In a future version we may look to consume the package and own table editing to facilitate expressions and some of the more
   	advanced org table tools, but for now, thank you for making this excellent plugin!
   - pymitter - a great little event library for python.
   - highlightjs - a wonderful highlighting library for html.
