@@ -45,6 +45,8 @@
 #+EMAIL:    myemail@mydomain.com
 #+OPTIONS: 
 
+#+TODO: TODO(!) WAIT(@) | DONE
+
 * Introduction
   This is a simple test file that has a bunch of the core Org Extended features in it.
   Org is huge and adding all of the features in org to a single file would be a very very large document.
@@ -699,5 +701,61 @@ $e^{i\pi}+1=0$
 
 
 
+[[http://reg.ca]] 
+** DONE Done task1 
+   CLOSED: [2021-05-13 Thu 23:14]
 
-[[http://reg.ca]]
+** DONE Task 2
+   CLOSED: [2010-05-13 Thu 23:14]
+
+   
+
+* TODO Hi
+
+
+* Clocker
+   #+BEGIN: clocktable :scope subtree :level 2
+  |    Heading    |  Time |       |
+  |---------------+-------+-------|
+  | Clocker       | 00:18 |       |
+  | \_ Clocktest1 |       | 00:18 |
+   #+END:
+** Clocktest1
+  :LOGBOOK:
+    CLOCK: [2021-05-29 Sat 00:05]--[2021-05-29 Sat 00:23] => 00:17
+    CLOCK: [2021-05-29 Sat 00:23]--[2021-05-29 Sat 00:23] => 00:00
+    CLOCK: [2021-05-29 Sat 00:23]--[2021-05-29 Sat 00:23] => 00:00
+  :END:
+
+* PerlTest
+
+  #+NAME: input-table
+  | a | b | c |
+  | 1 | 2 | 3 |
+  
+  #+BEGIN_SRC perl :var DATA=input-table :results table
+    foreach(my $m = 0; $m <= $#DATA; $m++)
+    {   
+      for(my $n = 0; $n <= $#{$DATA[$m]} ; $n++)
+      {  
+        print "$DATA[$m][$n] ";  
+      }  
+      print "\n";  
+    } 
+  #+END_SRC
+  #+RESULTS:
+  | a | b | c |
+  | 1 | 2 | 3 |
+
+  #+BEGIN_SRC perl :results value
+    return "Hello world"
+  #+END_SRC
+  #+RESULTS:
+  : Hello world
+
+* CSharpTest
+  
+  #+BEGIN_SRC csharp
+    using System;
+    Console.Writeline("Hello world");
+  #+END_SRC
