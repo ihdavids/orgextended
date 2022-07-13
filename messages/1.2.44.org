@@ -1,0 +1,20 @@
+* 1.2.44
+** Capture Supports Unicode
+	- [[https://github.com/ihdavids/orgextended/issues/57][Fix for Capture fails silently with unicode error]] 
+
+	Captures that contained unicode characters would fail. This was
+	due to the fact that the capture mechanism was not saving files with the default text encoding.
+
+	There is a new option that allows you to control the format of the destination capture file:
+	#+BEGIN_SRC js
+    // What file format should we write out as. This should be a python encoding value
+    // CAN BE:
+    // - utf-8
+    // - utf-16
+    // - utf-32
+    // SEE: https://docs.python.org/3.3/library/codecs.html#standard-encodings
+    "captureWriteFormat": "utf-8",
+	#+END_SRC
+
+	The default is now utf-
+

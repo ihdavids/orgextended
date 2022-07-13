@@ -31,3 +31,4 @@
 	2 new agenda views:
 	- Not Blocked Projects - Shows projects that are not in the blocked state (have a NEXT task)
 	- Projects             - Shows all projects
+
