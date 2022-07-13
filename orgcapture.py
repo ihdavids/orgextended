@@ -161,7 +161,7 @@ def GetCapturePath(view, template):
     # Try to create my capture file if I can
     try:
         if(not os.path.isfile(str(filename))):
-            with open(filename,"w") as fp:
+            with open(filename,"w",encoding=sets.Get("captureWriteFormat","utf-8")) as fp:
                 fp.write("#+TAGS: refile\n")
     except:
         log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename))
@@ -225,7 +225,7 @@ def onDeactivated(view):
                 # This does not work? its a node not a file
                 insertAt = captureFile.At(at)
             insertAt.insert_child(inserted)
-        f = open(capturePath,"w+")
+        f = open(capturePath,"w+",encoding=sets.Get("captureWriteFormat","utf-8"))
         # reauthor the ENTIRE file.
         # This can get expensive!
         for item in captureFileRoot:
@@ -330,7 +330,7 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             localDirname = os.path.dirname(self.view.file_name())
             if('/' not in filename and '\\' not in filename):
                 filename = os.path.join(localDirname, filename)
-        with open(filename, "a") as f:
+        with open(filename, "a",encoding=sets.Get("captureWriteFormat","utf-8")) as f:
             log.debug("  Archive file created...")
         # Okay now open the file.
         file       = db.Get().FindInfo(filename)
