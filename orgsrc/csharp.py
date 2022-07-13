@@ -12,7 +12,7 @@ import OrgExtended.orgparse.date as odate
 import OrgExtended.orgutil.util as util
 import OrgExtended.orglist as lst
 
-# Javascript Babel Mode
+# C# Babel Mode
 
 def FormatText(txt):
     if(isinstance(txt,str)):
