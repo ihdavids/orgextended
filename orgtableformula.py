@@ -2710,13 +2710,14 @@ class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
     def on_done(self):
         global highlightEnabled
         highlightEnabled = True
+        if(isTableFormula(self.view)):
+            self.view.run_command("org_highlight_formula")
+        elif(isTable(self.view)):
+            self.view.run_command("org_highlight_formula_from_cell")
+            self.view.run_command("org_highlight_cell")
         evt.EmitIf(self.onDone)
 
-    def run(self,edit,onDone = None):
-        global highlightEnabled
-        highlightEnabled = False
-        self.onDone = onDone
-        global tableCache
+    def on_aligned(self):
         td = tableCache.GetTable(self.view)
         if(td):
             cell = td.CursorToCell()
@@ -2731,6 +2732,15 @@ class OrgTableAutoComputeCommand(sublime_plugin.TextCommand):
                         if(val and isinstance(val,float) and fmt and "%" in fmt):
                             val = fmt % val
                         self.view.run_command("org_internal_replace", {"start": reg.begin(), "end": reg.end(), "text": str(val), "onDone": evt.Make(self.on_done_cell)})
+
+    def run(self,edit,onDone = None):
+        global highlightEnabled
+        global tableCache
+        self.onDone = onDone
+        highlightEnabled = False
+        self.view.run_command('table_editor_align')
+        sublime.set_timeout(self.on_aligned,1)
+
 
 # ================================================================================
 class OrgFillInFormulaFromCellCommand(sublime_plugin.TextCommand):

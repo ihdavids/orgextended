@@ -35,3 +35,20 @@
 
 
 
+** Autocalculated Rows Fix
+	- [[https://github.com/ihdavids/orgextended/issues/59][in tables, auto calculating rows sometimes break a column formula]]
+
+	Thanks to JosefTaylor reporting that autocalculating tables sometimes get confused with table formulas.
+	Some improvements have been made to fix this going forward.
+
+	The problem was that as you edit the column you can cross over into the next cell's space while editing. 
+	This was confusing the automatic targetting for the formula since the destination cell
+	was computed before the table was reformatted. I have added a table align before recomputing the cell.
+	It's a little slower when tabbing around but should result in correct behaviour.
+   
+   |   | am | I  |   what  |   |
+   |---+----+----+---------+---|
+   | # |  2 | 20 |  62.832 |   |
+   | # |  3 | 13 |  40.841 |   |
+   | # |  5 | 41 | 128.805 |   |
+   #+TBLFM::$4=$3*pi;N%.3f
