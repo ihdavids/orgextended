@@ -242,13 +242,13 @@ contexts:
     - match: (^|\s)=[^=]+=(^|\s)
       scope: orgmode.verbatim
 
-    - match: '<<'
-      scope: orgmode.target.bracket
-      push:
-        - meta_scope: orgmode.target
-        - match: '>>'
-          scope: orgmode.target.bracket
-          pop: true
+
+    - match: '(<<)([^>]+)(>>)'
+      captures:
+        1: orgmode.target.bracket
+        2: comment orgmode.link.text.href orgmode.target
+        3: orgmode.target.bracket
+      scope: markup.underline.link
 
     - match: '(\s*\#\+(BEGIN_CENTER|begin_center)\s*)'
       captures:

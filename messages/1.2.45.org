@@ -1,0 +1,14 @@
+* 1.2.45
+** FIXED Internal Target Highlighting
+   - [[https://github.com/ihdavids/orgextended/issues/62][Internal Target Problem]]
+
+   Thanks to flintforge for reporting that adding an unterminated << to a line would cause the rest of the document to become
+   an internal link in the org syntax setup as it is. This is now fixed:
+
+   << Internal Link >>  - This should be a valid link
+   << This is not a valid link
+
+
+   | This | Table | Should | Be | Okay |
+   |------+-------+--------+----+------|
+   |    1 |     2 |      3 |  4 |    5 | 
