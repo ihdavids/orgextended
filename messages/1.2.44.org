@@ -1,5 +1,5 @@
 * 1.2.44
-** Capture Supports Unicode
+** FIXED Capture Supports Unicode
 	- [[https://github.com/ihdavids/orgextended/issues/57][Fix for Capture fails silently with unicode error]] 
 
 	Captures that contained unicode characters would fail. This was
@@ -18,24 +18,7 @@
 
 	The default is now utf-8
 
-
-** Rounding Out Tag Support
-   Added new option to control the tag column when inserting tags:
-
-   #+BEGIN_SRC js
-    // Where should tags start in a headline?
-    // Tags will get inserted at this column
-    "tagColumn" : 80,
-   #+END_SRC
-
-   3 new commands (sadly t is used for timestamp so I am using m for mark...)
-   - Org Remove Tag      ::   (NeoVintageous: <space> r m)     Prompt to remove a tag
-   - Org Remove All Tags ::   (NeoVintageous: <space> r a m)   Removes all tags from current headline
-   - Org Fix Tags        ::   (NeoVintageous: <space> f m)     Will re-indent all tags in the file to the tag column specified
-
-
-
-** Autocalculated Rows Fix
+** FIXED Autocalculated Rows Fix
 	- [[https://github.com/ihdavids/orgextended/issues/59][in tables, auto calculating rows sometimes break a column formula]]
 
 	Thanks to JosefTaylor reporting that autocalculating tables sometimes get confused with table formulas.
@@ -52,3 +35,20 @@
    | # |  3 | 13 |  40.841 |   |
    | # |  5 | 41 | 128.805 |   |
    #+TBLFM::$4=$3*pi;N%.3f
+
+** FEATURE Rounding Out Tag Support
+   Added new option to control the tag column when inserting tags:
+
+   #+BEGIN_SRC js
+    // Where should tags start in a headline?
+    // Tags will get inserted at this column
+    "tagColumn" : 80,
+   #+END_SRC
+
+   3 new commands (sadly t is used for timestamp so I am using m for mark...)
+   - Org Remove Tag      ::   (NeoVintageous: <space> r m)     Prompt to remove a tag
+   - Org Remove All Tags ::   (NeoVintageous: <space> r a m)   Removes all tags from current headline
+   - Org Fix Tags        ::   (NeoVintageous: <space> f m)     Will re-indent all tags in the file to the tag column specified
+
+
+
