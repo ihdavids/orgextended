@@ -817,6 +817,44 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
             self.input.run("Tag:",db.Get().tags,evt.Make(self.OnDone))
 
 # ================================================================================
+class OrgRemoveTagCommand(sublime_plugin.TextCommand):
+    def OnDone(self, text):
+        if(not text):
+            return
+        node = db.Get().AtInView(self.view)
+        if(node):
+            if text in node.tags:
+                (region, line) = self.view.getLineAndRegion(node.start_row)
+                m = RE_TAGS.search(line)
+                if(m and m.group('tags') != None):
+                    txt = m.group('tags')
+                    tgs = txt.split(':')
+                    tags = []
+                    for tag in tgs:
+                        tag = tag.strip()
+                        if tag != None and tag != "" and tag.lower() != text.lower():
+                            tags.append(tag)
+                    if len(tags) > 0:
+                        tags = ":" + tags.join(":") + ":"
+                        toline = "{0:70}{1}".format(m.group('heading'), tags)
+                        self.view.ReplaceRegion(region,toline,self.onDone)
+                    else:
+                        toline = "{0:70}{1}".format(m.group('heading'), "")
+                        self.view.ReplaceRegion(region,toline,self.onDone)
+            else:
+                log.debug("Tag not part of node")
+                evt.EmitIf(self.onDone)
+
+    def run(self, edit, text=None, onDone=None):
+        self.onDone = onDone
+        self.text = text.strip() if text != None else text
+        if(self.text != None and self.text != ""):
+            self.OnDone(self.text)
+        else:
+            self.input = insSel.OrgInput()
+            self.input.run("Tag:",db.Get().tags,evt.Make(self.OnDone))
+
+# ================================================================================
 class OrgInsertArchiveTagCommand(sublime_plugin.TextCommand):
     def OnDone(self):
         evt.EmitIf(self.onDone)
