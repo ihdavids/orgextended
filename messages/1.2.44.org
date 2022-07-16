@@ -16,7 +16,7 @@
     "captureWriteFormat": "utf-8",
 	#+END_SRC
 
-	The default is now utf-
+	The default is now utf-8
 
 
 ** Rounding Out Tag Support
