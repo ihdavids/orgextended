@@ -16,6 +16,10 @@
     //"auto_complete_commit_on_tab": true,
     "auto_complete_use_index": true,
 
+    // Where should tags start in a headline?
+    // Tags will get inserted at this column
+    "tagColumn" : 80,
+
 
     // ============================================================
     // ORG DIRS:

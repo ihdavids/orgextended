@@ -268,6 +268,9 @@
     { "keys": ["R"],                 "command": "org_refile",                    "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ","r","f"],         "command": "org_refile_to_file",            "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ","r","r"],         "command": "org_refile_to_file_and_headline","context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+
+    { "keys": [" ","r","m"],         "command": "org_remove_tag",                "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ","r","a","m"],     "command": "org_remove_all_tags",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "p"],            "command": "org_priority_change",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "right"],        "command": "org_change_indent",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "left"],         "command": "org_change_de_indent",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
@@ -277,7 +280,7 @@
     { "keys": [" ", "i", "c"],       "command": "org_insert_heading_child",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "i", "d", "i"],  "command": "org_insert_date_inactive",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "i", "d", "a"],  "command": "org_insert_date_active",        "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
-    { "keys": [" ", "i", "t"],       "command": "org_insert_tag",                "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
+    { "keys": [" ", "i", "m"],       "command": "org_insert_tag",                "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "i", "i"],       "command": "org_insert_custom_id",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "i", "s"],       "command": "org_schedule",                  "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
     { "keys": [" ", "i", "t"],       "command": "org_active_timestamp",          "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}] },
@@ -291,6 +294,7 @@
     { "keys": [" ", "y", "s"],       "command": "org_copy_subtree",              "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "y", "e"],       "command": "org_copy_entity",               "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     { "keys": [" ", "f", "o"],       "command": "org_fold_all_but_me",           "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
+    { "keys": [" ", "f", "m"],       "command": "org_fix_tags",                  "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },
     
     // DAYPAGE
     { "keys": [" ", "d", "n"],       "command": "org_day_page_next",             "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "text.orgmode"}]  },

@@ -786,6 +786,16 @@ class OrgInsertClosedCommand(sublime_plugin.TextCommand):
             toInsert = orgdate.OrgDate.format_clock(now, False)
             self.view.insert(edit, l.end() + addnl, nl + node.indent() + "CLOSED: "+toInsert+"\n")
 
+def getTagColumn():
+    tagColumn = sets.Get("tagColumn",70)
+    if not isinstance(tagColumn,int):
+        tagColumn = 70
+    elif tagColumn < 30:
+        tagColumn = 30
+    elif tagColumn > 150:
+        tagColumn = 150
+    return tagColumn
+
 # ================================================================================
 RE_TAGS = re.compile(r'^(?P<heading>[*]+((?![ \t][:]).)+\s*)(\s+(?P<tags>[:]([^: ]+[:])+))?$')
 class OrgInsertTagCommand(sublime_plugin.TextCommand):
@@ -798,10 +808,12 @@ class OrgInsertTagCommand(sublime_plugin.TextCommand):
                 (region, line) = self.view.getLineAndRegion(node.start_row)
                 m = RE_TAGS.search(line)
                 if(m and m.group('tags') != None):
-                    tags = m.group('tags') + text + ":"
+                    tags = m.group('tags').strip() + text + ":"
                 else:
-                    tags = "    :" + text + ":" 
-                toline = "{0:70}{1}".format(m.group('heading'), tags)
+                    tags = ":" + text + ":" 
+                tagColumn = getTagColumn()
+                print("{0:"+str(tagColumn)+"s}{1}")
+                toline = ("{0:"+str(tagColumn)+"s}{1}").format(m.group('heading').strip(), tags)
                 self.view.ReplaceRegion(region,toline,self.onDone)
             else:
                 log.debug("Tag already part of node")
@@ -834,12 +846,13 @@ class OrgRemoveTagCommand(sublime_plugin.TextCommand):
                         tag = tag.strip()
                         if tag != None and tag != "" and tag.lower() != text.lower():
                             tags.append(tag)
+                    tagColumn = getTagColumn()
                     if len(tags) > 0:
-                        tags = ":" + tags.join(":") + ":"
-                        toline = "{0:70}{1}".format(m.group('heading'), tags)
+                        tags = (":" + ":".join(tags) + ":").strip()
+                        toline = ("{0:"+str(tagColumn)+"s}{1}").format(m.group('heading').strip(), tags)
                         self.view.ReplaceRegion(region,toline,self.onDone)
                     else:
-                        toline = "{0:70}{1}".format(m.group('heading'), "")
+                        toline = ("{0:"+str(tagColumn)+"s}{1}").format(m.group('heading').strip(), "")
                         self.view.ReplaceRegion(region,toline,self.onDone)
             else:
                 log.debug("Tag not part of node")
@@ -851,8 +864,41 @@ class OrgRemoveTagCommand(sublime_plugin.TextCommand):
         if(self.text != None and self.text != ""):
             self.OnDone(self.text)
         else:
-            self.input = insSel.OrgInput()
-            self.input.run("Tag:",db.Get().tags,evt.Make(self.OnDone))
+            self.ipt = insSel.OrgInput()
+            self.ipt.run("Tag:",db.Get().tags,evt.Make(self.OnDone))
+
+# ================================================================================
+class OrgRemoveAllTagsCommand(sublime_plugin.TextCommand):
+    def run(self, edit, text=None, onDone=None):
+        self.onDone = onDone
+        node = db.Get().AtInView(self.view)
+        if(node):
+            if len(node.tags) > 0:
+                (region, line) = self.view.getLineAndRegion(node.start_row)
+                m = RE_TAGS.search(line)
+                toline = ("{0}").format(m.group('heading'))
+                self.view.ReplaceRegion(region,toline,self.onDone)
+            else:
+                log.debug("Tags not part of node")
+                evt.EmitIf(self.onDone)
+
+# ================================================================================
+class OrgFixTagsCommand(sublime_plugin.TextCommand):
+    def run(self, edit, text=None, onDone=None):
+        self.onDone = onDone
+
+        file = db.Get().Find(self.view)
+        if file:
+            tagColumn = getTagColumn()
+            for node in file:
+                if(node):
+                    if len(node.tags) > 0:
+                        (region, line) = self.view.getLineAndRegion(node.start_row)
+                        m = RE_TAGS.search(line)
+                        if(m and m.group('tags') != None):
+                            txt = m.group('tags').strip()
+                            toline = ("{0:"+str(tagColumn)+"s}{1}").format(m.group('heading').strip(), txt)
+                            self.view.ReplaceRegion(region,toline,self.onDone)
 
 # ================================================================================
 class OrgInsertArchiveTagCommand(sublime_plugin.TextCommand):

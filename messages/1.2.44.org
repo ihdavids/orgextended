@@ -18,3 +18,20 @@
 
 	The default is now utf-
 
+
+** Rounding Out Tag Support
+   Added new option to control the tag column when inserting tags:
+
+   #+BEGIN_SRC js
+    // Where should tags start in a headline?
+    // Tags will get inserted at this column
+    "tagColumn" : 80,
+   #+END_SRC
+
+   2 new commands (sadly t is used for timestamp so I am using m for mark...)
+   - Org Remove Tag      ::   (NeoVintageous: <space> r m)     Prompt to remove a tag
+   - Org Remove All Tags ::   (NeoVintageous: <space> r a m)   Removes all tags from current headline
+   - Org Fix Tags        ::   (NeoVintageous: <space> f m)     Will re-indent all tags in the file to the tag column specified
+
+
+

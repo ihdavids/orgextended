@@ -85,6 +85,8 @@
     {"caption": "Org Jump To Today",           "command": "org_jump_to_today"           },
     {"caption": "Org Insert Tag",              "command": "org_insert_tag"              },
     {"caption": "Org Remove Tag",              "command": "org_remove_tag"              },
+    {"caption": "Org Remove All Tags",         "command": "org_remove_all_tags"         },
+    {"caption": "Org Fix Tags",                "command": "org_fix_tags"                },
     {"caption": "Org Closed",                  "command": "org_insert_closed"           },
     {"caption": "Org Insert CustomId",         "command": "org_insert_custom_id"        },
     {"caption": "Org Schedule",                "command": "org_schedule"                },
