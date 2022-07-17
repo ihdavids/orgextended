@@ -298,7 +298,14 @@ class OrgDb:
         self.files[fi.key] = fi
         if(self.Files == None):
             self.Files = []
-        self.Files.append(fi)
+        unique = True
+        for i,f in enumerate(self.Files):
+            if f.filename == fi.filename:
+                unique = False
+                self.Files[i] = fi
+                break
+        if unique:
+            self.Files.append(fi)
         self.SortFiles()
         fi.RebuildBacklinks()
 
