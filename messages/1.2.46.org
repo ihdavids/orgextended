@@ -1,0 +1,4 @@
+* 1.2.46
+** FIXED Duplicate filenames appearing in refile listing
+   When refiling to EOF sometimes the list would have duplicate files.
+   This should now be fixed.
