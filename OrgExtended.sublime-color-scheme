@@ -388,6 +388,14 @@
 			"foreground": "#9c9c17",
 		},
 		{
+			"scope": "orgmode.state.flag",
+			"foreground": "#9c9c17",
+		},
+		{
+			"scope": "orgmode.state.cleanup",
+			"foreground": "#9c9c17",
+		},
+		{
 			"scope": "orgmode.state.next",
 			"foreground": "#37dae6",
 		},

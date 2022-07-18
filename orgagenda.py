@@ -144,10 +144,12 @@ def HasChildTasks(n):
             return True
     return False
 
+# Task that belongs to a project. This means we have to have a parent and that parent has to be
+# identified as a project.
 def IsProjectTask(n):
     if(not n or n.is_root()):
         return False
-    return (IsTodo(n) and n.parent and not n.parent.is_root() and IsTodo(n.parent)) or (IsTodo(n) and n.parent and n.parent.is_root() and HasChildTasks(n))
+    return (IsTodo(n) and n.parent and not n.parent.is_root() and IsProject(n.parent))
 
 def IsBlockedProject(n):
     if(IsProject(n) and n.num_children > 0):

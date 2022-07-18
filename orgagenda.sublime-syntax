@@ -118,6 +118,12 @@ contexts:
     - match: '(IN-PROGRESS)'
       scope: orgmode.state.inprogress orgagenda.inprogress
 
+    - match: '(CLEANUP)'
+      scope: orgmode.state.cleanup orgagenda.cleanup
+
+    - match: '(FLAG)'
+      scope: orgmode.state.flag orgagenda.flag
+
     - match: '(NEXT)'
       scope: orgmode.state.next orgagenda.next
 

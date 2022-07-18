@@ -1,0 +1,9 @@
+* 1.2.47
+** FIXED Sometimes tasks were misidentified as being a task.
+   - Tasks are defined as being a todo that has a parent and that parent is a project identifier.
+   - NOTE: When I eventually support using the orgs server as an alternative to the orgdb the query language will
+           be cleaner. Right now I am not a fan of how I chose to build these querries.
+           
+** New default state keywords added
+   - FLAG - Personal state meaning this is waiting on processing. 
+   - CLEANUP - Personal state meaning this todo is in the cleanup phase and needs further cleanup effort.

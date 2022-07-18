@@ -13,7 +13,7 @@ variables:
   unscheddatetime: "\\[\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?\\]"
   tags: "(^|):[\\w\\d:]+:"
   priority: '\s*\[((\#A)|(\#B)|(\#C)|(\#D)|(\#E)|(\#[a-zA-Z0-9]+))\]\s+'
-  state: (TODO)|(BLOCKED)|(WAITING)|(CANCELLED)|(DONE)|(MEETING)|(PHONE)|(NOTE)|(IN-PROGRESS)|(DOING)|(NEXT)|(REASSIGNED)
+  state: (TODO)|(BLOCKED)|(WAITING)|(CANCELLED)|(DONE)|(MEETING)|(PHONE)|(NOTE)|(FLAG)|(CLEANUP)|(IN-PROGRESS)|(DOING)|(NEXT)|(REASSIGNED)
   beginmrk: BEGIN_SRC|begin_src
   endmrk:   END_SRC|end_src
   beginsrc: '(\s*\#\+({{beginmrk}})\s+)'

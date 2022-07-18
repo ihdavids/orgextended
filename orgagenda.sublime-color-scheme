@@ -75,6 +75,16 @@
 			"font_style": "bold italic",
 		},
 		{
+			"scope": "orgagenda.cleanup",
+			"foreground": "#d2a2e0",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.flag",
+			"foreground": "#d2a2e0",
+			"font_style": "bold italic",
+		},
+		{
 			"scope": "orgagenda.next",
 			"foreground": "#3fd9d7",
 			"font_style": "bold italic",
