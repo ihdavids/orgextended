@@ -13,7 +13,7 @@ variables:
   unscheddatetime: "\\[\\d{4}-\\d{2}-\\d{2}(?:\\s*\\w{3})?\\s*(\\d{2}\\:\\d{2})?\\s*([+]*\\d[wdmy])?\\]"
   tags: "(^|):[\\w\\d:]+:"
   priority: '\s*\[((\#A)|(\#B)|(\#C)|(\#D)|(\#E)|(\#[a-zA-Z0-9]+))\]\s+'
-  state: (TODO)|(BLOCKED)|(WAITING)|(CANCELLED)|(DONE)|(MEETING)|(PHONE)|(NOTE)|(FLAG)|(CLEANUP)|(IN-PROGRESS)|(DOING)|(NEXT)|(REASSIGNED)
+  state: (TODO)|(BLOCKED)|(WAITING)|(CANCELLED)|(DONE)|(MEETING)|(PHONE)|(NOTE)|(FLAG)|(CLEANUP)|(IN-PROGRESS)|(DOING)|(NEXT)|(REASSIGNED)|(FIXED)
   beginmrk: BEGIN_SRC|begin_src
   endmrk:   END_SRC|end_src
   beginsrc: '(\s*\#\+({{beginmrk}})\s+)'
@@ -36,20 +36,23 @@ contexts:
         7: variable.parameter orgmode.state.meeting
         8: variable.parameter orgmode.state.phone
         9: variable.parameter orgmode.state.note
-        10: variable.parameter orgmode.state.inprogress
-        11: variable.parameter orgmode.state.doing
-        12: variable.parameter orgmode.state.next
-        13: variable.parameter orgmode.state.reassigned
-        14: string.quoted orgmode.priority
-        15: string.quoted orgmode.priority.value
-        16: string.quoted orgmode.priority.value.a
-        17: string.quoted orgmode.priority.value.b
-        18: string.quoted orgmode.priority.value.c
-        19: string.quoted orgmode.priority.value.d
-        20: string.quoted orgmode.priority.value.e
-        21: string.quoted orgmode.priority.value.general
-        22: string.quoted orgmode.checkbox.summary
-        23: entity.name.tag.orgmode orgmode.tags.header
+        10: variable.parameter orgmode.state.flag
+        11: variable.parameter orgmode.state.cleanup
+        12: variable.parameter orgmode.state.inprogress
+        13: variable.parameter orgmode.state.doing
+        14: variable.parameter orgmode.state.next
+        15: variable.parameter orgmode.state.reassigned
+        16: variable.parameter orgmode.state.fixed
+        17: string.quoted orgmode.priority
+        18: string.quoted orgmode.priority.value
+        19: string.quoted orgmode.priority.value.a
+        20: string.quoted orgmode.priority.value.b
+        21: string.quoted orgmode.priority.value.c
+        22: string.quoted orgmode.priority.value.d
+        23: string.quoted orgmode.priority.value.e
+        24: string.quoted orgmode.priority.value.general
+        25: string.quoted orgmode.checkbox.summary
+        26: entity.name.tag.orgmode orgmode.tags.header
   main:
     # The main context is the initial starting point of our syntax.
     # Include other contexts from here (or specify them directly).

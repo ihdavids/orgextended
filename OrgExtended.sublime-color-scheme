@@ -404,6 +404,10 @@
 			"foreground": "#bab9b8",
 		},
 		{
+			"scope": "orgmode.state.fixed",
+			"foreground": "#bab9b8",
+		},
+		{
 			"scope": "orgmode.tack",
 			"foreground": "#c993c4",
 			"font_style": "bold",

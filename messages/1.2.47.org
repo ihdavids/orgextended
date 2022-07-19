@@ -5,5 +5,9 @@
            be cleaner. Right now I am not a fan of how I chose to build these querries.
            
 ** New default state keywords added
-   - FLAG - Personal state meaning this is waiting on processing. 
-   - CLEANUP - Personal state meaning this todo is in the cleanup phase and needs further cleanup effort.
+	New open states:
+    - FLAG - Personal state meaning this is waiting on processing. 
+    - CLEANUP - Personal state meaning this todo is in the cleanup phase and needs further cleanup effort.
+
+    New closed states:
+    - FIXED - same as DONE

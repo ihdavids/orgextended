@@ -80,8 +80,13 @@
 			"font_style": "bold italic",
 		},
 		{
-			"scope": "orgagenda.flag",
+			"scope": "orgagenda.fixed",
 			"foreground": "#d2a2e0",
+			"font_style": "bold italic",
+		},
+		{
+			"scope": "orgagenda.flag",
+			"foreground": "#f2a2e0",
 			"font_style": "bold italic",
 		},
 		{

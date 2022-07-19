@@ -121,6 +121,9 @@ contexts:
     - match: '(CLEANUP)'
       scope: orgmode.state.cleanup orgagenda.cleanup
 
+    - match: '(FIXED)'
+      scope: orgmode.state.fixed orgagenda.fixed
+
     - match: '(FLAG)'
       scope: orgmode.state.flag orgagenda.flag
 

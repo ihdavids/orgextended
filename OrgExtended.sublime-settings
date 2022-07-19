@@ -255,10 +255,10 @@
     "clockingSubMinuteClocks": true,
     
     // We follow the same sort of syntax as the normal orgmode for todos.
-    // Right now I don't support logging tags on these, but that will come.
     // I don't have smart syntax highlighting on these. The grammar file gives
-    // me some basic highlighting.
-    "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","|", "CANCELLED", "DONE","MEETING","PHONE","NOTE"],
+    // me some basic highlighting, but only for this set. I am hoping in the future I can figure
+    // out some way to make this extensible.
+    "todoStates": ["TODO","NEXT", "BLOCKED","WAITING","FLAG", "CLEANUP", "IN-PROGRESS", "DOING","|", "CANCELLED","REASSIGNED", "DONE","MEETING","PHONE","NOTE", "FIXED"],
 
     // ============================================================   
     // NOTIFICATION THREAD

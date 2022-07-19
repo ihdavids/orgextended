@@ -587,6 +587,9 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		self.addscope(cs,"orgmode.state.inprogress","#9c9c17")
 		self.addscope(cs,"orgmode.state.next",      "#37dae6")
 		self.addscope(cs,"orgmode.state.reassigned","#bab9b8")
+		self.addscope(cs,"orgmode.state.flag"      ,"#77ebed")
+		self.addscope(cs,"orgmode.state.cleanup"   ,"#e6ab4f")
+		self.addscope(cs,"orgmode.state.fixed"     ,"#47d04f")
 
 	def addpriorities(self, cs):
 		cs['rules'].append({"COMMENT ORGMODE PRIORITIES COMMENT HERE":""})
