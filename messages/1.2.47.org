@@ -11,3 +11,4 @@
 
     New closed states:
     - FIXED - same as DONE
+** FIXED Agenda color scheme was not highlighting filenames with underscores

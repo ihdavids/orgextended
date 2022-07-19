@@ -10,7 +10,7 @@ hidden: true
 contexts:
   main:
     # filename and line location
-    - match: '(^[a-zA-Z0-9]+:)'
+    - match: '(^[a-zA-Z0-9_]+:)'
       scope: string.quoted orgagenda.filename
 
     - match: '[0-9]+:[0-9]+(\.)+ (\-)+'
