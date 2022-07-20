@@ -1655,7 +1655,14 @@ class OrgNode(OrgBaseNode):
                 if(t):
                     t = t.strip()
                     if(t != ""):
-                        tags.add(t)
+                        if ':' in t:
+                            ts = t.split(':')
+                            for tt in ts:
+                                tt = tt.strip()
+                                if tt != "":
+                                    tags.add(tt)
+                        else:
+                            tags.add(t)
             parent = self.get_parent()
             if parent:
                 return tags | parent._get_tags(inher=True)

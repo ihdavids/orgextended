@@ -11,3 +11,14 @@
 	  (See above for the format)
 
 
+** FIXED FILETAGS
+   Filestags with colons around them were not having the colon stripped.
+   This was a bug introduced a while back and I did not notice.
+   This is no longer the case:
+
+   #+BEGIN_SRC org
+      #+FILETAGS: :A:B:C:
+   #+END_SRC 
+
+   Will now correctly tag all nodes with A B and C tags
+   
