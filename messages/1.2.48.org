@@ -1,0 +1,13 @@
+* 1.2.48
+** Properties
+   :PROPERTIES:
+     :Created: [2022-07-20 Wed 08:49]
+   :END:
+
+	- I found myself adding a Created property to a lot of new notes.
+	  (I like timestamps on when a note has been created)
+	  So I have added a new command Org Insert Created Property that will
+	  auto insert a :Created: [TIMESTAMP] to a heading, saves me a few keystrokes.
+	  (See above for the format)
+
+

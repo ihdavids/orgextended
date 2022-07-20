@@ -62,6 +62,7 @@
     {"caption": "Org Insert Today Active",     "command": "org_insert_today_active"     },
     {"caption": "Org Insert Now Inactive",     "command": "org_insert_now_inactive"     },
     {"caption": "Org Insert Now Active",       "command": "org_insert_now_active"       },
+    {"caption": "Org Insert Created Property", "command": "org_insert_created_property" },
     {"caption": "Org Insert Drawer",           "command": "org_insert_drawer"           },
     {"caption": "Org Insert Property Drawer",  "command": "org_insert_property_drawer"  },
     {"caption": "Org Insert Property",         "command": "org_insert_property"         },

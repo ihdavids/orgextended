@@ -7,6 +7,7 @@ import os
 import fnmatch
 import OrgExtended.orgparse.node as node
 from   OrgExtended.orgparse.sublimenode import * 
+import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgutil.util as util
 import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
@@ -250,12 +251,20 @@ class OrgInsertPropertyDrawerCommand(sublime_plugin.TextCommand):
             InsertDrawerIfNotPresent(self.view, node, ":PROPERTIES:")
 
 class OrgInsertPropertyCommand(sublime_plugin.TextCommand):
-    def run(self,edit,onDone=None):
+    def run(self,edit,onDone=None,name=None,value=None):
         self.onDone=onDone
-        self.view.window().show_input_panel(
-                    "Property Name:",
-                    "",
-                    self.createProperty, None, None)
+        if name != None:
+            self.pname = name
+            if value != None:
+                self.prop = value
+                self.createPropertyV2(self.prop)
+            else:
+                self.createProperty(name)
+        else:
+            self.view.window().show_input_panel(
+                        "Property Name:",
+                        "",
+                        self.createProperty, None, None)
 
     def createProperty(self, prop):
         if(not prop):
@@ -272,6 +281,14 @@ class OrgInsertPropertyCommand(sublime_plugin.TextCommand):
         node = db.Get().AtInView(self.view)
         if(node and node.level > 0):
             UpdateProperty(self.view, node, self.pname, prop, self.onDone)
+
+class OrgInsertCreatedPropertyCommand(sublime_plugin.TextCommand):
+    def run(self,edit,onDone=None):
+        self.onDone=onDone
+        now = datetime.datetime.now()
+        toInsert = orgdate.OrgDate.format_clock(now, False)
+        self.view.run_command("org_insert_property", {"name": "Created","value": toInsert, "onDone":onDone})
+
 
 class OrgInsertEffortCommand(sublime_plugin.TextCommand):
     def run(self,edit,onDone=None):
