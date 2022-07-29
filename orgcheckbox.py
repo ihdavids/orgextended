@@ -103,7 +103,7 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False, rec
         content = view.substr(line)
         summary = get_summary(view, line)
         lc = content.lstrip()
-        if summary and lc.startswith("*") or lc.startswith('#'):
+        if lc.startswith("*") or lc.startswith('#'):
              break
         if cre.search(content):
             cur_indent = len(get_indent(view, content))

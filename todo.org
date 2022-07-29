@@ -1,14 +1,11 @@
-* TODO Things I want [22/47]
-	- [-] Extensibility [1/5]
+* TODO Things I want [3/18]
+	- [-] Extensibility [2/5]
 		- [x] Avoid reloading when files do not change
 		- [ ] Similar folder names for all extensions in User folder
 		- [ ] Document all extensibility in user folder (and test it)
 		- [ ] Symbol and function table is only created once and reused. 
-		- [ ] Document all items available in the settings file. (Might be best just to do this in the settings file?)
-	- [ ] Named Objects [0%]
-		- [ ] Works with babel
-		- [ ] Identifies tables and other things
-	- [-] Capture [57%]
+		- [x] Document all items available in the settings file. (Might be best just to do this in the settings file?)
+	- [-] Capture [71%]
 		- [ ] External Capture (orgprotocol)
 		- [x] Basic capture buffer
 		- [x] Templates in config file.
@@ -16,7 +13,7 @@
 			- [x] *Capture manages level properly (BROKEN)*
 		- [x] Capture using sublime snippets
 		- [ ] Capture panel size controls?
-		- [ ] Capture with view vs panel (better for neovintageous users)
+		- [x] Capture with view vs panel (better for neovintageous users)
 	- [-] Parsing [5/6]
 		- [x] Basic file parsing
 		- [x] Tags parsed.
@@ -28,18 +25,6 @@
 		- [x] Basic Refile support
 		- [x] Basic Copy support
 		- [ ] More complex options for refiling.
-	- [x] Fold cycling [11/11]
-		- [x] Local fold cycling
-		- [x] Fold cycling in a modified file (currently gets confused)
-		- [x] Global fold cycling
-		- [x] Initial folding state control tag
-		- [x] Fold ALL, Unfold ALL commands
-		- [x] Folding property drawers
-		- [x] Folding src and quote blocks
-		- [x] Automatic property drawer folding. (I hate seeing those things!)
-		- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
-		- [x] Folding of all generic property drawers.
-		- [x] Folding of checkbox trees
 	- [-] Archiving [4/7]
 		- [x] Copy to org_archive an entire subtree
 		- [ ] (Low Priority) Archive by old datetime stamps
@@ -48,42 +33,6 @@
 		- [ ] Configuration for what gets added to the archive entries
 		- [x] #+ARCHIVE tags
 		- [x] Global archive option
-	- [x] Numbered Lists
-	- [-] Editing [13/14]
-		- [ ] Todo cycling
-		- [x] Todo menu
-		- [x] Priority menu
-		- [x] Insert heading (child and sibling)
-		- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
-		- [x] Caret looks okay
-		- [x] Indent, De-Indent heading and subtree
-		- [x] Heading movement, like you can do with lines
-		- [x] Checkbox insert?
-		- [x] Sublime snippets?
-		- [x] Auto indenting of checkboxes (with tab)
-		- [x] Property insertion
-		- [x] Fix Tag Insertion (tooltip is broken for some reason)
-		- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
-	- [-] Links [11/19]
-		- [x] Orgmode style links
-		- [x] images displayed inline
-		- [ ] #+ATTR_ORG: :width 100 supported for images
-		- [x] Single entry links vs with description (don't auto fold)
-		- [x] Follow links on various platforms.
-		- [x] Link copy
-		- [ ] Link insertion
-		- [x] Link snippet
-		- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
-		- [ ] Links in templates.
-		- [x] Ensure file: works (currently doesn't work that well)
-		- [x] <<TAG>> works for links
-		- [ ] Named objects work
-		- [ ] Ensure line number
-		- [ ] search links
-		- [x] regex links works for links
-		- [x] custom_id links work
-		- [ ] Write a page about personal wikis
-		- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
 	- [-] Formatting [7/8]
 		- [x] Basic syntax highlighting
 		- [x] Priority blocks
@@ -93,55 +42,12 @@
 		- [x] Strings?
 		- [x] Finish the babel work.
 		- [ ] Htmlify
-	- [-] Tables [21/23]
-		- [x] Basic table editing (Table Edit?)
-		- [x] Syntax highlighting of tables
-		- [x] Formula highlighting in tables
-		- [ ] Bold headers in tables
-		- [x] Table formats
-		- [x] Table parameters to execution blocks
-		- [x] Relative offsets in tables
-		- [x] In cell formulas
-		- [x] From edge symbols
-		- [x] Date time calc functions
-		- [x] Start column for column formulas
-		- [x] Range operator for cells
-		- [x] Range targets for cells
-		- [x] HLine indexes
-		- [x] Table visualization
-		- [x] Table resizing updates formulas
-		- [x] Extensible functions for tables
-		- [x] Documentation page for tables
-		- [ ] Extensible symbols for tables
-		- [x] Advanced table features
-		- [x] Gnu Plot Support
-		- [x] Table cache handles multiple files.
-		- [x] Remote keyword handles tables in other files.
-	- [x] Checkbox summary updating
-		- [x] Recursive mode for checkbox summaries (1.1.19)
-	- [x] Checkbox percentages
-	- [-] Dynamic Blocks [3/5]
+	- [-] Dynamic Blocks [4/5]
 		- [x] Basic dynamic blocks
 		- [ ] Test user side blocks
 		- [x] clocktable block
 		- [x] Clock reports
-		- [ ] execute all dynamic blocks in file command
-	- [x] Basic Clocking
-	- [x] Agenda [8/8]
-		- [x] Todo list (dynamic)
-		- [x] Extensible agenda views
-		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
-		- [x] Todo summaries?
-		- [x] More extensible views.
-		- [x] Week View
-		- [x] Calendar is selectable for day view?
-		- [x] Formatting for today line in day view?
-	- [-] Agenda Notifications [2/4]
-	    - [x] Windows Support
-	    - [ ] Fully customizable
-	    - [x] Mac Support
-	    - [ ] Linux Support
-	    - [ ] More testing doesn't pop up all the time!
+		- [x] execute all dynamic blocks in file command
 	- [ ] Logging [0/2]
 		- [ ] Todo state controls (Markup @ symbol etc.)
 		- [ ] Logging and notes on certain state transitions.
@@ -154,11 +60,76 @@
 		- [x] noweb
 		- [x] naming src blocks
 		- [x] parameters from tables
-	- [-] Snippets [2/4]
-		- [x] Src block snippet
-		- [ ] Quote block snippet
-		- [ ] Name snippet
-		- [x] Example block snippet
+	- [ ] Jira integration?
+	- [x] Google calendar integration?
+		  - This I am going to do by publishing calsync eventually.
+	- [ ] Searching by tag (like occur style?)
+	- [ ] Presentation mode from a file.
+	- [ ] Column view (Is this possible in sublime?)
+	- [ ] Effort Estimate
+
+* TODO Tables [22/24]
+	- [x] Basic table editing (Table Edit?)
+	- [x] Syntax highlighting of tables
+	- [x] Formula highlighting in tables
+	- [ ] Bold headers in tables
+	- [x] Table formats
+	- [x] Table parameters to execution blocks
+	- [x] Relative offsets in tables
+	- [x] In cell formulas
+	- [x] From edge symbols
+	- [x] Date time calc functions
+	- [x] Start column for column formulas
+	- [x] Range operator for cells
+	- [x] Range targets for cells
+	- [x] HLine indexes
+	- [x] Table visualization
+	- [x] Table resizing updates formulas
+	- [x] Extensible functions for tables
+	- [x] Documentation page for tables
+	- [ ] Extensible symbols for tables
+	- [x] Advanced table features
+	- [x] Gnu Plot Support
+	- [x] Table cache handles multiple files.
+	- [x] Remote keyword handles tables in other files.
+	- [x] Named Objects [100%]
+		- [x] Works with babel
+		- [x] Identifies tables and other things
+
+* TODO Clocking [1/5]
+	- [x] Basic Clocking
+	- [ ] Todo list showing by clock history
+	- [ ] Clock report todo view (day, week, month)
+	- [ ] Clock report to mermaid output
+	- [ ] Auto record sublime death in clocking and stop clock
+
+* TODO Notifications
+    - [x] Linux popup
+    - [ ] Windows powershell prompt (ascii art)
+
+* TODO Agenda [4/5]
+	- [x] Agenda? Integration with existing plugin? NO
+	- [x] Week View
+	- [x] Week Quick Select
+	- [x] Core Agenda [8/8]
+		- [x] Todo list (dynamic)
+		- [x] Extensible agenda views
+		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
+		- [x] Todo summaries?
+		- [x] More extensible views.
+		- [x] Week View
+		- [x] Calendar is selectable for day view?
+		- [x] Formatting for today line in day view?
+	- [-] Agenda Notifications [2/5]
+	    - [x] Windows Support
+	    - [ ] Fully customizable
+	    - [x] Mac Support
+	    - [ ] Linux Support
+	    - [ ] More testing doesn't pop up all the time!
+
+
+* TODO Editing [22/24]
+	- [x] Vintageous bindings
 	- [x] Quotes
 	- [x] Src blocks (more languages finish the color scheme)
 	- [x] Symbol indexing for headers
@@ -166,35 +137,83 @@
 	- [x] Image display? Is that possible?
 	- [x] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
 	- [x] Persistent folding between open and close
-	- [x] Agenda? Integration with existing plugin?
-	- [ ] Jira integration?
-	- [x] Google calendar integration?
-		  - This I am going to do by publishing calsync eventually.
-	- [ ] Searching by tag (like occur style?)
-	- [x] Export... probably refer and document using pandoc?
-		- [x] Reveal.js support
-		- [x] Export subtree
-	- [ ] Presentation mode from a file.
-	- [ ] Column view (Is this possible in sublime?)
-	- [ ] Effort Estimate
-	- [x] Vintageous bindings
+	- [x] Sublime snippets?
+	- [-] Snippets [4/5]
+		- [x] Src block snippet
+		- [x] Quote block snippet
+		- [x] Notes block snippet
+		- [ ] Name snippet
+		- [x] Example block snippet
+	- [x] Numbered Lists
+	- [ ] Todo cycling
+	- [x] Todo menu
+	- [x] Priority menu
+	- [x] Insert heading (child and sibling)
+	- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
+	- [x] Caret when editing is propper
+	- [x] Indent, De-Indent heading and subtree
+	- [x] Heading movement, like you can do with lines
+	- [x] Checkbox insert?
+	- [x] Auto indenting of checkboxes (with tab)
+	- [x] Property insertion
+	- [x] Fix Tag Insertion (tooltip is broken for some reason)
+	- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
 
-* TODO DatePicker
+* DONE Export [6/6]
+	- [x] Pandoc
+	- [x] Reveal.js support
+	- [x] Export subtree
+	- [x] Export to html
+	- [x] Export to latex
+	- [x] Export to pdf
+
+* TODO Checkboxes [3/3]
+	- [x] Checkbox summary updating
+		- [x] Recursive mode for checkbox summaries (1.1.19)
+	- [x] Checkbox percentages
+	- [x] BUG: Summaries on headings fall through to rest of list
+
+* TODO DatePicker [1/5]
 	- [ ] Support +XXX versions of commands
 	- [ ] Support Expanding dates inline in buffer from date text (like a snippet)
 	- [ ] Support Scrolling on dates with hotkeys
 	- [x] Support Prettier clock
 	- [ ] Better colors for clock
 
+* TODO Links [11/19]
+	- [x] Orgmode style links
+	- [x] images displayed inline
+	- [ ] #+ATTR_ORG: :width 100 supported for images
+	- [x] Single entry links vs with description (don't auto fold)
+	- [x] Follow links on various platforms.
+	- [x] Link copy
+	- [ ] Link insertion
+	- [x] Link snippet
+	- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
+	- [ ] Links in templates.
+	- [x] Ensure file: works (currently doesn't work that well)
+	- [x] <<TAG>> works for links
+	- [ ] Named objects work
+	- [ ] Ensure line number
+	- [ ] search links
+	- [x] regex links works for links
+	- [x] custom_id links work
+	- [ ] Write a page about personal wikis
+	- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
 
-* TODO Next
-** TODO Agenda
-	- [x] Week View
-	- [x] Week Quick Select
-
-** TODO Notifications
-    - [x] Linux popup
-    - [ ] Windows powershell prompt (ascii art)
+* TODO Folding [12/12]
+	- [x] Fold cycling
+	- [x] Local fold cycling
+	- [x] Fold cycling in a modified file (currently gets confused)
+	- [x] Global fold cycling
+	- [x] Initial folding state control tag
+	- [x] Fold ALL, Unfold ALL commands
+	- [x] Folding property drawers
+	- [x] Folding src and quote blocks
+	- [x] Automatic property drawer folding. (I hate seeing those things!)
+	- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
+	- [x] Folding of all generic property drawers.
+	- [x] Folding of checkbox trees
 
 ** TODO Jira
     - [ ] Query Jira for My Stuff

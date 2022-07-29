@@ -21,4 +21,16 @@
    #+END_SRC 
 
    Will now correctly tag all nodes with A B and C tags
+
+** FIXED Checkbox summaries
+   Summaries that were followed by a list of checkboxes in a second heading could miscalculate the summary
+   including checkboxes from the next heading
+
+   #+BEGIN_SRC org
+   * A [/]       <-- This would be miscalculated as [1/3] vs [1/2]
+     - [ ] B
+     - [x] C
+   ** D 
+     - [ ] E
+   #+END_SRC
    
