@@ -1295,6 +1295,7 @@ RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
 class TodoView(AgendaBaseView):
     def __init__(self, name, setup=True, **kwargs):
         super(TodoView, self).__init__(name, setup, **kwargs)
+        self.showduration = "showduration" in kwargs
 
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
@@ -1305,7 +1306,15 @@ class TodoView(AgendaBaseView):
             self.RenderEntry(n, filename, edit)
 
     def RenderEntry(self, n, filename, edit):
-        self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, n.todo, n.heading))
+        if self.showduration:
+            duration = ""
+            dur = datetime.timedelta(days=0)
+            for c in n.clock:
+                dur += c.duration
+            duration = orgdate.OrgDate.format_duration(dur)
+            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2:7} {3}\n".format(filename, n.todo, duration, n.heading))
+        else:
+            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, n.todo, n.heading))
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsArchived(n)

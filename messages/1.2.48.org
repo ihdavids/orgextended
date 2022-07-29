@@ -27,7 +27,7 @@
    including checkboxes from the next heading
 
    #+BEGIN_SRC org
-      
+
    * A [1/2]       <-- This would be miscalculated as [1/3] vs [1/2]
      - [ ] B
      - [x] C
@@ -71,4 +71,9 @@
      "This Weeks Work":   ["Todos : clockfilter +7d"],
    #+END_SRC
 
+*** showduration
+   This will show the amount of time in hours and minutes that you spent on a todo, in the todo view
 
+   #+BEGIN_SRC js
+     "This Weeks Work":   ["Todos : clockfilter +7d : showduration"],
+   #+END_SRC
