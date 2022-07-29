@@ -27,11 +27,25 @@
    including checkboxes from the next heading
 
    #+BEGIN_SRC org
-   * A [/]       <-- This would be miscalculated as [1/3] vs [1/2]
+      
+   * A [1/2]       <-- This would be miscalculated as [1/3] vs [1/2]
      - [ ] B
      - [x] C
    ** D 
      - [ ] E
+
+   While still facilitating nested summaries:
+
+   * Heading [3/5]
+   - [x] A
+   - [x] B
+   - [ ] C
+   - [-] D [1/3]
+      - [ ] X
+      - [x] Y
+      - [ ] Z
+   - [x] E
+
    #+END_SRC
    
 ** FIXED Clocking in and out was crashing
@@ -40,3 +54,21 @@
 
 ** New Command Org Jump To Clock
    This will jump to an active clock if one is running.
+
+** New Todo filters
+*** clockedtoday
+   clockedtoday tests if the todo has a clock value and if either start or end spans today
+   If you are using the clocking feature this makes it easier to get a quick list of things you have worked on today.
+  
+   #+BEGIN_SRC js
+     "Todays Work":   ["Todos : clockedtoday"],
+   #+END_SRC 
+
+*** clockfilter
+   clockfilter is like durationfilter in that it takes a duration specifier
+
+   #+BEGIN_SRC js
+     "This Weeks Work":   ["Todos : clockfilter +7d"],
+   #+END_SRC
+
+

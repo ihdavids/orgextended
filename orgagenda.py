@@ -455,8 +455,11 @@ class AgendaBaseView:
         self.SetPriorityFilter(kwargs)
         self.SetStateFilter(kwargs)
         self.SetDurationFilter(kwargs)
+        self.SetClockedDurationFilter(kwargs)
         self.SetDateFilter(kwargs)
         self.hasclock = "hasclock" in kwargs
+        self.clockedtoday = "clockedtoday" in kwargs
+        self.clockfilter = "clockfilter" in kwargs
         self.hasclose = "hasclose" in kwargs
         self.hasdeadline = "hasdeadline" in kwargs
         self.hasschedule = "hasschedule" in kwargs
@@ -496,6 +499,28 @@ class AgendaBaseView:
                     self._beforeDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
                 else:
                     self._afterDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
+    
+    def SetClockedDurationFilter(self,kwargs):
+        self._beforeClockedDuration     = []
+        self._afterClockedDuration      = []
+        if("clockfilter" in kwargs):
+            self._clockedDurationFilter = kwargs["clockfilter"]
+        else:
+            self._clockedDurationFilter = None
+            return
+        tags = self._clockedDurationFilter.split(' ')
+        for tag in tags:
+            tag = tag.strip()
+            if not tag or len(tag) <= 0:
+                continue
+            m = RE_IN_OUT_TAG.search(tag)
+            if(m):
+                inout = m.group('inout')
+                tagdata = m.group('tag')
+                if(not inout or inout == '+'):
+                    self._beforeClockedDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
+                else:
+                    self._afterClockedDuration.append(dur.OrgDuration.Parse(tagdata.strip()))
 
     def SetStateFilter(self,kwargs):
         if("statefilter" in kwargs):
@@ -687,6 +712,29 @@ class AgendaBaseView:
             return False
         return True
 
+    def MatchClock(self, node):
+        if self.clockedtoday:
+            if not node.clock:
+                return False
+            now = datetime.datetime.now()
+            for c in node.clock:
+                if c.start.date() == now.date():
+                    return True
+                if c.end.date() == now.date():
+                    return True
+            return False
+        if self.clockfilter:
+            if not node.clock:
+                return False
+            for t in node.clock:
+                if t:
+                    if(self._afterClockedDuration and any(not t.after_duration(elem) for elem in self._afterClockedDuration)):
+                        return False
+                    if(self._beforeClockedDuration and any(not t.before_duration(elem) for elem in self._beforeClockedDuration)):
+                        return False
+        return True
+
+
     def SetupView(self):
         self.view = CreateUniqueViewNamed(self.name, self)
         self.view.set_read_only(True)
@@ -783,6 +831,7 @@ class AgendaBaseView:
                    and self.MatchState(n)
                    and self.MatchDuration(n)
                    and self.MatchDate(n)
+                   and self.MatchClock(n)
                    and self.FilterEntry(n, file)):
                     self.AddEntry(n, file)
 
