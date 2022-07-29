@@ -34,3 +34,9 @@
      - [ ] E
    #+END_SRC
    
+** FIXED Clocking in and out was crashing
+   Clocking in and out on a node was throwing exceptions due to the property
+   drawer API attempting to operate on a root node. This should now be fixed.
+
+** New Command Org Jump To Clock
+   This will jump to an active clock if one is running.

@@ -135,7 +135,7 @@ class ClockManager:
 			return None
 		node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
 		if(node):
-			node.start_row()
+			return node.start_row
 
 
 # Load the clock cache.
@@ -145,13 +145,28 @@ def Load():
 # Clock in a task
 class OrgClockInCommand(sublime_plugin.TextCommand):
 	def run(self,edit,onDone=None):
+		ClockManager.LoadClock()
 		ClockManager.ClockIn(self.view)
 		evt.EmitIf(onDone)
 
 # Clock out a task
 class OrgClockOutCommand(sublime_plugin.TextCommand):
 	def run(self,edit,onDone=None):
+		ClockManager.LoadClock()
 		ClockManager.ClockOut(self.view)
+		evt.EmitIf(onDone)
+
+# Jump to an active clock
+class OrgJumpToClockCommand(sublime_plugin.TextCommand):
+	def run(self,edit,onDone=None):
+		ClockManager.LoadClock()
+		at = ClockManager.GetActiveClockAt()
+		filename = ClockManager.GetActiveClockFile()
+		if at and filename:	
+			path = "{0}:{1}".format(filename,at + 1)
+			self.view.window().open_file(path, sublime.ENCODED_POSITION)
+		else:
+			print("No active clock")
 		evt.EmitIf(onDone)
 
 # Clear the currently running clock (if there is one)

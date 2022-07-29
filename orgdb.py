@@ -552,11 +552,11 @@ class OrgDb:
                 if(n.heading == heading):
                     cur = n
                     break
-            # Did not find it darn
-            if(cur.heading != heading):
+            # Did not find this level of heading darn
+            if(not cur or cur.is_root() or cur.heading != heading):
                 break
         heading = headings[len(headings)-1]
-        if(cur.heading == heading):
+        if(not cur or cur.is_root() or cur.heading == heading):
             return cur
 
         if(len(headings) > 1):

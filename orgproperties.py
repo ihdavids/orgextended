@@ -25,6 +25,9 @@ log = logging.getLogger(__name__)
 
 RE_SDC = re.compile(r'^\s*(SCHEDULED|DEADLINE|CLOSED):')
 def InsertDrawerIfNotPresent(view, node, drawer = ":PROPERTIES:", onDone=None):
+    if not node or node.is_root():
+        evt.EmitIf(onDone)
+        return False
     if(drawer == ":PROPERTIES:"):
         if(node.property_drawer_location):
             evt.EmitIf(onDone)
@@ -141,6 +144,9 @@ def UpdateLogbook(view, node, key, value, onDone=None):
     if(InsertDrawerIfNotPresent(view, node, ":LOGBOOK:")):
         # File is reloaded have to regrab node
         node = db.Get().At(view, node.start_row)
+    if not node or node.is_root():
+        evt.EmitIf(onDone)
+        return
     drawer = node.get_drawer("LOGBOOK")
     loc    = drawer['loc']
     start  = loc[0]
