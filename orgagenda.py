@@ -1296,28 +1296,71 @@ class TodoView(AgendaBaseView):
     def __init__(self, name, setup=True, **kwargs):
         super(TodoView, self).__init__(name, setup, **kwargs)
         self.showduration = "showduration" in kwargs
+        self.showfilename = "hidefilename" not in kwargs
+        self.showheading  = "hideheading" not in kwargs
+        self.showstatus   = "hidestatus" not in kwargs
+        self.showtotalduration = "showtotalduration" in kwargs
+
+    def GetFormatData(self, n, filename):
+        data = {}
+        if self.showfilename:
+            data['filename'] = filename
+        if self.showstatus:
+            todo = ""
+            if n:
+                todo = n.todo
+                if todo == None:
+                    todo = ""
+            data['status'] = todo
+        if self.showduration:
+            duration = ""
+            dur = datetime.timedelta(days=0)
+            if n:
+                for c in n.clock:
+                    dur += c.duration
+                self.totalduration += dur
+                duration = orgdate.OrgDate.format_duration(dur)
+            data['duration'] = duration
+        if self.showheading:
+            heading = ""
+            if n:
+                heading = n.heading
+            data['heading'] = heading
+        return data
+
+    def GetFormatString(self):
+        formatstr = ""
+        if self.showfilename:
+            formatstr += "{filename:15} "
+        if self.showstatus:
+            formatstr += "{status:12} "
+        if self.showduration:
+            formatstr += "{duration:7} "
+        if self.showheading:
+            formatstr += "{heading}"
+        formatstr += "\n"
+        return formatstr
 
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
+        self.totalduration = datetime.timedelta(days=0)
         for entry in self.entries:
             n        = entry['node']
             filename = entry['file'].AgendaFilenameTag()
             self.MarkEntryAt(entry)
             self.RenderEntry(n, filename, edit)
+        if self.showtotalduration:
+            formatstr = self.GetFormatString()
+            data      = self.GetFormatData(None,"")
+            data['duration'] = orgdate.OrgDate.format_duration(self.totalduration)
+            data['filename'] = "TOTAL: "
+            self.view.insert(edit, self.view.size(), "----------------------------------------------------------------------------\n")
+            self.view.insert(edit, self.view.size(), formatstr.format(**data))
 
     def RenderEntry(self, n, filename, edit):
-        todo = n.todo
-        if todo == None:
-            todo = ""
-        if self.showduration:
-            duration = ""
-            dur = datetime.timedelta(days=0)
-            for c in n.clock:
-                dur += c.duration
-            duration = orgdate.OrgDate.format_duration(dur)
-            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2:7} {3}\n".format(filename, todo, duration, n.heading))
-        else:
-            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, todo, n.heading))
+        formatstr = self.GetFormatString()
+        data      = self.GetFormatData(n, filename)
+        self.view.insert(edit, self.view.size(), formatstr.format(**data))
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsArchived(n)

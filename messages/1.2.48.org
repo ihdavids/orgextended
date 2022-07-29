@@ -78,6 +78,26 @@
      "This Weeks Work":   ["Todos : clockfilter +7d : showduration"],
    #+END_SRC
 
+*** hide filters
+   3 Additional formatting options for task list views:
+
+   - hidefilename
+   - hideheading
+   - hidestatus
+
+   #+BEGIN_SRC js
+     "This Weeks Work":   ["Todos : clockfilter +7d : showduration : hidefilename"],
+   #+END_SRC
+
+   These will hide the filename, todo heading and todo status fields as desired in the listing.
+
+*** showtotalduration
+   This option will turn on a summary of the total duration at the end of task listing of tasks that were clocked.
+
+   #+BEGIN_SRC js
+     "This Weeks Work":   ["Todos : clockfilter +7d : showduration : showtotalduration"],
+   #+END_SRC
+
 ** New Agenda Views
    Clocked view shows anything with a clock value including non todos
 
@@ -85,7 +105,7 @@
    since it uses the Todo view while the following will actually show all work done on any node.
    Obviously this comes with a slight performance cost as it has to scan non todo nodes, but it makes
    the clocking feature more useful.
-   
+
    #+BEGIN_SRC js
      "This Weeks Work":   ["Clocked : clockfilter +7d : showduration"],
    #+END_SRC
