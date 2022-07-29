@@ -1300,6 +1300,7 @@ class TodoView(AgendaBaseView):
         self.showheading  = "hideheading" not in kwargs
         self.showstatus   = "hidestatus" not in kwargs
         self.showtotalduration = "showtotalduration" in kwargs
+        self.byproject    = "byproject" in kwargs
 
     def GetFormatData(self, n, filename):
         data = {}
@@ -1344,11 +1345,40 @@ class TodoView(AgendaBaseView):
     def RenderView(self, edit):
         self.InsertAgendaHeading(edit)
         self.totalduration = datetime.timedelta(days=0)
-        for entry in self.entries:
-            n        = entry['node']
-            filename = entry['file'].AgendaFilenameTag()
-            self.MarkEntryAt(entry)
-            self.RenderEntry(n, filename, edit)
+        if self.byproject:
+            projects   = {}
+            loosetasks = []
+            for entry in self.entries:
+                n        = entry['node']
+                if n == None:
+                    continue
+                if n.is_root() or n.parent == None or n.parent.is_root() or not IsProject(n.parent):
+                    loosetasks.append(entry)
+                else:
+                    pname = n.parent.heading
+                    if pname not in projects:
+                        projects[pname] = []
+                    projects[pname].append(entry)
+            for pname,vals in projects.items():
+                self.view.insert(edit, self.view.size(), "\n== [{0}] ==\n".format(pname))
+                for entry in vals:
+                    n        = entry['node']
+                    filename = entry['file'].AgendaFilenameTag()
+                    self.MarkEntryAt(entry)
+                    self.RenderEntry(n, filename, edit)
+            if len(loosetasks) > 0:
+                self.view.insert(edit, self.view.size(), "\n== [] ==\n")
+                for entry in loosetasks:
+                    n        = entry['node']
+                    filename = entry['file'].AgendaFilenameTag()
+                    self.MarkEntryAt(entry)
+                    self.RenderEntry(n, filename, edit)
+        else:
+            for entry in self.entries:
+                n        = entry['node']
+                filename = entry['file'].AgendaFilenameTag()
+                self.MarkEntryAt(entry)
+                self.RenderEntry(n, filename, edit)
         if self.showtotalduration:
             formatstr = self.GetFormatString()
             data      = self.GetFormatData(None,"")
@@ -1715,6 +1745,8 @@ class CalendarViewRegistry:
                 vv = self.KnownViews[n](n, False, **args)
             if(vv):
                 vlist.append(vv)
+        if len(vlist) == 1:
+            vlist[0].name = name + " [" + vlist[0].name + "]"
         cview = CompositeView(name, vlist)
         return cview
 

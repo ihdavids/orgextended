@@ -50,10 +50,10 @@
    
 ** FIXED Clocking in and out was crashing
    Clocking in and out on a node was throwing exceptions due to the property
-   drawer API attempting to operate on a root node. This should now be fixed.
+   drawer API attempting to operate on a root node missing some API. This should now be fixed.
 
 ** New Command Org Jump To Clock
-   This will jump to an active clock if one is running.
+   This will jump to an active clock if one is running. Currently not bound to anything.
 
 ** New Todo filters
 *** clockedtoday
@@ -98,6 +98,13 @@
      "This Weeks Work":   ["Todos : clockfilter +7d : showduration : showtotalduration"],
    #+END_SRC
 
+*** byproject
+   This task pane option will group tasks by project adding a == [Project Name] == header to each project for clarity
+
+   #+BEGIN_SRC js
+     "This Weeks Work":   ["Todos : clockfilter +7d : showduration : showtotalduration : byproject"],
+   #+END_SRC
+
 ** New Agenda Views
    Clocked view shows anything with a clock value including non todos
 
@@ -109,3 +116,13 @@
    #+BEGIN_SRC js
      "This Weeks Work":   ["Clocked : clockfilter +7d : showduration"],
    #+END_SRC
+
+** Tweak to Composite Todo List Titles
+   If the composite list only contains a single view, the name of the view is assigned the name of the composite view + [view name]
+   This allows a custom view with "This Weeks Work" as the name to appear as:
+
+   #+BEGIN_EXAMPLE
+     This Weeks Work [Clocked]
+   #+END_EXAMPLE
+
+   Increasing clarity as to the type of list you are viewing

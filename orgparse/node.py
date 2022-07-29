@@ -1360,7 +1360,6 @@ class OrgNode(OrgBaseNode):
                 print("FAILED PARSING CLOCK({0}): {1}".format(at.offset,line))
             if cl:
                 clocklist.append(cl)
-                evt.Get().emit("clockfound", self, cl)
             else:
                 yield line
 

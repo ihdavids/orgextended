@@ -328,17 +328,10 @@ class OrgDb:
                     return True
         return False 
 
-    def OnClock(self, node, tm):
-        pass
-
     def RebuildDb(self):
         if(evt.Get().listeners('tagsfound')):
             evt.Get().clear_listeners('tagsfound')
         evt.Get().on("tagsfound",self.OnTags)
-        if(evt.Get().listeners('clockfound')):
-            evt.Get().clear_listeners('clockfound')
-        evt.Get().on("clockfound",self.OnClock)
-        self.ByClock = []
         self.Files = []
         self.files = {}
         self.orgPaths = self.__GetPaths("orgDirs")
