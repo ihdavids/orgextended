@@ -1306,15 +1306,18 @@ class TodoView(AgendaBaseView):
             self.RenderEntry(n, filename, edit)
 
     def RenderEntry(self, n, filename, edit):
+        todo = n.todo
+        if todo == None:
+            todo = ""
         if self.showduration:
             duration = ""
             dur = datetime.timedelta(days=0)
             for c in n.clock:
                 dur += c.duration
             duration = orgdate.OrgDate.format_duration(dur)
-            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2:7} {3}\n".format(filename, n.todo, duration, n.heading))
+            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2:7} {3}\n".format(filename, todo, duration, n.heading))
         else:
-            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, n.todo, n.heading))
+            self.view.insert(edit, self.view.size(), "{0:15} {1:12} {2}\n".format(filename, todo, n.heading))
 
     def FilterEntry(self, n, filename):
         return IsTodo(n) and not IsProject(n) and not IsArchived(n)
@@ -1361,6 +1364,14 @@ class DoneTasksView(TodoView):
     def FilterEntry(self, n, filename):
         rc = IsDone(n) and not IsArchived(n)
         return rc
+
+# ================================================================================
+class ClockedView(TodoView):
+    def __init__(self, name, setup=True, **kwargs):
+        super(ClockedView, self).__init__(name, setup, **kwargs)
+
+    def FilterEntry(self, n, filename):
+        return n and n.clock
 
 # ================================================================================
 class NextTasksProjectsView(TodoView):
@@ -1623,6 +1634,7 @@ class CalendarViewRegistry:
         self.AddView("Phone", PhoneView)
         self.AddView("Week", WeekView)
         self.AddView("Done", DoneTasksView)
+        self.AddView("Clocked", ClockedView)
         self.AddView("Projects", ProjectsView)
         self.AddView("Not Blocked Projects", NotBlockedProjectsView)
 
