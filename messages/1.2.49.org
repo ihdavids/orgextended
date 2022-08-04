@@ -1,2 +1,39 @@
 * 1.2.49
-	
+** REMINDER org_agenda_custom_view
+   Recently I was asked about todo views. I thought I would take a moment and
+   highlight what is already there. 
+
+	The org_agenda_choose_custom_view command can be handy
+	for scanning through your todo lists, but if you are like me,
+	it can get in the way.
+
+	You can bind your own keybindings and select a particular view quickly like so:
+	Here I am using a neovintageous style keybinding to pop up my "This Weeks Work" list
+	when I press <space> o l w in normal mode. (Think VIM) You can do much the same for whatever your
+	preferences might be.
+
+
+	#+BEGIN_SRC js
+    { "keys": [" ","o", "l", "w"]
+    , "command": "org_agenda_custom_view"
+    , "args": {"toShow": "This Weeks Work"}
+    , "context": [{"key": "vi_command_mode_aware"}]  
+    },
+	#+END_SRC
+
+	This view is created using the view syntax like so:
+
+	#+BEGIN_SRC js
+    "AgendaCustomViews": 
+    {
+    	# My agenda is comprised of several standard views
+        "Default":           ["Calendar", "Week", "Day", "Blocked Projects", "Loose Tasks"],
+        # Show any todos tagged as being active
+        "Active":            ["Todos : tagfilter +Active"],
+        # Show my todos tagged as being part of my backlog.
+        "Backlog":           ["Todos : tagfilter +Backlog"],
+        # Show anything, not just todos that have been clocked within the last 7 days. Also show their duration
+        # and group them in projects if they are associated with a project.
+        "This Weeks Work":   ["Clocked : clockfilter +7d : showduration : showtotalduration : byproject"],
+    },
+	#+END_SRC
