@@ -1,2 +1,8 @@
 * 1.2.49
-	
+
+
+
+** FIXED Clocking out
+	- When clocking in to a different file while a previous clock was running the clock value was getting written
+	  to the wrong file due to using the wrong view!
+	- We now open the other file, add the clock out value, save it and switch back to the correct buffer
