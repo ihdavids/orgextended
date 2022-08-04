@@ -102,17 +102,21 @@ class ClockManager:
 			duration = end - start
 			# Should we keep clocking entries less than a minute?
 			shouldKeep = sets.Get("clockingSubMinuteClocks",True)
+			tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
 			if(not shouldKeep and duration.seconds < 60):
 				if(sets.Get("clockInPropertyBlock",False)):
-					props.RemoveProperty(view, node, "CLOCK")
+					props.RemoveProperty(tview, node, "CLOCK")
 				else:
-					props.RemoveLogbook(view, node, r"CLOCK:")
+					props.RemoveLogbook(tview, node, r"CLOCK:")
 			else:
 				if(sets.Get("clockInPropertyBlock",False)):
-					props.UpdateProperty(view, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+					props.UpdateProperty(tview, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
 				else:
-					props.UpdateLogbook(view, node, "CLOCK:", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+					props.UpdateLogbook(tview, node, "CLOCK:", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+			view.window().focus_view(view)
+			tview.run_command("save")
 			ClockManager.ClearClock()
+			view.run_command("save")
 		else:
 			log.error("Failed to clock out, couldn't find node")
 
