@@ -30,6 +30,7 @@ class OrgInput:
         self.skipRecalc = False
         self.isFileBox  = False
         self.inputpanel = None
+        self.onRecalc   = None
         global inputCommand
         inputCommand = self
 
@@ -101,6 +102,9 @@ class OrgInput:
     def recalculate(self,text):
         if(None == self.inputpanel):
             return
+        if(None != self.onRecalc):
+            self.matched = [text]
+            return
         if(not text):
             return
         se = re.compile(text.replace(" ",".*"))
@@ -113,6 +117,8 @@ class OrgInput:
                 self.matched.append(i)
 
     def on_change(self, text):
+        if(None != self.onRecalc):
+            evt.Get().emit(self.onRecalc,text)
         # When we press down we don't want to recalc the box
         if(self.skipRecalc):
             self.skipRecalc = False

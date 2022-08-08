@@ -18,6 +18,7 @@ import OrgExtended.orgdb as db
 import OrgExtended.orgdatepicker as dpick
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
+import OrgExtended.orginsertselected as insSel
 import calendar
 
 import dateutil.rrule as dr
@@ -474,6 +475,11 @@ class AgendaBaseView:
         else:
             self.BasicSetup()
 
+    # Default view does not have a filter view
+    # Only todo view
+    def OpenFilterView(self):
+        pass
+
     def BasicSetup(self):
         self.UpdateNow()
         self.entries = []
@@ -751,6 +757,12 @@ class AgendaBaseView:
         self.RenderView(edit)
         self.DoneEditing()
 
+    def OpenFilterView(self):
+        first = True
+        for v in self.agendaViews:
+            v.view = self.view
+            v.OpenFilterView()
+
 
     def InsertAgendaHeading(self, edit):
         if(hasattr(self,'_tagfilter') and self._tagfilter):
@@ -780,6 +792,12 @@ class AgendaBaseView:
 
     def AddEntry(self, node, file):
         self.entries.append({"node": node, "file": file})
+
+
+    def ClearEntriesAt(self):
+        for e in self.entries:
+            if 'at' in e:
+                del e['at']
 
     def MarkEntryAt(self, entry, ts= None):
         if(not 'at' in entry):
@@ -1301,6 +1319,8 @@ class TodoView(AgendaBaseView):
         self.showstatus   = "hidestatus" not in kwargs
         self.showtotalduration = "showtotalduration" in kwargs
         self.byproject    = "byproject" in kwargs
+        self.input        = None
+        self.search_filter = None
 
     def GetFormatData(self, n, filename):
         data = {}
@@ -1342,7 +1362,23 @@ class TodoView(AgendaBaseView):
         formatstr += "\n"
         return formatstr
 
+    def OnFilter(self, text):
+        print("FILTER: " + str(text))
+        self.input.onRecalc = evt.Make(self.OnFilter)
+        if text == None:
+            self.search_filter = None
+        else:
+            self.search_filter = re.compile(text + ".*")
+        self.view.run_command("org_agenda_re_render_view")
+
+    def OpenFilterView(self):
+        if self.input != None:
+            self.input.onRecalc = evt.Make(self.OnFilter)
+            self.input.run("Filter:",None,evt.Make(self.OnFilter))
+
     def RenderView(self, edit):
+        self.ClearEntriesAt()
+        self.view.erase(edit, sublime.Region(0, self.view.size()))
         self.InsertAgendaHeading(edit)
         self.totalduration = datetime.timedelta(days=0)
         if self.byproject:
@@ -1351,6 +1387,8 @@ class TodoView(AgendaBaseView):
             for entry in self.entries:
                 n        = entry['node']
                 if n == None:
+                    continue
+                if self.search_filter and not n.is_root() and not self.search_filter.match(n.heading):
                     continue
                 if n.is_root() or n.parent == None or n.parent.is_root() or not IsProject(n.parent):
                     loosetasks.append(entry)
@@ -1376,6 +1414,8 @@ class TodoView(AgendaBaseView):
         else:
             for entry in self.entries:
                 n        = entry['node']
+                if self.search_filter and not n.is_root() and not self.search_filter.match(n.heading):
+                    continue
                 filename = entry['file'].AgendaFilenameTag()
                 self.MarkEntryAt(entry)
                 self.RenderEntry(n, filename, edit)
@@ -1386,6 +1426,10 @@ class TodoView(AgendaBaseView):
             data['filename'] = "TOTAL: "
             self.view.insert(edit, self.view.size(), "----------------------------------------------------------------------------\n")
             self.view.insert(edit, self.view.size(), formatstr.format(**data))
+        if(self.input == None):
+            self.input = insSel.OrgInput()
+            self.input.onRecalc = evt.Make(self.OnFilter)
+            self.input.run("Filter:",None,evt.Make(self.OnFilter))
 
     def RenderEntry(self, n, filename, edit):
         formatstr = self.GetFormatString()
@@ -1805,6 +1849,22 @@ class OrgAgendaChooseCustomViewCommand(sublime_plugin.TextCommand):
             self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
+
+# ================================================================================
+# When the view filter changes we re-render the todo view.
+class OrgAgendaReRenderViewCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        v = FindMappedView(self.view)
+        if v != None:
+            v.DoRenderView(edit)
+
+# ================================================================================
+class OrgAgendaReOpenFilterViewCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        print("RE OPEN FILTER VIEW")
+        v = FindMappedView(self.view)
+        if v != None:
+            v.OpenFilterView()
 
 # ================================================================================
 # Change the TODO status of the node.
