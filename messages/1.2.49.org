@@ -52,3 +52,8 @@
 	- Escape will clear the filter
 	- Enter will make the filter permanent allowing you to scroll through todos again.
 
+	You can force this input panel to have focus and be visible when the todo list pops up with the following option:
+	
+	#+BEGIN_SRC js
+    "agendaTodoFilterByDefault": true,
+	#+END_SRC

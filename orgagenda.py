@@ -1428,8 +1428,9 @@ class TodoView(AgendaBaseView):
             self.view.insert(edit, self.view.size(), formatstr.format(**data))
         if(self.input == None):
             self.input = insSel.OrgInput()
-            self.input.onRecalc = evt.Make(self.OnFilter)
-            self.input.run("Filter:",None,evt.Make(self.OnFilter))
+            shouldFilter = sets.Get("agendaTodoFilterByDefault", False)
+            if shouldFilter:
+                self.OpenFilterView()
 
     def RenderEntry(self, n, filename, edit):
         formatstr = self.GetFormatString()
