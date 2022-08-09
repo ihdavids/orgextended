@@ -233,9 +233,8 @@
             { "key": "following_text", "operator": "regex_contains", "operand": "\\|", "match_all": true }
         ]
     },
- 
 
-    // ORG AGENDA
+    // ORG AGENDA NORMAL KEYBINDING
     { "keys": ["alt+o", "o", "a"],       "command": "org_agenda_custom_view",        "context": []  },
     { "keys": ["enter"],             "command": "org_agenda_go_to",                  "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": [" "],                 "command": "org_agenda_go_to_split",            "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
@@ -246,6 +245,7 @@
     { "keys": ["c","o"],             "command": "org_agenda_clock_out",              "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": [">"],                 "command": "org_agenda_goto_next_day",          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["<"],                 "command": "org_agenda_goto_prev_day",          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["alt+o", "f", "f"],   "command": "org_agenda_re_open_filter_view",    "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
 
 
 	// NeoVintageous - Command / Normal Mode - Quick commands
@@ -313,6 +313,7 @@
     { "keys": [">"],                 "command": "org_agenda_goto_next_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["<"],                 "command": "org_agenda_goto_prev_day",      "context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
     { "keys": ["f", "f"],            "command": "org_agenda_re_open_filter_view","context": [{"key": "vi_command_mode_aware"}, { "key": "eol_selector", "operand": "source.orgagenda"}]  },
+
 
     // TABLES
     { "keys": [" ", "t", "a"],       "command": "table_editor_align", "context":
