@@ -1,72 +1,55 @@
-* TODO Things I want [3/18]
-	- [-] Extensibility [2/5]
-		- [x] Avoid reloading when files do not change
-		- [ ] Similar folder names for all extensions in User folder
-		- [ ] Document all extensibility in user folder (and test it)
-		- [ ] Symbol and function table is only created once and reused. 
-		- [x] Document all items available in the settings file. (Might be best just to do this in the settings file?)
-	- [-] Capture [71%]
-		- [ ] External Capture (orgprotocol)
-		- [x] Basic capture buffer
-		- [x] Templates in config file.
-		- [x] Capture targetting
-			- [x] *Capture manages level properly (BROKEN)*
-		- [x] Capture using sublime snippets
-		- [ ] Capture panel size controls?
-		- [x] Capture with view vs panel (better for neovintageous users)
-	- [-] Parsing [5/6]
-		- [x] Basic file parsing
-		- [x] Tags parsed.
-		- [x] Comments (#+) available
-		- [x] Positions available
-		- [ ] Stripping to keep in memory size down.
-		- [x] Folding on unsaved files seems to have a problem sometimes
-	- [-] Refiling [2/3]
-		- [x] Basic Refile support
-		- [x] Basic Copy support
-		- [ ] More complex options for refiling.
-	- [-] Archiving [4/7]
-		- [x] Copy to org_archive an entire subtree
-		- [ ] (Low Priority) Archive by old datetime stamps
-		- [x] (Low Priority) Archive by adding :ARCHIVE: tag
-		- [ ] (Low Priority) Archive projects without TODO tags.
-		- [ ] Configuration for what gets added to the archive entries
-		- [x] #+ARCHIVE tags
-		- [x] Global archive option
-	- [-] Formatting [7/8]
-		- [x] Basic syntax highlighting
-		- [x] Priority blocks
-		- [x] Smarter heading blocks
-		- [x] Fix priority highlighting.
-		- [x] Property drawers vs tags.
-		- [x] Strings?
-		- [x] Finish the babel work.
-		- [ ] Htmlify
-	- [-] Dynamic Blocks [4/5]
-		- [x] Basic dynamic blocks
-		- [ ] Test user side blocks
-		- [x] clocktable block
-		- [x] Clock reports
-		- [x] execute all dynamic blocks in file command
-	- [ ] Logging [0/2]
-		- [ ] Todo state controls (Markup @ symbol etc.)
-		- [ ] Logging and notes on certain state transitions.
-	- [x] Priorities (From format block)
+* TODO Misc [0/3]
 	- [ ] TODO states are fully dynamic, even in coloring? Not sure I can make that possible.
-	- [ ] Format headings
-	- [x] Babel execution of src blocks [5/5]
-		- [x] plantuml and dot integration?
-		- [x] latex?
-		- [x] noweb
-		- [x] naming src blocks
-		- [x] parameters from tables
-	- [ ] Jira integration?
-	- [x] Google calendar integration?
-		  - This I am going to do by publishing calsync eventually.
 	- [ ] Searching by tag (like occur style?)
 	- [ ] Presentation mode from a file.
+
+* TODO Extensibility [2/5]
+	- [x] Avoid reloading when files do not change
+	- [ ] Similar folder names for all extensions in User folder
+	- [ ] Document all extensibility in user folder (and test it)
+	- [ ] Symbol and function table is only created once and reused. 
+	- [x] Document all items available in the settings file. (Might be best just to do this in the settings file?)
+
+* TODO Capture [71%]
+	- [ ] External Capture (orgprotocol)
+	- [x] Basic capture buffer
+	- [x] Templates in config file.
+	- [x] Capture targetting
+	- [x] *Capture manages level properly (BROKEN)*
+	- [x] Capture using sublime snippets
+	- [ ] Capture panel size controls?
+	- [x] Capture with view vs panel (better for neovintageous users)
+
+* TODO Refiling [2/3]
+	- [x] Basic Refile support
+	- [x] Basic Copy support
+	- [ ] More complex options for refiling.
+
+* TODO Archiving [4/7]
+	- [x] Copy to org_archive an entire subtree
+	- [ ] (Low Priority) Archive by old datetime stamps
+	- [x] (Low Priority) Archive by adding :ARCHIVE: tag
+	- [ ] (Low Priority) Archive projects without TODO tags.
+	- [ ] Configuration for what gets added to the archive entries
+	- [x] #+ARCHIVE tags
+	- [x] Global archive option
+
+* TODO Dynamic Blocks [4/5]
+	- [x] Basic dynamic blocks
+	- [ ] Test user side blocks
+	- [x] clocktable block
+	- [x] Clock reports
+	- [x] execute all dynamic blocks in file command
+
+* TODO Column View and Effort [0/2]
 	- [ ] Column view (Is this possible in sublime?)
 	- [ ] Effort Estimate
+
+* TODO Google Calendar Integration [0/4]
+	- [ ] This I am going to do by publishing calsync eventually.
+	- [ ] Also build this into orgs
+	- [ ] Pull my calendar
+	- [ ] Update my calendar
 
 * TODO Tables [22/24]
 	- [x] Basic table editing (Table Edit?)
@@ -96,16 +79,19 @@
 		- [x] Works with babel
 		- [x] Identifies tables and other things
 
-* TODO Clocking [1/5]
+* TODO Clocking [2/7]
 	- [x] Basic Clocking
 	- [ ] Todo list showing by clock history
-	- [ ] Clock report todo view (day, week, month)
+	- [x] Clock report todo view (day, week, month)
 	- [ ] Clock report to mermaid output
 	- [ ] Auto record sublime death in clocking and stop clock
+	- [ ] Clock has its own status panel
+	- [ ] Manually adjust clock time once clocked in.
+		  (Sometimes I forget to clock in and I don't want to have to remember to adjust it AFTER I clock out.)
 
-* TODO Notifications
-    - [x] Linux popup
-    - [ ] Windows powershell prompt (ascii art)
+* TODO Logging [0/2]
+	- [ ] Todo state controls (Markup @ symbol etc.)
+	- [ ] Logging and notes on certain state transitions.
 
 * TODO Agenda [4/5]
 	- [x] Agenda? Integration with existing plugin? NO
@@ -120,12 +106,14 @@
 		- [x] Week View
 		- [x] Calendar is selectable for day view?
 		- [x] Formatting for today line in day view?
-	- [-] Agenda Notifications [2/5]
-	    - [x] Windows Support
-	    - [ ] Fully customizable
-	    - [x] Mac Support
-	    - [ ] Linux Support
-	    - [ ] More testing doesn't pop up all the time!
+** TODO Notifications [3/7]
+        - [ ] Fully customizable
+        - [x] Windows Support
+        - [x] Mac Support
+        - [x] Linux popup
+        - [ ] Windows powershell prompt (ascii art)
+        - [ ] Notifications pop up properly!
+        - [ ] Notifications checks are not as expensive. (Use Orgs maybe?)
 
 
 * TODO Editing [22/24]
@@ -159,13 +147,6 @@
 	- [x] Fix Tag Insertion (tooltip is broken for some reason)
 	- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
 
-* DONE Export [6/6]
-	- [x] Pandoc
-	- [x] Reveal.js support
-	- [x] Export subtree
-	- [x] Export to html
-	- [x] Export to latex
-	- [x] Export to pdf
 
 * TODO Checkboxes [3/3]
 	- [x] Checkbox summary updating
@@ -201,7 +182,19 @@
 	- [ ] Write a page about personal wikis
 	- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
 
-* TODO Folding [12/12]
+
+* TODO Parsing [5/6]
+	- [x] Basic file parsing
+	- [x] Tags parsed.
+	- [x] Comments (#+) available
+	- [x] Positions available
+	- [ ] Stripping to keep in memory size down.
+	- [x] Folding on unsaved files seems to have a problem sometimes
+
+* TODO Jira
+    - [ ] Query Jira for My Stuff
+
+* DONE Folding [12/12]
 	- [x] Fold cycling
 	- [x] Local fold cycling
 	- [x] Fold cycling in a modified file (currently gets confused)
@@ -215,26 +208,45 @@
 	- [x] Folding of all generic property drawers.
 	- [x] Folding of checkbox trees
 
-** TODO Jira
-    - [ ] Query Jira for My Stuff
-
-** TODO Google Calendar
-    - [ ] Pull my calendar
-    - [ ] Update my calendar
-
+* DONE Formatting [9/9]
+	- [x] Basic syntax highlighting
+	- [x] Priority blocks
+	- [x] Smarter heading blocks
+	- [x] Fix priority highlighting.
+	- [x] Property drawers vs tags.
+	- [x] Strings?
+	- [x] Finish the babel work.
+	- [x] Htmlify
+	- [x] Priorities (From format block)
 ** DONE Colored Headers
 ** DONE Underlined Headers
-** TODO TRAMP
+
+* DONE Export [6/6]
+	- [x] Pandoc
+	- [x] Reveal.js support
+	- [x] Export subtree
+	- [x] Export to html
+	- [x] Export to latex
+	- [x] Export to pdf
+
+* DONE Babel [5/5]
+	- [x] plantuml and dot integration?
+	- [x] latex?
+	- [x] noweb
+	- [x] naming src blocks
+	- [x] parameters from tables
+
+* TODO TRAMP
 	- I would love to hook this in to babel as well.
 	- I would love to see this embeded into sublime as a whole
 	  this IS one of the powerful tools of emacs.
 
-** TODO GUD - Grand Unified Debugger
+* TODO GUD - Grand Unified Debugger
 	- I would love to see something like GUD ported
 
-** TODO Mu4E
+* TODO Mu4E
 	- I love using Mu once I have org.
 
-** TODO EDiff
+* TODO EDiff
 	- There are diff tools for sublime but ediff is simple and awesome
 	  the other tools cost to much money IMHO and I find them a bit buggy.
