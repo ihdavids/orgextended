@@ -1,7 +1,5 @@
 * 1.2.49
 
-
-
 ** FIXED Clocking out
 	- When clocking in to a different file while a previous clock was running the clock value was getting written
 	  to the wrong file due to using the wrong view!
@@ -73,3 +71,13 @@
 
 *** Better todo sorting
     - Now sorts by date by default, will be looking to make this configurable going forward as well.
+    - Sort order can be flipped globally if preferred using:
+
+    #+BEGIN_SRC js
+      "agendaTodoSortAscending": false,
+    #+END_SRC
+
+    Or locally in a list using:
+
+    - sortascend
+    - sortdescend

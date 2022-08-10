@@ -944,12 +944,36 @@ def getdatefromnode(n):
     if(isinstance(dt,orgdate.OrgDate)):
         dt=dt.start
     if(isinstance(dt, datetime.date)):
-        return datetime.datetime.combine(dt.date(), datetime.datetime.now().time())
+        return datetime.datetime.combine(dt.date(), datetime.datetime.min.time())
     return dt
 
 def getdate(a):
     n = a['node']
     return getdatefromnode(n)
+
+def getsortkey(a):
+    n = a['node']
+    dt = getdatefromnode(n)
+    result = 0
+    if dt:
+        result = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
+    result = int(result)
+    result = float(result)
+    result *= 1000
+    # Include priority after datetime information
+    if n and n.priority and n.priority != "":
+        result += (ord(n.priority[0]) - ord('A'))*100
+    else:
+        result += 0
+    # Ensure todos end up before done before archived
+    if IsTodo(n):
+        result += 1
+    if IsDone(n):
+        result += 2
+    if IsArchived(n):
+        result += 3
+    return result
+
 
 # ============================================================ 
 class WeekView(AgendaBaseView):
@@ -1344,6 +1368,11 @@ class TodoView(AgendaBaseView):
         self.byproject    = "byproject" in kwargs
         self.input        = None
         self.search_filter = None
+        self.havesortorder = "sortascend" in kwargs or "sortdescend" in kwargs
+        self.sortorder = False
+        if self.havesortorder:
+            self.sortorder = False if "sortascend" in kwargs else self.sortorder
+            self.sortorder = True  if "sortdescend" in kwargs else self.sortorder
 
     def GetFormatData(self, n, filename):
         data = {}
@@ -1417,6 +1446,12 @@ class TodoView(AgendaBaseView):
             self.input.onRecalc = evt.Make(self.OnFilter)
             self.input.run("Filter:",None,evt.Make(self.OnFilter))
 
+    def getSortOrdering(self):
+        order = not sets.Get("agendaTodoSortAscending",True)
+        if self.havesortorder:
+            order = self.sortorder
+        return order
+
     def RenderView(self, edit):
         self.ClearEntriesAt()
         self.view.erase(edit, sublime.Region(0, self.view.size()))
@@ -1439,7 +1474,7 @@ class TodoView(AgendaBaseView):
                         projects[pname] = []
                     projects[pname].append(entry)
             for pname,vals in projects.items():
-                vals.sort(key=getdate)
+                vals.sort(key=getsortkey,reverse=self.getSortOrdering())
                 projects[pname] = vals
 
             for pname,vals in projects.items():
@@ -1457,7 +1492,7 @@ class TodoView(AgendaBaseView):
                     self.MarkEntryAt(entry)
                     self.RenderEntry(n, filename, edit)
         else:
-            self.entries.sort(key=getdate)
+            self.entries.sort(key=getsortkey,reverse=self.getSortOrdering())
             for entry in self.entries:
                 n        = entry['node']
                 if self.search_filter and not n.is_root() and not self.search_filter.match(n.heading):
