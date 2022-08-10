@@ -1,252 +1,628 @@
-* TODO Misc [0/3]
+#+TITLE: Org Extended Todo Lists
+#+STARTUP: content
+  
+* RANDOM BACKLOG  
+** TODO Misc [0/3]
 	- [ ] TODO states are fully dynamic, even in coloring? Not sure I can make that possible.
 	- [ ] Searching by tag (like occur style?)
 	- [ ] Presentation mode from a file.
 
-* TODO Extensibility [2/5]
+** TODO Extensibility [2/5]
 	- [x] Avoid reloading when files do not change
 	- [ ] Similar folder names for all extensions in User folder
 	- [ ] Document all extensibility in user folder (and test it)
 	- [ ] Symbol and function table is only created once and reused. 
 	- [x] Document all items available in the settings file. (Might be best just to do this in the settings file?)
 
-* TODO Capture [71%]
-	- [ ] External Capture (orgprotocol)
-	- [x] Basic capture buffer
-	- [x] Templates in config file.
-	- [x] Capture targetting
-	- [x] *Capture manages level properly (BROKEN)*
-	- [x] Capture using sublime snippets
-	- [ ] Capture panel size controls?
-	- [x] Capture with view vs panel (better for neovintageous users)
+** TODO Capture [71%]
+ 	- [ ] Capture panel size controls?
+ 	- [ ] External Capture (orgprotocol)
+ 	- [ ] Capture in Orgs
+ 	- [x] Basic capture buffer
+ 	- [x] Templates in config file.
+ 	- [x] Capture targetting
+ 	- [x] *Capture manages level properly (BROKEN)*
+ 	- [x] Capture using sublime snippets
+ 	- [x] Capture with view vs panel (better for neovintageous users)
+ 
+** TODO Refiling [2/3]
+ 	- [x] Basic Refile support
+ 	- [x] Basic Copy support
+ 	- [ ] More complex options for refiling.
+ 
+** TODO Archiving [5/8]
+ 	- [x] Copy to org_archive an entire subtree
+ 	- [ ] (Low Priority) Archive by old datetime stamps
+ 	- [x] (Low Priority) Archive by adding :ARCHIVE: tag
+ 	- [ ] (Low Priority) Archive projects without TODO tags.
+ 	- [ ] Configuration for what gets added to the archive entries
+ 	- [x] #+ARCHIVE tags
+ 	- [x] Global archive option
+ 	- [x] Unicode Archiving Support
+ 
+** TODO Dynamic Blocks [4/5]
+ 	- [x] Basic dynamic blocks
+ 	- [ ] Test user side blocks
+ 	- [x] clocktable block
+ 	- [x] Clock reports
+ 	- [x] execute all dynamic blocks in file command
+ 
+** TODO Column View and Effort [0/2]
+ 	- [ ] Column view (Is this possible in sublime?)
+ 	- [ ] Effort Estimate
+ 
+** TODO Google Calendar Integration [0/4]
+ 	- [ ] This I am going to do by publishing calsync eventually.
+ 	- [ ] Also build this into orgs
+ 	- [ ] Pull my calendar
+ 	- [ ] Update my calendar
+ 
+** TODO Tables [22/25]
+ 	- [x] Basic table editing (Table Edit?)
+ 	- [x] Syntax highlighting of tables
+ 	- [x] Formula highlighting in tables
+ 	- [ ] Bold headers in tables
+ 	- [x] Table formats
+ 	- [x] Table parameters to execution blocks
+ 	- [x] Relative offsets in tables
+ 	- [x] In cell formulas
+ 	- [x] From edge symbols
+ 	- [x] Date time calc functions
+ 	- [x] Start column for column formulas
+ 	- [x] Range operator for cells
+ 	- [x] Range targets for cells
+ 	- [x] HLine indexes
+ 	- [x] Table visualization
+ 	- [x] Table resizing updates formulas
+ 	- [x] Extensible functions for tables
+ 	- [x] Documentation page for tables
+ 	- [ ] Extensible symbols for tables
+ 	- [x] Advanced table features
+ 	- [x] Gnu Plot Support
+ 	- [x] Table cache handles multiple files.
+ 	- [x] Remote keyword handles tables in other files.
+ 	- [x] Named Objects [100%]
+ 		- [x] Works with babel
+ 		- [x] Identifies tables and other things
+ 	- [ ] Performance, 1000x1000 should be possible to work in efficiently
+ 
+** TODO Clocking [2/7]
+ 	- [x] Basic Clocking
+ 	- [ ] Todo list showing by clock history
+ 	- [x] Clock report todo view (day, week, month)
+ 	- [ ] Clock report to mermaid output
+ 	- [ ] Auto record sublime death in clocking and stop clock
+ 	- [ ] Clock has its own status panel
+ 	- [ ] Manually adjust clock time once clocked in.
+ 		  (Sometimes I forget to clock in and I don't want to have to remember to adjust it AFTER I clock out.)
+ 
+** TODO Logging [0/2]
+ 	- [ ] Todo state controls (Markup @ symbol etc.)
+ 	- [ ] Logging and notes on certain state transitions.
+ 
+** TODO Agenda [4/5]
+ 	- [x] Agenda? Integration with existing plugin? NO
+ 	- [x] Week View
+ 	- [x] Week Quick Select
+ 	- [x] Core Agenda [8/8]
+ 		- [x] Todo list (dynamic)
+ 		- [x] Extensible agenda views
+ 		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
+ 		- [x] Todo summaries?
+ 		- [x] More extensible views.
+ 		- [x] Week View
+ 		- [x] Calendar is selectable for day view?
+ 		- [x] Formatting for today line in day view?
+*** TODO Notifications [3/7]
+         - [ ] Fully customizable
+         - [x] Windows Support
+         - [x] Mac Support
+         - [x] Linux popup
+         - [ ] Windows powershell prompt (ascii art)
+         - [ ] Notifications pop up properly!
+         - [ ] Notifications checks are not as expensive. (Use Orgs maybe?)
+ 
+ 
+** TODO Editing [22/24]
+ 	- [x] Vintageous bindings
+ 	- [x] Quotes
+ 	- [x] Src blocks (more languages finish the color scheme)
+ 	- [x] Symbol indexing for headers
+ 	- [x] Color highlighting for #+ symbols
+ 	- [x] Image display? Is that possible?
+ 	- [x] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
+ 	- [x] Persistent folding between open and close
+ 	- [x] Sublime snippets?
+ 	- [-] Snippets [4/5]
+ 		- [x] Src block snippet
+ 		- [x] Quote block snippet
+ 		- [x] Notes block snippet
+ 		- [ ] Name snippet
+ 		- [x] Example block snippet
+ 	- [x] Numbered Lists
+ 	- [ ] Todo cycling
+ 	- [x] Todo menu
+ 	- [x] Priority menu
+ 	- [x] Insert heading (child and sibling)
+ 	- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
+ 	- [x] Caret when editing is propper
+ 	- [x] Indent, De-Indent heading and subtree
+ 	- [x] Heading movement, like you can do with lines
+ 	- [x] Checkbox insert?
+ 	- [x] Auto indenting of checkboxes (with tab)
+ 	- [x] Property insertion
+ 	- [x] Fix Tag Insertion (tooltip is broken for some reason)
+ 	- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
+ 
+ 
+** TODO Checkboxes [3/3]
+ 	- [x] Checkbox summary updating
+ 		- [x] Recursive mode for checkbox summaries (1.1.19)
+ 	- [x] Checkbox percentages
+ 	- [x] BUG: Summaries on headings fall through to rest of list
+ 
+** TODO DatePicker [1/5]
+ 	- [ ] Support +XXX versions of commands
+ 	- [ ] Support Expanding dates inline in buffer from date text (like a snippet)
+ 	- [ ] Support Scrolling on dates with hotkeys
+ 	- [x] Support Prettier clock
+ 	- [ ] Better colors for clock
+ 
+** TODO Links [11/19]
+ 	- [x] Orgmode style links
+ 	- [x] images displayed inline
+ 	- [ ] #+ATTR_ORG: :width 100 supported for images
+ 	- [x] Single entry links vs with description (don't auto fold)
+ 	- [x] Follow links on various platforms.
+ 	- [x] Link copy
+ 	- [ ] Link insertion
+ 	- [x] Link snippet
+ 	- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
+ 	- [ ] Links in templates.
+ 	- [x] Ensure file: works (currently doesn't work that well)
+ 	- [x] <<TAG>> works for links
+ 	- [ ] Named objects work
+ 	- [ ] Ensure line number
+ 	- [ ] search links
+ 	- [x] regex links works for links
+ 	- [x] custom_id links work
+ 	- [ ] Write a page about personal wikis
+ 	- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
+ 
+ 
+** TODO Parsing [5/6]
+ 	- [x] Basic file parsing
+ 	- [x] Tags parsed.
+ 	- [x] Comments (#+) available
+ 	- [x] Positions available
+ 	- [ ] Stripping to keep in memory size down.
+ 	- [x] Folding on unsaved files seems to have a problem sometimes
+ 
+** TODO Jira
+     - [ ] Query Jira for My Stuff
+ 
+** DONE Folding [12/12]
+ 	- [x] Fold cycling
+ 	- [x] Local fold cycling
+ 	- [x] Fold cycling in a modified file (currently gets confused)
+ 	- [x] Global fold cycling
+ 	- [x] Initial folding state control tag
+ 	- [x] Fold ALL, Unfold ALL commands
+ 	- [x] Folding property drawers
+ 	- [x] Folding src and quote blocks
+ 	- [x] Automatic property drawer folding. (I hate seeing those things!)
+ 	- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
+ 	- [x] Folding of all generic property drawers.
+ 	- [x] Folding of checkbox trees
+ 
+** DONE Formatting [9/9]
+ 	- [x] Basic syntax highlighting
+ 	- [x] Priority blocks
+ 	- [x] Smarter heading blocks
+ 	- [x] Fix priority highlighting.
+ 	- [x] Property drawers vs tags.
+ 	- [x] Strings?
+ 	- [x] Finish the babel work.
+ 	- [x] Htmlify
+ 	- [x] Priorities (From format block)
+*** DONE Colored Headers
+*** DONE Underlined Headers
+ 
+** DONE Export [6/6]
+ 	- [x] Pandoc
+ 	- [x] Reveal.js support
+ 	- [x] Export subtree
+ 	- [x] Export to html
+ 	- [x] Export to latex
+ 	- [x] Export to pdf
+ 
+** DONE Babel [5/5]
+ 	- [x] plantuml and dot integration?
+ 	- [x] latex?
+ 	- [x] noweb
+ 	- [x] naming src blocks
+ 	- [x] parameters from tables
 
-* TODO Refiling [2/3]
-	- [x] Basic Refile support
-	- [x] Basic Copy support
-	- [ ] More complex options for refiling.
+* BIGGER FUTURE RELEASE IDEAS
+** TODO Ghost View (Webpage or overlay rendering?)
+** TODO Ghost View in Agenda (Popup of task in overlay, but rendered)
+** TODO Better Back References
+** TODO Convert to Orgs as DB rather than python DB.
+** TODO Interactive Hud for Querying TODO Lists (using orgs)
+** TODO Improved Spreadsheets (formula export / import)
+** TODO Improved integration with mermaid et al, render timeline etc.
+** TODO Estimation support (column view) 
+   - not really sure if I can do this in sublime yet. REALLY hope the sublime team gives me some of the features I have been asking for
+   	Emacs has a lovely means of editing properties on all headings in a file.
+	This is called column mode. It is implemented as an overlay on a buffer... which means... we can't do it in sublime.
 
-* TODO Archiving [4/7]
-	- [x] Copy to org_archive an entire subtree
-	- [ ] (Low Priority) Archive by old datetime stamps
-	- [x] (Low Priority) Archive by adding :ARCHIVE: tag
-	- [ ] (Low Priority) Archive projects without TODO tags.
-	- [ ] Configuration for what gets added to the archive entries
-	- [x] #+ARCHIVE tags
-	- [x] Global archive option
+	Right now my thought is that we might implement it with phantoms and the input panel. We might do as follows:
 
-* TODO Dynamic Blocks [4/5]
-	- [x] Basic dynamic blocks
-	- [ ] Test user side blocks
-	- [x] clocktable block
-	- [x] Clock reports
-	- [x] execute all dynamic blocks in file command
+	- Flip to a column fold of the document
+	- Insert phantoms at every heading that have the table elements
+	- Support cursor navigation of the phantoms with the input panel representing the active cell.
+	- Dynamically update the folded properties as we go.
 
-* TODO Column View and Effort [0/2]
-	- [ ] Column view (Is this possible in sublime?)
-	- [ ] Effort Estimate
+	It's lame, but it's the best idea I have right now.
+** TODO Quality of life
+   - Build a fully interactive unit test for the system
+   - Improve auto highlighting construction
+   - Improve todo lists to include headings
+** TODO Presentation Mode in Sublime
+   - Again I don't really have enough features for this, but I could try I suppose. 
+** TODO Videos about the plugin
+** TODO Org For Writers
 
-* TODO Google Calendar Integration [0/4]
-	- [ ] This I am going to do by publishing calsync eventually.
-	- [ ] Also build this into orgs
-	- [ ] Pull my calendar
-	- [ ] Update my calendar
+	The idea of this is to use org mode to emulate some of the more common writing tools such as scrivener
 
-* TODO Tables [22/24]
-	- [x] Basic table editing (Table Edit?)
-	- [x] Syntax highlighting of tables
-	- [x] Formula highlighting in tables
-	- [ ] Bold headers in tables
-	- [x] Table formats
-	- [x] Table parameters to execution blocks
-	- [x] Relative offsets in tables
-	- [x] In cell formulas
-	- [x] From edge symbols
-	- [x] Date time calc functions
-	- [x] Start column for column formulas
-	- [x] Range operator for cells
-	- [x] Range targets for cells
-	- [x] HLine indexes
-	- [x] Table visualization
-	- [x] Table resizing updates formulas
-	- [x] Extensible functions for tables
-	- [x] Documentation page for tables
-	- [ ] Extensible symbols for tables
-	- [x] Advanced table features
-	- [x] Gnu Plot Support
-	- [x] Table cache handles multiple files.
-	- [x] Remote keyword handles tables in other files.
-	- [x] Named Objects [100%]
-		- [x] Works with babel
-		- [x] Identifies tables and other things
+	This has been something that emacs has had for years and some writers do indeed use it.
 
-* TODO Clocking [2/7]
-	- [x] Basic Clocking
-	- [ ] Todo list showing by clock history
-	- [x] Clock report todo view (day, week, month)
-	- [ ] Clock report to mermaid output
-	- [ ] Auto record sublime death in clocking and stop clock
-	- [ ] Clock has its own status panel
-	- [ ] Manually adjust clock time once clocked in.
-		  (Sometimes I forget to clock in and I don't want to have to remember to adjust it AFTER I clock out.)
+	We split the layout into 2 views.
+	We show the same document in both views
+	The view on the left we have a ViewEventListener for that:
+	Forces the document to stay folded in contents view mode. You can unfold for a quick look but it will refold again like links and properties do.
+	It listens for you to press enter and if you do it jumps to that heading in the right pane.
+	The right pane has a view event listener that is tracking selection. When that moves it highlights a region in the left pane on the heading you are currently in!
+	In this way you have a table of contents view with sections and can easily jump around.
+	We create helper methods to create property drawers for notes and other writers aids. These are hidden away.
+	We support export to PDF and other common ebook formats that writers tend to publish in.
 
-* TODO Logging [0/2]
-	- [ ] Todo state controls (Markup @ symbol etc.)
-	- [ ] Logging and notes on certain state transitions.
+** TODO Read The Org Export
 
-* TODO Agenda [4/5]
-	- [x] Agenda? Integration with existing plugin? NO
-	- [x] Week View
-	- [x] Week Quick Select
-	- [x] Core Agenda [8/8]
-		- [x] Todo list (dynamic)
-		- [x] Extensible agenda views
-		- [x] org_calendar - will it work for me? (NO) - to linked to old orgmode
-		- [x] Todo summaries?
-		- [x] More extensible views.
-		- [x] Week View
-		- [x] Calendar is selectable for day view?
-		- [x] Formatting for today line in day view?
-** TODO Notifications [3/7]
-        - [ ] Fully customizable
-        - [x] Windows Support
-        - [x] Mac Support
-        - [x] Linux popup
-        - [ ] Windows powershell prompt (ascii art)
-        - [ ] Notifications pop up properly!
-        - [ ] Notifications checks are not as expensive. (Use Orgs maybe?)
+	I would like to create a default html style export that behaves a looks a lot like Read The Org, which is a very popular style for emacs. 
+
+* RELEASES
+** DONE 1.1.0 - Editing, Capture, Refiling, Searching
+** DONE 1.2.0 - Full Table Alpha
+   My goal here is to remove the Preview moniker from tables. That said some of the work will be
+   outside of pure table support but rather be about building the start of our babel feature.
+ 
+   The "big reveal" of 1.2.0 is going to be this:
+ 
+   [[https://www.youtube.com/watch?v=5ViUBaarsbw][Gantt Charts In Org]] 
+ 
+**** Planned Releases
+***** DONE 1.1.27 - Extending Date Formula Support
+***** DONE 1.1.28 - Core Performance and Quality of Life
+***** DONE 1.1.29 - GNU Plot Script Blocks
+***** DONE 1.1.30 - Table Babel
+***** DONE 1.2.0  - RELEASE
+  
+*** DONE 1.1.27 
+     Core Idea: Extending datetime formula support
+                you should be able to make the table the guy shows in the video
+                with some "OrgExtended" flair to make it easier.
+**** Ian Goals
+    I am working towards this as my ultimate goal
+    [[https://www.youtube.com/watch?v=5ViUBaarsbw][Gantt Charts In Org]] 
+  
+    For 1.1.26 I am hoping to have the full creation of the table
+    functional, but with some added bells and whistles that allow
+    you to create that table dynamically directly in the columnview
+    rather than having to build the table every time you want a gantt chart.
+  
+    - [x] Support adding formulas to the generated table in the columnview description somehow
+    - [x] Support adding non existent columns in the columnview description (probably just property markers)
+    - [x] Support date() parsing cells
+    - [x] Support OrgDate converting back to a string properly
+    - [x] Support OrgDate + OrgDuration additions so you do not have to remove the d from the effort estimate.
+    - [x] Support percentage strings
+    - [x] Support if statement in tables 
+  
+**** DONE 1.1.27 Documentation Goals
+    - [x] Document advanced tables
+    - [x] Audit other major features that I might have forgotten?
+  
+*** DONE 1.1.28 
+     Core Idea: Table Performance and Quality of Life
+                I should feel like the table feature is not needlessly expensive
+                and I can use it for babel.
+**** Ian Goals
+  	- [x] Improve function table creation times. Can we cache this?
+  	- [x] Test table cache across multiple files?
+  	- [x] Create symbol parsing cache?
+  	- [x] Turn off highlight durng execution view updates
+  	- [x] Create table from node vs view (improve remote function) - *Important for babel*
+  	- [x] Cleanup table? Move plot out of table file?
+  	- [x] Cleanup table? Hoist any utility functions?
+  	- [x] Cleanup table? Improve parameter parser around quotes?
+  	- [x] Support extensible symbols as well as functions.
+    - [x] Add GnuPlot syntax
+  
+**** Documentation Goals
+    - [x] Document all available functions (using a TextCommand) (can we create docstrings for this and pull from that?)
+    - [x] Document all available symbols
+    - [x] Start column view docs
+    - [ ] Add docstrings to all functions.
+  
+*** DONE 1.1.29
+    Core Idea: Add GNU Plot Script Blocks
+ 
+    - [x] Add a syntax for gnu plot script blocks if one does not already exist
+    - [x] Add a src handler to execute these script blocks.
+    - [x] Any prep/improvements I feel is necessary to support setting up for table source data and babel work
+ 
+**** Documentation Goals
+ 	- [x] Write a tool to dump out the list of supported script blocks to our docs.
+ 	- [x] Add that to our script block page.
+ 
+*** DONE 1.1.30
+ 	Core Idea: Table Babel
+ 
+**** Ian Goals
+ 	- [x] Support tables as data sources for babel
+    - [x] Provide tool for detecting datetimes in cells
+    - [x] GNU Plot converts dates automatically
+ 
+ 	--> More research required here as to the full list of tasks.
+ 
+**** Documentation Goals
+ 	- [x] Table Babel Demo
+ 
+*** DONE 1.2.0
+**** Ian Goals
+    - [x] Full unit test suite
+    - [x] More functions for table editing.
+ 	
+**** Documentation Goals
+ 	- [x] Gantt chart demo page.
+ 
+ 
+** TODO 1.3.0 - Full Babel Support
+*** Babel - What this is
+    Babel has at its root 2 ideas:
+
+  	- Literate Programming  :: The concept that programming is more about communication to programmers than communication to a machine
+  	- Reproducible Research :: The idea that all tools, data, process and output should be part of a research document.
+
+**** Script vs Function
+	Bable supports the notion of script vs function execution.
+	In script mode babel will capture stdout and stderr and treat that as the output
+	In function mode babel will treat the code as a function and capture the output of the last statement
+	and format it back to text.
+
+	Functional:
+
+	#+BEGIN_EXAMPLE
+	  :results value
+	#+END_EXAMPLE
+
+	Script:
+
+	#+BEGIN_EXAMPLE
+	  :results output
+	#+END_EXAMPLE
+
+**** Simple Variables
+	Source blocks can and should support :var key=data-source-or-value entries
+	These specify the available parameters to a source block.
+
+**** Sources
+	I was thinking we could treat sources as plain old data types OR generators.
+	Generators represent the abstract concept of a list and can pull from almost anywhere.
+
+**** Tables as Source
+
+	Table data should be an optional source for any source block.
+
+**** Lists as Source
+
+	List blocks in code should be an optional source for any source block.
+
+**** Output Formats
+
+	The system needs to be smart enough to detect tabular data and output it as:
+
+	- a link
+	- a table
+	- simple output
+	- a list
+	- silent
+
+	#+BEGIN_EXAMPLE
+	  :results silent
+	  :results replace
+	#+END_EXAMPLE
+
+**** Call Comment Block
+
+	These are a way of invoking a script block several times with different parameters.
+
+	#+BEGIN_EXAMPLE
+	  #+call: srcblockname(x=6)
+	#+END_EXAMPLE
+
+**** Table Functions
+	Script blocks need to be called from a TBLFM: block on a table. This is done through
+	a function that takes the name and parameters. (sbe function)
+
+**** Tangle
+	The ability to strip code from a document and produce a fully functional
+	piece of source code. The tangle engine is dependent on the language snippets to help
+	format the code.
+
+	- OrgTangleDocument - Should produce source files following the tangle parameters in src blocks.
+
+	Note NoWeb macros should be respected and evaluated as part of the tangle process.
+
+ 	#+BEGIN_EXAMPLE
+	:export none
+	:tangle
+ 	#+END_EXAMPLE
+
+**** NoWeb
+	- A macro like language inside of source blocks:
+
+	#+BEGIN_EXAMPLE
+	  <<pasted-source-named-x-here>>
+
+	  # <<call-source-named-y(a=5)>>
+	#+END_EXAMPLE
+
+**** Sessions
+	*Probably not going to support this!*
+
+	Babel supports the notion of working with sessions. This becomes huge when you want to use babel for execution
+	on remote machines through ssh et al. IMHO this is a last feature to support. 
+*** DONE 1.2.1 - Basic Input
+    - [x] Python supports table sources
+    - [x] Powershell supports table sources
+    - [x] Unordered lists can act as data sources
+    - [x] Ordered lists can act as data sources
+    - [x] Plain variables work embedded in block header.
+ 
+*** DONE 1.2.2 - Better Input, Some Output 
+    - [x] Quoted strings work for properties.
+    - [x] Property and variable blocks can act as variable sources.
+    - [x] Table output works.
+ 
+*** DONE 1.2.3 - Execution Modes
+    - [x] List output works
+    - [x] drawer format
+    - [x] code format
+    - [x] org format
+    - [x] raw format
+    - [x] file format
+    - [x] text format
+    - [x] Parameters
+    - [x] Output to Drawer
+ 
+*** DONE 1.2.4
+    - [x] results value
+    - [x] results output
+    - [x] results replace
+    - [x] results prepend
+    - [x] results append
+    - [x] results silent
+    - [x] chaining execution
+ 
+*** DONE 1.2.5 - Calling
+    - [x] better chaining of functions
+    - [x] handle silent functions.
+    - [x] #+call
+    - [x] Table sbe functions
+ 
+*** DONE 1.2.6 - Inline Blocks
+    - [x] Inline blocks and execution
+    - [x] #+header blocks 
+ 
+*** DONE 1.2.7/1.2.8 - Quality of Life
+    - [x] Build some unit tests in a table
+ 
+*** DONE 1.2.9 - Tangle
+    - [x] Support tangling
+    - [x] Cache - support hash value in results
+    - [x] Eval - never and query
+ --- Fixed Color Scheme Export, and ST3 dependencies problem in here.
+*** DONE 1.2.15 - NoWeb
+    - [x] NoWeb for pasting
+    - [x] NoWeb for parameters
+    - [x] NoWeb function calls
+ 
+*** DONE 1.2.16 - Batch File
+    - [x] More testing of noweb
+    - [x] Dos CMD support
+    - [x] Params / Vars
+ 
+*** DONE 1.2.18 - Bash and JavaScript
+    - [x] Bash block
+    - [x] Bash module and supports table sources?
+    - [x] The community seems to use node.js a lot perhaps this one is a good one to support.
+ 
+*** DONE 1.2.19 - Caching Security and Exports
+    - [x] Exports - Various export controls / mechanisms
+ 
+*** DONE 1.2.20 - Cleanup
+    - [x] Cleanup
+ 
+*** DONE 1.2.21 - Latex
+    - [x] Kind of got off track and am adding latex exporter support
+ 
+*** DONE 1.2.22 - More Latex
+    - [x] Latex Basics are done
+ 
+*** DONE 1.2.23 - Full Latex?
+    - [x] Images are supported
+    - [x] Better link support (use \url in the right places)
+    - [x] Results are handled properly during export
+    - [x] Local refs work for links
+    - [x] Table of contents can be included
+    - [ ] Export DND sample (and it works)
+    - [x] Strip todo, tags, property and other blocks
+    - [x] Options audit
+ 
+*** DONE 1.2.24 - 1.2.49 Off Track!
+ 	- [x] Bugfixes
+ 	- [x] Improving Clocking
+ 	- [x] Improving Task List filtering
+ 	- [x] Org Dailies (Org Roam Like Feature)
+
+*** TODO 1.2. - Html Exporter Upgrade
+    - Convert the exporter to use the new framework
+    - Improve the documentation
+ 
+*** TODO 1.2. - Perl
+    - [ ] Support perl in honour of graham
+ 
+*** TODO 1.2. - Typescript
+    - [ ] Support typescript in honour website work
+ 
+*** TODO 1.2. - C#
+    - [ ] .NET Core Support
+    - [ ] .NET Core Params / Vars
+ 
+*** TODO 1.2. - Go
+    - [ ] Basic Go Snippet Support
+ 
+*** TODO 1.2. - RUST
+    This one I may not do, we will see. It is becomming a really highly useful language though.
+    I find myself occasionally working in it, so I will consider it.
+ 
+    - [ ] Basic RUST Snippet Support
+ 
+ 
+*** TODO 1.3.0 - RELEASE
+    Full Babel Support 
+    - What big target are we trying to hit?
+   
+ 
 
 
-* TODO Editing [22/24]
-	- [x] Vintageous bindings
-	- [x] Quotes
-	- [x] Src blocks (more languages finish the color scheme)
-	- [x] Symbol indexing for headers
-	- [x] Color highlighting for #+ symbols
-	- [x] Image display? Is that possible?
-	- [x] csharp mode still doesn't exit properly for some reason? Something is up with that grammar
-	- [x] Persistent folding between open and close
-	- [x] Sublime snippets?
-	- [-] Snippets [4/5]
-		- [x] Src block snippet
-		- [x] Quote block snippet
-		- [x] Notes block snippet
-		- [ ] Name snippet
-		- [x] Example block snippet
-	- [x] Numbered Lists
-	- [ ] Todo cycling
-	- [x] Todo menu
-	- [x] Priority menu
-	- [x] Insert heading (child and sibling)
-	- [x] Insertion flow with dwim style insertion (new headings, new checkboxes etc)
-	- [x] Caret when editing is propper
-	- [x] Indent, De-Indent heading and subtree
-	- [x] Heading movement, like you can do with lines
-	- [x] Checkbox insert?
-	- [x] Auto indenting of checkboxes (with tab)
-	- [x] Property insertion
-	- [x] Fix Tag Insertion (tooltip is broken for some reason)
-	- [x] Fix Tab Insertion (snippets are now not expanding properly) (ST4 only issue)
+* FUTURE PLUGIN IDEAS
+** TODO TRAMP
+ 	- I would love to hook this in to babel as well.
+ 	- I would love to see this embeded into sublime as a whole
+ 	  this IS one of the powerful tools of emacs.
+ 
+** TODO GUD - Grand Unified Debugger
+ 	- I would love to see something like GUD ported
+ 
+** TODO Mu4E
+ 	- I love using Mu once I have org.
+ 
+** TODO EDiff
+ 	- There are diff tools for sublime but ediff is simple and awesome
+ 	  the other tools cost to much money IMHO and I find them a bit buggy.
+ 
+ 
 
-
-* TODO Checkboxes [3/3]
-	- [x] Checkbox summary updating
-		- [x] Recursive mode for checkbox summaries (1.1.19)
-	- [x] Checkbox percentages
-	- [x] BUG: Summaries on headings fall through to rest of list
-
-* TODO DatePicker [1/5]
-	- [ ] Support +XXX versions of commands
-	- [ ] Support Expanding dates inline in buffer from date text (like a snippet)
-	- [ ] Support Scrolling on dates with hotkeys
-	- [x] Support Prettier clock
-	- [ ] Better colors for clock
-
-* TODO Links [11/19]
-	- [x] Orgmode style links
-	- [x] images displayed inline
-	- [ ] #+ATTR_ORG: :width 100 supported for images
-	- [x] Single entry links vs with description (don't auto fold)
-	- [x] Follow links on various platforms.
-	- [x] Link copy
-	- [ ] Link insertion
-	- [x] Link snippet
-	- [x] Collapsing links/pretty formatting (not possible) or can this be done with folding?
-	- [ ] Links in templates.
-	- [x] Ensure file: works (currently doesn't work that well)
-	- [x] <<TAG>> works for links
-	- [ ] Named objects work
-	- [ ] Ensure line number
-	- [ ] search links
-	- [x] regex links works for links
-	- [x] custom_id links work
-	- [ ] Write a page about personal wikis
-	- [ ] Link aliases, find a way of making that work well. How about doing this like dynamic blocks? Simplify the resolver?
-
-
-* TODO Parsing [5/6]
-	- [x] Basic file parsing
-	- [x] Tags parsed.
-	- [x] Comments (#+) available
-	- [x] Positions available
-	- [ ] Stripping to keep in memory size down.
-	- [x] Folding on unsaved files seems to have a problem sometimes
-
-* TODO Jira
-    - [ ] Query Jira for My Stuff
-
-* DONE Folding [12/12]
-	- [x] Fold cycling
-	- [x] Local fold cycling
-	- [x] Fold cycling in a modified file (currently gets confused)
-	- [x] Global fold cycling
-	- [x] Initial folding state control tag
-	- [x] Fold ALL, Unfold ALL commands
-	- [x] Folding property drawers
-	- [x] Folding src and quote blocks
-	- [x] Automatic property drawer folding. (I hate seeing those things!)
-	- [x] Fixing folding over a git pull! Sublime folds don't adapt and persist across a save.
-	- [x] Folding of all generic property drawers.
-	- [x] Folding of checkbox trees
-
-* DONE Formatting [9/9]
-	- [x] Basic syntax highlighting
-	- [x] Priority blocks
-	- [x] Smarter heading blocks
-	- [x] Fix priority highlighting.
-	- [x] Property drawers vs tags.
-	- [x] Strings?
-	- [x] Finish the babel work.
-	- [x] Htmlify
-	- [x] Priorities (From format block)
-** DONE Colored Headers
-** DONE Underlined Headers
-
-* DONE Export [6/6]
-	- [x] Pandoc
-	- [x] Reveal.js support
-	- [x] Export subtree
-	- [x] Export to html
-	- [x] Export to latex
-	- [x] Export to pdf
-
-* DONE Babel [5/5]
-	- [x] plantuml and dot integration?
-	- [x] latex?
-	- [x] noweb
-	- [x] naming src blocks
-	- [x] parameters from tables
-
-* TODO TRAMP
-	- I would love to hook this in to babel as well.
-	- I would love to see this embeded into sublime as a whole
-	  this IS one of the powerful tools of emacs.
-
-* TODO GUD - Grand Unified Debugger
-	- I would love to see something like GUD ported
-
-* TODO Mu4E
-	- I love using Mu once I have org.
-
-* TODO EDiff
-	- There are diff tools for sublime but ediff is simple and awesome
-	  the other tools cost to much money IMHO and I find them a bit buggy.
