@@ -62,6 +62,8 @@
 	#+END_SRC
 
 *** New todo view columns
+	Not sure I like this yet, still somewhat experimental.
+
     - showdate - will show most relevant date information (active, scheduled, dealine, closed timestamp)
     - showtime - will show the time info from the most relevant date information
 
@@ -70,6 +72,8 @@
     #+END_SRC
 
 *** Better todo sorting
+	Somewhat experimental at the moment...
+
     - Now sorts by date by default, will be looking to make this configurable going forward as well.
     - Sort order can be flipped globally if preferred using:
 
