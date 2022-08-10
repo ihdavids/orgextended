@@ -46,7 +46,7 @@
 	#+END_SRC
 
 	
-** Todo Lists
+** Agenda Task Lists
 	- Todo lists now have a dynamic filter option. This option will provide an input box that allows you to dynamically filter the text in the todo list.
 	- The keybinding is REALLY rough right now. 
 		- In neovintageous mode "f","f" will bring back up the input box allowing for more filtering goodness.
@@ -63,4 +63,13 @@
     "agendaTodoFilterByDefault": true,
 	#+END_SRC
 
+*** New todo view columns
+    - showdate - will show most relevant date information (active, scheduled, dealine, closed timestamp)
+    - showtime - will show the time info from the most relevant date information
 
+    #+BEGIN_SRC js
+        "This Weeks Work":   ["Clocked : clockfilter +7d : showduration : showtotalduration : byproject : showdate : showtime"],
+    #+END_SRC
+
+*** Better todo sorting
+    - Now sorts by date by default, will be looking to make this configurable going forward as well.

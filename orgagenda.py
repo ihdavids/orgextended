@@ -930,6 +930,27 @@ def bystartnodedatekey(a):
         return datetime.datetime.combine(dt.today(), datetime.datetime.min.time())
     return dt
 
+def getdatefromnode(n):
+    dt = datetime.datetime.min
+    timestamps = n.get_timestamps(active=True,point=True,range=True)
+    if timestamps and len(timestamps) > 0:
+        dt = timestamps[0]
+    if n.deadline:
+        dt = n.deadline.start
+    if n.scheduled:
+        dt = n.scheduled.start
+    if n.closed:
+        dt = n.closed
+    if(isinstance(dt,orgdate.OrgDate)):
+        dt=dt.start
+    if(isinstance(dt, datetime.date)):
+        return datetime.datetime.combine(dt.date(), datetime.datetime.now().time())
+    return dt
+
+def getdate(a):
+    n = a['node']
+    return getdatefromnode(n)
+
 # ============================================================ 
 class WeekView(AgendaBaseView):
     def __init__(self, name, setup=True,**kwargs):
@@ -1317,6 +1338,8 @@ class TodoView(AgendaBaseView):
         self.showfilename = "hidefilename" not in kwargs
         self.showheading  = "hideheading" not in kwargs
         self.showstatus   = "hidestatus" not in kwargs
+        self.showdate     = "showdate" in kwargs
+        self.showtime     = "showtime" in kwargs
         self.showtotalduration = "showtotalduration" in kwargs
         self.byproject    = "byproject" in kwargs
         self.input        = None
@@ -1347,6 +1370,20 @@ class TodoView(AgendaBaseView):
             if n:
                 heading = n.heading
             data['heading'] = heading
+        if self.showdate:
+            date = ""
+            if n:
+                dt = getdatefromnode(n)
+                if dt != datetime.datetime.min and dt.date() != datetime.date.min:
+                    date = dt.strftime("%Y-%m-%d %a")  
+            data['date'] = date
+        if self.showtime:
+            time = ""
+            if n:
+                dt = getdatefromnode(n)
+                if dt != datetime.datetime.min and dt.time() != datetime.time.min:
+                    time = dt.time().strftime("%H:%M")  
+            data['time'] = time
         return data
 
     def GetFormatString(self):
@@ -1354,9 +1391,13 @@ class TodoView(AgendaBaseView):
         if self.showfilename:
             formatstr += "{filename:15} "
         if self.showstatus:
-            formatstr += "{status:12} "
+            formatstr += "{status:11} "
         if self.showduration:
             formatstr += "{duration:7} "
+        if self.showdate:
+            formatstr += "{date:15} "
+        if self.showtime:
+            formatstr += "{time:6} "
         if self.showheading:
             formatstr += "{heading}"
         formatstr += "\n"
@@ -1398,6 +1439,10 @@ class TodoView(AgendaBaseView):
                         projects[pname] = []
                     projects[pname].append(entry)
             for pname,vals in projects.items():
+                vals.sort(key=getdate)
+                projects[pname] = vals
+
+            for pname,vals in projects.items():
                 self.view.insert(edit, self.view.size(), "\n== [{0}] ==\n".format(pname))
                 for entry in vals:
                     n        = entry['node']
@@ -1412,6 +1457,7 @@ class TodoView(AgendaBaseView):
                     self.MarkEntryAt(entry)
                     self.RenderEntry(n, filename, edit)
         else:
+            self.entries.sort(key=getdate)
             for entry in self.entries:
                 n        = entry['node']
                 if self.search_filter and not n.is_root() and not self.search_filter.match(n.heading):
