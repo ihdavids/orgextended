@@ -173,7 +173,7 @@ def IsProjectTaskWithProjectTag(n):
     if(n):
         tags = n.shallow_tags
         if("PROJECT" in tags or "Project" in tags or "project" in tags):
-            print("PROJ: " + n.heading)
+            #print("PROJ: " + n.heading)
             return True
     return False
 
@@ -1433,7 +1433,7 @@ class TodoView(AgendaBaseView):
         return formatstr
 
     def OnFilter(self, text):
-        print("FILTER: " + str(text))
+        #print("FILTER: " + str(text))
         self.input.onRecalc = evt.Make(self.OnFilter)
         if text == None:
             self.search_filter = None
@@ -1943,7 +1943,6 @@ class OrgAgendaReRenderViewCommand(sublime_plugin.TextCommand):
 # ================================================================================
 class OrgAgendaReOpenFilterViewCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        print("RE OPEN FILTER VIEW")
         v = FindMappedView(self.view)
         if v != None:
             v.OpenFilterView()
