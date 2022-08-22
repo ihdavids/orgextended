@@ -2606,8 +2606,10 @@ class OrgHighlightCellCommand(sublime_plugin.TextCommand):
         global tableCache
         td = tableCache.GetTable(self.view)
         if(td):
-            r,c = td.CursorToCell()
-            td.HighlightCell(r, c, 10)
+            rv = td.CursorToCell()
+            if(rv):
+                r,c = rv
+                td.HighlightCell(r, c, 10)
 
 # ================================================================================
 class OrgHighlightFormulaFromCellCommand(sublime_plugin.TextCommand):
