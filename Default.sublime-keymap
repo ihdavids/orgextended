@@ -5,6 +5,24 @@
 	{ "keys": ["ctrl+down"],         "command": "org_down" ,                     "context": [{ "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" }]},
     // TODO: ST4 REQUIRES the use of context vs wrapping.
     //       Split these appart to make the easier to manage.
+
+    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_table",  "operator": "equal", "operand": true },
+            { "key": "has_next_field", "operator": "not_equal", "operand": true},
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
+    { "keys": ["shift+tab"], "command": "table_editor_previous_field", "context":
+        [
+            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
+            { "key": "org_table",  "operator": "equal", "operand": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
+        ]
+    },
 	{ "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
         [
             { "key": "eol_selector",   "operator": "equal",     "operand": "text.orgmode" },
@@ -31,6 +49,7 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "org_global",  "operator": "equal", "operand": true },
+            { "key": "org_table",  "operator": "equal", "operand": false },
             { "key": "has_next_field", "operator": "not_equal", "operand": true}
         ]
     },
@@ -52,23 +71,6 @@
         [
             { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
             { "key": "has_snippet" }
-        ]
-    },
-    { "keys": ["tab"],               "command": "org_tab_cycling",               "context": 
-        [
-            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
-            { "key": "org_table",  "operator": "equal", "operand": true },
-            { "key": "has_next_field", "operator": "not_equal", "operand": true},
-            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
-            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
-        ]
-    },
-    { "keys": ["shift+tab"], "command": "table_editor_previous_field", "context":
-        [
-            { "key": "eol_selector", "operator": "equal", "operand": "text.orgmode" },
-            { "key": "org_table",  "operator": "equal", "operand": true },
-            { "key": "preceding_text", "operator": "regex_contains", "operand": "^\\s*\\|", "match_all": true },
-            { "key": "following_text", "operator": "regex_contains", "operand": "$", "match_all": true }
         ]
     },
 
