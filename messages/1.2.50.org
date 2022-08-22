@@ -3,4 +3,8 @@
 *** FIXED Task Lists
 	- Some print cleanup from the sublime output window.
 
-   
+** Tables
+   - Fixed some tabbing problems (mostly highlight related in some generated tables)
+   - Problem was both a potential exception AND a table living at global scope
+     the keybinding was going to the global scope tab binding rather than the
+     table keybinding which was causing improper behaviour.
