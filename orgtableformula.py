@@ -29,6 +29,7 @@ import platform
 import time
 import json
 import ast
+import random
 
 random.seed()
 RE_TABLE_LINE   = re.compile(r'\s*[|]')
@@ -2437,6 +2438,42 @@ def FormulaIterator(table):
             val = table.Execute(i)
             yield (r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i))
     return None
+
+def RandomRowFromTable(tableid):
+    tbl = LookupTableFromNamedObject(tableid)
+    if tbl:
+        numRows = tbl.Height()
+        row = random.randrange(numRows)
+        ret = "|"
+        for i in range(1,tbl.Width()+1):
+            txt = tbl.GetCellText(row,i)
+            ret += txt + "|"
+        return ret
+
+
+# ================================================================================
+class OrgInsertRandomRowFromTableCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            evt.EmitIf(self.onDone)
+            return
+        rowText = RandomRowFromTable(self.ids[index])
+        self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": rowText, "onDone": self.onDone})
+
+    def run(self, edit, tblName=None, onDone=None):
+        print("HERE")
+        self.onDone = onDone
+        self.ids = list(db.Get().GetIds())
+        print("IDS: " + str(self.ids))
+        if (tblName == None):
+            print("PROMPT")
+            if(int(sublime.version()) <= 4096):
+                self.view.window().show_quick_panel(self.ids, self.on_done, -1, -1)
+            else:
+                self.view.window().show_quick_panel(self.ids, self.on_done_st4, -1, -1)
+
 
 # ================================================================================
 class OrgExecuteFormulaCommand(sublime_plugin.TextCommand):

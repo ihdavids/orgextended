@@ -8,3 +8,26 @@
    - Problem was both a potential exception AND a table living at global scope
      the keybinding was going to the global scope tab binding rather than the
      table keybinding which was causing improper behaviour.
+
+*** Random Insertion From Remote Table
+	Sometimes I would like to make a random selection from a remote table. There is a new command to insert at point a random selection from a remote table (by ID)
+	NOTE the properties block with ID this lets you reference this table and make a random selection from the table.
+
+    
+    #+BEGIN_SRC org
+     * Common Items
+       :PROPERTIES:
+  :ID: common-items
+  :END:
+
+	|            Item Name             |      Type     | Attuned | Source |                                    Link                                   |
+	|----------------------------------+---------------+---------+--------+---------------------------------------------------------------------------|
+	| Armblade                         | Weapon        | Attuned | E:RLW  | http://dnd5e.wikidot.com//wondrous-items:armblade                         |
+	| Armor of Gleaming                | Armor         | -       | XGE    | http://dnd5e.wikidot.com//wondrous-items:armor-of-gleaming                |
+	| Bead of Nourishment              | Wondrous Item | -       | XGE    | http://dnd5e.wikidot.com//wondrous-items:bead-of-nourishment              |
+	| Bead of Refreshment              | Wondrous Item | -       | XGE    | http://dnd5e.wikidot.com//wondrous-items:bead-of-refreshment              |
+	| Boots of False Tracks            | Wondrous Item | -       | XGE    | http://dnd5e.wikidot.com//wondrous-items:boots-of-false-tracks            |
+	| Bottle of Boundless Coffee       | Wondrous Item | -       | SCC    | http://dnd5e.wikidot.com//wondrous-items:bottle-of-boundless-coffee       |
+	| Breathing Bubble                 | Wondrous Item | -       | EGW    | http://dnd5e.wikidot.com//wondrous-items:breathing-bubble                 |
+      
+    #+END_SRC

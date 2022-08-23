@@ -637,6 +637,9 @@ class OrgDb:
             return (file,at)
         return (None, None)
 
+    def GetIds(self):
+        return self.idmaps.keys()
+
     def __GetPaths(self, name):
         paths = sets.Get(name, None)
         if (str == type(paths)):
