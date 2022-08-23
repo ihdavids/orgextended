@@ -1798,6 +1798,15 @@ class TableDef(simpev.SimpleEval):
             pt = ll.end()
         self.view.run_command("org_internal_insert", {"location": pt, "text": formula})
 
+    def IsRowAboveHLine(self, r):
+        if r >= 1 and r < len(self.lineToRow):
+            realRow = self.lineToRow[r]
+            hline = realRow + 1
+            for x in self.hlines:
+                if hline == x:
+                    return True
+        return False
+
     def RowToCellRow(self,r):
         for i in range(1,len(self.lineToRow)+1):
             if(i in self.lineToRow and self.lineToRow[i] == r):
@@ -1805,6 +1814,8 @@ class TableDef(simpev.SimpleEval):
         return 1
 
     def FindCellColFromCol(self,c):
+        if self.linedef == None:
+            return 1
         for i in range(0,len(self.linedef)-1):
             if(c >= self.linedef[i] and c < self.linedef[i+1]):
                 return i+1
@@ -2443,7 +2454,14 @@ def RandomRowFromTable(tableid):
     tbl = LookupTableFromNamedObject(tableid)
     if tbl:
         numRows = tbl.Height()
-        row = random.randrange(numRows)
+        random.seed()
+        row = random.randrange(1,numRows)
+        cnt = 0
+        while tbl.IsRowAboveHLine(row) or tbl.ShouldIgnoreRow(row):
+            row = random.randrange(1,numRows)
+            cnt += 1
+            if cnt > 100:
+                return "[NO MATCH]"
         ret = "|"
         for i in range(1,tbl.Width()+1):
             txt = tbl.GetCellText(row,i)
@@ -2463,12 +2481,9 @@ class OrgInsertRandomRowFromTableCommand(sublime_plugin.TextCommand):
         self.view.run_command("org_internal_insert", {"location": self.view.sel()[0].begin(), "text": rowText, "onDone": self.onDone})
 
     def run(self, edit, tblName=None, onDone=None):
-        print("HERE")
         self.onDone = onDone
         self.ids = list(db.Get().GetIds())
-        print("IDS: " + str(self.ids))
         if (tblName == None):
-            print("PROMPT")
             if(int(sublime.version()) <= 4096):
                 self.view.window().show_quick_panel(self.ids, self.on_done, -1, -1)
             else:
