@@ -250,6 +250,11 @@
     // to Monday
     "agendaWeekViewNumDays": 7,
 
+    // Do you want todo views to pop up the filter box when they pop up or
+    // only after you ask for it. This is an input panel at the bottom of the view
+    // that lets you filter out todos that do not match a regex as you type it.
+    "agendaTodoFilterByDefault": false,
+
     // Do you want the system to delete clocking entries smaller than 1 minute
     // or keep them?
     "clockingSubMinuteClocks": true,
@@ -369,11 +374,17 @@
 
     // LaTeX path for Org Export File As Pdf
     // "latex2Pdf": "C:\\texlive\\2021\\bin\\win32\\pdflatex.exe",
+    //
+    // If you need to control the language mapping you can do so here
+    // using this table. A quick example is below where we are mapping to [5.2]Lua
+    // rather than 5.0 Lua which is the default.
+    // 
     // LateX SRC_BLOC - LaTex Listing package language matching
     // "latexListingPackageLang": {
     //     "python":  "Python",
     //     "lua":   "[5.2]Lua",
     // },
+
 
     // ============================================================
     // BACKLINKS

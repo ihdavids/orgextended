@@ -188,6 +188,8 @@
     // Trello:
     // Trello commands allow you to 2 way sync with a trello board. It does however require
     // that you have the Trello package installed as I parasitically use that package.
-    {"caption": "Org Trello Sync Board",        "command": "org_trello_sync_board"            },
+    {"caption": "Org Trello Sync Board",        "command": "org_trello_sync_board"               },
 
+    // Timesheet System
+    {"caption": "Org Timesheet Table",          "command": "org_insert_timesheet"                },
 ]

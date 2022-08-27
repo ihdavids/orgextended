@@ -1364,6 +1364,7 @@ class TodoView(AgendaBaseView):
         self.showstatus   = "hidestatus" not in kwargs
         self.showdate     = "showdate" in kwargs
         self.showtime     = "showtime" in kwargs
+        self.showeffort   = "showeffort" in kwargs
         self.showtotalduration = "showtotalduration" in kwargs
         self.byproject    = "byproject" in kwargs
         self.input        = None
@@ -1413,6 +1414,11 @@ class TodoView(AgendaBaseView):
                 if dt != datetime.datetime.min and dt.time() != datetime.time.min:
                     time = dt.time().strftime("%H:%M")  
             data['time'] = time
+        if self.showeffort:
+            effort = ""
+            if n:
+                effort = n.get_property("EFFORT","")
+            data['effort'] = effort
         return data
 
     def GetFormatString(self):
@@ -1427,6 +1433,8 @@ class TodoView(AgendaBaseView):
             formatstr += "{date:15} "
         if self.showtime:
             formatstr += "{time:6} "
+        if self.showeffort:
+            formatstr += "{effort:>6} "
         if self.showheading:
             formatstr += "{heading}"
         formatstr += "\n"
