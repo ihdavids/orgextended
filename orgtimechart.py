@@ -24,7 +24,7 @@ class OrgTimesheet(ag.TodoView):
         super(OrgTimesheet, self).__init__(name, False, **kwargs)
 
     def InsertTableHeadings(self, edit):
-        self.view.insert(edit,self.view.sel()[0].begin(),"|Name|Estimate|Start|End|Dep|Assigned To|\n|-\n")
+        self.view.insert(edit,self.view.sel()[0].begin(),"|Name|Estimate|Start|End|Dep|Assigned|Spent|X|\n|-\n")
 
     def RenderSheet(self, edit, view):
         self.view = view
@@ -53,10 +53,17 @@ class OrgTimesheet(ag.TodoView):
                     pass
             else:
                 start = ""
-            self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|\n".format(n.heading,estimate,start,end,"",""))
+            done = ""
+            if ag.IsDone(n):
+                done = "x"
+
+            spent = ""
+            dependenton = ""
+            assigned = ""
+            self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
 
     def FilterEntry(self, n, filename):
-        return ag.IsTodo(n) and not ag.IsProject(n) and not ag.IsArchived(n)
+        return (ag.IsDone(n) or ag.IsTodo(n)) and not ag.IsProject(n) and not ag.IsArchived(n)
 
 
 # ================================================================================
