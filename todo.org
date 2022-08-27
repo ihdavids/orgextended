@@ -236,7 +236,7 @@
  	- [x] Export to latex
  	- [x] Export to pdf
  
-** DONE Babel [5/5]
+** DONE Core Babel [5/5]
  	- [x] plantuml and dot integration?
  	- [x] latex?
  	- [x] noweb
@@ -625,4 +625,7 @@
  	  the other tools cost to much money IMHO and I find them a bit buggy.
  
  
+
+
+
 

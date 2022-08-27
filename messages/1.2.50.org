@@ -3,6 +3,14 @@
 *** FIXED Task Lists
 	- Some print cleanup from the sublime output window.
 
+*** New showeffort todo agenda option 
+    
+    #+BEGIN_SRC js
+        "Active":   ["Todos: tagfilter +Active :showeffort"],
+    #+END_SRC 
+
+    This will add the :EFFORT: property if present on a todo to the todo list view in a column
+
 ** Tables
    - Fixed some tabbing problems (mostly highlight related in some generated tables)
    - Problem was both a potential exception AND a table living at global scope
@@ -31,3 +39,4 @@
 	| Breathing Bubble                 | Wondrous Item | -       | EGW    | http://dnd5e.wikidot.com//wondrous-items:breathing-bubble                 |
       
     #+END_SRC
+
