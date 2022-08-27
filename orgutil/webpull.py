@@ -105,3 +105,40 @@ def download_highlightjs():
 		file.close()	
 	z.close() 
 	log.debug("Zip file unzipped")
+
+def GetZip(url):
+	import requests
+	payload = ""
+	r = requests.get(url)
+	if(not 'Content-Type' in r.headers or r.headers['Content-Type'] != 'application/zip'):
+		log.error("Cannot finish download, download was not a zip file")
+		log.error(str(r.headers))
+		return None
+	print("Downloaded zip")
+	return r
+
+def UnzipRequest(r, targetDir):
+	import zipfile
+	import io
+	os.mkdir(targetDir)	
+	othersep = '/'
+	if(os.sep == othersep):
+		othersep = '\\'
+	z = zipfile.ZipFile(io.BytesIO(r.content))
+	for info in z.infolist():
+		data = z.read(info.filename)   # Reads the data from the file
+		fname = info.filename.replace(othersep, os.sep)
+		filename = os.path.join(targetDir, fname)
+		ensure_dir(filename)
+		file = open(filename, "wb")
+		file.write(data)
+		file.close()	
+	z.close()
+
+def DownloadDnd():
+	r = GetZip('https://github.com/rpgtex/DND-5e-LaTeX-Template/archive/master.zip')
+	if r != None:
+		UnzipRequest(r)
+	#unzip -d "$(kpsewhich -var-value TEXMFHOME)/tex/latex/" master.zip
+	#cd "$(kpsewhich -var-value TEXMFHOME)/tex/latex/"
+	#mv DND-5e-LaTeX-Template-master dnd	

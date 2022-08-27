@@ -135,6 +135,7 @@
     {"caption": "Org Export Subtree As Html",  "command": "org_export_subtree_as_org_html"    },
     {"caption": "Org Export File As Pdf",      "command": "org_export_file_as_pdf"            },
     {"caption": "Org Export File As Latex",    "command": "org_export_file_as_latex"          },
+    {"caption": "Org Export File As Dnd",      "command": "org_export_file_as_dnd_pdf"        },
     {"caption": "Org Pandoc File To Html",     "command": "org_export_file_as_html"           },
     {"caption": "Org Pandoc Subtree To Html",  "command": "org_export_subtree_as_html"        },
 
@@ -153,6 +154,7 @@
     {"caption": "Org Edit Table Formula",      "command": "org_edit_formula_for_cell"         },
     {"caption": "Org Clear Table Cell",        "command": "org_clear_cell"                    },
     {"caption": "Org Table Exec Below",        "command": "org_exec_on_column"                },
+    {"caption": "Org Insert Rnd Table Row",    "command": "org_insert_random_row_from_table"  },
 
     // Internal Mechanics
     {"caption": "Org Internal Keymap Gen",     "command": "org_create_keymap_doc"             },

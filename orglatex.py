@@ -1118,3 +1118,15 @@ class OrgExportFileAsLatexCommand(sublime_plugin.TextCommand):
             self.view.run_command('org_execute_all_source_blocks',{"onDone":evt.Make(self.OnDoneSourceBlockExecution),"amExporting": True})
         else:
             self.OnDoneSourceBlockExecution()
+
+def SetupDnd():
+    import OrgExtended.orgutil.webpull as wp
+    wp.DownloadDnd()
+
+class OrgExportFileAsDndPdfCommand(sublime_plugin.TextCommand):
+    def run(self,edit, onDone=None, index=None, suffix=""):
+        self.file = db.Get().FindInfo(self.view)
+        self.onDone = onDone
+        self.suffix = suffix
+        SetupDnd()
+
