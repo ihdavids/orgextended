@@ -26,10 +26,57 @@ class OrgTimesheet(ag.TodoView):
     def InsertTableHeadings(self, edit):
         self.view.insert(edit,self.view.sel()[0].begin(),"|Name|Estimate|Start|End|Dep|Assigned|Spent|X|\n|-\n")
 
+    # Dependencies are marked with the AFTER tag or an ORDERED list.
+    def GetAfter(self, n):
+        dep = n.get_property("AFTER","")
+        if dep and not dep == "":
+            d = db.Get().FindById(dep)
+            if not d:
+                d = db.Get().FindByCustomId(dep)
+            if d:
+                dep = d
+            else:
+                dep = None
+        if not dep or dep == "":
+            if n.parent != None and not n.parent.is_root:
+                orde = n.parent.get_property("ORDERED",None)
+                if orde != None:
+                    dep = n.get_sibling_up()
+        return dep
+
+    def GetGlobalProperty(self, name, n, ass):
+        props = n.list_comment('PROPERTY',None)
+        if(props):
+            for i in range(0,len(props),2):
+                prop = props[i]
+                prop = prop.strip()
+                if(prop.startswith('ASSIGNED') and len(props) > i+1):
+                    ass = props[i+1]
+                    return ass
+        return ass
+
+    def GetAssigned(self, n):
+        ass = sets.Get("timesheetDefaultAssigned","")
+        ass = self.GetGlobalProperty("ASSIGNED",n,ass)
+        ass = n.get_property("ASSIGNED",ass)
+        return ass
+
     def RenderSheet(self, edit, view):
         self.view = view
         self.InsertTableHeadings(edit)
         newEntries = []
+        for entry in self.entries:
+            n        = entry['node']
+            dep = self.GetAfter(n)
+            if dep:
+                entry['after'] = dep
+                index = 0
+                for dp in self.entries:
+                    index += 1
+                    d = entry['node']
+                    if d == dep:
+                        entry['after_offset'] = index
+
         for entry in self.entries:
             n        = entry['node']
             filename = entry['file'].AgendaFilenameTag()
@@ -58,8 +105,9 @@ class OrgTimesheet(ag.TodoView):
                 done = "x"
 
             spent = ""
-            dependenton = ""
-            assigned = ""
+            dependenton = entry['after_offset'] if 'after_offset' in entry else ""
+            # TODO: Adjust index to match table separators
+            assigned = self.GetAssigned(n)
             self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
 
     def FilterEntry(self, n, filename):
