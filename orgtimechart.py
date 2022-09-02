@@ -61,6 +61,11 @@ class OrgTimesheet(ag.TodoView):
         ass = n.get_property("ASSIGNED",ass)
         return ass
 
+    def GetClockingData(self, n):
+        if n.clock:
+            return n.duration()
+        return ""
+
     def RenderSheet(self, edit, view):
         self.view = view
         self.InsertTableHeadings(edit)
@@ -104,7 +109,7 @@ class OrgTimesheet(ag.TodoView):
             if ag.IsDone(n):
                 done = "x"
 
-            spent = ""
+            spent = self.GetClockingData(n)
             dependenton = entry['after_offset'] if 'after_offset' in entry else ""
             # TODO: Adjust index to match table separators
             assigned = self.GetAssigned(n)

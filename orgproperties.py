@@ -225,6 +225,33 @@ def RemoveLogbook(view, node, key):
         return True
     return False
 
+def GetLogbook(view, node, key):
+    if(not node):
+        return False
+    drawer = node.get_drawer("LOGBOOK")
+    if not drawer:
+        return False
+    loc    = drawer['loc']
+    start  = loc[0]
+    end    = loc[1]
+    lkey   = key.lower()
+    mrow   = None
+    v = False
+    # Work backwards, want to find the latest incarnation of this
+    for row in range(end-1, start, -1):
+        line = view.getLine(row)
+        m = re.search(key,line)
+        if(m != None):
+            mrow = row
+            break
+    if(mrow != None):
+        pt = view.text_point(mrow, 0)
+        rw = view.line(pt)
+        #view.run_command("org_internal_erase", {"start": rw.begin(), "end": (rw.end()+1)})
+        #drawer['loc'] = (start,end-1)
+        v = re.sub(key,"",line).strip()
+    return v
+
 # Removes all instances of a named property from the drawer.
 def RemoveAllInstances(view, node, key):
     while(RemoveProperty(view, node, key)):
