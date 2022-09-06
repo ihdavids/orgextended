@@ -481,6 +481,21 @@ class OrgBaseNode(Sequence):
         return self.env._nodes[pos]
    
 
+    def get_sibling_and_child_up(self):
+        idx = 0
+        i = self._index - 1
+        level = self._level
+        while(i > 0):
+            sibling = self.env._nodes[i]
+            if(sibling._level < level):
+                return None
+            if(sibling._level >= level):
+                return sibling
+            i -= 1
+            idx += 1
+        # Return the root node
+        return None
+
     def get_sibling_up(self):
         i = self._index - 1
         level = self._level

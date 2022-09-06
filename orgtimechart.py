@@ -41,10 +41,16 @@ class OrgTimesheet(ag.TodoView):
             else:
                 dep = None
         if not dep or dep == "":
-            if n.parent != None and not n.parent.is_root:
-                orde = n.parent.get_property("ORDERED",None)
+            t = n
+            while t.parent != None and not t.parent.is_root():
+                orde = t.parent.get_property("ORDERED",None)
                 if orde != None:
-                    dep = n.get_sibling_up()
+                    dep = n.get_sibling_and_child_up()
+                    # Chain to parent in ORDERED setup.
+                    if dep == None and t != n:
+                        dep = n.parent
+                    break
+                t = t.parent
         return dep
 
     def GetGlobalProperty(self, name, n, ass):
@@ -78,7 +84,7 @@ class OrgTimesheet(ag.TodoView):
                 index = 0
                 for dp in self.entries:
                     index += 1
-                    d = entry['node']
+                    d = dp['node']
                     if d == dep:
                         entry['after_offset'] = index
 
@@ -132,7 +138,7 @@ class OrgTimesheet(ag.TodoView):
         execs = sets.Get("timesheetExed","C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1")
         outputFilename = ".\\schedule.png"
         #inputFilename = "D:\\Git\\notes\\worklog\\schedule.mermaid"
-        commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500"]
+        commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
         try:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -148,6 +154,7 @@ class OrgTimesheet(ag.TodoView):
 
     # This is REALLY rough it gives us a non functional, really basic view.
     def CreateMermaidGanttFile(self,f):
+        self.PreprocessAfter()
         import re
         idx = 0
         f.write("gantt\n")
@@ -193,8 +200,8 @@ class OrgTimesheet(ag.TodoView):
             #self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
             idx += 1
             if(idx > 1):
-                if(done):
-                    continue
+                #if(done):
+                #    continue
                 if(curSection != section and section != None):
                     f.write("section {name}".format(name=section))
                     curSection = section
