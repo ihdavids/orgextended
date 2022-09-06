@@ -192,4 +192,5 @@
 
     // Timesheet System
     {"caption": "Org Timesheet Table",          "command": "org_insert_timesheet"                },
+    {"caption": "Org Timesheet Mermaid Gantt",  "command": "org_generate_mermaid_gantt_chart"    },
 ]
