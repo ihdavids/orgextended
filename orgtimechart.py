@@ -146,6 +146,7 @@ class OrgTimesheet(ag.TodoView):
         log.debug(o)
         log.debug(e)
 
+    # This is REALLY rough it gives us a non functional, really basic view.
     def CreateMermaidGanttFile(self,f):
         import re
         idx = 0
