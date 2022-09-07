@@ -41,7 +41,13 @@
 ** Todo Views
 	- Org Agenda * commands now work on todo views as well as the agenda
 	- This allows for changing priority et al directly form todo lists.
-	
+	- 3 new commands for todo view editing:
+		- Add tag from view
+		- Add property EFFORT
+		- Add property ASSIGNED
+ 
+		These get us closer to a pseudo column view mode using a todo table.
+
 ** Tables
    - Fixed some tabbing problems (mostly highlight related in some generated tables)
    - Problem was both a potential exception AND a table living at global scope
@@ -77,4 +83,5 @@
       Much like a clocktable dynamic block / report. 
       However this maps effort vs spent, who has been assigned to a task (if desired) and done tasks, more than your standard clock report.
     - My thought is to make it possible to dump out one of these and eventually automatically output as several gantt chart options as well.
+    - First version is outputting to mermaid. It is not fully ready for consumption but can be experimented with for those that are adventurous.
 
