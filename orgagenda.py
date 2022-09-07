@@ -1408,7 +1408,7 @@ class TodoView(AgendaBaseView):
             data2['after'] = "------------"
         if self.showid:
             data['id'] = "ID"
-            data2['id'] = "------------"
+            data2['id'] = "-----------------"
         if self.showassigned:
             data['assigned'] = "Who"
             data2['assigned'] = "------------"
@@ -1497,7 +1497,7 @@ class TodoView(AgendaBaseView):
         if self.showafter:
             formatstr += "{after:>12} "
         if self.showid:
-            formatstr += "{id:>12} "
+            formatstr += "{id:>17} "
         if self.showassigned:
             formatstr += "{assigned:>12} "
         if self.showheading:
@@ -1859,9 +1859,10 @@ class OrgAgendaGoToCommand(sublime_plugin.TextCommand):
 
 # ================================================================================
 class RunEditingCommandOnNode:
-    def __init__(self, view, command):
+    def __init__(self, view, command, params={}):
         self.view = view
         self.command = command
+        self.params = params
 
     def onSaved(self):
         if self.viewName == "Agenda":
@@ -1882,7 +1883,10 @@ class RunEditingCommandOnNode:
         eventName = util.RandomString()
         evt.Get().once(eventName, self.onEdited)
         log.debug("Trying to run: " + self.command)
-        view.run_command(self.command, {"onDone": eventName })
+        params = {"onDone": eventName }
+        for k,v in self.params.items():
+            params[k] = v
+        view.run_command(self.command, params)
 
     def Run(self):
         agenda = FindMappedView(self.view)
@@ -2053,6 +2057,30 @@ class OrgAgendaClockInCommand(sublime_plugin.TextCommand):
 class OrgAgendaClockOutCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.ed = RunEditingCommandOnNode(self.view,"org_clock_out")
+        self.ed.Run()
+
+# ================================================================================
+class OrgAgendaInsertTagCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.ed = RunEditingCommandOnNode(self.view,"org_insert_tag")
+        self.ed.Run()
+
+# ================================================================================
+class OrgAgendaInsertEffortCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.ed = RunEditingCommandOnNode(self.view,"org_insert_property", {"name": "EFFORT"})
+        self.ed.Run()
+
+# ================================================================================
+class OrgAgendaAssignCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.ed = RunEditingCommandOnNode(self.view,"org_insert_property", {"name": "ASSIGNED"})
+        self.ed.Run()
+
+# ================================================================================
+class OrgAgendaIdCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.ed = RunEditingCommandOnNode(self.view,"org_insert_property", {"name": "ID"})
         self.ed.Run()
 
 # ================================================================================
