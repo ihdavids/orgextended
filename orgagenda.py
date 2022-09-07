@@ -752,9 +752,9 @@ class AgendaBaseView:
         # This doesn't work BOO
         self.view.agenda = self
 
-    def DoRenderView(self,edit):
+    def DoRenderView(self,edit, clear = False):
         self.StartEditing()
-        self.RenderView(edit)
+        self.RenderView(edit, clear)
         self.DoneEditing()
 
     def OpenFilterView(self):
@@ -830,7 +830,7 @@ class AgendaBaseView:
 
     # ----------------------------------------------
     # These are user extended views!
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         pass
 
     def FilterEntries(self):
@@ -894,7 +894,7 @@ class CalendarView(AgendaBaseView):
             date = date.start
         self.dv.AddToDayHighlights(date, "todo", "orgagenda.todo", sublime.DRAW_NO_FILL)
     #def AddToDayHighlights(self, date, key, hightlight, drawtype = sublime.DRAW_NO_OUTLINE):
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         self.InsertAgendaHeading(edit)
         self.dv.SetView(self.view)
         self.dv.Render(self.now)
@@ -1115,7 +1115,7 @@ class WeekView(AgendaBaseView):
                         self.view.insert(edit, self.view.size(), "_")
         self.view.insert(edit, self.view.size(),"]\n")
 
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         self.InsertAgendaHeading(edit)
         self.InsertTimeHeading(edit,self.now.hour)
         #print(str(self.now))
@@ -1263,7 +1263,7 @@ class AgendaView(AgendaBaseView):
             return ""
 
 
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         self.InsertAgendaHeading(edit)
         self.RenderDateHeading(edit, self.now)
         view     = self.view
@@ -1525,9 +1525,10 @@ class TodoView(AgendaBaseView):
             order = self.sortorder
         return order
 
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear = False):
         self.ClearEntriesAt()
-        self.view.erase(edit, sublime.Region(0, self.view.size()))
+        if clear:
+            self.view.erase(edit, sublime.Region(0, self.view.size()))
         self.InsertAgendaHeading(edit)
         formatstr = self.GetFormatString()
         data,under      = self.GetFormatHeaders(None,"")
@@ -1655,7 +1656,7 @@ class NextTasksProjectsView(TodoView):
         super(NextTasksProjectsView, self).__init__(name, setup, **kwargs)
 
     # TODO Print project and then the next task
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         self.InsertAgendaHeading(edit)
         newEntries = []
         for entry in self.entries:
@@ -1782,14 +1783,14 @@ class CompositeView(AgendaBaseView):
         super(CompositeView, self).__init__(name)
         self.SetupView()
 
-    def RenderView(self, edit):
+    def RenderView(self, edit, clear=False):
         first = True
         for v in self.agendaViews:
             if not first:
                 self.view.insert(edit, self.view.size(), ("=" * 75) + "\n")
             first = False
             v.view = self.view
-            v.RenderView(edit)
+            v.RenderView(edit, clear)
         # These get updated when rendered
         self.entries = []
         for v in self.agendaViews:
@@ -1863,7 +1864,10 @@ class RunEditingCommandOnNode:
         self.command = command
 
     def onSaved(self):
-        self.view.run_command("org_agenda_day_view")
+        if self.viewName == "Agenda":
+            self.view.run_command("org_agenda_day_view")
+        else:
+            self.view.run_command("org_agenda_custom_view", { "toShow": self.viewName })
 
     def onEdited(self):
         # NOTE the save here doesn't seem to be working
@@ -1883,6 +1887,7 @@ class RunEditingCommandOnNode:
     def Run(self):
         agenda = FindMappedView(self.view)
         if(agenda):
+            self.viewName = agenda.name
             row, col  = self.view.curRowCol()
             n, f = agenda.At(row,col)
             if(f):
@@ -2015,7 +2020,7 @@ class OrgAgendaReRenderViewCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         v = FindMappedView(self.view)
         if v != None:
-            v.DoRenderView(edit)
+            v.DoRenderView(edit, True)
 
 # ================================================================================
 class OrgAgendaReOpenFilterViewCommand(sublime_plugin.TextCommand):
