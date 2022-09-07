@@ -1365,6 +1365,9 @@ class TodoView(AgendaBaseView):
         self.showdate     = "showdate" in kwargs
         self.showtime     = "showtime" in kwargs
         self.showeffort   = "showeffort" in kwargs
+        self.showafter    = "showafter" in kwargs
+        self.showassigned = "showassigned" in kwargs
+        self.showid       = "showid" in kwargs
         self.showtotalduration = "showtotalduration" in kwargs
         self.byproject    = "byproject" in kwargs
         self.input        = None
@@ -1374,6 +1377,45 @@ class TodoView(AgendaBaseView):
         if self.havesortorder:
             self.sortorder = False if "sortascend" in kwargs else self.sortorder
             self.sortorder = True  if "sortdescend" in kwargs else self.sortorder
+
+
+    def GetFormatHeaders(self, n, filename):
+        data = {}
+        data2 = {}
+        if self.showfilename:
+            data['filename'] = "File"
+            data2['filename'] = "---------------"
+        if self.showstatus:
+            data['status']   = "Status"
+            data2['status']   = "-----------"
+        if self.showduration:
+            data['duration'] = "Duration"
+            data2['duration']= "--------"
+        if self.showheading:
+            data['heading'] =  "Heading"
+            data2['heading'] = "--------------------"
+        if self.showdate:
+            data['date'] = "Date"
+            data2['date']= "---------------"
+        if self.showtime:
+            data['time'] = "Time"
+            data2['time'] = "------"
+        if self.showeffort:
+            data['effort'] = "Effort"
+            data2['effort'] = "------"
+        if self.showafter:
+            data['after'] = "After"
+            data2['after'] = "------------"
+        if self.showid:
+            data['id'] = "ID"
+            data2['id'] = "------------"
+        if self.showassigned:
+            data['assigned'] = "Who"
+            data2['assigned'] = "------------"
+        return (data, data2)
+
+
+
 
     def GetFormatData(self, n, filename):
         data = {}
@@ -1419,6 +1461,23 @@ class TodoView(AgendaBaseView):
             if n:
                 effort = n.get_property("EFFORT","")
             data['effort'] = effort
+        if self.showafter:
+            after = ""
+            if n:
+                after = n.get_property("AFTER","")
+            data['after'] = after
+        if self.showid:
+            idd = ""
+            if n:
+                idd = n.get_property("ID","")
+                if not idd or idd == "":
+                    idd = n.get_property("CUSTOM_ID","")
+            data['id'] = idd
+        if self.showassigned:
+            ass = ""
+            if n:
+                ass = n.get_property("ASSIGNED","")
+            data['assigned'] = ass
         return data
 
     def GetFormatString(self):
@@ -1435,6 +1494,12 @@ class TodoView(AgendaBaseView):
             formatstr += "{time:6} "
         if self.showeffort:
             formatstr += "{effort:>6} "
+        if self.showafter:
+            formatstr += "{after:>12} "
+        if self.showid:
+            formatstr += "{id:>12} "
+        if self.showassigned:
+            formatstr += "{assigned:>12} "
         if self.showheading:
             formatstr += "{heading}"
         formatstr += "\n"
@@ -1464,6 +1529,10 @@ class TodoView(AgendaBaseView):
         self.ClearEntriesAt()
         self.view.erase(edit, sublime.Region(0, self.view.size()))
         self.InsertAgendaHeading(edit)
+        formatstr = self.GetFormatString()
+        data,under      = self.GetFormatHeaders(None,"")
+        self.view.insert(edit, self.view.size(), formatstr.format(**data))
+        self.view.insert(edit, self.view.size(), formatstr.format(**under))
         self.totalduration = datetime.timedelta(days=0)
         if self.byproject:
             projects   = {}
