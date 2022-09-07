@@ -3,6 +3,9 @@
 *** FIXED Task Lists
 	- Some print cleanup from the sublime output window.
 
+*** FIXED Agenda View
+	- Searchable task lists broke the agenda render. Very frustrating.
+
 *** New showeffort todo agenda option 
     
     #+BEGIN_SRC js
@@ -34,6 +37,10 @@
 *** Change in TODO Tables
 	- As I have added more columns it becomes more confusing deciphering what you are looking at. I have added headings to the table.
 	- I may simply convert this to an org table, we will see.
+
+** Todo Views
+	- Org Agenda * commands now work on todo views as well as the agenda
+	- This allows for changing priority et al directly form todo lists.
 	
 ** Tables
    - Fixed some tabbing problems (mostly highlight related in some generated tables)
@@ -70,6 +77,4 @@
       Much like a clocktable dynamic block / report. 
       However this maps effort vs spent, who has been assigned to a task (if desired) and done tasks, more than your standard clock report.
     - My thought is to make it possible to dump out one of these and eventually automatically output as several gantt chart options as well.
-
-
 
