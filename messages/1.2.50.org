@@ -11,6 +11,30 @@
 
     This will add the :EFFORT: property if present on a todo to the todo list view in a column
 
+*** New showid todo agenda option
+
+	Will show the ID or CUSTOM_ID property of a task in the todo list
+    #+BEGIN_SRC js
+        "Active":   ["Todos: tagfilter +Active :showid"],
+    #+END_SRC 
+
+*** New showafter todo agenda option
+
+	Will show the AFTER property of a task in the todo list
+    #+BEGIN_SRC js
+        "Active":   ["Todos: tagfilter +Active :showafter"],
+    #+END_SRC 
+
+*** New showassigned todo agenda option
+
+	Will show the ASSIGNED property of a task in the todo list
+    #+BEGIN_SRC js
+        "Active":   ["Todos: tagfilter +Active :showassigned"],
+    #+END_SRC 
+*** Change in TODO Tables
+	- As I have added more columns it becomes more confusing deciphering what you are looking at. I have added headings to the table.
+	- I may simply convert this to an org table, we will see.
+	
 ** Tables
    - Fixed some tabbing problems (mostly highlight related in some generated tables)
    - Problem was both a potential exception AND a table living at global scope
@@ -46,5 +70,6 @@
       Much like a clocktable dynamic block / report. 
       However this maps effort vs spent, who has been assigned to a task (if desired) and done tasks, more than your standard clock report.
     - My thought is to make it possible to dump out one of these and eventually automatically output as several gantt chart options as well.
+
 
 
