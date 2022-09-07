@@ -33,11 +33,9 @@ class OrgTimesheet(ag.TodoView):
     def GetAfter(self, n):
         dep = n.get_property("AFTER","")
         if dep and not dep == "":
-            d = db.Get().FindById(dep)
-            if not d:
-                d = db.Get().FindByCustomId(dep)
-            if d:
-                dep = d
+            file, at = db.Get().FindByAnyId(dep)
+            if file:
+                dep = file.At(at)
             else:
                 dep = None
         if not dep or dep == "":
