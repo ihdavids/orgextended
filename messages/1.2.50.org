@@ -78,8 +78,8 @@
     #+END_SRC
 
 
-** Timechart
-    - New experimental feature. Much like an agenda we have the timechart. This is a table that can be inserted anywhere from todo's.
+** Timechart Initial Experiment
+    - New VERY experimental feature. Much like an agenda we have the timechart. This is a table that can be inserted anywhere from todo's.
       Much like a clocktable dynamic block / report. 
       However this maps effort vs spent, who has been assigned to a task (if desired) and done tasks, more than your standard clock report.
     - My thought is to make it possible to dump out one of these and eventually automatically output as several gantt chart options as well.
