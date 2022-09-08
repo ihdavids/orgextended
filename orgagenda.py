@@ -943,8 +943,10 @@ def getdatefromnode(n):
         dt = n.closed
     if(isinstance(dt,orgdate.OrgDate)):
         dt=dt.start
+    #if(isinstance(dt, datetime.datetime)):
+    #    return datetime.datetime.combine(dt.date(), datetime.datetime.min.time())
     if(isinstance(dt, datetime.date)):
-        return datetime.datetime.combine(dt.date(), datetime.datetime.min.time())
+        return datetime.datetime.combine(dt, datetime.datetime.min.time())
     return dt
 
 def getdate(a):
