@@ -68,6 +68,12 @@ class OrgTimesheet(ag.TodoView):
         ass = n.get_property("ASSIGNED",ass)
         return ass
 
+    def GetSection(self, n):
+        ass = sets.Get("timesheetDefaultSection",None)
+        ass = self.GetGlobalProperty("SECTION",n,ass)
+        ass = n.get_property("SECTION",ass)
+        return ass
+
     def GetClockingData(self, n):
         if n.clock:
             return n.duration()
@@ -76,6 +82,9 @@ class OrgTimesheet(ag.TodoView):
     def PreprocessAfter(self):
         for entry in self.entries:
             n        = entry['node']
+            sec = self.GetSection(n)
+            if sec:
+                entry['section'] = sec
             dep = self.GetAfter(n)
             if dep:
                 entry['after'] = dep
@@ -201,7 +210,7 @@ class OrgTimesheet(ag.TodoView):
                 #if(done):
                 #    continue
                 if(curSection != section and section != None):
-                    f.write("section {name}".format(name=section))
+                    f.write("section {name}\n".format(name=section))
                     curSection = section
                 date = start
                 dep = dependenton

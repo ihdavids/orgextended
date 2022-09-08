@@ -62,8 +62,8 @@
     #+BEGIN_SRC org
      * Common Items
        :PROPERTIES:
-  :ID: common-items
-  :END:
+        :ID: common-items
+       :END:
 
 	|            Item Name             |      Type     | Attuned | Source |                                    Link                                   |
 	|----------------------------------+---------------+---------+--------+---------------------------------------------------------------------------|
