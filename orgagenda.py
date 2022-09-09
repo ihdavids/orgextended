@@ -1358,18 +1358,24 @@ class AgendaView(AgendaBaseView):
 RE_IN_OUT_TAG = re.compile('(?P<inout>[|+-])?(?P<tag>[^ ]+)')
 # ================================================================================
 class TodoView(AgendaBaseView):
+
+    def GetParam(self, name, defaultVal, kwargs):
+        v       = kwargs[name] if name in kwargs else None
+        if isinstance(v,bool):
+            v = ">10.10"
+        return v
     def __init__(self, name, setup=True, **kwargs):
         super(TodoView, self).__init__(name, setup, **kwargs)
-        self.showduration = "showduration" in kwargs
-        self.showfilename = "hidefilename" not in kwargs
+        self.showduration = self.GetParam("showduration","7.7",kwargs)
+        self.showfilename = "15.15" if "hidefilename" not in kwargs else None
         self.showheading  = "hideheading" not in kwargs
-        self.showstatus   = "hidestatus" not in kwargs
-        self.showdate     = "showdate" in kwargs
-        self.showtime     = "showtime" in kwargs
-        self.showeffort   = "showeffort" in kwargs
-        self.showafter    = "showafter" in kwargs
-        self.showassigned = "showassigned" in kwargs
-        self.showid       = "showid" in kwargs
+        self.showstatus   = "11.11" if "hidestatus" not in kwargs else None
+        self.showdate     = self.GetParam("showdate","15.15",kwargs)
+        self.showtime     = self.GetParam("showtime","6.6",kwargs)
+        self.showeffort   = self.GetParam("showeffort",">6.6",kwargs)
+        self.showafter    = self.GetParam("showafter",">12.12",kwargs)
+        self.showassigned = self.GetParam("showassigned",">12.12", kwargs)
+        self.showid       = self.GetParam("showid",">10.10", kwargs)
         self.showtotalduration = "showtotalduration" in kwargs
         self.byproject    = "byproject" in kwargs
         self.input        = None
@@ -1379,7 +1385,6 @@ class TodoView(AgendaBaseView):
         if self.havesortorder:
             self.sortorder = False if "sortascend" in kwargs else self.sortorder
             self.sortorder = True  if "sortdescend" in kwargs else self.sortorder
-
 
     def GetFormatHeaders(self, n, filename):
         data = {}
@@ -1482,26 +1487,22 @@ class TodoView(AgendaBaseView):
             data['assigned'] = ass
         return data
 
+
+    def GetF(self,p,name):
+        if p:
+            return "{" + name + ":" + p + "} "
+        return ""
     def GetFormatString(self):
         formatstr = ""
-        if self.showfilename:
-            formatstr += "{filename:15} "
-        if self.showstatus:
-            formatstr += "{status:11} "
-        if self.showduration:
-            formatstr += "{duration:7} "
-        if self.showdate:
-            formatstr += "{date:15} "
-        if self.showtime:
-            formatstr += "{time:6} "
-        if self.showeffort:
-            formatstr += "{effort:>6} "
-        if self.showafter:
-            formatstr += "{after:>12} "
-        if self.showid:
-            formatstr += "{id:>17} "
-        if self.showassigned:
-            formatstr += "{assigned:>12} "
+        formatstr += self.GetF(self.showfilename,"filename")
+        formatstr += self.GetF(self.showstatus,"status")
+        formatstr += self.GetF(self.showduration,"duration")
+        formatstr += self.GetF(self.showdate,"date")
+        formatstr += self.GetF(self.showtime,"time")
+        formatstr += self.GetF(self.showeffort,"effort")
+        formatstr += self.GetF(self.showafter,"after")
+        formatstr += self.GetF(self.showid,"id")
+        formatstr += self.GetF(self.showassigned,"assigned")
         if self.showheading:
             formatstr += "{heading}"
         formatstr += "\n"
