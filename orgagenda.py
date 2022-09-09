@@ -1874,14 +1874,8 @@ class RunEditingCommandOnNode:
         self.command = command
         self.params = params
 
-    def onRestoreCursor(self):
-        self.view.sel().clear()
-        p = self.view.text_point(self.row,0)
-        print("Jumping to: " + str(self.row))
-        self.view.sel().add(p)
-
     def onAfterSaved(self):
-        sublime.set_timeout_async(lambda: self.onRestoreCursor(), 1000)
+        pass # Not needed anymore
 
     def onSaved(self):
         whenDoneEvt = util.RandomString()
@@ -1992,8 +1986,8 @@ viewRegistry = CalendarViewRegistry()
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
     def run(self, edit, toShow="Default", onDone=None):
         pos = None
-        if(self.view.name() == "Agenda"):
-            pos = self.view.sel()[0]
+        #if(self.view.name() == "Agenda"):
+        pos = self.view.sel()[0]
         ReloadAllUnsavedBuffers()
         views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         views = views[toShow]
@@ -2004,8 +1998,8 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         #agenda = CompositeView("Agenda", views)
         #agenda = AgendaView(AGENDA_VIEW)
         agenda.DoRenderView(edit)
-        if(self.view.name() == "Agenda"):
-            agenda.RestoreCursor(pos)
+        #if(self.view.name() == "Agenda"):
+        agenda.RestoreCursor(pos)
         log.info("Custom view refreshed")
         evt.EmitIf(onDone)
 
