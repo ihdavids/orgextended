@@ -1,3 +1,24 @@
 * 1.2.51
 ** FIXED Date only labels were confounding some TODO reports causing an assert.
    - This would manifest as a blank todo list when the todo had a date but no time, this has been fixed
+
+
+** Timesheet / Timechart
+   Still an experimental feature
+
+   - Org Choose Timesheet command acts like Agenda Choose View and uses the same list.
+
+
+** Todo view rebinds:
+	These allow editing of task state in a todo view which is handy for planning purposes
+
+    { "keys": ["t"],                 "command": "org_agenda_change_todo",            "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["s"],                 "command": "org_agenda_change_todo",            "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["e"],                 "command": "org_agenda_insert_effort",          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["i"],                 "command": "org_agenda_id"           ,          "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["t"],                 "command": "org_agenda_insert_tag",             "context": [{ "key": "eol_selector", "operand": "source.orgagenda"}]  },
+    { "keys": ["a"],                 "command": "org_agenda_assign",          
+
+
+*** New Agenda Todo List Type
+    Has Status - Lists all todos regardless of status or presence in a project. Useful if you want to filter you tasks by tag or property instead

@@ -263,6 +263,9 @@ class TimesheetRegistry:
         vlist = []
         for v in views:
             n, args = self.ParseArgs(v)
+            # For timesheets we ONLY have the one view.
+            # We may need to pull the filter from the other known views in the future?
+            n = "Todos"
             vv = None
             if(args == None):
                 vv = self.KnownViews[n](n, False)
@@ -274,34 +277,85 @@ class TimesheetRegistry:
 
 timesheetRegistry = TimesheetRegistry()
 
+
+
 class OrgInsertTimesheetCommand(sublime_plugin.TextCommand):
-    def run(self, edit, toShow="Default", onDone=None):
+    def run(self, edit, toShow=None, onDone=None):
         self.onDone=onDone
-        pos = self.view.sel()[0]
+        self.pos = self.view.sel()[0]
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.keys = list(self.views.keys())
+        self.edit = edit
         ag.ReloadAllUnsavedBuffers()
-        views = sets.Get("TimesheetCustomViews",{ "Default": ["Todos"]})
-        views = views[toShow]
         nameOfShow = toShow
-        ts = timesheetRegistry.CreateCompositeView(views, nameOfShow)
+        self.views = self.views[nameOfShow]
+        ts = timesheetRegistry.CreateCompositeView(self.views, nameOfShow)
         ts.FilterEntries()
         ts.RenderSheet(edit, self.view)
         self.view.sel().clear()
-        self.view.sel().add(pos)
+        self.view.sel().add(self.pos)
         self.view.run_command('table_editor_next_field')
         evt.EmitIf(self.onDone)
 
-class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
-    def run(self, edit, toShow='Default', onDone=None ):
+class OrgChooseTimesheetCommand(sublime_plugin.TextCommand):
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        key = self.keys[index]
+        self.view.run_command("org_insert_timesheet", { "toShow": key, "onDone": self.onDone })
+
+    def run(self, edit, toShow=None, onDone=None):
         self.onDone=onDone
-        pos = self.view.sel()[0]
+        self.pos = self.view.sel()[0]
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.keys = list(self.views.keys())
+        self.edit = edit
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
+
+class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
+
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        key = self.keys[index]
+        self.Run(key)
+
+    def Run(self, nameOfShow):
         ag.ReloadAllUnsavedBuffers()
-        views = sets.Get("TimesheetCustomViews",{ "Default": ["Todos"]})
-        views = views[toShow]
-        nameOfShow = toShow
+        self.views = self.views[nameOfShow]
         ts = timesheetRegistry.CreateCompositeView(views, nameOfShow)
         ts.FilterEntries()
         ts.RenderMermaidGanttFile()
-        #self.view.sel().clear()
-        #self.view.sel().add(pos)
-        #self.view.run_command('table_editor_next_field')
         evt.EmitIf(self.onDone)
+
+    def run(self, edit, toShow=None, onDone=None ):
+        self.onDone=onDone
+        self.pos = self.view.sel()[0]
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.keys = list(self.views.keys())
+        if toShow != None:
+            self.Run(toShow)
+            return
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
+
+
+
+
+    def run(self, edit, onDone=None):
+        self.onDone = onDone
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
+        self.keys = list(self.views.keys())
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)

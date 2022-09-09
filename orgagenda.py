@@ -1653,6 +1653,14 @@ class ClockedView(TodoView):
         return n and n.clock
 
 # ================================================================================
+class HasStatusView(TodoView):
+    def __init__(self, name, setup=True, **kwargs):
+        super(HasStatusView, self).__init__(name, setup, **kwargs)
+
+    def FilterEntry(self, n, filename):
+        return n and (IsDone(n) or IsTodo(n))
+
+# ================================================================================
 class NextTasksProjectsView(TodoView):
     def __init__(self, name, setup=True, **kwargs):
         super(NextTasksProjectsView, self).__init__(name, setup, **kwargs)
@@ -1915,6 +1923,7 @@ class CalendarViewRegistry:
         self.AddView("Blocked Projects", BlockedProjectsView)
         self.AddView("Next Tasks", NextTasksProjectsView)
         self.AddView("Loose Tasks", LooseTasksView)
+        self.AddView("Has Status", HasStatusView)
         self.AddView("Todos", TodoView)
         self.AddView("Notes", NoteView)
         self.AddView("Meetings", MeetingView)
