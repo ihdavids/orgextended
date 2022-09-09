@@ -1874,11 +1874,22 @@ class RunEditingCommandOnNode:
         self.command = command
         self.params = params
 
+    def onRestoreCursor(self):
+        self.view.sel().clear()
+        p = self.view.text_point(self.row,0)
+        print("Jumping to: " + str(self.row))
+        self.view.sel().add(p)
+
+    def onAfterSaved(self):
+        sublime.set_timeout_async(lambda: self.onRestoreCursor(), 1000)
+
     def onSaved(self):
+        whenDoneEvt = util.RandomString()
+        evt.Get().once(whenDoneEvt, self.onAfterSaved)
         if self.viewName == "Agenda":
             self.view.run_command("org_agenda_day_view")
         else:
-            self.view.run_command("org_agenda_custom_view", { "toShow": self.viewName })
+            self.view.run_command("org_agenda_custom_view", { "toShow": self.viewName, "onDone": whenDoneEvt })
 
     def onEdited(self):
         # NOTE the save here doesn't seem to be working
@@ -1903,6 +1914,7 @@ class RunEditingCommandOnNode:
         if(agenda):
             self.viewName = agenda.name
             row, col  = self.view.curRowCol()
+            self.row = row
             n, f = agenda.At(row,col)
             if(f):
                 if(n):
@@ -1978,7 +1990,7 @@ viewRegistry = CalendarViewRegistry()
 
 # ================================================================================
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
-    def run(self, edit, toShow="Default"):
+    def run(self, edit, toShow="Default", onDone=None):
         pos = None
         if(self.view.name() == "Agenda"):
             pos = self.view.sel()[0]
@@ -1995,6 +2007,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         if(self.view.name() == "Agenda"):
             agenda.RestoreCursor(pos)
         log.info("Custom view refreshed")
+        evt.EmitIf(onDone)
 
 
 # ================================================================================
