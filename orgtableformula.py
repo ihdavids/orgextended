@@ -144,6 +144,11 @@ def GetFunctions():
         f['vmax'] = vmax
         f['vmin'] = vmin
         f['vsum'] = vsum
+        f['vsumifeq'] = vsumifeq
+        f['vsumifgt'] = vsumifgt
+        f['vsumiflt'] = vsumiflt
+        f['vsumifgteq'] = vsumifgteq
+        f['vsumiflteq'] = vsumiflteq
         f['tan'] = tan
         f['cos'] = cos
         f['sin'] = sin
@@ -188,6 +193,15 @@ def GetFunctions():
         f['int'] = myint
         f['float'] = myfloat
         f['highlight'] = myhighlight
+        f['red'] = myred
+        f['green'] = mygreen
+        f['yellow'] = myyellow
+        f['blue'] = myblue
+        f['cyan'] = mycyan
+        f['purple'] = mypurple
+        f['orange'] = myorange
+        f['pink'] = mypink
+        f['gradient'] = mygradient
         f['filename'] = mylocalfile
         add_dynamic_functions(f)
         functionsTable = f
@@ -787,6 +801,9 @@ class Cell:
             return rv
         return False
 
+    def GetTable(self):
+        return self.table
+
     def GetRow(self,height=None):
         r = None
         # We have to allow someone to pass in the height
@@ -1111,6 +1128,101 @@ def vsum(rng):
         s += GetNum(i)
     return s
 
+# Only adds a row from rng to the sum if a and b are equal.
+def vsumifeq(a,b,rng):
+    """Computes the sum of a range of cells where a == b"""
+    s = 0
+    for i in rng:
+        r = a.GetTable().CurRow()
+        c = a.GetTable().CurCol()
+        cr = i.GetRow()
+        cc = i.GetCol()
+        a.GetTable().SetCurRow(cr)
+        a.GetTable().SetCurCol(cc)
+        va = GetVal(a)
+        vb = GetVal(b)
+        a.GetTable().SetCurRow(c)
+        a.GetTable().SetCurCol(r)
+        if va == GetVal(vb):
+            s += GetNum(i)
+    return s
+
+# Only adds a row from rng to the sum if a > b.
+def vsumifgt(a,b,rng):
+    """Computes the sum of a range of cells where a > b"""
+    s = 0
+    for i in rng:
+        r = a.GetTable().CurRow()
+        c = a.GetTable().CurCol()
+        cr = i.GetRow()
+        cc = i.GetCol()
+        a.GetTable().SetCurRow(cr)
+        a.GetTable().SetCurCol(cc)
+        va = GetVal(a)
+        vb = GetVal(b)
+        a.GetTable().SetCurRow(c)
+        a.GetTable().SetCurCol(r)
+        if va > GetVal(vb):
+            s += GetNum(i)
+    return s
+
+# Only adds a row from rng to the sum if a < b.
+def vsumiflt(a,b,rng):
+    """Computes the sum of a range of cells where a < b"""
+    s = 0
+    for i in rng:
+        r = a.GetTable().CurRow()
+        c = a.GetTable().CurCol()
+        cr = i.GetRow()
+        cc = i.GetCol()
+        a.GetTable().SetCurRow(cr)
+        a.GetTable().SetCurCol(cc)
+        va = GetVal(a)
+        vb = GetVal(b)
+        a.GetTable().SetCurRow(c)
+        a.GetTable().SetCurCol(r)
+        if va < GetVal(vb):
+            s += GetNum(i)
+    return s
+
+# Only adds a row from rng to the sum if a <= b.
+def vsumiflteq(a,b,rng):
+    """Computes the sum of a range of cells where a <= b"""
+    s = 0
+    for i in rng:
+        r = a.GetTable().CurRow()
+        c = a.GetTable().CurCol()
+        cr = i.GetRow()
+        cc = i.GetCol()
+        a.GetTable().SetCurRow(cr)
+        a.GetTable().SetCurCol(cc)
+        va = GetVal(a)
+        vb = GetVal(b)
+        a.GetTable().SetCurRow(c)
+        a.GetTable().SetCurCol(r)
+        if va <= GetVal(vb):
+            s += GetNum(i)
+    return s
+
+# Only adds a row from rng to the sum if a >= b.
+def vsumifgteq(a,b,rng):
+    """Computes the sum of a range of cells where a >= b"""
+    s = 0
+    for i in rng:
+        r = a.GetTable().CurRow()
+        c = a.GetTable().CurCol()
+        cr = i.GetRow()
+        cc = i.GetCol()
+        a.GetTable().SetCurRow(cr)
+        a.GetTable().SetCurCol(cc)
+        va = GetVal(a)
+        vb = GetVal(b)
+        a.GetTable().SetCurRow(c)
+        a.GetTable().SetCurCol(r)
+        if va >= GetVal(vb):
+            s += GetNum(i)
+    return s
+
 def vmedian(rng):
     """Computes the median (middle) value of a sorted range of cells"""
     data = list(rng)
@@ -1217,6 +1329,42 @@ def myhighlight(cell,color,value=""):
     cell.table.SetPostExecuteHook(lambda table,x=cell.GetRow(),y=cell.GetCol(),c=color,v=value: postedithighlight(table,x,y,c,v))
     return value
 
+def myred(cell):
+    """equivalent to highlight($x,red,$x) """
+    return myhighlight(cell,"red",cell)
+
+def mygreen(cell):
+    """equivalent to highlight($x,green,$x) """
+    return myhighlight(cell,"green",cell)
+
+def myyellow(cell):
+    """equivalent to highlight($x,yellow,$x) """
+    return myhighlight(cell,"yellow",cell)
+
+def myblue(cell):
+    """equivalent to highlight($x,blue,$x) """
+    return myhighlight(cell,"blue",cell)
+
+def mycyan(cell):
+    """equivalent to highlight($x,cyan,$x) """
+    return myhighlight(cell,"cyan",cell)
+
+def mypurple(cell):
+    """equivalent to highlight($x,purple,$x) """
+    return myhighlight(cell,"purple",cell)
+
+def myorange(cell):
+    """equivalent to highlight($x,purple,$x) """
+    return myhighlight(cell,"purple",cell)
+
+def mypink(cell):
+    """equivalent to highlight($x,purple,$x) """
+    return myhighlight(cell,"pink",cell)
+def mygradient(cell, progress, *colors):
+    """Cell is expected to be a value between 1 and 100, gradient will color the cell proportionally from an array of color names [] """
+    val = GetVal(progress)
+    idx = int((val/100.0)*len(colors))
+    return myhighlight(cell,colors[idx],cell)
 
 def myfloor(num):
     """Force a value to the previous integer"""

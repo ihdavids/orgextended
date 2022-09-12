@@ -22,3 +22,76 @@
 
 *** New Agenda Todo List Type
     Has Status - Lists all todos regardless of status or presence in a project. Useful if you want to filter you tasks by tag or property instead
+
+** Tables
+*** New Sum Functions
+    - vsumifeq(a,b,range) - will sum all cells in range where a == b 
+    - vsumifgt(a,b,range) - will sum all cells in range where a > b
+    - vsumiflt(a,b,range) - will sum all cells in range where a < b
+    - vsumifgteq(a,b,range) - will sum all cells in range where a >= b
+    - vsumiflteq(a,b,range) - will sum all cells in range where a <= b
+
+    In the blow example I am computing the damage tally for John by adding up all damage values during combat where john has been hit
+      #+BEGIN_SRC org
+      ** Combat
+        #+NAME: Combat-Action
+        | Player | Damage |     |
+        |--------+--------+-----|
+        | John   | 15     |     |
+        |--------+--------+-----|
+        | I Hit  | Who    | For |
+        |--------+--------+-----|
+        | Sam    | John   | 10  |
+        | John   | Sam    | 1   |
+        | Sam    | John   | 5   |
+        #+TBLFM: @2$2=vsumifeq($2,'John',@4$3..@>$3) 
+      #+END_SRC
+
+*** Color Shortcut functions
+   - red(cell):
+   - green(cell):
+   - yellow(cell):
+   - blue(cell):
+   - cyan(cell):
+   - purple(cell):
+   - orange(cell):
+   - pink(cell):
+
+   This would highlight a cell red if a players current hp is less than 10% and green otherwise:
+
+   #+BEGIN_SRC org
+   #+NAME: Player-Stats
+   | Player | Start Health | Temp Hits | AC | Damage | Cur Hp | Initiative |
+   |--------+--------------+-----------+----+--------+--------+------------|
+   |        |           13 |         0 |    |      1 |     12 |            |
+   #+TBLFM:$6=($2+$3)-$5::%6=highlight($6,"red",$6) if((($6)/$2)*100.0)<=10.0 else highlight($6,"green",$6)
+   #+END_SRC
+
+   But it can now be rewritten as:
+
+   #+BEGIN_SRC org
+   #+NAME: Player-Stats
+   | Player | Start Health | Temp Hits | AC | Damage | Cur Hp | Initiative |
+   |--------+--------------+-----------+----+--------+--------+------------|
+   |        |           13 |         0 |    |      1 |     12 |            |
+   #+TBLFM:$6=($2+$3)-$5::%6=red($6) if((($6)/$2)*100.0)<=10.0 else green($6)
+   #+END_SRC
+
+
+*** Gradient Shortcut
+    
+    Better yet, avoid all the if else and use the new gradient method:
+
+    - gradient(cell, progress_out_of_100, *colors) - Will choose a color sequentially out of the colors list based on the progress value:
+
+    In the following example the Bridand would have a red Cur Hp and the Rabid Wolf will have a green Cur Hp value when the table is evaluated
+
+    #+BEGIN_SRC org
+     ** Monsters
+        #+NAME: Monster-Stats
+        |    Name    | Start Health | Damage | Cur Hp | AC | Initiative |
+        |------------+--------------+--------+--------+----+------------|
+        | Brigand    |           10 |      9 |      1 |  4 |            |
+        | Rabid Wolf |           10 |      2 |      8 |  2 |            |
+        #+TBLFM:$4=$2-$3::$4=gradient($4,($4/$2)*100.0, "red","orange","yellow","cyan","green")
+    #+END_SRC
