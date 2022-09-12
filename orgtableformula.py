@@ -2788,6 +2788,7 @@ class OrgExecuteAllTablesCommand(sublime_plugin.TextCommand):
                 self.inTable = False
 
     def run(self,edit,at=None):
+        ClearAllOldCellHighlights()
         global tableCache
         self.last_row = self.view.endRow()
         self.cur = 0

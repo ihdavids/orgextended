@@ -25,10 +25,13 @@
 
 ** Tables
 
+*** FIXED Executing all tables clears all highlights
+    - Still need better highlight management but this improves things slightly when recomputing all tables
+
 *** FIXED Table Cache
     - At times the table cache was getting out of sync due to invalid dirty buffer checks. This could cause the highlighting of cells in a page with
       multiple tables to go wonky. I believe I have fixed this now but this is a complex issue to fully track down.
-      
+
 *** New Sum Functions
     - vsumifeq(a,b,range) - will sum all cells in range where a == b 
     - vsumifgt(a,b,range) - will sum all cells in range where a > b

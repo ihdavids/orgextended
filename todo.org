@@ -632,33 +632,37 @@
 
 
 * Combat
+
+** Combat
+   #+NAME: Combat-Action
+   |     PC     |   Damage   |     |
+   |------------+------------+-----|
+   | John       | 2          |     |
+   | Sam        | 0          |     |
+   | Brigand    | 9          |     |
+   | Rabid Wolf | 2          |     |
+   |------------+------------+-----|
+   | I Hit      | Who        | For |
+   |------------+------------+-----|
+   | Sam        | Rabid Wolf | 2   |
+   | John       | Brigand    | 8   |
+   | Sam        | Brigand    | 1   |
+   | Rabid Wolf | John       | 2   |
+   #+TBLFM: @2$2..@5$2=vsumifeq($2,$1,@7$3..@>$3,'b_or')
+
 ** Player Info
    #+NAME: Player-Stats
    | Player | Start Health | Temp Hits | AC | Damage | Cur Hp | Initiative |
    |--------+--------------+-----------+----+--------+--------+------------|
-   |        |           13 |         0 |    |      1 |     12 |            |
-   #+TBLFM:$6=($2+$3)-$5::%6=highlight($6,"red",$6) if((($6)/$2)*100.0)<=10.0 else highlight($6,"green",$6)
+   | John   |           13 |         0 | 18 |      2 |     11 |            |
+   | Sam    |           15 |         0 | 13 |      0 |     15 |            |
+   #+TBLFM:@2$5=remote('Combat-Action',@2$2)::@3$5=remote('Combat-Action',@3$2)::$6=($2+$3)-$5::$6=gradient($6,($6/$2)*100.0,"red","orange","yellow","cyan","green")
  
 ** Monsters
    #+NAME: Monster-Stats
    |    Name    | Start Health | Damage | Cur Hp | AC | Initiative |
    |------------+--------------+--------+--------+----+------------|
    | Brigand    |           10 |      9 |      1 |  4 |            |
-   | Rabid Wolf |           10 |      2 |      8 |  2 |            |
-   #+TBLFM:$4=$2-$3::$4=gradient($4,($4/$2)*100.0, "red","orange","yellow","cyan","green")
+   | Rabid Wolf |           12 |      2 |     10 |  2 |            |
+   #+TBLFM:@3$3=remote("Combat-Action",@5$2)::@2$3=remote("Combat-Action",@4$2)::$4=$2-$3::$4=gradient($4,($4/$2)*100.0, "red","orange","yellow","cyan","green")
  
-** Combat
-   #+NAME: Combat-Action
-   | Player | Damage |     |
-   |--------+--------+-----|
-   | John   | 15     |     |
-   |--------+--------+-----|
-   | I Hit  | Who    | For |
-   |--------+--------+-----|
-   | Sam    | John   | 10  |
-   | John   | Sam    | 1   |
-   | Sam    | John   | 5   |
-   #+TBLFM: @2$2=vsumifeq($2,'John',@4$3..@>$3) 
-
-
-   ###+TBLFM:$4=$2-$3::$4=red($4) if((($4)/$2)*100.0)<=10.0 else green($4)
