@@ -24,6 +24,11 @@
     Has Status - Lists all todos regardless of status or presence in a project. Useful if you want to filter you tasks by tag or property instead
 
 ** Tables
+
+*** FIXED Table Cache
+    - At times the table cache was getting out of sync due to invalid dirty buffer checks. This could cause the highlighting of cells in a page with
+      multiple tables to go wonky. I believe I have fixed this now but this is a complex issue to fully track down.
+      
 *** New Sum Functions
     - vsumifeq(a,b,range) - will sum all cells in range where a == b 
     - vsumifgt(a,b,range) - will sum all cells in range where a > b

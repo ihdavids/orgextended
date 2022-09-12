@@ -221,15 +221,17 @@ class TableCache:
     def _FindTable(self,row,view):
         name = self._ViewName(view)
         if(not name in self.cachedTables):
-            self.cachedTables[name] = []
+            self.cachedTables[name] = {'cnt': view.change_count(), 'tbls': []}
         cache = self.cachedTables[name]
-        if(self.change_count >= view.change_count()):
-            for t in cache:
+        cnt = cache['cnt']
+        if(cnt >= view.change_count()):
+            tcache = cache['tbls']
+            for t in tcache:
                 if row >= t[0][0] and row <= t[0][1]:
                     return t[1]
         else:
             self.change_count = view.change_count()
-            self.cachedTables[name] = []
+            self.cachedTables[name] = {'cnt': view.change_count(), 'tbls': []}
         return None
 
     def GetTable(self,view,at=None):
@@ -240,7 +242,7 @@ class TableCache:
         if(not td):
             td = create_table(view,at)
             name = self._ViewName(view)
-            self.cachedTables[name].append(((td.start,td.end),td))
+            self.cachedTables[name]['tbls'].append(((td.start,td.end),td))
         return td
 
 tableCache = TableCache()
@@ -1129,21 +1131,29 @@ def vsum(rng):
     return s
 
 # Only adds a row from rng to the sum if a and b are equal.
-def vsumifeq(a,b,rng):
-    """Computes the sum of a range of cells where a == b"""
+def vsumifeq(a,b,rng,*opt):
+    """Computes the sum of a range of cells where a == b last parameter of o means b is relative to original offset"""
     s = 0
     for i in rng:
-        r = a.GetTable().CurRow()
-        c = a.GetTable().CurCol()
-        cr = i.GetRow()
-        cc = i.GetCol()
-        a.GetTable().SetCurRow(cr)
-        a.GetTable().SetCurCol(cc)
+        a_r = a.GetTable().CurRow()
+        a_c = a.GetTable().CurCol()
+        b_r = b.GetTable().CurRow()
+        b_c = b.GetTable().CurCol()
+        i_r = i.GetRow()
+        i_c = i.GetCol()
+        a.GetTable().SetCurRow(i_r)
+        a.GetTable().SetCurCol(i_c)
         va = GetVal(a)
-        vb = GetVal(b)
-        a.GetTable().SetCurRow(c)
-        a.GetTable().SetCurCol(r)
-        if va == GetVal(vb):
+        vb = None
+        if opt == None or len(opt) == 0:
+            vb = GetVal(b)
+        a.GetTable().SetCurRow(a_r)
+        a.GetTable().SetCurCol(a_c)
+        b.GetTable().SetCurRow(b_r)
+        b.GetTable().SetCurCol(b_c)
+        if opt != None and len(opt) > 0:
+            vb = GetVal(b)
+        if va == vb:
             s += GetNum(i)
     return s
 
@@ -1363,7 +1373,13 @@ def mypink(cell):
 def mygradient(cell, progress, *colors):
     """Cell is expected to be a value between 1 and 100, gradient will color the cell proportionally from an array of color names [] """
     val = GetVal(progress)
+    if not colors or len(colors) < 0:
+        return GetVal(cell)
     idx = int((val/100.0)*len(colors))
+    if idx >= len(colors):
+        idx = len(colors) - 1
+    if idx < 0:
+        idx = 0
     return myhighlight(cell,colors[idx],cell)
 
 def myfloor(num):
@@ -1856,7 +1872,7 @@ class TableDef(simpev.SimpleEval):
                 text = self.view.substr(reg)
                 if(self.emptyiszero and text.strip() == ""):
                     return "0"
-                return text
+                return text.strip()
             if(self.emptyiszero):
                 return "0"
         else:
