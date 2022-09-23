@@ -136,14 +136,21 @@ class OrgTimesheet(ag.TodoView):
             self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
 
     def RenderMermaidGanttFile(self):
-        filename = "C:\\Users\\ihdav\\repos\\gtd\\schedule.mermaid"
+        tpath = sets.Get("timesheetPath",None)
+        if tpath == None:
+            print("ERROR CANNOT RENDER TIMESHEET WITHOUT timesheetPath in config")
+            return
+        if not os.path.exists(tpath):
+            os.makedirs(tpath)
+        filename = os.path.join(tpath,"schedule.mermaid")
         with open(filename,"w") as f:
             self.CreateMermaidGanttFile(f)
         self.GenerateMermaidGanttChartFromFile(filename)
 
     def GenerateMermaidGanttChartFromFile(self, filename):
         execs = sets.Get("timesheetExed","C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1")
-        outputFilename = ".\\schedule.png"
+        tpath = sets.Get("timesheetPath",None)
+        outputFilename = os.path.join(tpath,"schedule.png")
         #inputFilename = "D:\\Git\\notes\\worklog\\schedule.mermaid"
         commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
         try:
@@ -181,6 +188,8 @@ class OrgTimesheet(ag.TodoView):
             end = ""
             start = ""
             duration = "1d"
+            if estimate != "":
+                duration = dur.OrgDuration.Parse(estimate)
             if timestamps and len(timestamps) > 0:
                 dt = timestamps[0].start
             if n.deadline:
@@ -206,7 +215,7 @@ class OrgTimesheet(ag.TodoView):
             assigned = self.GetAssigned(n)
             #self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
             idx += 1
-            if(idx > 1):
+            if(idx > 0):
                 #if(done):
                 #    continue
                 if(curSection != section and section != None):
@@ -215,10 +224,20 @@ class OrgTimesheet(ag.TodoView):
                 date = start
                 dep = dependenton
                 prefix = ""
-                if(assigned=='N'):
-                        prefix = "active,"
-                if(assigned == 'R'):
-                    prefix = 'crit,'
+                if (ag.IsDone(n)):
+                    prefix = "done,"
+                if(assigned=='D'):
+                    prefix = "done,"
+                if(assigned=='A'):
+                    prefix += "active,"
+                if(assigned == 'C'):
+                    prefix += 'crit,'
+                if(assigned == 'M'):
+                    prefix += 'milestone,'
+                if(assigned == 'X'):
+                    prefix += 'crit,done,'
+                if(assigned == 'Y'):
+                    prefix += 'crit,active,'
                 if(date == ""):
                     date = sets.Get("timesheetDefaultStartDate","2021-05-18")
                 line = ""
@@ -330,7 +349,7 @@ class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
     def Run(self, nameOfShow):
         ag.ReloadAllUnsavedBuffers()
         self.views = self.views[nameOfShow]
-        ts = timesheetRegistry.CreateCompositeView(views, nameOfShow)
+        ts = timesheetRegistry.CreateCompositeView(self.views, nameOfShow)
         ts.FilterEntries()
         ts.RenderMermaidGanttFile()
         evt.EmitIf(self.onDone)
