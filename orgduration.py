@@ -53,6 +53,9 @@ class OrgDuration:
         if(mins > 0):
             r += str(mins) + "mins"
         return r.strip()
+
+    def days(self):
+        return self.mins/1440.0
     
     def __sub__(self,o):
         if(isinstance(o,int)):

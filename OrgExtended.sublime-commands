@@ -198,4 +198,5 @@
     {"caption": "Org Timesheet Table",          "command": "org_insert_timesheet"                },
     {"caption": "Org Choose Timesheet Table",   "command": "org_choose_timesheet"                },
     {"caption": "Org Timesheet Mermaid Gantt",  "command": "org_generate_mermaid_gantt_chart"    },
+    {"caption": "Org Timesheet Google Gantt",   "command": "org_generate_google_gantt_chart"     },
 ]

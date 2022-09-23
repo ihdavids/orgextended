@@ -94,6 +94,7 @@ class OrgTimesheet(ag.TodoView):
                     d = dp['node']
                     if d == dep:
                         entry['after_offset'] = index
+                        entry['after_name'] = dep.heading
 
 
     def RenderSheet(self, edit, view):
@@ -165,7 +166,139 @@ class OrgTimesheet(ag.TodoView):
         (o,e) = popen.communicate()
         log.debug(o)
         log.debug(e)
+    def RenderGoogleGanttFile(self):
+        tpath = sets.Get("timesheetPath",None)
+        if tpath == None:
+            print("ERROR CANNOT RENDER TIMESHEET WITHOUT timesheetPath in config")
+            return
+        if not os.path.exists(tpath):
+            os.makedirs(tpath)
+        filename = os.path.join(tpath,"schedule.html")
+        with open(filename,"w") as f:
+            self.CreateGoogleGanttFile(f)
 
+    def CreateGoogleGanttFile(self,f):
+        self.PreprocessAfter() 
+        import re
+        idx = 0
+        f.write("""
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['gantt']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function daysToMilliseconds(days) {
+      return days * 24 * 60 * 60 * 1000;
+    }
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('string', 'Resource');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+      data.addRows([""")
+
+        curSection = None
+        for entry in self.entries:
+            n        = entry['node']
+            filename = entry['file'].AgendaFilenameTag()
+            section  = entry['section'] if 'section' in entry else None
+            estimate = n.get_property("EFFORT","")
+            dt = None
+            timestamps = n.get_timestamps(active=True,point=True,range=True)
+            end = ""
+            start = ""
+            duration = "1"
+            if estimate != "":
+                duration = dur.OrgDuration.Parse(estimate).days()
+            if timestamps and len(timestamps) > 0:
+                dt = timestamps[0].start
+            if n.deadline:
+                dt = n.deadline.start
+            if n.scheduled:
+                dt = n.scheduled.start
+            if dt:
+                start = dt.strftime("%Y-%m-%d")
+                if estimate != "":
+                    duration = dur.OrgDuration.Parse(estimate)
+                    endtm = dt + duration.timedelta()
+                    duration = duration.days()
+                    end = endtm.strftime("%Y-%m-%d")  
+                    pass
+            else:
+                start = ""
+            done = False
+            if ag.IsDone(n):
+                done = True
+
+            spent = self.GetClockingData(n)
+            #dependenton = entry['after_offset'] if 'after_offset' in entry else ""
+            dependenton = entry['after_name'] if 'after_name' in entry else None
+            # TODO: Adjust index to match table separators
+            assigned = self.GetAssigned(n)
+            #self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
+            idx += 1
+            if(idx > 0):
+                #if(done):
+                #    continue
+                #if(curSection != section and section != None):
+                #    f.write("section {name}\n".format(name=section))
+                #    curSection = section
+                date = start
+                dep = dependenton
+                prefix = ""
+                if (ag.IsDone(n)):
+                    prefix = "done,"
+                if(assigned=='D'):
+                    prefix = "done,"
+                if(assigned=='A'):
+                    prefix += "active,"
+                if(assigned == 'C'):
+                    prefix += 'crit,'
+                if(assigned == 'M'):
+                    prefix += 'milestone,'
+                if(assigned == 'X'):
+                    prefix += 'crit,done,'
+                if(assigned == 'Y'):
+                    prefix += 'crit,active,'
+                if(date == ""):
+                    date = sets.Get("timesheetDefaultStartDate","2021-05-18")
+                line = ""
+                if idx != 1:
+                    line += ","
+                if(dep != None and dep != ""):
+                    line += "[\"{name}\",\"{name}\",null, null,null,daysToMilliseconds({duration}),0,\"{after}\"]\n".format(prefix=prefix,name=n.heading,idx=idx,after=str(dep),duration=duration)
+                else:
+                    line += "[\"{name}\",\"{name}\",null, null,null,daysToMilliseconds({duration}),0,null]\n".format(prefix=prefix,name=n.heading,idx=idx,start="after " + str(dep),duration=duration)
+                f.write(line)
+        f.write("""]);
+var options = {
+        height: 1200,
+        gantt: {
+          trackHeight: 30,
+          colorByRowLabel: true 
+        }
+      };
+
+      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+  </script>
+</head>
+<body>
+  <div id="chart_div"></div>
+</body>
+</html>
+""")
     # This is REALLY rough it gives us a non functional, really basic view.
     def CreateMermaidGanttFile(self,f):
         self.PreprocessAfter()
@@ -367,6 +500,36 @@ class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
+class OrgGenerateGoogleGanttChart(sublime_plugin.TextCommand):
+
+    def on_done_st4(self,index,modifers):
+        self.on_done(index)
+    def on_done(self, index):
+        if(index < 0):
+            return
+        key = self.keys[index]
+        self.Run(key)
+
+    def Run(self, nameOfShow):
+        ag.ReloadAllUnsavedBuffers()
+        self.views = self.views[nameOfShow]
+        ts = timesheetRegistry.CreateCompositeView(self.views, nameOfShow)
+        ts.FilterEntries()
+        ts.RenderGoogleGanttFile()
+        evt.EmitIf(self.onDone)
+
+    def run(self, edit, toShow=None, onDone=None ):
+        self.onDone=onDone
+        self.pos = self.view.sel()[0]
+        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.keys = list(self.views.keys())
+        if toShow != None:
+            self.Run(toShow)
+            return
+        if(int(sublime.version()) <= 4096):
+            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+        else:
+            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
 
 
