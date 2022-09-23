@@ -184,7 +184,17 @@ class OrgTimesheet(ag.TodoView):
         f.write("""
 <html>
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia">  
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<style>
+text {
+  font-family: "Sofia" !important;
+}
+body {
+  font-family: "Sofia", sans-serif;
+}
+</style>  
   <script type="text/javascript">
     google.charts.load('current', {'packages':['gantt']});
     google.charts.setOnLoadCallback(drawChart);
@@ -214,8 +224,8 @@ class OrgTimesheet(ag.TodoView):
             estimate = n.get_property("EFFORT","")
             dt = None
             timestamps = n.get_timestamps(active=True,point=True,range=True)
-            end = ""
-            start = ""
+            end = None
+            start = None
             duration = "1"
             if estimate != "":
                 duration = dur.OrgDuration.Parse(estimate).days()
@@ -226,25 +236,25 @@ class OrgTimesheet(ag.TodoView):
             if n.scheduled:
                 dt = n.scheduled.start
             if dt:
-                start = dt.strftime("%Y-%m-%d")
+                start = dt
                 if estimate != "":
                     duration = dur.OrgDuration.Parse(estimate)
-                    endtm = dt + duration.timedelta()
+                    end = dt + duration.timedelta()
                     duration = duration.days()
-                    end = endtm.strftime("%Y-%m-%d")  
                     pass
             else:
-                start = ""
+                start = None
             done = False
+            percentDone = 0
             if ag.IsDone(n):
                 done = True
+                percentDone = 100
+
+            resource="active"
 
             spent = self.GetClockingData(n)
-            #dependenton = entry['after_offset'] if 'after_offset' in entry else ""
             dependenton = entry['after_name'] if 'after_name' in entry else None
-            # TODO: Adjust index to match table separators
             assigned = self.GetAssigned(n)
-            #self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
             idx += 1
             if(idx > 0):
                 #if(done):
@@ -254,37 +264,37 @@ class OrgTimesheet(ag.TodoView):
                 #    curSection = section
                 date = start
                 dep = dependenton
-                prefix = ""
-                if (ag.IsDone(n)):
-                    prefix = "done,"
-                if(assigned=='D'):
-                    prefix = "done,"
-                if(assigned=='A'):
-                    prefix += "active,"
-                if(assigned == 'C'):
-                    prefix += 'crit,'
-                if(assigned == 'M'):
-                    prefix += 'milestone,'
-                if(assigned == 'X'):
-                    prefix += 'crit,done,'
-                if(assigned == 'Y'):
-                    prefix += 'crit,active,'
+                if assigned and assigned.strip() != None:
+                    resource = assigned.strip()
+                if done:
+                    resource = "done"
                 if(date == ""):
                     date = sets.Get("timesheetDefaultStartDate","2021-05-18")
+                if start:
+                    start = "new Date({year},{month},{day})".format(year=start.year,month=start.month,day=start.day)
+                else:
+                    start = "null"
+                if end:
+                    end = "new Date({year},{month},{day})".format(year=end.year,month=end.month,day=end.day)
+                else:
+                    end = "null"
                 line = ""
                 if idx != 1:
                     line += ","
                 if(dep != None and dep != ""):
-                    line += "[\"{name}\",\"{name}\",null, null,null,daysToMilliseconds({duration}),0,\"{after}\"]\n".format(prefix=prefix,name=n.heading,idx=idx,after=str(dep),duration=duration)
+                    line += "[\"{name}\",\"{name}\",\"{resource}\", {start},{end},daysToMilliseconds({duration}),{percent},\"{after}\"]\n".format(name=n.heading,idx=idx,after=str(dep),duration=duration,start=start,end=end,percent=percentDone,resource=resource)
                 else:
-                    line += "[\"{name}\",\"{name}\",null, null,null,daysToMilliseconds({duration}),0,null]\n".format(prefix=prefix,name=n.heading,idx=idx,start="after " + str(dep),duration=duration)
+                    line += "[\"{name}\",\"{name}\",\"{resource}\", {start},{end},daysToMilliseconds({duration}),{percent},null]\n".format(name=n.heading,idx=idx,start=start,end=end,duration=duration,percent=percentDone,resource=resource)
                 f.write(line)
+        #colorByRowLabel: true 
         f.write("""]);
 var options = {
+        'font-family': 'Sofia',
         height: 1200,
+        is3D: true,
+        title: 'Hello World',
         gantt: {
           trackHeight: 30,
-          colorByRowLabel: true 
         }
       };
 
