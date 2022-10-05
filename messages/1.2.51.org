@@ -7,7 +7,11 @@
    Still an experimental feature
 
    - Org Choose Timesheet command acts like Agenda Choose View and uses the same list.
+   - Mermaid and an Html visualiztion experiment.
 
+** Clocking
+   New command Org Update Active Clock Command
+   - updates the start time in the clock info file.
 
 ** Todo view rebinds:
 	These allow editing of task state in a todo view which is handy for planning purposes
