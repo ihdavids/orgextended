@@ -90,6 +90,28 @@ class ClockManager:
 					props.AddLogbook(view, node, "CLOCK:", ClockManager.FormatClock(dt) + "--")
 
 	@staticmethod
+	def UpdateClockStart(view):
+		if(not ClockManager.ClockRunning()):
+			log.error("Clock not running, nothing to update")
+			return
+		# Eventually we want to navigate to this node
+		# rather than doing this.
+		node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
+		newStart = None
+		if(node):
+			tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
+			if(sets.Get("clockInPropertyBlock",False)):
+				val = props.GetProperty(tview, node, "CLOCK")
+			else:
+				val = props.GetLogbook(tview, node, r"CLOCK:")
+			if val:
+				clock = OrgDateClock.from_str(val)
+				if clock:
+					newStart = clock.start
+		if newStart:
+			file = db.Get().FindInfo(ClockManager.Clock["file"])
+			ClockManager.ClockInRecord(file, node, newStart)
+	@staticmethod
 	def ClockOut(view):
 		if(not ClockManager.ClockRunning()):
 			return
@@ -177,6 +199,11 @@ class OrgJumpToClockCommand(sublime_plugin.TextCommand):
 class OrgClearClockCommand(sublime_plugin.TextCommand):
 	def run(self,edit):
 		ClockManager.ClearClock()
+
+# Update the currently running command based on an open clock manual update
+class OrgUpdateClockCommand(sublime_plugin.TextCommand):
+	def run(self,edit):
+		ClockManager.UpdateClockStart(self.view)
 
 # Recalculate all the clock values in a node (Crtl-c Ctrl-c on a clock entry)
 class OrgRecalculateClockCommand(sublime_plugin.TextCommand):

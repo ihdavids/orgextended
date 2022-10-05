@@ -882,20 +882,26 @@ class OrgDateClock(OrgDate):
         match = cls._re.search(line)
         if not match:
             return cls(None, None)
-        groups = [int(d) for d in match.groups()]
-        ymdhm1 = groups[:5]
-        ymdhm2 = groups[5:10]
-        hm3 = groups[10:]
+        d1 = None
+        d2 = None
+        dd = 0
+        y = match.group('y1')
+        if y:
+            d1 = datetime.datetime(int(y), int(match.group('mo1')), int(match.group('d1')), int(match.group('h1')), int(match.group('m1')))
+        y = match.group('y2')
+        if y:
+            d2 = datetime.datetime(int(y), int(match.group('mo2')), int(match.group('d2')), int(match.group('h2')), int(match.group('m2')))
+        h = match.group('dd1')
+        if h:
+            dd = int(h) * 60 + int(match.group('dd2'))
         return cls(
-            datetime.datetime(*ymdhm1),
-            datetime.datetime(*ymdhm2),
-            hm3[0] * 60 + hm3[1],
-        )
-
+            d1,
+            d2,
+            dd)
     _re = re.compile(
-        r'^(?!#).*CLOCK:\s+'
-        r'\[(\d+)\-(\d+)\-(\d+)[^\]\d]*(\d+)\:(\d+)\]--'
-        r'\[(\d+)\-(\d+)\-(\d+)[^\]\d]*(\d+)\:(\d+)\]\s+=>\s+(\d+)\:(\d+)'
+        r'^((?!#).*CLOCK\:\s+)?'
+        r'\s*\[(?P<y1>\d+)\-(?P<mo1>\d+)\-(?P<d1>\d+)[^\]\d]*(?P<h1>\d+)\:(?P<m1>\d+)\]--'
+        r'(\[(?P<y2>\d+)\-(?P<mo2>\d+)\-(?P<d2>\d+)[^\]\d]*(?P<h2>\d+)\:(?P<m2>\d+)\]\s+=>\s+(?P<dd1>\d+)\:(?P<dd2>\d+))?'
         )
 
 
