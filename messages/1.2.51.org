@@ -7,7 +7,11 @@
    Still an experimental feature
 
    - Org Choose Timesheet command acts like Agenda Choose View and uses the same list.
+   - Mermaid and an Html visualiztion experiment.
 
+** Clocking
+   New command Org Update Active Clock Command
+   - updates the start time in the clock info file.
 
 ** Todo view rebinds:
 	These allow editing of task state in a todo view which is handy for planning purposes
@@ -22,6 +26,14 @@
 
 *** New Agenda Todo List Type
     Has Status - Lists all todos regardless of status or presence in a project. Useful if you want to filter you tasks by tag or property instead
+
+*** Todo table adjustable column width
+    the column statements now take format specifiers: >12.12 (right justify 12 characters min x 12 characters max) 
+
+    #+BEGIN_SRC js
+        "Recent":   ["Done : -5d : hasclose : showdate >12.12 : showtime : sortdescend : showid : showeffort : showafter : showassigned"],
+      
+    #+END_SRC
 
 ** Tables
 

@@ -72,6 +72,7 @@
     {"caption": "Org Clear Clock",             "command": "org_clear_clock"             },
     {"caption": "Org Recalculate Clock",       "command": "org_recalculate_clock"       },
     {"caption": "Org Jump To Clock",           "command": "org_jump_to_clock"           },
+    {"caption": "Org Update Active Clock",     "command": "org_update_clock"            },
     {"caption": "Org Todo View",               "command": "org_todo_view"               },
     {"caption": "Org Filtered Todo View",      "command": "org_tag_filtered_todo_view"  },
     {"caption": "Org Exec Dynamic Block",      "command": "org_execute_dynamic_block"   },
