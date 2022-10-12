@@ -467,6 +467,10 @@ class HtmlDoc(exp.OrgExporter):
   def TextFullEscape(self,text):
       return html.escape(text)
 
+
+  def Escape(self,str):
+    return self.TextFullEscape(str)
+
   def NodeBody(self,slide):
     ilines = slide._lines[1:]
     for parser in self.nodeParsers:
@@ -643,7 +647,7 @@ class HtmlDoc(exp.OrgExporter):
     self.doc.append("  </body>\n")
 
   def InsertScripts(self,file):
-    self.InsertJs(GetHighlightJs())
+    #self.InsertJs(GetHighlightJs())
     self.doc.append("<script>hljs.initHighlightingOnLoad();</script>\n")
     self.InsertJs(GetCollapsibleCode())
 
@@ -671,7 +675,7 @@ class HtmlExportHelper(exp.OrgExportHelper):
 
   def CustomBuildHead(self):
     highlight      = exp.GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
-    self.doc.AddInlineStyle(GetHighlightJsCss(highlight))
+    #self.doc.AddInlineStyle(GetHighlightJsCss(highlight))
     self.doc.AddInlineStyle(GetCollapsibleCss())
     self.doc.AddInlineStyle(GetStyleData(self.doc.style, self.file))
 
