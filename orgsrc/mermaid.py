@@ -15,7 +15,7 @@ def Extension(cmd):
 
 # Actually do the work, return an array of output.
 def Execute(cmd,sets):
-	mmdc = sets.Get("mermaid",None)
+	mmdc = sets.Get("mermaid",'C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1')
 	if(mmdc == None):
 		print("ERROR: cannot find mmdc file. Please setup the mermaid key in your settings file")
 		return ["ERROR - missing mermaid file"]
@@ -29,7 +29,8 @@ def Execute(cmd,sets):
 	#commandLine = [r"./node_modules/.bin/mmdc", "-i", cmd.filename, "-o", destFile]
 	basedir = os.path.dirname(mmdc)
 
-	commandLine = ["node", basedir + "/../@mermaid-js/mermaid-cli/index.bundle.js", "-i", cmd.filename, "-o", destFile]
+	commandLine = ["powershell",mmdc, "-i", cmd.filename, "-o", destFile]
+	#commandLine = ["node", basedir + "/../@mermaid-js/mermaid-cli/index.bundle.js", "-i", cmd.filename, "-o", destFile]
 	
 	print(str(commandLine))
 	#commandLine = [r"java", "-jar", jarfile, "-help"]
