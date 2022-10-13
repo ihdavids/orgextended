@@ -29,7 +29,7 @@ def Execute(cmd,sets):
 	#commandLine = [r"./node_modules/.bin/mmdc", "-i", cmd.filename, "-o", destFile]
 	basedir = os.path.dirname(mmdc)
 
-	commandLine = ["powershell",mmdc, "-i", cmd.filename, "-o", destFile]
+	commandLine = ["powershell",mmdc, "-i", cmd.filename, "-o", '"' + destFile + '"']
 	#commandLine = ["node", basedir + "/../@mermaid-js/mermaid-cli/index.bundle.js", "-i", cmd.filename, "-o", destFile]
 	
 	print(str(commandLine))
