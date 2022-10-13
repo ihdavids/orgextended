@@ -1,1 +1,10 @@
 * 1.2.52
+** FIXED Html Exporter
+   - The html exporter was crashing downloading HighlightJs with some odd SSL certificate errors.
+   - The exporter may still have a few problems as it was converted recently.
+     Please report any problems you may experience.  
+
+   [[https://github.com/ihdavids/orgextended/issues/69][Github Issue]] 
+   Thanks berteh for finding this one.
+
+
