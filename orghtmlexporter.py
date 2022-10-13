@@ -22,6 +22,7 @@ import OrgExtended.orgproperties as props
 import OrgExtended.orgexporter as exp
 import OrgExtended.pymitter as evt
 import OrgExtended.orgplist as plist
+import OrgExtended.orgsourceblock as src
 import yaml
 import sys
 import subprocess
@@ -32,13 +33,25 @@ log = logging.getLogger(__name__)
 # <!-- multiple_stores height="50%" width="50%" --> 
 RE_COMMENT_TAG = re.compile(r"^\s*[<][!][-][-]\s+(?P<name>[a-zA-Z0-9_-]+)\s+(?P<props>.*)\s+[-][-][>]")
 
+
+def mapLanguage(lang):
+  if(lang == 'html'):
+    return 'language-html'
+  elif(lang == 'python'):
+    return 'language-python'
+  else:
+    return lang
+
+def haveLang(lang):
+  return True
+
 class HtmlSourceBlockState(exp.SourceBlockState):
     def __init__(self,doc):
         super(HtmlSourceBlockState,self).__init__(doc)
         self.skipSrc = False
 
     def HandleOptions(self):
-        attr = self.e.GetAttrib("attr_reveal")
+        attr = self.e.GetAttrib("attr_html")
         optionsOp = ""
         if(attr):
             p = plist.PList.createPList(attr)
@@ -51,13 +64,24 @@ class HtmlSourceBlockState(exp.SourceBlockState):
         cc = p.Get("caption",None)
         if(cc):
             caption = cc
+        floatOp = GetOption(p,"float",None)
+        if(caption and not floatOp):
+            floatOp = "t"
+        if(floatOp and floatOp != "nil"):
+            if(floatOp == "multicolumn"):
+                figure = "figure*"
+            elif(floatOp == "sideways"):
+                figure = "sidewaysfigure" 
+            elif(floatOp == "wrap"):
+                figure = "wrapfigure"
+                figureext = "{l}"
         if(optionsOp.strip() != ""):
             optionsOp = "[" + optionsOp + "]"
         # There is a discrepancy between orgmode docs and
         # actual emacs export.. I need to figure this out so
         # nuke it for now till I understand it
         optionsOp = ""
-        return (optionsOp,caption)
+        return (optionsOp,floatOp,caption)
 
     def HandleEntering(self, m, l, orgnode):
         self.skipSrc = False
@@ -79,12 +103,12 @@ class HtmlSourceBlockState(exp.SourceBlockState):
             self.skipSrc = True
             return
         attribs = ""
-        if("data-noescape" in params):
+        if(p.params.Has("data-noescape")):
             attribs += " data-noescape"
-        if("data-trim" in params):
+        if(p.params.Has('data-trim')):
             attribs += " data-trim"
-        if("data-line-numbers" in params):
-            attribs += " data-line-numbers=\"{nums}\"".format(nums=params["data-line-numbers"])
+        if(p.params.Has("data-line-numbers")):
+            attribs += " data-line-numbers=\"{nums}\"".format(nums=p.params.Get("data-line-numbers",1))
         self.options, self.float, self.caption = self.HandleOptions()
         if(haveLang(language)):
             self.e.doc.append("    <pre><code language=\"{language}\" {attribs}>".format(language=mapLanguage(language),attribs=attribs))

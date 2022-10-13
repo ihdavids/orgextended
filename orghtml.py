@@ -152,6 +152,9 @@ def mapLanguage(lang):
   else:
     return lang
 
+def haveLang(lang):
+  return True
+
 def GetStyleRelatedData(style, extension):
   inHeader = os.path.join(sublime.packages_path(),"User", "htmlstyles", style + extension)
   if(os.path.isfile(inHeader)):
@@ -648,6 +651,7 @@ class HtmlDoc(exp.OrgExporter):
 
   def InsertScripts(self,file):
     #self.InsertJs(GetHighlightJs())
+    self.AddJs('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js')
     self.doc.append("<script>hljs.initHighlightingOnLoad();</script>\n")
     self.InsertJs(GetCollapsibleCode())
 
@@ -676,6 +680,7 @@ class HtmlExportHelper(exp.OrgExportHelper):
   def CustomBuildHead(self):
     highlight      = exp.GetGlobalOption(self.file,"HTML_HIGHLIGHT","HtmlHighlight","zenburn").lower()
     #self.doc.AddInlineStyle(GetHighlightJsCss(highlight))
+    self.doc.AddStyle('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css')
     self.doc.AddInlineStyle(GetCollapsibleCss())
     self.doc.AddInlineStyle(GetStyleData(self.doc.style, self.file))
 
