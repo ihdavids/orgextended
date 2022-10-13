@@ -24,16 +24,13 @@ def Execute(cmd,sets):
 	sourcepath = os.path.dirname(cmd.sourcefile)
 	convertFile = os.path.join(outpath,os.path.splitext(os.path.basename(cmd.filename))[0] + ".png")
 	destFile    = os.path.join(sourcepath,cmd.output)
-	#copyfile(convertFile, destFile)
-	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
-	#commandLine = [r"./node_modules/.bin/mmdc", "-i", cmd.filename, "-o", destFile]
 	basedir = os.path.dirname(mmdc)
-
-	commandLine = ["powershell",mmdc, "-i", cmd.filename, "-o", '"' + destFile + '"']
-	#commandLine = ["node", basedir + "/../@mermaid-js/mermaid-cli/index.bundle.js", "-i", cmd.filename, "-o", destFile]
+	if sys.platform == 'win32':
+		commandLine = ["powershell",mmdc, "-i", cmd.filename, "-o", '"' + destFile + '"']
+	else:
+		commandLine = [mmdc, "-i", cmd.filename, "-o", '"' + destFile + '"']
 	
 	print(str(commandLine))
-	#commandLine = [r"java", "-jar", jarfile, "-help"]
 	try:
 		startupinfo = subprocess.STARTUPINFO()
 		startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -45,18 +42,10 @@ def Execute(cmd,sets):
 	cwd = basedir + "/../.."
 	popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-	#popen.wait()
 	(o,e) = popen.communicate()
 	
-	#print(str(os.path.basename(cmd.sourcefile)))
-	#print(str(os.path.splitext(cmd.filename)))
-	#print(str(os.path.splitext(cmd.sourcefile)))
-	#destFile = os.path.relpath(destFile, sourcepath)
 	out = o
 	o = ""
-	#o = "[[file:" + destFile + "]]"
-	#if("error" in out or "failed" in out or "Failed" in out or "Error" in out or "not" in out):
-	#	o = o +out
 	return o.split('\n') + e.split('\n')
 
 
