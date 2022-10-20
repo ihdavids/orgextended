@@ -300,6 +300,9 @@ class RevealDoc(exp.OrgExporter):
 
     def TextFullEscape(self,text):
         return html.escape(text)
+        
+    def Escape(self,str):
+        return self.TextFullEscape(str)
 
     def NodeBody(self,n):
         ilines = n._lines[1:]

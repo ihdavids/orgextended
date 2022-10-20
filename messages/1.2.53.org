@@ -17,3 +17,11 @@ On windows this will allow the following to run properly
 ** FIXED Org Capture
    - If the user had a list as their dayPagePath variable org capture would crash.
      Improved symbol expansion reliability a little bit.
+
+** FIXED Reveal JS Exporter
+   Reveal js had moved on since the last time I used the exporter. Derusting is required to get it
+   functional again.
+
+   - [x] Reveal js exporter was missing Escape method of embedded source blocks
+   - [ ] Reveal js exporter had regressed with links, they were not active.
+   - [ ] Reveal js exporter had regressed with sub pages not showing up properly (overlaid rather than hidden state)
