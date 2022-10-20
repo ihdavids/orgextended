@@ -13,3 +13,7 @@ On windows this will allow the following to run properly
   flowchart TD
     Start --> Stop	
   #+END_SRC
+
+** FIXED Org Capture
+   - If the user had a list as their dayPagePath variable org capture would crash.
+     Improved symbol expansion reliability a little bit.

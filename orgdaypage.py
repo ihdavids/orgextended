@@ -35,10 +35,18 @@ def dayPageGetToday():
 def dayPageGetPath():
     dpPath = sets.Get("dayPagePath",None)
     if(dpPath == None):
-        sublime.status_message("Day Page error. dayPagePath setting is not set!")
-        log.error(" Cannot create day page without dayPathPath in configuration")
         return None
-    os.makedirs(dpPath, exist_ok=True)
+    try:
+        if isinstance(dpPath, list):
+            sublime.status_message("Day Page error. dayPagePath setting should be a string not a list! ABORT!")
+            log.error(" Cannot create day page without propper dayPathPath in configuration. Expected string, found list")
+            return None
+        if isinstance(dpPath, str) and not dpPath.strip() == "":
+            os.makedirs(dpPath, exist_ok=True)
+    except Exception as e:
+        sublime.status_message("Day Page error. dayPagePath setting is not valid could not create daypage! ABORT!")
+        log.error("Cannot create day page without propper dayPathPath in configuration: \n" + str(e))
+        return None
     return dpPath
 
 def dayPageGetDateString(dt):
@@ -54,7 +62,11 @@ def dayPageFilenameToDateTime(view):
     return datetime.datetime.strptime(filename,formatStr)
 
 def dayPageGetName(dt):
-    return os.path.join(dayPageGetPath(),dayPageGetDateString(dt) + ".org")
+    path = dayPageGetPath()
+    if path == None:
+        return "DAY_PAGE_NOT_SET.org"
+    else:
+        return os.path.join(dayPageGetPath(),dayPageGetDateString(dt) + ".org")
 
 
 def OnLoaded(view,dt):
