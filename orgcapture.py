@@ -160,11 +160,15 @@ def GetCapturePath(view, template):
         at       = clk.ClockManager.GetActiveClockAt()
     # Try to create my capture file if I can
     try:
+        # Ensure the directory exists first
+        dirName = os.path.dirname(os.path.abspath(filename))
+        if(not os.path.exists(dirName)):
+            os.makedirs(dirName,exist_ok=True)
         if(not os.path.isfile(str(filename))):
             with open(filename,"w",encoding=sets.Get("captureWriteFormat","utf-8")) as fp:
                 fp.write("#+TAGS: refile\n")
-    except:
-        log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename))
+    except Exception as e:
+        log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename) + "\n" + str(e))
     # Now make sure that file is loaded in the DB
     # it might not be in my org path
     if(file == None):
