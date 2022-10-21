@@ -19,7 +19,6 @@
    - If the user had a list as their dayPagePath variable org capture would crash.
      Improved symbol expansion reliability a little bit.
    - File creation in directory that does not exists was not working. This should now be fixed
-   - [[https://reg.ca][Reg Ca]] Org link
 
 ** FIXED Reveal JS Exporter
    Reveal js had moved on since the last time I used the exporter. Derusting is required to get it
