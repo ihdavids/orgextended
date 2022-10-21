@@ -29,7 +29,3 @@
 
    Please note when using reveal exporter that if slides have to much content they will become jumbled.
    The layout is somewhat simplistic
-
-** TODO For Release
-   - [ ] Write exporter test framework to run with each release.
-   - [ ] Update docs release notes
