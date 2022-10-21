@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" class>
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/dist/reveal.css">
+    <style>None</style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/dist/theme/league.css" id="theme">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/highlight/zenburn.css" id="highlight-theme">
+  </head>
+  <body style="transition: -webkit-transform 0.8s ease 0s; transform-origin: 0px 0px;">
+  <div class="reveal slide center has-vertical-slides has-horizontal-slides ready" role="application" data-transition-speed="default" data-background-transition="none">
+    <div class="slides">
+      <section >
+      <h2>Main</h2>
+      <section >
+      <h3>Basic Page</h3>
+	This is a basic page
+      </section>
+      <section >
+      <h3>Table Page</h3>
+<br/>
+  <table>
+    <tr>
+     <th>  H1  </th>
+     <th> H2 </th>
+     <th> H3 </th>
+    </tr>
+
+    <tr>
+     <th> Row1 </th>
+     <th>  1 </th>
+     <th>  2 </th>
+    </tr>
+    <tr>
+     <th> Row2 </th>
+     <th>  3 </th>
+     <th>  4 </th>
+    </tr>
+
+    <tr>
+     <th> Row3 </th>
+     <th>  5 </th>
+     <th>  6 </th>
+    </tr>
+    <tr>
+     <th> Row4 </th>
+     <th>  7 </th>
+     <th>  8 </th>
+    </tr>
+  </table>
+      </section>
+      <section >
+      <h3>Link Page</h3>
+<br/>
+    <ul>
+     <li> <a href="https://reg.ca">RegCa</a>    </li>
+     <li> <a href="https://google.ca">Google</a>    </li>
+     <li> List 1    </li>
+    <ul>
+     <li> Sub List 1    </li>
+     <li> Sub List 2    </li>
+     </ul>
+     </ul>
+<br/>
+      </section>
+      <section >
+      <h3>Source Blocks Page</h3>
+<br/>
+    <pre><code language="cpp" >
+    printf("Hello World\n");
+    int x = 5;
+  </code></pre>
+<br/>
+    <pre><code language="language-python" >
+    if this_is_test == 5:
+      print("Another test")
+  </code></pre>
+      </section>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/markdown/markdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/search/search.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/zoom/zoom.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/math/math.js"></script>
+  <script>
+      Reveal.initialize({
+          hash: true,
+          transition: 'none',
+          transitionSpeed: 'default',
+          dependencies: [
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/markdown/markdown.js', async: true },
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/highlight/highlight.js', async: true },
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/search/search.js', async: true },
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/zoom/zoom.js', async: true },
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/notes/notes.js', async: true },
+              { src: 'https://cdn.jsdelivr.net/npm/reveal.js@4.1.0/plugin/math/math.js', async: true }
+          ],
+          plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+      });
+  </script>
+  </body>
+</html>

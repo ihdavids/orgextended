@@ -18,18 +18,18 @@
 ** FIXED Org Capture
    - If the user had a list as their dayPagePath variable org capture would crash.
      Improved symbol expansion reliability a little bit.
+   - File creation in directory that does not exists was not working. This should now be fixed
+   - [[https://reg.ca][Reg Ca]] Org link
 
 ** FIXED Reveal JS Exporter
    Reveal js had moved on since the last time I used the exporter. Derusting is required to get it
    functional again.
 
    - [x] Reveal js exporter was missing Escape method of embedded source blocks
-   - [ ] Reveal js exporter had regressed with links, they were not active.
-   - [ ] Reveal js exporter had regressed with sub pages not showing up properly (overlaid rather than hidden state)
+
+   Please note when using reveal exporter that if slides have to much content they will become jumbled.
+   The layout is somewhat simplistic
 
 ** TODO For Release
-   - [ ] Test mermaid on mac
-   - [ ] Test orgcapture on mac
-   - [ ] Test reveal on mac
    - [ ] Write exporter test framework to run with each release.
    - [ ] Update docs release notes
