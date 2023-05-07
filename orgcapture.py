@@ -591,7 +591,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 pt = linev.end()
             else:
                 pt = linev.begin()
-            panel.Insert(pt, toinsert, evt.Make(lambda: self.on_panel_ready(index,openas,panel,cnt+1)))
+            panel.Insert(pt, toinsert, evt.Make(lambda: self.on_panel_ready(index, openas, panel, cnt + 1)))
             return
 
         startPos = -1
@@ -687,24 +687,25 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         # TM_CURRENT_WORD - Word under cursor when snippet was triggered
         # TM_SELECTED_TEXT - Selected text when snippet was triggered
         # TM_CURRENT_LINE - Line of snippet when snippet was triggered
-        self.panel.run_command("insert_snippet",
-            { "name" : snipName
-            , "ORG_INACTIVE_DATE": inow
-            , "ORG_ACTIVE_DATE":   anow
-            , "ORG_DATE":          str(datetime.date.today())
-            , "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S")
-            , "ORG_CLIPBOARD":     sublime.get_clipboard()
-            , "ORG_SELECTION":     self.view.substr(self.view.sel()[0])
-            , "ORG_LINENUM":       str(self.view.curRow())
-            , "ORG_FILENAME":      self.view.file_name()
-            })
-        sublime.active_window().active_view().settings().set('auto_indent',ai)
+        self.panel.run_command("insert_snippet", {
+            "name": snipName,
+            "ORG_INACTIVE_DATE": inow,
+            "ORG_ACTIVE_DATE":   anow,
+            "ORG_DATE":          str(datetime.date.today()),
+            "ORG_TIME":          datetime.datetime.now().strftime("%H:%M:%S"),
+            "ORG_CLIPBOARD":     sublime.get_clipboard(),
+            "ORG_SELECTION":     self.view.substr(self.view.sel()[0]),
+            "ORG_LINENUM":       str(self.view.curRow()),
+            "ORG_FILENAME":      self.view.file_name()
+        })
+        sublime.active_window().active_view().settings().set('auto_indent', ai)
         self.cleanup_capture_panel()
 
-    def on_done_st4(self,index,modifiers):
+    def on_done_st4(self, index, modifiers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         global captureBufferName
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
@@ -712,10 +713,9 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         template = self.templates[index]
         target, capturePath, captureFile, at, toinsert = GetCapturePath(self.view, template)
         openas = False
-        if('openas' in template and 'direct' == template['openas']):
+        if ('openas' in template and 'direct' == template['openas']):
             panel = window.open_file(capturePath)
             openas = True
         else:
             panel = window.create_output_panel("orgcapture")
         self.on_panel_ready(index, openas, panel)
-
