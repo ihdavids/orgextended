@@ -2,44 +2,46 @@ import sublime
 import sublime_plugin
 import datetime
 import re
-from pathlib import Path
+# from pathlib import Path
 import os
-import fnmatch
+# import fnmatch
 import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
-from   OrgExtended.orgparse.sublimenode import * 
-import OrgExtended.orgutil.util as util
-import OrgExtended.orgutil.navigation as nav
+# from   OrgExtended.orgparse.sublimenode import *
+# import OrgExtended.orgutil.util as util
+# import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
 import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgextension as ext
 import OrgExtended.orgclocking as clk
 import logging
-import sys
-import traceback 
+# import sys
+# import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props
 import OrgExtended.pymitter as evt
 import OrgExtended.orgdaypage as daypage
-import time
+# import time
 
 log = logging.getLogger(__name__)
 captureBufferName = "*capture*"
 lastHeader        = None
 
+
 def GetViewById(id):
     win = sublime.active_window()
     for v in win.views():
-        if(v.id() == id):
+        if (v.id() == id):
             return v
     return None
 
+
 def GetDict():
     tempDict = {
-        'refile' : sets.Get('refile',''),
-        'daypage' : daypage.dayPageGetName(daypage.dayPageGetToday()),
-    } 
+        'refile': sets.Get('refile', ''),
+        'daypage': daypage.dayPageGetName(daypage.dayPageGetToday()),
+    }
     return tempDict
 
 
@@ -64,7 +66,7 @@ def FindNodeByPath(n, target, idx):
         return n
     for c in n.children:
         if (c.heading == target[idx]):
-            return FindNodeByPath(c, target, idx+1)
+            return FindNodeByPath(c, target, idx + 1)
     return None
 
 
@@ -193,17 +195,17 @@ def GetCapturePath(view, template):
 def onDeactivated(view):
     global captureBufferName
     global lastHeader
-    if(view.name() == captureBufferName):
+    if (view.name() == captureBufferName):
         tempIndex = view.settings().get('cap_index')
-        templates = sets.Get("captureTemplates",[])
+        templates = sets.Get("captureTemplates", [])
         template  = templates[tempIndex]
-        #outpath, outfile = GetCaptureOutput()
-        #print('template index was: ' + str(tempIndex))
+        # outpath, outfile = GetCaptureOutput()
+        # print('template index was: ' + str(tempIndex))
         target, capturePath, captureFile, at, toinsert = GetCapturePath(GetViewById(view.settings().get('cap_view')), template)
-        #refilePath = sets.Get("refile","UNKNOWN")
-        #refile = load(refilePath)
+        # refilePath = sets.Get("refile","UNKNOWN")
+        # refile = load(refilePath)
         captureFileRoot = None
-        if(captureFile != None):
+        if (captureFile is not None):
             captureFileRoot = captureFile.org
 
         bufferContentsToInsert = view.substr(sublime.Region(0, view.size()))
@@ -214,26 +216,26 @@ def onDeactivated(view):
         captureNode = loader.loads(bufferContentsToInsert)
         # if we moused out of the window we might be replacing
         # ourselves again.
-        if(lastHeader == None):
+        if (lastHeader is None):
             lastHeader = str(captureNode[1].heading)
         # We may haved moved around in the capture file
         # so find the old heading.
         for heading in captureFileRoot:
-            if(type(heading) is node.OrgRootNode):
+            if (type(heading) is node.OrgRootNode):
                 continue
             if str(heading.heading) == lastHeader:
-                #log.debug("REPLACING: " + str(heading.heading))
+                # log.debug("REPLACING: " + str(heading.heading))
                 heading.replace_node(captureNode[1])
                 didInsert = True
                 continue
-        if(not didInsert):
+        if (not didInsert):
             insertAt = captureFileRoot
             inserted = captureNode[1]
-            if(at != None and at > 0):
+            if (at is not None and at > 0):
                 # This does not work? its a node not a file
                 insertAt = captureFile.At(at)
             insertAt.insert_child(inserted)
-        f = open(capturePath,"w+",encoding=sets.Get("captureWriteFormat","utf-8"))
+        f = open(capturePath, "w+", encoding=sets.Get("captureWriteFormat", "utf-8"))
         # reauthor the ENTIRE file.
         # This can get expensive!
         for item in captureFileRoot:
@@ -241,6 +243,7 @@ def onDeactivated(view):
         f.close()
         lastHeader = str(captureNode[1].heading)
         log.debug("***************>>>>> [" + view.name() + "] is no more")
+
 
 # Respond to panel events. If the panel is hidden we stop
 # tracking the last header.
@@ -254,13 +257,14 @@ def onPostWindowCommand(window, cmd, args):
 
 
 class OrgCopyCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifers):
+    def on_done_st4(self, index, modifers):
         self.on_done(index)
+
     def on_done(self, index):
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
         node = db.Get().AtInView(self.view)
-        if(fileIndex != None):
-            #print(str(file.key))
+        if (fileIndex is not None):
+            # print(str(file.key))
             file.org[fileIndex].insert_child(node)
             file.Save()
         else:
@@ -268,19 +272,21 @@ class OrgCopyCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
+
 class OrgOpenRefileCommand(sublime_plugin.TextCommand):
-    def run(self,edit):
-        refile = sets.Get("refile",None)
+    def run(self, edit):
+        refile = sets.Get("refile", None)
         log.debug("REFILE: ", refile)
-        if(refile):
-           self.view.window().open_file(refile) 
+        if (refile):
+            self.view.window().open_file(refile)
         else:
             log.error("Could not find refile file, have you set it in your config?")
+
 
 # Archiving will push the current item to an archive file (with some tags etc)
 class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
@@ -289,16 +295,16 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
         self.tempView.run_command("close")
 
     def finish_archive_on_loaded(self):
-        while(self.tempView.is_loading()):
+        while (self.tempView. is_loading()):
             sublime.set_timeout_async(lambda: self.finish_archive_on_loaded(), 100)
         node = self.file.At(self.result.start_row)
-        #:ARCHIVE_TIME: 2017-11-30 Thu 18:15
-        #:ARCHIVE_FILE: ~/notes/inxile/worklog.org
-        #:ARCHIVE_OLPATH: Daily
-        #:ARCHIVE_CATEGORY: InXile
-        #:ARCHIVE_ITAGS: InXile
-        props.UpdateProperty(self.tempView,node, "ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
-        props.UpdateProperty(self.tempView,node, "ARCHIVE_FILE", self.view.file_name())
+        # :ARCHIVE_TIME: 2017-11-30 Thu 18:15
+        # :ARCHIVE_FILE: ~/notes/inxile/worklog.org
+        # :ARCHIVE_OLPATH: Daily
+        # :ARCHIVE_CATEGORY: InXile
+        # :ARCHIVE_ITAGS: InXile
+        props.UpdateProperty(self.tempView, node, "ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
+        props.UpdateProperty(self.tempView, node, "ARCHIVE_FILE", self.view.file_name())
         self.tempView.run_command("save")
         sublime.set_timeout_async(lambda: self.close_tempView(), 1000)
         # Now remove the old node
@@ -307,11 +313,11 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
         fromFile.Save()
         fromFile.Reload()
 
-    def run(self,edit):
-        globalArchive = sets.Get("archive","%s_archive::")
+    def run(self, edit):
+        globalArchive = sets.Get("archive", "%s_archive::")
         node          = db.Get().AtInView(self.view)
         archive       = node.archive(globalArchive)
-        if(archive == None or archive.strip() == ""):
+        if (archive is None or archive.strip() == ""):
             node = db.Get().AtInView(self.view)
             node.add_tag("ARCHIVE")
             file = db.Get().FindInfo(self.view)
@@ -319,34 +325,35 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             print(str(node))
             return
         # Set the root to empty if not provided
-        if('::' not in archive):
+        if ('::' not in archive):
             archive = archive + "::"
         (fileTemplate, headingTarget) = archive.split('::')
-        if('%' in fileTemplate):
-            filename      = fileTemplate % (self.view.file_name()) 
+        if ('%' in fileTemplate):
+            filename      = fileTemplate % (self.view.file_name())
         else:
             filename = fileTemplate
         log.debug("ARCHIVE FILE:    " + filename)
         log.debug("ARCHIVE HEADING: " + headingTarget)
 
         # Ensure the file actually exists.
-        if(not os.path.dirname(filename).strip() == ''):
+        if (not os.path.dirname(filename).strip() == ''):
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         # Okay the file is probably a local path
         # Get the full path from our file.
         else:
             localDirname = os.path.dirname(self.view.file_name())
-            if('/' not in filename and '\\' not in filename):
+            if ('/' not in filename and '\\' not in filename):
                 filename = os.path.join(localDirname, filename)
-        with open(filename, "a",encoding=sets.Get("captureWriteFormat","utf-8")) as f:
+        with open(filename, "a", encoding=sets.Get("captureWriteFormat", "utf-8")) as f:
+            f.write("")
             log.debug("  Archive file created...")
         # Okay now open the file.
         file       = db.Get().FindInfo(filename)
         sourceNode = db.Get().AtInView(self.view)
-        if(sourceNode != None):
+        if (sourceNode is not None):
             log.debug("Find or create: " + headingTarget)
             targetNode = file.FindOrCreateNode(headingTarget)
-            if(targetNode == None):
+            if (targetNode is None):
                 targetNode = file.Root()
                 self.result = targetNode.insert_child(sourceNode)
                 self.result.update_property("ARCHIVE_TIME", datetime.datetime.now().strftime("%Y-%m-%d %a %H:%M"))
@@ -366,29 +373,28 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             file.Save()
             file.Reload()
 
-
             sourceNode.remove_node()
             fromFile = db.Get().FindInfo(self.view)
             fromFile.Save()
             fromFile.Reload()
-            #self.tempView = self.view.window().open_file(file.filename, sublime.ENCODED_POSITION)
-            #self.file = file
-            #self.sourceNode = sourceNode
-            #sublime.set_timeout_async(lambda: self.finish_archive_on_loaded(), 1000)
+            # self.tempView = self.view.window().open_file(file.filename, sublime.ENCODED_POSITION)
+            # self.file = file
+            # self.sourceNode = sourceNode
+            # sublime.set_timeout_async(lambda: self.finish_archive_on_loaded(), 1000)
         else:
-            log.error("Failed to archive subtree! Could not find source Node")  
+            log.error("Failed to archive subtree! Could not find source Node")
 
 
 def RefileCurNode(view, file, nodeIndex):
-    (curRow,curCol) = view.curRowCol()
+    (curRow, curCol) = view.curRowCol()
     node = db.Get().At(view, curRow)
 
-    if(node == None):
+    if (node is None):
         log.error("COULD NOT REFILE: Node at line " + str(curRow) + " not found")
         return
-    if(nodeIndex == None):
+    if (nodeIndex is None):
         log.error("Could not refile node index is out of bounds")
-        return 
+        return
     log.debug("Inserting child into: " + str(nodeIndex) + " vs " + str(len(file.org)) + " in file: " + file.filename)
 
     fromFile = db.Get().FindInfo(view)
@@ -401,30 +407,34 @@ def RefileCurNode(view, file, nodeIndex):
     fromFile.Save()
     fromFile.Reload()
 
+
 # This refile gives you a list of all headings to make it quicker to jump to
 # "That heading" This one is bound to R for really quick refiling.
 class OrgRefileCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifiers):
+    def on_done_st4(self, index, modifiers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         file, fileIndex = db.Get().FindFileInfoByAllHeadingsIndex(index)
         RefileCurNode(self.view, file, fileIndex)
 
     def run(self, edit):
         self.headings = db.Get().AllHeadingsWContext(self.view)
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
+
 # This refile, files to the end of the file.
 class OrgRefileToFileCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifiers):
+    def on_done_st4(self, index, modifiers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         file = db.Get().FindFileByIndex(index)
         fileIndex = 0
@@ -432,70 +442,79 @@ class OrgRefileToFileCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.headings = db.Get().AllFiles(self.view)
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4, -1, -1)
 
+
 # This refile version takes a filename prompt first
 # then it shows the headings in the file.
 class OrgRefileToFileAndHeadlineCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifiers):
+    def on_done_st4(self, index, modifiers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         self.file = db.Get().FindFileByIndex(index)
         self.headings = db.Get().AllHeadingsForFile(self.file)
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.headings, self.on_done_v2, -1, -1)
         else:
             self.view.window().show_quick_panel(self.headings, self.on_done_st4_v2, -1, -1)
 
-    def on_done_st4_v2(self,index,modifiers):
+    def on_done_st4_v2(self, index, modifiers):
         self.on_done_v2(index)
+
     def on_done_v2(self, index):
-        if(index < 0):
+        if (index < 0):
             return
-        RefileCurNode(self.view, self.file, index+1)
+        RefileCurNode(self.view, self.file, index + 1)
         pass
 
     def run(self, edit):
         headings = db.Get().AllFiles(self.view)
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(headings, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(headings, self.on_done_st4, -1, -1)
 
+
 class OrgCaptureBaseCommand(sublime_plugin.TextCommand):
     def on_done(self, index):
         pass
+
     def on_done_base_st3(self, index):
-        if(index < 0):
+        if (index < 0):
             return
-        self.templates         = sets.Get("captureTemplates",[])
+        self.templates         = sets.Get("captureTemplates", [])
         self.on_done(index)
+
     def on_done_base_st4(self, index, modifiers):
         self.on_done_base_st3(index)
+
     def run(self, edit):
-        templates = sets.Get("captureTemplates",[])
+        templates = sets.Get("captureTemplates", [])
         temps = []
         for temp in templates:
             log.debug("TEMPLATE: ", temp)
             temps.append(temp['name'])
-        if(int(sublime.version()) >= 4096):
+        if (int(sublime.version()) >= 4096):
             self.view.window().show_quick_panel(temps, self.on_done_base_st4, -1, -1)
         else:
             self.view.window().show_quick_panel(temps, self.on_done_base_st3, -1, -1)
 
-def IsType(val,template):
+
+def IsType(val, template):
     return 'type' in template and template['type'].strip() == val
 
-def GetProp(template,name,defaultVal=None):
-    if('properties' in template):
+
+def GetProp(template, name, defaultVal=None):
+    if ('properties' in template):
         props = template['properties']
-        if(isinstance(props,dict)):
-            if(name in props):
+        if (isinstance(props, dict)):
+            if (name in props):
                 return props[name]
     return defaultVal
 
@@ -503,12 +522,12 @@ def GetProp(template,name,defaultVal=None):
 # Capture some text into our refile org file
 class OrgCaptureCommand(OrgCaptureBaseCommand):
     def insert_template(self, template, panel):
-        #template          = templates[index]['template']
+        # template          = templates[index]['template']
         startPos = -1
         template, startPos = templateEngine.ExpandTemplate(self.view, template)
 
-        panel.run_command("insert",{"characters": template})
-        if(startPos >= 0):
+        panel.run_command("insert", {"characters": template})
+        if (startPos >= 0):
             startPos = sublime.Region(startPos)
         else:
             startPos = panel.sel()[0]
@@ -516,7 +535,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
 
     def cleanup_capture_panel(self):
         global captureBufferName
-        if(not self.openas):
+        if (not self.openas):
             self.panel.set_syntax_file('Packages/OrgExtended/OrgExtended.sublime-syntax')
             self.panel.set_name(captureBufferName)
 
@@ -524,7 +543,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
     # Before inserting the snippet. This SHOULD get our
     # heading where it needs to be?
     def on_added_stars(self):
-        self.pt = self.panel.text_point(self.insertRow,0)
+        self.pt = self.panel.text_point(self.insertRow, 0)
         linev = self.panel.line(self.pt)
         linetxt = self.panel.substr(linev)
         self.panel.sel().clear()
@@ -533,41 +552,41 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
 
     def find_end_of_thing(self, panel, insertAt, itemre):
         self.insertRow = insertAt.local_end_row
-        self.pt = panel.text_point(insertAt.local_end_row,0)
-        #item_line_regex   = re.compile(r'^(\s*)([-+])\s*[^\[]')
+        self.pt = panel.text_point(insertAt.local_end_row, 0)
+        # item_line_regex   = re.compile(r'^(\s*)([-+])\s*[^\[]')
         have = False
         itemtype = '-'
-        preprefix = " " * (insertAt.level+1)
-        for row in range(insertAt.start_row, insertAt.local_end_row+1):
-            pt = panel.text_point(row,0)
+        preprefix = " " * (insertAt.level + 1)
+        for row in range(insertAt.start_row, insertAt.local_end_row + 1):
+            pt = panel.text_point(row, 0)
             line  = panel.substr(panel.line(pt))
             m = itemre.search(line)
-            if(m):
+            if (m):
                 preprefix = m.group(1)
                 itemtype = m.group(2)
                 have = True
-            elif(have):
+            elif (have):
                 self.insertRow = row
                 self.pt = pt
                 break
         return (preprefix, itemtype)
 
-    def on_panel_ready(self, index, openas, panel,cnt=0):
+    def on_panel_ready(self, index, openas, panel, cnt=0):
         self.panel = panel
         global captureBufferName
         captureBufferName = sets.Get("captureBufferName", captureBufferName)
         window = self.view.window()
         template = self.templates[index]
         target, capturePath, captureFile, at, toinsert = GetCapturePath(self.view, template)
-        if(panel.is_loading()):
+        if (panel.is_loading()):
             sublime.set_timeout_async(lambda: self.on_panel_ready(index, openas, panel), 100)
             return
 
-        if(toinsert != "" and cnt==0):
-            pt = panel.text_point(at,0)
+        if (toinsert != "" and cnt == 0):
+            pt = panel.text_point(at, 0)
             linev = panel.line(pt)
             linetxt = panel.substr(linev)
-            if((linetxt and not linetxt.strip() == "") or at == 0 or panel.lastRow() == at):
+            if ((linetxt and not linetxt.strip() == "") or at == 0 or panel.lastRow() == at):
                 toinsert = "\n" + toinsert
                 pt = linev.end()
             else:
@@ -577,44 +596,44 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
 
         startPos = -1
         # Try to store the capture index
-        panel.settings().set('cap_index',index)
-        panel.settings().set('cap_view',self.view.id())
+        panel.settings().set('cap_index', index)
+        panel.settings().set('cap_view', self.view.id())
         self.openas = openas
-        if((IsType('item',template) or IsType('checkitem',template) or IsType('plain',template) or IsType('table-line',template)) and not 'snippet' in template):
+        if ((IsType('item', template) or IsType('checkitem', template) or IsType('plain', template) or IsType('table-line', template)) and 'snippet' not in template):
             template['snippet'] = 'plain_template'
-            if('template' in template):
+            if ('template' in template):
                 del template['template']
 
-        if('template' in template):
+        if ('template' in template):
             startPos = self.insert_template(template['template'], panel)
             window.run_command('show_panel', args={'panel': 'output.orgcapture'})
             panel.sel().clear()
             panel.sel().add(startPos)
             window.focus_view(panel)
             self.cleanup_capture_panel()
-        elif('snippet' in template):
+        elif ('snippet' in template):
             self.level = 0
             self.pt = None
             prefix = ""
             preprefix = ""
             itemtype = '-'
-            if(self.openas):
+            if (self.openas):
                 insertAt = captureFile.At(at)
-                if(IsType('plain',template)):
-                    self.pt = panel.text_point(insertAt.local_end_row,0)
+                if (IsType('plain', template)):
+                    self.pt = panel.text_point(insertAt.local_end_row, 0)
                     self.insertRow = insertAt.local_end_row
-                elif(IsType('checkitem',template)):
+                elif (IsType('checkitem', template)):
                     preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([-+])\s*(\[[xX\- ]\])\s+'))
-                elif(IsType('item',template)):
+                elif (IsType('item', template)):
                     preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([-+])\s*[^\[]'))
-                elif(IsType('table-line',template)):
+                elif (IsType('table-line', template)):
                     preprefix, itemtype = self.find_end_of_thing(panel, insertAt, re.compile(r'^(\s*)([|])'))
                 else:
-                    self.pt = panel.text_point(insertAt.end_row,0)
+                    self.pt = panel.text_point(insertAt.end_row, 0)
                     self.insertRow = insertAt.end_row
                 linev = panel.line(self.pt)
                 linetxt = panel.substr(linev)
-                if((linetxt and not linetxt.strip() == "") or at == 0 or (insertAt and panel.lastRow() == insertAt.end_row)):
+                if ((linetxt and not linetxt.strip() == "") or at == 0 or (insertAt and panel.lastRow() == insertAt.end_row)):
                     prefix = "\n"
                     self.pt = linev.end()
                     self.insertRow += 1
@@ -625,23 +644,23 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
                 self.level = insertAt.level
             else:
                 window.run_command('show_panel', args={'panel': 'output.orgcapture'})
-            if(self.openas and self.level > 0):
+            if (self.openas and self.level > 0):
                 self.index = index
                 self.panel = panel
-                if(IsType('plain',template)):
-                    self.panel.Insert(self.pt, prefix + (" " * (self.level+1)), evt.Make(self.on_added_stars))
-                elif(IsType('item',template)):
+                if (IsType('plain', template)):
+                    self.panel.Insert(self.pt, prefix + (" " * (self.level + 1)), evt.Make(self.on_added_stars))
+                elif (IsType('item', template)):
                     self.panel.Insert(self.pt, prefix + preprefix + itemtype + " ", evt.Make(self.on_added_stars))
-                elif(IsType('checkitem',template)):
+                elif (IsType('checkitem', template)):
                     self.panel.Insert(self.pt, prefix + preprefix + itemtype + " [ ] ", evt.Make(self.on_added_stars))
-                elif(IsType('table-line',template)):
+                elif (IsType('table-line', template)):
                     self.panel.Insert(self.pt, prefix + preprefix + itemtype, evt.Make(self.on_added_stars))
                 else:
                     self.panel.Insert(self.pt, prefix + ("*" * self.level), evt.Make(self.on_added_stars))
             else:
-                if(IsType('plain',template)):
+                if (IsType('plain', template)):
                     self.panel.Insert(self.pt, prefix, evt.Make(self.on_added_stars))
-                elif(prefix != ""):
+                elif (prefix != ""):
                     self.index = index
                     self.panel = panel
                     self.panel.Insert(self.pt, prefix, evt.Make(self.on_added_stars))
@@ -652,11 +671,11 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         window = self.view.window()
         template = self.templates[index]
         ai = sublime.active_window().active_view().settings().get('auto_indent')
-        self.panel.settings().set('auto_indent',False)
+        self.panel.settings().set('auto_indent', False)
         snippet = template['snippet']
-        snipName = ext.find_extension_file('orgsnippets',snippet,'.sublime-snippet')
+        snipName = ext.find_extension_file('orgsnippets', snippet, '.sublime-snippet')
         window.focus_view(self.panel)
-        #panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
+        # panel.meta_info("shellVariables", 0)[0]['TM_EMAIL'] = "Trying to set email value"
         self.panel.run_command('_enter_insert_mode', {"count": 1, "mode": "mode_internal_normal"})
         now = datetime.datetime.now()
         inow = orgdate.OrgDate.format_date(now, False)
@@ -668,7 +687,7 @@ class OrgCaptureCommand(OrgCaptureBaseCommand):
         # TM_CURRENT_WORD - Word under cursor when snippet was triggered
         # TM_SELECTED_TEXT - Selected text when snippet was triggered
         # TM_CURRENT_LINE - Line of snippet when snippet was triggered
-        self.panel.run_command("insert_snippet", 
+        self.panel.run_command("insert_snippet",
             { "name" : snipName
             , "ORG_INACTIVE_DATE": inow
             , "ORG_ACTIVE_DATE":   anow
