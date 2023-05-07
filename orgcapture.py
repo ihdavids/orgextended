@@ -42,27 +42,31 @@ def GetDict():
     } 
     return tempDict
 
+
 def GetCaptureFile(view, template, target):
-    temp = templateEngine.TemplateFormatter(sets.Get)
+    # temp = templateEngine.TemplateFormatter(sets.Get)
     filename = templateEngine.ExpandTemplate(view, target[1], GetDict(), sets.Get)[0]
     return filename
 
+
 def GetCaptureFileAndParam(view, template, target):
-    temp = templateEngine.TemplateFormatter(sets.Get)
+    # temp = templateEngine.TemplateFormatter(sets.Get)
     tempDict = GetDict()
     filename = templateEngine.ExpandTemplate(view, target[1], tempDict, sets.Get)[0]
     headline = None
-    if(len(target) > 2):
+    if (len(target) > 2):
         headline = templateEngine.ExpandTemplate(view, target[2], tempDict, sets.Get)[0]
     return (filename, headline)
 
+
 def FindNodeByPath(n, target, idx):
-    if(idx >= len(target)):
+    if (idx >= len(target)):
         return n
     for c in n.children:
-        if(c.heading == target[idx]):
+        if (c.heading == target[idx]):
             return FindNodeByPath(c, target, idx+1)
     return None
+
 
 def GetCapturePath(view, template):
     target    = ['file', '{refile}']
@@ -72,36 +76,36 @@ def GetCapturePath(view, template):
     file = None
     at = None
     toinsert = ""
-    if('file' in target[0]):
+    if ('file' in target[0]):
         filename = GetCaptureFile(view, template, target)
-    if('file+headline' in target[0]):
+    if ('file+headline' in target[0]):
         filename, headline = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
-        if(file and headline):
+        if (file and headline):
             at = file.FindOrCreateNode(headline)
-            if(at):
+            if (at):
                 at = at.local_end_row
-    elif('file+regexp' in target[0]):
+    elif ('file+regexp' in target[0]):
         filename, reg = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
-        if(file and reg):
+        if (file and reg):
             r = re.compile(reg)
             row = 0
             for n in file.org:
                 for line in n._lines:
                     m = r.search(line)
-                    if(m):
+                    if (m):
                         at = row
                         break
                     row += 1
-    elif('file+olp+datetree' in target[0]):
+    elif ('file+olp+datetree' in target[0]):
         filename, reg = GetCaptureFileAndParam(view, template, target)
         file = db.Get().FindInfo(filename)
-        n = FindNodeByPath(file.org,target,2)
-        if(not n):
+        n = FindNodeByPath(file.org, target, 2)
+        if (not n):
             n = file.org
         # Now we assume this is a date tree. Default is per day.
-        t = datetime.datetime.now() 
+        t = datetime.datetime.now()
         yearformat  = t.strftime(GetProp(template, "year-format",  "%Y"))
         monthformat = t.strftime(GetProp(template, "month-format", "%Y-%m %B"))
         dayformat   = t.strftime(GetProp(template, "day-format",   "%Y-%m-%d %A"))
@@ -109,51 +113,51 @@ def GetCapturePath(view, template):
         nmonth = None
         nday   = None
         prefix   = ""
-        if(n.level > 0):
+        if (n.level > 0):
             prefix = "*" * n.level
         for c in n.children:
-            if(c.heading == yearformat):
+            if (c.heading == yearformat):
                 nyear = c
                 break
-        if(nyear == None):
-            toinsert += "{prefix}* {yearformat}\n".format(prefix=prefix,yearformat=yearformat)
+        if (nyear is None):
+            toinsert += "{prefix}* {yearformat}\n".format(prefix=prefix, yearformat=yearformat)
         else:
             n = nyear
             for c in nyear.children:
-                if(c.heading == monthformat):
+                if (c.heading == monthformat):
                     nmonth = c
                     break
-        if(nmonth == None):
-            toinsert += "{prefix}** {monthformat}\n".format(prefix=prefix,monthformat=monthformat)
+        if (nmonth is None):
+            toinsert += "{prefix}** {monthformat}\n".format(prefix=prefix, monthformat=monthformat)
         else:
             n = nmonth
             for c in nmonth.children:
-                if(c.heading == dayformat):
+                if (c.heading == dayformat):
                     nday = c
                     break
-        if(nday == None):
-            toinsert += "{prefix}*** {dayformat}\n".format(prefix=prefix,dayformat=dayformat)
+        if (nday is None):
+            toinsert += "{prefix}*** {dayformat}\n".format(prefix=prefix, dayformat=dayformat)
         else:
             n = nday
-        if(n and toinsert == ""):
+        if (n and toinsert == ""):
             at = n.local_end_row
         else:
             at = n.end_row
-    elif('file+olp' in target[0]):
+    elif ('file+olp' in target[0]):
         filename, reg = GetCaptureFileAndParam(view, template, target)
         file = db.Get().LoadNew(filename)
-        n = FindNodeByPath(file.org,target,2)
-        if(n):
+        n = FindNodeByPath(file.org, target, 2)
+        if (n):
             at = n.local_end_row
 
-    elif('id' == target[0]):
+    elif ('id' == target[0]):
         file, at = db.Get().FindByCustomId(target[1])
-        if(file == None):
+        if (file is None):
             log.error("Could not find id: " + target[1])
             return
         filename = file.filename
-    elif('clock' == target[0]):
-        if(not clk.ClockManager.ClockRunning()):
+    elif ('clock' == target[0]):
+        if (not clk.ClockManager.ClockRunning()):
             log.debug("ERROR: clock is not running!")
             raise "ERROR: clock is not running"
         filename = clk.ClockManager.GetActiveClockFile()
@@ -162,20 +166,20 @@ def GetCapturePath(view, template):
     try:
         # Ensure the directory exists first
         dirName = os.path.dirname(os.path.abspath(filename))
-        if(not os.path.exists(dirName)):
-            os.makedirs(dirName,exist_ok=True)
-        if(not os.path.isfile(str(filename))):
-            with open(filename,"w",encoding=sets.Get("captureWriteFormat","utf-8")) as fp:
+        if (not os.path.exists(dirName)):
+            os.makedirs(dirName, exist_ok=True)
+        if (not os.path.isfile(str(filename))):
+            with open(filename, "w", encoding=sets. Get("captureWriteFormat", "utf-8")) as fp:
                 fp.write("#+TAGS: refile\n")
     except Exception as e:
         log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename) + "\n" + str(e))
     # Now make sure that file is loaded in the DB
     # it might not be in my org path
-    if(file == None):
+    if (file is None):
         file = db.Get().LoadNew(filename)
     else:
         file = db.Get().FindInfo(filename)
-    if(not at and file):
+    if (not at and file):
         at = file.org.start_row
     return (target, filename, file, at, toinsert)
 
