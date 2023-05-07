@@ -2,27 +2,19 @@ import sublime
 import sublime_plugin
 import datetime
 import re
-# from pathlib import Path
 import os
-# import fnmatch
 import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
-# from   OrgExtended.orgparse.sublimenode import *
-# import OrgExtended.orgutil.util as util
-# import OrgExtended.orgutil.navigation as nav
 import OrgExtended.orgutil.template as templateEngine
 import OrgExtended.orgparse.date as orgdate
 import OrgExtended.orgextension as ext
 import OrgExtended.orgclocking as clk
 import logging
-# import sys
-# import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props
 import OrgExtended.pymitter as evt
 import OrgExtended.orgdaypage as daypage
-# import time
 
 log = logging.getLogger(__name__)
 captureBufferName = "*capture*"
