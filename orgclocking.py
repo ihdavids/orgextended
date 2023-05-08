@@ -1,21 +1,14 @@
 import sublime
 import sublime_plugin
 import datetime
-import re
-from pathlib import Path
 import os
-import fnmatch
-import OrgExtended.orgparse.node as node
-from OrgExtended.orgparse.sublimenode import *
-import OrgExtended.orgutil.util as util
-import OrgExtended.orgutil.navigation as nav
-import OrgExtended.orgutil.template as templateEngine
+# from OrgExtended.orgparse.sublimenode import *
 import logging
-import sys
-import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.orgproperties as props
+from OrgExtended.orgparse.node import *
+import copy
 import yaml
 import OrgExtended.pymitter as evt
 
@@ -27,10 +20,9 @@ class ClockManager:
 
     @staticmethod
     def ClockInRecord(file, onode, dt):
-        parentHeading = ""
-        if (onode.parent and type(onode.parent) != node.OrgRootNode):
-            parentHeading = onode.parent.heading
-
+        # parentHeading = ""
+        # if (onode.parent and type(onode.parent) != node.OrgRootNode):
+        #     parentHeading = onode.parent.heading
         ClockManager.Clock = {
             'file': file.filename,
             'start': dt,
@@ -40,7 +32,7 @@ class ClockManager:
 
     @staticmethod
     def ClockRunning():
-        return ClockManager.Clock != None
+        return ClockManager.Clock is not None
 
     @staticmethod
     def FormatClock(now):
@@ -59,7 +51,7 @@ class ClockManager:
     @staticmethod
     def SaveClock():
         f = open(ClockManager.ClockPath(), "w")
-        data = yaml.dump(ClockManager.Clock, f)
+        yaml.dump(ClockManager.Clock, f)
         f.close()
 
     @staticmethod
@@ -67,7 +59,11 @@ class ClockManager:
         cpath = ClockManager.ClockPath()
         if (os.path.isfile(cpath)):
             stream = open(cpath, 'r')
-            ClockManager.Clock = yaml.load(stream, Loader=yaml.SafeLoader)
+            res = yaml.load(stream, Loader=yaml.SafeLoader)
+            if res is not None and isinstance(res, dict):
+                ClockManager.Clock = res
+            else:
+                ClockManager.Clock = None
             stream.close()
 
     @staticmethod
@@ -94,21 +90,22 @@ class ClockManager:
             return
         # Eventually we want to navigate to this node
         # rather than doing this.
-        node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
-        newStart = None
-        if (node):
-            tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
-            if (sets.Get("clockInPropertyBlock", False)):
-                val = props.GetProperty(tview, node, "CLOCK")
-            else:
-                val = props.GetLogbook(tview, node, r"CLOCK:")
-            if val:
-                clock = OrgDateClock.from_str(val)
-                if clock:
-                    newStart = clock.start
-        if newStart:
-            file = db.Get().FindInfo(ClockManager.Clock["file"])
-            ClockManager.ClockInRecord(file, node, newStart)
+        if ClockManager.Clock is not None:
+            node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
+            newStart = None
+            if (node):
+                tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
+                if (sets.Get("clockInPropertyBlock", False)):
+                    val = props.GetProperty(tview, node, "CLOCK")
+                else:
+                    val = props.GetLogbook(tview, node, r"CLOCK:")
+                if val:
+                    clock = OrgDateClock.from_str(val)
+                    if clock:
+                        newStart = clock.start
+            if newStart:
+                file = db.Get().FindInfo(ClockManager.Clock["file"])
+                ClockManager.ClockInRecord(file, node, newStart)
 
     @staticmethod
     def ClockOut(view):
@@ -116,28 +113,29 @@ class ClockManager:
             return
         # Eventually we want to navigate to this node
         # rather than doing this.
-        node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
-        if (node):
-            end = datetime.datetime.now()
-            start = ClockManager.Clock["start"]
-            duration = end - start
-            # Should we keep clocking entries less than a minute?
-            shouldKeep = sets.Get("clockingSubMinuteClocks", True)
-            tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
-            if (not shouldKeep and duration.seconds < 60):
-                if (sets.Get("clockInPropertyBlock", False)):
-                    props.RemoveProperty(tview, node, "CLOCK")
+        if ClockManager.Clock is not None:
+            node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
+            if (node):
+                end = datetime.datetime.now()
+                start = ClockManager.Clock["start"]
+                duration = end - start
+                # Should we keep clocking entries less than a minute?
+                shouldKeep = sets.Get("clockingSubMinuteClocks", True)
+                tview = view.window().open_file(ClockManager.Clock["file"], sublime.ENCODED_POSITION)
+                if (not shouldKeep and duration.seconds < 60):
+                    if (sets.Get("clockInPropertyBlock", False)):
+                        props.RemoveProperty(tview, node, "CLOCK")
+                    else:
+                        props.RemoveLogbook(tview, node, r"CLOCK:")
                 else:
-                    props.RemoveLogbook(tview, node, r"CLOCK:")
-            else:
-                if (sets.Get("clockInPropertyBlock", False)):
-                    props.UpdateProperty(tview, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
-                else:
-                    props.UpdateLogbook(tview, node, "CLOCK:", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
-            view.window().focus_view(view)
-            tview.run_command("save")
-            ClockManager.ClearClock()
-            view.run_command("save")
+                    if (sets.Get("clockInPropertyBlock", False)):
+                        props.UpdateProperty(tview, node, "CLOCK", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+                    else:
+                        props.UpdateLogbook(tview, node, "CLOCK:", ClockManager.FormatClock(start) + "--" + ClockManager.FormatClock(end) + " => " + ClockManager.FormatDuration(duration))
+                view.window().focus_view(view)
+                tview.run_command("save")
+                ClockManager.ClearClock()
+                view.run_command("save")
         else:
             log.error("Failed to clock out, couldn't find node")
 
@@ -152,15 +150,16 @@ class ClockManager:
     def GetActiveClockFile():
         if (not ClockManager.ClockRunning()):
             return None
-        return ClockManager.Clock["file"]
+        return ClockManager.Clock["file"] if ClockManager.Clock is not None else None
 
     @staticmethod
     def GetActiveClockAt():
         if (not ClockManager.ClockRunning()):
             return None
-        node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
-        if (node):
-            return node.start_row
+        if ClockManager.Clock is not None:
+            node = db.Get().FindNode(ClockManager.Clock["file"], ClockManager.Clock["heading"])
+            if (node):
+                return node.start_row
 
 
 # Load the clock cache.
