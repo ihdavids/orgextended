@@ -8,7 +8,7 @@ import OrgExtended.orgparse.loader as loader
 import OrgExtended.orgparse.node as node
 import OrgExtended.orgutil.util as util
 import logging
-import traceback 
+import traceback
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 
@@ -682,7 +682,7 @@ class OrgJumpToIdCommand(sublime_plugin.TextCommand):
         file = fid.file
         id   = fid.id
         at   = file.org.env.ids[id][1]
-        path = "{0}:{1}".format(file.filename,at + 1)
+        path = "{0}:{1}".format(file.filename, at + 1)
         self.view.window().open_file(path, sublime.ENCODED_POSITION)
 
     def run(self, edit):
