@@ -151,7 +151,7 @@ class OrgTimesheet(ag.TodoView):
     def GenerateMermaidGanttChartFromFile(self, filename):
         execs = sets.Get("timesheetExed","C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1")
         tpath = sets.Get("timesheetPath",None)
-        outputFilename = os.path.join(tpath,"schedule.png")
+        outputFilename = os.path.join(tpath,"project_schedule.png")
         #inputFilename = "D:\\Git\\notes\\worklog\\schedule.mermaid"
         commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
         try:
@@ -173,7 +173,7 @@ class OrgTimesheet(ag.TodoView):
             return
         if not os.path.exists(tpath):
             os.makedirs(tpath)
-        filename = os.path.join(tpath,"schedule.html")
+        filename = os.path.join(tpath,"project_schedule.html")
         with open(filename,"w") as f:
             self.CreateGoogleGanttFile(f)
 
@@ -184,7 +184,7 @@ class OrgTimesheet(ag.TodoView):
         f.write("""
 <html>
 <head>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia">  
+  <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source%20Sans%20Pro">  -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <style>
@@ -317,7 +317,7 @@ var options = {
         f.write("gantt\n")
         f.write("\tdateFormat YYYY-MM-DD\n")
         f.write("\taxisFormat %m-%d\n")
-        f.write("\ttitle Telem Schedule\n")
+        f.write("\ttitle Bench Schedule\n")
         f.write("\ttodayMarker off\n")
         f.write("\texcludes    weekends\n")
         curSection = None
@@ -382,7 +382,7 @@ var options = {
                 if(assigned == 'Y'):
                     prefix += 'crit,active,'
                 if(date == ""):
-                    date = sets.Get("timesheetDefaultStartDate","2021-05-18")
+                    date = sets.Get("timesheetDefaultStartDate","2023-01-02")
                 line = ""
                 if(dep != None and dep != ""):
                     line = "\t{name}\t:{prefix}{idx},{start},{duration}\n".format(prefix=prefix,name=n.heading,idx=idx,start="after " + str(dep),duration=duration)
