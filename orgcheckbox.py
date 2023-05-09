@@ -1,35 +1,25 @@
 import sublime
 import sublime_plugin
-import datetime
 import re
-import os
-import fnmatch
-import OrgExtended.orgparse.node as node
-import OrgExtended.orgutil.util as util
-import OrgExtended.orgutil.navigation as nav
-import OrgExtended.orgutil.template as templateEngine
 import logging
-import sys
-import traceback 
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
-import OrgExtended.orgcapture as capture
-import sys
-import os.path
-import fnmatch
 
 
 log = logging.getLogger(__name__)
 
 # Stolen from the original orgmode
 
+
 class CheckState:
     Unchecked, Checked, Indeterminate, Error = range(1, 5)
+
 
 indent_regex     = re.compile(r'^(\s*).*$')
 summary_regex    = re.compile(r'(\[\d*[/%]\d*\])')
 checkbox_regex   = re.compile(r'(\[[xX\- ]\])')
 checkbox_line_regex   = re.compile(r'\s*[-+]?\s*(\[[xX\- ]\])\s+')
+
 
 # Extract the indent of this checkbox.
 # RETURNS: a string with the indent of this line.
@@ -37,13 +27,16 @@ def get_indent(view, content):
     if isinstance(content, sublime.Region):
         content = view.substr(content)
     match = indent_regex.match(content)
-    if(match):
+    if (match):
         return match.group(1)
     else:
         log.debug("Could not match indent: " + content)
         return ""
 
+
 RE_HEADING = re.compile('^[*]+ ')
+
+
 # Try to find the parent of a region (by indent)
 def find_parent(view, region):
     row, col = view.rowcol(region.begin())
@@ -51,12 +44,12 @@ def find_parent(view, region):
     indent   = len(get_indent(view, content))
     row     -= 1
     found    = False
-    # Look upward 
+    # Look upward
     while row >= 0:
         point = view.text_point(row, 0)
         content = view.substr(view.line(point))
         if len(content.strip()):
-            if(RE_HEADING.search(content)):
+            if (RE_HEADING.search(content)):
                 break
             cur_indent = len(get_indent(view, content))
             if cur_indent < indent:
@@ -66,6 +59,7 @@ def find_parent(view, region):
     if found:
         # return the parent we found.
         return view.line(view.text_point(row,0))
+
 
 def find_heading(view, region):
     row, col = view.rowcol(region.begin())
@@ -81,7 +75,8 @@ def find_heading(view, region):
         row -= 1
     if found:
         # return the heading we found.
-        return view.line(view.text_point(row,0))
+        return view.line(view.text_point(row, 0))
+
 
 def find_children(view, region, cre = checkbox_regex, includeSiblings=False, recursiveChildFind=False):
     row, col = view.rowcol(region.begin())
