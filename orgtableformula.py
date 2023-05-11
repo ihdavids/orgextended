@@ -2,14 +2,14 @@ import sublime
 import sublime_plugin
 import datetime
 import re
-#from pathlib import Path
+# from pathlib import Path
 import os
-#import fnmatch
-#import OrgExtended.orgparse.node as node
+# import fnmatch
+# import OrgExtended.orgparse.node as node
 import OrgExtended.orgutil.util as util
 import logging
-#import sys
-import traceback 
+# import sys
+import traceback
 import OrgExtended.orgdb as db
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
@@ -23,13 +23,13 @@ import OrgExtended.orglinks as olinks
 import math
 import random
 import ast
-import operator as op
-import subprocess
-import platform
-import time
-import json
-import ast
-import random
+# import operator as op
+# import subprocess
+# import platform
+# import time
+# import json
+# import ast
+# import random
 
 random.seed()
 RE_TABLE_LINE   = re.compile(r'\s*[|]')
@@ -47,26 +47,32 @@ highlightEnabled = True
 log = logging.getLogger(__name__)
 
 
-def isTable(view,at=None):
-    if(at == None):
+def isTable(view, at=None):
+    if (at is None):
         at = view.sel()[0].end()
     names = view.scope_name(at)
     return 'orgmode.table' in names
+
 
 def isTableFormula(view):
     names = view.scope_name(view.sel()[0].end())
     return 'orgmode.tblfm' in names
 
+
 def isTableLine(line):
     return RE_TABLE_LINE.search(line)
 
+
 def isAutoComputeRow(view):
-    return None != RE_AUTOLINE.search(view.curLineText())
+    return RE_AUTOLINE.search(view.curLineText()) is not None
+
 
 opsTable = None
+
+
 def GetOps():
     global opsTable
-    if(opsTable == None):
+    if (opsTable is None):
         o = simpev.DEFAULT_OPERATORS.copy()
         o[ast.Mult]  = safe_mult
         o[ast.Add]   = safe_add
@@ -86,24 +92,29 @@ def GetOps():
         opsTable     = o
     return opsTable
 
+
 def add_dynamic_symbols(s):
-    exts = sets.Get("enableTableExtensions",None)
-    if(exts):
+    exts = sets.Get("enableTableExtensions", None)
+    if (exts):
         dynamic = ext.find_extension_modules('orgtable', [])
         for k in dynamic.keys():
-            if(hasattr(dynamic[k],"AddSymbols")):
+            if (hasattr(dynamic[k], "AddSymbols")):
                 try:
                     dynamic[k].AddSymbols(s)
-                except:
+                except Exception:
                     log.error("Failed to add symbols from: " + str(k) + "\n" + traceback.format_exc())
             else:
-                if(not hasattr(dynamic[k],"Execute")):
+                if (not hasattr(dynamic[k], "Execute")):
                     log.warning("Dynamic table module does not have method AddSymbols, cannot use: " + k)
+
+
 constsTable = None
+
+
 def GetConsts():
     global constsTable
-    reloadExtensions = sets.Get("forceLoadExternalExtensions",False)
-    if(constsTable == None or reloadExtensions):
+    reloadExtensions = sets.Get("forceLoadExternalExtensions", False)
+    if (constsTable is None or reloadExtensions):
         n = simpev.DEFAULT_NAMES.copy()
         n['pi']     = 3.1415926535897932385
         n['t']      = True
@@ -116,6 +127,7 @@ def GetConsts():
         add_dynamic_symbols(n)
         constsTable = n
     return constsTable
+
 
 # These are table extensions you would like to add
 # for performance reasons we only reload them when you start sublime
