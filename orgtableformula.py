@@ -2387,6 +2387,7 @@ def create_table(view, at=None):
     # 
     return td
 
+
 # CREATE TABLE FROM NODE
 # Figure out a way to get rid of this duplication!
 # ====================================================================
@@ -2403,11 +2404,11 @@ def create_table_from_node(node, row):
     endHeader = 1
     formulaRow = None
     formulaLine = None
-    for r in range(row-1,0,-1):
+    for r in range(row - 1, 0, -1):
         line = lineData[r]
-        if(RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line) or RE_END_BLOCK.search(line)):
+        if (RE_TABLE_LINE.search(line) or RE_TABLE_HLINE.search(line) or RE_END_BLOCK.search(line)):
             continue
-        row = r+1
+        row = r + 1
         break
     start = row
     rowNum = 0
@@ -2421,106 +2422,106 @@ def create_table_from_node(node, row):
     parameters     = []
     ignore = []
     ignoreRows = {}
-    for r in range(row,last_row):
+    for r in range(row, last_row):
         rowNum += 1
         line = lineData[r]
         m = RE_FMT_LINE.search(line)
         # Found a table hline. These don't get counted
-        if(RE_TABLE_HLINE.search(line)):
+        if (RE_TABLE_HLINE.search(line)):
             hlines.append(r)
             rowNum -= 1
-            if(endHeader == 1):
+            if (endHeader == 1):
                 endHeader = (r - start) + 1
             continue
         # Found a table line match and continue
-        elif(RE_TABLE_LINE.search(line)):
-            if(None == linedef):
-                linedef = findOccurrences(line,'|')
+        elif (RE_TABLE_LINE.search(line)):
+            if (linedef is None):
+                linedef = findOccurrences(line, '|')
             # Is this an advanced table? If so we have to handle things
             # in a special way!
-            mm = RE_AUTOCOMPUTE.search(line) 
-            if(mm):
+            mm = RE_AUTOCOMPUTE.search(line)
+            if (mm):
                 char = mm.group('a')
-                if(char != ' '):
+                if (char != ' '):
                     isAdvanced = True
                 # Name row
-                if(char == '!'):
+                if (char == '!'):
                     ignoreRows[rowNum] = r
-                    ignore.append((rowNum,r))
-                    colNames.append((rowNum,r))
+                    ignore.append((rowNum, r))
+                    colNames.append((rowNum, r))
                     pass
                 # Auto compute row
-                elif(char == "#"):
+                elif (char == "#"):
                     autoCompute.append(rowNum)
                 # compute row
-                elif(char == "*"):
+                elif (char == "*"):
                     pass
                 # Skip row
-                elif(char == "/"):
+                elif (char == "/"):
                     ignoreRows[rowNum] = r
-                    ignore.append((rowNum,r))
+                    ignore.append((rowNum, r))
                     pass
                 # Name below
-                elif(char == "_"):
+                elif (char == "_"):
                     ignoreRows[rowNum] = r
-                    namesRowsBelow.append((rowNum,r))
-                    ignore.append((rowNum,r))
+                    namesRowsBelow.append((rowNum, r))
+                    ignore.append((rowNum, r))
                     pass
                 # Name above
-                elif(char == "^"):
+                elif (char == "^"):
                     ignoreRows[rowNum] = r
-                    namesRowsAbove.append((rowNum,r))
-                    ignore.append((rowNum,r))
+                    namesRowsAbove.append((rowNum, r))
+                    ignore.append((rowNum, r))
                     pass
-                elif(char == "$"):
+                elif (char == "$"):
                     ignoreRows[rowNum] = r
-                    parameters.append((rowNum,r))
-                    ignore.append((rowNum,r))
+                    parameters.append((rowNum, r))
+                    ignore.append((rowNum, r))
                 else:
                     ignoreRows[rowNum] = r
-                    ignore.append((rowNum,r))
+                    ignore.append((rowNum, r))
                     pass
                 lineToRow[rowNum] = r
             else:
                 lineToRow[rowNum] = r
             continue
         # Found a formula break!
-        elif(m):
+        elif (m):
             formula = m.group('expr').split('::')
             formulaRow = r
             formulaLine = line
-            if(lastRow == 0):
-                end = r-1
+            if (lastRow == 0):
+                end = r - 1
                 lastRow = rowNum - 1
             break
         else:
             endb = RE_END_BLOCK.search(line)
             # We keep going for blank lines allowing #TBLFM lines with spaces to
             # be okay OR tables inside dynamic blocks (RE above)
-            if(line.strip() == "" or endb):
-                if(lastRow == 0):
+            if (line.strip() == "" or endb):
+                if (lastRow == 0):
                     spacesRow = r
-                    if(lastRow == 0):
-                        end = r-1
+                    if (lastRow == 0):
+                        end = r - 1
                         lastRow = rowNum - 1
                 continue
             else:
-                if(lastRow == 0):
-                    end = r-1
+                if (lastRow == 0):
+                    end = r - 1
                     lastRow = rowNum - 1
             break
-    for r in range(row,0,-1):
+    for r in range(row, 0, -1):
         line = lineData[r]
-        if(RE_TABLE_LINE.search(line)):
+        if (RE_TABLE_LINE.search(line)):
             continue
         else:
-            start = r+1
+            start = r + 1
             break
     td = TableDef(node, start, end, linedef)
     td.hlines = hlines
     td.startRow = endHeader
     td.spacesRow = spacesRow
-    #td.linedef = linedef
+    # td.linedef = linedef
     td.formulas = []
     td.formulaRow    = formulaRow
     td.formulaLine   = formulaLine
@@ -2530,115 +2531,118 @@ def create_table_from_node(node, row):
     td.nameRowsAbove = namesRowsAbove
     td.nameRowsBelow = namesRowsBelow
     td.colNames      = colNames
-    if(isAdvanced):
+    if (isAdvanced):
         td.ignore        = ignore
         td.ignoreRows    = ignoreRows
     else:
         td.ignore     = []
         td.ignoreRows = {}
-    if(isAdvanced):
+    if (isAdvanced):
         td.startCol = 2
         td.BuildNameMap()
-    if(td):
-        if(node):
-            constants = node.list_comment('CONSTANTS',[])
+    if (td):
+        if (node):
+            constants = node.list_comment('CONSTANTS', [])
             consts = {}
-            if(constants and len(constants) > 0):
+            if (constants and len(constants) > 0):
                 for con in constants:
                     cs = con.split('=')
-                    if(len(cs) == 2):
+                    if (len(cs) == 2):
                         name = cs[0].strip()
                         val  = cs[1].strip()
                         consts[name] = val
-            if(hasattr(node,'properties')):
+            if (hasattr(node, 'properties')):
                 props = node.properties
-                if(props and len(props) > 0):
-                    for k,v in props.items():
-                        consts['PROP_'+k] = v
+                if (props and len(props) > 0):
+                    for k, v in props.items():
+                        consts['PROP_' + k] = v
             td.consts = consts
-        if(parameters and len(parameters) > 0):
+        if (parameters and len(parameters) > 0):
             for prow in parameters:
-                for c in range(2,td.Width()):
-                    txt = td.GetCellText(prow[0],c).strip()
-                    if('=' in txt):
+                for c in range(2, td.Width()):
+                    txt = td.GetCellText(prow[0], c).strip()
+                    if ('=' in txt):
                         ps = txt.split(' ')
-                        if(len(ps) < 1):
+                        if (len(ps) < 1):
                             continue
                         for p in ps:
                             pp = p.split('=')
-                            if(len(pp) == 2):
+                            if (len(pp) == 2):
                                 td.consts[pp[0].strip()] = pp[1].strip()
-    if(formula):
+    if (formula):
         sre = re.compile(r'\s*[#][+]((TBLFM)|(tblfm))[:]')
         first = sre.match(formulaLine)
-        if(first):
+        if (first):
             lastend = len(first.group(0))
-            xline = sre.sub('',formulaLine)
+            xline = sre.sub('', formulaLine)
             las = xline.split('::')
             index = 0
             for fm in formula:
                 raw = fm.strip()
                 formatters = fm.split(';')
-                if(len(formatters) > 1):
+                if (len(formatters) > 1):
                     fm = formatters[0]
                     formatters = formatters[1]
                 else:
                     formatters = ""
-                fend = lastend+len(las[index])
-                td.formulas.append(Formula(raw,fm, None,formatters,td))
+                fend = lastend + len(las[index])
+                td.formulas.append(Formula(raw, fm, None, formatters, td))
                 index += 1
                 lastend = fend + 2
         td.BuildCellToFormulaMap()
-    # 
     return td
 
-def SingleFormulaIterator(table,i):
+
+def SingleFormulaIterator(table, i):
     table.SetActiveFormula(i)
-    cellIterator = table.FormulaTargetCellIterator(i) 
+    cellIterator = table.FormulaTargetCellIterator(i)
     for cell in cellIterator:
-        r,c = cell.rc()
+        r, c = cell.rc()
         table.SetCurRow(r)
         table.SetCurCol(c)
         val = table.Execute(i)
-        yield [r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i)]
+        yield [r, c, val, table.FindCellRegion(r, c), table.FormulaFormatter(i)]
+
 
 def FormulaIterator(table):
-    for i in range(0,table.NumFormulas()):
+    for i in range(0, table.NumFormulas()):
         table.SetActiveFormula(i)
-        cellIterator = table.FormulaTargetCellIterator(i) 
+        cellIterator = table.FormulaTargetCellIterator(i)
         for cell in cellIterator:
-            r,c = cell.rc()
+            r, c = cell.rc()
             table.SetCurRow(r)
             table.SetCurCol(c)
             val = table.Execute(i)
-            yield (r,c,val,table.FindCellRegion(r,c),table.FormulaFormatter(i))
+            yield (r, c, val, table.FindCellRegion(r, c), table.FormulaFormatter(i))
     return None
+
 
 def RandomRowFromTable(tableid):
     tbl = LookupTableFromNamedObject(tableid)
     if tbl:
         numRows = tbl.Height()
         random.seed()
-        row = random.randrange(1,numRows)
+        row = random.randrange(1, numRows)
         cnt = 0
         while tbl.IsRowAboveHLine(row) or tbl.ShouldIgnoreRow(row):
-            row = random.randrange(1,numRows)
+            row = random.randrange(1, numRows)
             cnt += 1
             if cnt > 100:
                 return "[NO MATCH]"
         ret = "|"
-        for i in range(1,tbl.Width()+1):
-            txt = tbl.GetCellText(row,i)
+        for i in range(1, tbl.Width() + 1):
+            txt = tbl.GetCellText(row, i)
             ret += txt + "|"
         return ret
 
 
 # ================================================================================
 class OrgInsertRandomRowFromTableCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifers):
+    def on_done_st4(self, index, modifers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             evt.EmitIf(self.onDone)
             return
         rowText = RandomRowFromTable(self.ids[index])
@@ -2647,8 +2651,8 @@ class OrgInsertRandomRowFromTableCommand(sublime_plugin.TextCommand):
     def run(self, edit, tblName=None, onDone=None):
         self.onDone = onDone
         self.ids = list(db.Get().GetIds())
-        if (tblName == None):
-            if(int(sublime.version()) <= 4096):
+        if (tblName is None):
+            if (int(sublime.version()) <= 4096):
                 self.view.window().show_quick_panel(self.ids, self.on_done, -1, -1)
             else:
                 self.view.window().show_quick_panel(self.ids, self.on_done_st4, -1, -1)
