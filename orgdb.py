@@ -157,7 +157,7 @@ class FileInfo:
 
 class OrgFileId:
     def __init__(self, file, id, index):
-        self.file  =file
+        self.file  = file
         self.id    = id
         self.index = index
 
