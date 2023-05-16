@@ -27,11 +27,11 @@ class OrgTimesheet(ag.TodoView):
         super(OrgTimesheet, self).__init__(name, False, **kwargs)
 
     def InsertTableHeadings(self, edit):
-        self.view.insert(edit,self.view.sel()[0].begin(),"|Name|Estimate|Start|End|Dep|Assigned|Spent|X|\n|-\n")
+        self.view.insert(edit, self.view.sel()[0].begin(), "|Name|Estimate|Start|End|Dep|Assigned|Spent|X|\n|-\n")
 
     # Dependencies are marked with the AFTER tag or an ORDERED list.
     def GetAfter(self, n):
-        dep = n.get_property("AFTER","")
+        dep = n.get_property("AFTER", "")
         if dep and not dep == "":
             file, at = db.Get().FindByAnyId(dep)
             if file:
@@ -40,38 +40,40 @@ class OrgTimesheet(ag.TodoView):
                 dep = None
         if not dep or dep == "":
             t = n
-            while t.parent != None and not t.parent.is_root():
-                orde = t.parent.get_property("ORDERED",None)
-                if orde != None:
+            while t.parent is not None and not t.parent.is_root():
+                orde = t.parent.get_property("ORDERED", None)
+                if orde is not None:
                     dep = n.get_sibling_and_child_up()
                     # Chain to parent in ORDERED setup.
-                    if dep == None and t != n:
+                    if dep is None and t != n:
                         dep = n.parent
                     break
                 t = t.parent
         return dep
 
     def GetGlobalProperty(self, name, n, ass):
-        props = n.list_comment('PROPERTY',None)
-        if(props):
-            for i in range(0,len(props),2):
+        props = n.list_comment('PROPERTY', None)
+        if (props):
+            for i in range(0, len(props), 2):
                 prop = props[i]
                 prop = prop.strip()
-                if(prop.startswith('ASSIGNED') and len(props) > i+1):
-                    ass = props[i+1]
+                if (prop.startswith('ASSIGNED') and len(props) > i + 1):
+                    ass = props[i + 1]
                     return ass
         return ass
 
     def GetAssigned(self, n):
-        ass = sets.Get("timesheetDefaultAssigned","")
-        ass = self.GetGlobalProperty("ASSIGNED",n,ass)
-        ass = n.get_property("ASSIGNED",ass)
+        ass = sets.Get("timesheetDefaultAssigned", "")
+        ass = self.GetGlobalProperty("ASSIGNED", n, ass)
+        ass = n.get_property("ASSIGNED", ass)
         return ass
 
     def GetSection(self, n):
-        ass = sets.Get("timesheetDefaultSection",None)
-        ass = self.GetGlobalProperty("SECTION",n,ass)
-        ass = n.get_property("SECTION",ass)
+        ass = sets.Get("timesheetDefaultSection", None)
+        ass = self.GetGlobalProperty("SECTION", n, ass)
+        if n.parent is not None:
+            ass = n.parent.get_property("SECTION", ass)
+        ass = n.get_property("SECTION", ass)
         return ass
 
     def GetClockingData(self, n):
@@ -96,7 +98,6 @@ class OrgTimesheet(ag.TodoView):
                         entry['after_offset'] = index
                         entry['after_name'] = dep.heading
 
-
     def RenderSheet(self, edit, view):
         self.view = view
         self.InsertTableHeadings(edit)
@@ -106,9 +107,9 @@ class OrgTimesheet(ag.TodoView):
         for entry in self.entries:
             n        = entry['node']
             filename = entry['file'].AgendaFilenameTag()
-            estimate = n.get_property("EFFORT","")
+            estimate = n.get_property("EFFORT", "")
             dt = None
-            timestamps = n.get_timestamps(active=True,point=True,range=True)
+            timestamps = n.get_timestamps(active=True, point=True, range=True)
             end = ""
             start = ""
             if timestamps and len(timestamps) > 0:
@@ -137,48 +138,65 @@ class OrgTimesheet(ag.TodoView):
             self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
 
     def RenderMermaidGanttFile(self):
-        tpath = sets.Get("timesheetPath",None)
-        if tpath == None:
-            print("ERROR CANNOT RENDER TIMESHEET WITHOUT timesheetPath in config")
+        tpath = sets.Get("timesheetPath", None)
+        if tpath is None:
+            print("ERROR CANNOT RENDER MERMAID WITHOUT timesheetPath in config as destination for file")
             return
         if not os.path.exists(tpath):
             os.makedirs(tpath)
-        filename = os.path.join(tpath,"schedule.mermaid")
-        with open(filename,"w") as f:
+        filename = os.path.join(tpath, "schedule.mermaid")
+        with open(filename, "w") as f:
             self.CreateMermaidGanttFile(f)
         self.GenerateMermaidGanttChartFromFile(filename)
 
     def GenerateMermaidGanttChartFromFile(self, filename):
-        execs = sets.Get("timesheetExed","C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1")
-        tpath = sets.Get("timesheetPath",None)
-        outputFilename = os.path.join(tpath,"project_schedule.png")
-        #inputFilename = "D:\\Git\\notes\\worklog\\schedule.mermaid"
-        commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
+        # To install on mac or linux:
+        # npm install @mermaid-js/mermaid-cli
+        # if sys.platform == 'darwin':
+        #    mmdc = "./node_modules/.bin/mmdc"
+        # elif sys.platform == 'win32':
+        #    mmdc = "C:\\Users\\ihdav\\node_modules\\.bin\\mmdc.ps1"
+        print("Trying to render: " + filename)
+        execs = sets.Get("mermaidPath", None)
+        tpath = sets.Get("timesheetPath", None)
+        if execs is None:
+            print("CANNOT RENDER MERMAID WITHOUT mmdc command line tool. Please install mermaid-cli and fill in mermaidPath")
+            return
+        outputFilename = os.path.join(tpath, "project_schedule.png")
+        # inputFilename = "D:\\Git\\notes\\worklog\\schedule.mermaid"
+        if sys.platform == 'win32':
+            commandLine = ["powershell.exe", execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
+        elif sys.platform == 'darwin':
+            commandLine = [execs, "-i", filename, "-o", outputFilename, "--width", "2500", "--height", "1024"]
         try:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        except:
+        except Exception:
             startupinfo = None
         view = sublime.active_window().active_view()
-        cwd = os.path.dirname(view.file_name())
+        fn = view.file_name()
+        cwd = tpath
+        if fn is not None:
+            cwd = os.path.dirname(fn)
         popen = subprocess.Popen(commandLine, universal_newlines=True, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #popen.wait()
-        (o,e) = popen.communicate()
+        # popen.wait()
+        (o, e) = popen.communicate()
         log.debug(o)
         log.debug(e)
+
     def RenderGoogleGanttFile(self):
-        tpath = sets.Get("timesheetPath",None)
-        if tpath == None:
-            print("ERROR CANNOT RENDER TIMESHEET WITHOUT timesheetPath in config")
+        tpath = sets.Get("timesheetPath", None)
+        if tpath is None:
+            print("ERROR CANNOT RENDER GOOGLE GANTT WITHOUT timesheetPath in config")
             return
         if not os.path.exists(tpath):
             os.makedirs(tpath)
-        filename = os.path.join(tpath,"project_schedule.html")
-        with open(filename,"w") as f:
+        filename = os.path.join(tpath, "project_schedule.html")
+        with open(filename, "w") as f:
             self.CreateGoogleGanttFile(f)
 
-    def CreateGoogleGanttFile(self,f):
-        self.PreprocessAfter() 
+    def CreateGoogleGanttFile(self, f):
+        self.PreprocessAfter()
         import re
         idx = 0
         f.write("""
@@ -194,7 +212,7 @@ text {
 body {
   font-family: "Sofia", sans-serif;
 }
-</style>  
+</style>
   <script type="text/javascript">
     google.charts.load('current', {'packages':['gantt']});
     google.charts.setOnLoadCallback(drawChart);
@@ -221,7 +239,7 @@ body {
             n        = entry['node']
             filename = entry['file'].AgendaFilenameTag()
             section  = entry['section'] if 'section' in entry else None
-            estimate = n.get_property("EFFORT","")
+            estimate = n.get_property("EFFORT", "")
             dt = None
             timestamps = n.get_timestamps(active=True,point=True,range=True)
             end = None
@@ -325,9 +343,9 @@ var options = {
             n        = entry['node']
             filename = entry['file'].AgendaFilenameTag()
             section  = entry['section'] if 'section' in entry else None
-            estimate = n.get_property("EFFORT","")
+            estimate = n.get_property("EFFORT", "")
             dt = None
-            timestamps = n.get_timestamps(active=True,point=True,range=True)
+            timestamps = n.get_timestamps(active=True, point=True, range=True)
             end = ""
             start = ""
             duration = "1d"
@@ -348,20 +366,14 @@ var options = {
                     pass
             else:
                 start = ""
-            done = False
-            if ag.IsDone(n):
-                done = True
-
-            spent = self.GetClockingData(n)
+            ## spent = self.GetClockingData(n)
             dependenton = entry['after_offset'] if 'after_offset' in entry else ""
             # TODO: Adjust index to match table separators
             assigned = self.GetAssigned(n)
             #self.view.insert(edit, self.view.sel()[0].begin(), "|{0:15}|{1:12}|{2}|{3}|{4}|{5}|{6}|{7}|\n".format(n.heading,estimate,start,end,dependenton,assigned,spent,done))
             idx += 1
-            if(idx > 0):
-                #if(done):
-                #    continue
-                if(curSection != section and section != None):
+            if (idx > 0):
+                if (curSection != section and section is not None):
                     f.write("section {name}\n".format(name=section))
                     curSection = section
                 date = start
@@ -369,22 +381,22 @@ var options = {
                 prefix = ""
                 if (ag.IsDone(n)):
                     prefix = "done,"
-                if(assigned=='D'):
+                if (assigned == 'D'):
                     prefix = "done,"
-                if(assigned=='A'):
+                if (assigned == 'A'):
                     prefix += "active,"
-                if(assigned == 'C'):
+                if (assigned == 'C'):
                     prefix += 'crit,'
-                if(assigned == 'M'):
+                if (assigned == 'M'):
                     prefix += 'milestone,'
-                if(assigned == 'X'):
+                if (assigned == 'X'):
                     prefix += 'crit,done,'
-                if(assigned == 'Y'):
+                if (assigned == 'Y'):
                     prefix += 'crit,active,'
-                if(date == ""):
-                    date = sets.Get("timesheetDefaultStartDate","2023-01-02")
+                if (date == ""):
+                    date = sets.Get("timesheetDefaultStartDate", "2023-01-02")
                 line = ""
-                if(dep != None and dep != ""):
+                if (dep is not None and dep != ""):
                     line = "\t{name}\t:{prefix}{idx},{start},{duration}\n".format(prefix=prefix,name=n.heading,idx=idx,start="after " + str(dep),duration=duration)
                 else:
                     line = "\t{name}\t:{prefix}{idx},{start},{duration}\n".format(prefix=prefix,name=n.heading,idx=idx,start=date,duration=duration)
@@ -497,9 +509,13 @@ class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
     def Run(self, nameOfShow):
         ag.ReloadAllUnsavedBuffers()
         self.views = self.views[nameOfShow]
+        print("Creating composite view")
         ts = timesheetRegistry.CreateCompositeView(self.views, nameOfShow)
+        print("Filtering entries")
         ts.FilterEntries()
+        print("Rendering mermaid")
         ts.RenderMermaidGanttFile()
+        print("Done rendering...")
         evt.EmitIf(self.onDone)
 
     def run(self, edit, toShow=None, onDone=None):

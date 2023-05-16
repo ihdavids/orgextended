@@ -157,6 +157,7 @@ def parse_heading_priority(heading):
     else:
         return (heading, None)
 
+
 RE_HEADING_PRIORITY = re.compile(r'^\s*\[#([A-Z0-9])\] ?(.*)$')
 
 
@@ -177,13 +178,17 @@ def parse_property(line):
         prop_key = match.group(1)
         prop_val = match.group(2).strip()
         if prop_key == 'Effort':
-            if(':' in prop_val):
+            if (':' in prop_val):
                 (h, m) = prop_val.split(":", 2)
                 if h.isdigit() and m.isdigit():
                     prop_val = int(h) * 60 + int(m)
+        if prop_key is not None and prop_val is None:
+            prop_val = ""
     return (prop_key, prop_val)
 
+
 RE_PROP = re.compile(r'^\s*:([^ ]+):((\s|[a-zA-Z0-9\"_-]).*?)\s*$')
+
 
 def parse_comment(line):
     """
@@ -195,11 +200,11 @@ def parse_comment(line):
 
     """
     m = RE_COMMENT.match(line)
-    if(m):
+    if (m):
         name = m.group('name')
         val  = m.group('val').strip()
-        return (name,val)
-    #if line.startswith('#+'):
+        return (name, val)
+    # if line.startswith('#+'):
     #    comment = line.lstrip('#+').split(':', 1)
     #    if len(comment) == 2:
     #        return (comment[0], comment[1].strip())
