@@ -440,15 +440,16 @@ class TimesheetRegistry:
 timesheetRegistry = TimesheetRegistry()
 
 
-
 class OrgInsertTimesheetCommand(sublime_plugin.TextCommand):
     def run(self, edit, toShow=None, onDone=None):
-        self.onDone=onDone
+        self.onDone = onDone
         self.pos = self.view.sel()[0]
-        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.views = sets.Get("AgendaCustomViews", {"Default": ["Todos"]})
         self.keys = list(self.views.keys())
         self.edit = edit
         ag.ReloadAllUnsavedBuffers()
+        if toShow is None:
+            toShow = "Default"
         nameOfShow = toShow
         self.views = self.views[nameOfShow]
         ts = timesheetRegistry.CreateCompositeView(self.views, nameOfShow)
@@ -459,32 +460,36 @@ class OrgInsertTimesheetCommand(sublime_plugin.TextCommand):
         self.view.run_command('table_editor_next_field')
         evt.EmitIf(self.onDone)
 
+
 class OrgChooseTimesheetCommand(sublime_plugin.TextCommand):
-    def on_done_st4(self,index,modifers):
+    def on_done_st4(self, index, modifers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         key = self.keys[index]
-        self.view.run_command("org_insert_timesheet", { "toShow": key, "onDone": self.onDone })
+        self.view.run_command("org_insert_timesheet", {"toShow": key, "onDone": self.onDone})
 
     def run(self, edit, toShow=None, onDone=None):
-        self.onDone=onDone
+        self.onDone = onDone
         self.pos = self.view.sel()[0]
-        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.views = sets.Get("AgendaCustomViews", {"Default": ["Todos"]})
         self.keys = list(self.views.keys())
         self.edit = edit
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
+
 class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
 
-    def on_done_st4(self,index,modifers):
+    def on_done_st4(self, index, modifers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         key = self.keys[index]
         self.Run(key)
@@ -497,25 +502,27 @@ class OrgGenerateMermaidGanttChart(sublime_plugin.TextCommand):
         ts.RenderMermaidGanttFile()
         evt.EmitIf(self.onDone)
 
-    def run(self, edit, toShow=None, onDone=None ):
-        self.onDone=onDone
+    def run(self, edit, toShow=None, onDone=None):
+        self.onDone = onDone
         self.pos = self.view.sel()[0]
-        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.views = sets.Get("AgendaCustomViews", {"Default": ["Todos"]})
         self.keys = list(self.views.keys())
-        if toShow != None:
+        if toShow is not None:
             self.Run(toShow)
             return
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
+
 class OrgGenerateGoogleGanttChart(sublime_plugin.TextCommand):
 
-    def on_done_st4(self,index,modifers):
+    def on_done_st4(self, index, modifers):
         self.on_done(index)
+
     def on_done(self, index):
-        if(index < 0):
+        if (index < 0):
             return
         key = self.keys[index]
         self.Run(key)
@@ -528,26 +535,24 @@ class OrgGenerateGoogleGanttChart(sublime_plugin.TextCommand):
         ts.RenderGoogleGanttFile()
         evt.EmitIf(self.onDone)
 
-    def run(self, edit, toShow=None, onDone=None ):
-        self.onDone=onDone
+    def run(self, edit, toShow=None, onDone=None):
+        self.onDone = onDone
         self.pos = self.view.sel()[0]
-        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Todos"]})
+        self.views = sets.Get("AgendaCustomViews", {"Default": ["Todos"]})
         self.keys = list(self.views.keys())
-        if toShow != None:
+        if toShow is not None:
             self.Run(toShow)
             return
-        if(int(sublime.version()) <= 4096):
+        if (int(sublime.version()) <= 4096):
             self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
         else:
             self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
 
-
-
-    def run(self, edit, onDone=None):
-        self.onDone = onDone
-        self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
-        self.keys = list(self.views.keys())
-        if(int(sublime.version()) <= 4096):
-            self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
-        else:
-            self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
+    # def run(self, edit, onDone=None):
+    #     self.onDone = onDone
+    #     self.views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
+    #     self.keys = list(self.views.keys())
+    #     if(int(sublime.version()) <= 4096):
+    #         self.view.window().show_quick_panel(self.keys, self.on_done, -1, -1)
+    #     else:
+    #         self.view.window().show_quick_panel(self.keys, self.on_done_st4, -1, -1)
