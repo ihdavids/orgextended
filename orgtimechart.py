@@ -42,6 +42,7 @@ class OrgTimesheet(ag.TodoView):
             t = n
             while t.parent is not None and not t.parent.is_root():
                 orde = t.parent.get_property("ORDERED", None)
+                print("PROP: " + str(orde))
                 if orde is not None:
                     dep = n.get_sibling_and_child_up()
                     # Chain to parent in ORDERED setup.
@@ -286,7 +287,7 @@ body {
                     resource = assigned.strip()
                 if done:
                     resource = "done"
-                if(date == ""):
+                if (date == ""):
                     date = sets.Get("timesheetDefaultStartDate","2021-05-18")
                 if start:
                     start = "new Date({year},{month},{day})".format(year=start.year,month=start.month,day=start.day)
@@ -299,12 +300,12 @@ body {
                 line = ""
                 if idx != 1:
                     line += ","
-                if(dep != None and dep != ""):
+                if (dep != None and dep != ""):
                     line += "[\"{name}\",\"{name}\",\"{resource}\", {start},{end},daysToMilliseconds({duration}),{percent},\"{after}\"]\n".format(name=n.heading,idx=idx,after=str(dep),duration=duration,start=start,end=end,percent=percentDone,resource=resource)
                 else:
                     line += "[\"{name}\",\"{name}\",\"{resource}\", {start},{end},daysToMilliseconds({duration}),{percent},null]\n".format(name=n.heading,idx=idx,start=start,end=end,duration=duration,percent=percentDone,resource=resource)
                 f.write(line)
-        #colorByRowLabel: true 
+        # colorByRowLabel: true 
         f.write("""]);
 var options = {
         'font-family': 'Sofia',
@@ -327,6 +328,7 @@ var options = {
 </body>
 </html>
 """)
+        
     # This is REALLY rough it gives us a non functional, really basic view.
     def CreateMermaidGanttFile(self,f):
         self.PreprocessAfter()

@@ -1453,10 +1453,10 @@ class OrgNode(OrgBaseNode):
                     (key, val) = parse_property(line)
                     if key:
                         properties.update({key: val})
-                        if(key.lower() == "custom_id"):
+                        if (key.lower() == "custom_id"):
                             self._customid = (val, at.offset)
                             self.env.customids[val] = (at.offset, self._start)
-                        if(key.lower() == "id"):
+                        if (key.lower() == "id"):
                             self._id = (val, at.offset)
                             self.env.ids[val] = (at.offset, self._start)
                         poff.update({key: at.offset})
