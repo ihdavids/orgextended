@@ -80,6 +80,8 @@
 - language: gnuplot
 - language: mermaid
 - language: awk
+- language: painless
+  source: java
 
 
 
