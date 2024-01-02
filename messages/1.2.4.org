@@ -7,7 +7,7 @@
    If there is a file type you want launched outside of sublime use:
 
    #+BEGIN_EXAMPLE
-     "file_exclude_pattern": ["*.pdf"],
+     "file_exclude_patterns": ["*.pdf"],
    #+END_EXAMPLE
 
 ** Column View
