@@ -20,6 +20,14 @@
     // Tags will get inserted at this column
     "tagColumn" : 80,
 
+    // Files which should be loaded outside Sublime when a file link is followed
+    "file_exclude_patterns": [
+        "*.pdf",
+        "*.doc",
+        "*.docx",
+        "*.docm",
+    ],
+
 
     // ============================================================
     // ORG DIRS:
