@@ -16,3 +16,15 @@
      nochildtasks
    #+END_QUOTE
    
+** Extended default binary formats for links
+   Thanks to dyaso for extending the default binary formats list
+   to include pdfs and word documents.
+
+   #+BEGIN_EXAMPLE
+     "file_exclude_patterns": [
+        "*.pdf",
+        "*.doc",
+        "*.docx",
+        "*.docm",
+    ],
+   #+END_EXAMPLE
