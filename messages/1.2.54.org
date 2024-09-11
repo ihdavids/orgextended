@@ -1,3 +1,18 @@
 * 1.2.54
 ** 3.8 Upgrade
    Package upgraded to the 3.8 runtime.
+   TextTable plugin is still running on 3.3 but orgextended itself
+   is now running on 3.8 for greater performance and cleanliness.
+
+** Agenda haschildtask filter 
+   Thanks to tim3z for his contribution to the agenda:
+
+   - I sometimes need to filter for tasks with/without child tasks
+
+   This adds the following keywords for child tasks
+
+   #+BEGIN_QUOTE
+     haschildtasks
+     nochildtasks
+   #+END_QUOTE
+   
