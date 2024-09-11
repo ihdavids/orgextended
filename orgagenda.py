@@ -469,6 +469,8 @@ class AgendaBaseView:
         self.nodeadline = "nodeadline" in kwargs
         self.noschedule = "noschedule" in kwargs
         self.onlyTasks  = "onlytasks" in kwargs
+        self.haschildtasks = "haschildtasks" in kwargs
+        self.nochildtasks = "nochildtasks" in kwargs
 
         if(setup):
             self.SetupView()
@@ -644,6 +646,8 @@ class AgendaBaseView:
             return False
         if(self.hasschedule and not node.scheduled):
             return False
+        if(self.haschildtasks and not HasChildTasks(node)):
+            return False
         if(self.noclock and node.clock):
             return False
         if(self.nodeadline and node.deadline):
@@ -651,6 +655,8 @@ class AgendaBaseView:
         if(self.noclose and node.closed):
             return False
         if(self.noschedule and node.scheduled):
+            return False
+        if(self.nochildtasks and HasChildTasks(node)):
             return False
         return True
 
