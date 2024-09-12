@@ -54,3 +54,9 @@
    We now account for this and export a line_highlight variant that matches the lineHighlight version in the globals.
 
    
+** List Sort Docs
+   There was confusion over the simplistic Org Sort List command.
+   I added some quick docs to help demonstrate how that command works. It currently does not work on headings. 
+   Contributions welcome. 
+
+   [[https://github.com/ihdavids/orgextended_docs/blob/master/lists.org#sorting-lists][Org Sort List]] 
