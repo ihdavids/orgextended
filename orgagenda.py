@@ -1129,7 +1129,7 @@ class WeekView(AgendaBaseView):
         #print(str(self.now))
         wday   = self.now.weekday()
         firstDayIndex = sets.GetWeekdayIndexByName(sets.Get("firstDayOfWeek", "Sunday"))
-        wstart = self.now + datetime.timedelta(days=firstDayIndex-wday)
+        wstart = self.now + datetime.timedelta(days=-((wday+1)%7)-((firstDayIndex+1)%7))
         dayNames  = sets.Get("weekViewDayNames",["Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun"])
         numDays   = sets.Get("agendaWeekViewNumDays",7)
         for i in range(0,numDays):

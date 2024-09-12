@@ -45,6 +45,10 @@
 	when the tab is first opened. I am not sure why. I added a recursive command that draws on a second pass
 	to work around the issue. This is not ideal but it at least gets things rendering again.
 
+** FIX Agenda Week View Lineup With Week
+   Some previous changes to the week view had it a week off from the current day.
+   This has been fixed
+
 ** FIX Color Scheme Genereator
    Fix for: [[https://github.com/ihdavids/orgextended/issues/83][Generated color schemas (partially) use camelCase instead of snake_case]]
 
