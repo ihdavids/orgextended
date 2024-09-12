@@ -64,3 +64,20 @@
    Contributions welcome. 
 
    [[https://github.com/ihdavids/orgextended_docs/blob/master/lists.org#sorting-lists][Org Sort List]] 
+
+** List Cookie Issues
+   [[https://github.com/ihdavids/orgextended/issues/84][Cookies are wrongly calculated in lists with checkboxes]]
+
+
+   List cookies:
+   #+BEGIN_EXAMPLE
+      - List [1/2]     
+         - [x] A
+         - [ ] B
+      - List2
+         - [ ] This should NOT be included in list 1
+   #+END_EXAMPLE
+
+   had a problem when list types alternated from unordered lists to checked lists.
+   This is not perfect but has been improved and should now no longer be combined.
+   

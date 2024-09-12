@@ -19,6 +19,7 @@ indent_regex     = re.compile(r'^(\s*).*$')
 summary_regex    = re.compile(r'(\[\d*[/%]\d*\])')
 checkbox_regex   = re.compile(r'(\[[xX\- ]\])')
 checkbox_line_regex   = re.compile(r'\s*[-+]?\s*(\[[xX\- ]\])\s+')
+unordered_line_regex   = re.compile(r'\s*[-+]\s+')
 
 
 # Extract the indent of this checkbox.
@@ -36,6 +37,14 @@ def get_indent(view, content):
 
 RE_HEADING = re.compile('^[*]+ ')
 
+def check_type(line):
+    if checkbox_regex.search(line):
+        return "C"
+    if unordered_line_regex.search(line):
+        return "L"
+    ls = line.strip()
+    if len(ls) > 0 and ls[0] == "*":
+        return "H"
 
 # Try to find the parent of a region (by indent)
 def find_parent(view, region):
@@ -92,6 +101,7 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False, rec
     child_indent = None
     children = []
     last_row, _ = view.rowcol(view.size())
+    check = None
     while row <= last_row:
         point = view.text_point(row, 0)
         line = view.line(point)
@@ -101,6 +111,8 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False, rec
         if lc.startswith("*") or lc.startswith('#'):
              break
         if cre.search(content):
+            if check is None:
+                check = check_type(content)
             cur_indent = len(get_indent(view, content))
             # check for end of descendants
             if includeSiblings and cur_indent < indent:
@@ -117,6 +129,11 @@ def find_children(view, region, cre = checkbox_regex, includeSiblings=False, rec
                     children.append(line)
             else:
                 children.append(line)
+        else:
+            if check is not None:
+                lineType = check_type(content)
+                if check != "H" and lineType != check:
+                    break
         row += 1
     return children
 
