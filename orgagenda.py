@@ -1845,19 +1845,30 @@ class OrgTodoViewCommand(sublime_plugin.TextCommand):
 # Right now this is a composite view... Need to allow the user to define
 # Their own versions of this.
 class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        pos = None
-        if(self.view.name() == "Agenda"):
-            pos = self.view.sel()[0]
-        # Save and restore the cursor
-        views = [CalendarView("Calendar",False), WeekView("Week", False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
-        #views = [AgendaView("Agenda", False), TodoView("Global Todo List", False)]
-        agenda = CompositeView("Agenda", views)
-        #agenda = AgendaView(AGENDA_VIEW)
+    def onDone(self, edit, agenda):
         agenda.DoRenderView(edit)
-        if(self.view.name() == "Agenda"):
+        if(self.pos is not None):
             agenda.RestoreCursor(pos)
         log.info("Day view refreshed")
+
+    def run(self, edit, draw=False, pos=None):
+        VIEW_NAME="Agenda"
+        if draw:
+            # This is a hack: A bug in sublime 4 seems to not alow multiple inserts
+            # on the edit object when the buffer is created. For now just work around
+            # I HATE this but it at least stops this from being just plain broken
+            self.pos = pos
+            agenda = FindMappedView(self.view)
+            self.onDone(edit, agenda)
+            return
+        else:
+            if(self.view.name() == VIEW_NAME):
+                self.pos = self.view.sel()[0]
+            # Save and restore the cursor
+            views = [CalendarView("Calendar",False), WeekView("Week", False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
+            #views = [AgendaView("Agenda", False), TodoView("Global Todo List", False)]
+            agenda = CompositeView(VIEW_NAME, views)
+            agenda.view.run_command("org_agenda_day_view", {"draw": True})
 
 # ================================================================================
 # Goto the file in the current window (ENTER)
