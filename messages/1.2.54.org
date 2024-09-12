@@ -4,6 +4,15 @@
    TextTable plugin is still running on 3.3 but orgextended itself
    is now running on 3.8 for greater performance and cleanliness.
 
+   NOTE: YOU WILL NEED TO RESTART SUBLIME TEXT SEVERAL TIMES TO ALLOW 
+         DEPENDENCIES TO INSTALL AND UPGRADE.
+
+   I have run into some problems where the dateutil.rrule package will not update from the 3.3 version
+   to the 3.8 version.
+   
+   The only solution I have found is to reinstall sublime and then reinstall OrgExtended.
+   This forces the upgrade and allows things to work again.
+
 ** Agenda haschildtask filter 
    Thanks to tim3z for his contribution to the agenda:
 
@@ -29,4 +38,19 @@
     ],
    #+END_EXAMPLE
 
-  
+** FIX Agenda Day View Rendering Bug  
+	Fix for: [[https://github.com/ihdavids/orgextended/issues/85][Agenda does not work in ST4]]	
+
+	In recent builds of sublime text 4 The composite Agenda class was only able to render the first view
+	when the tab is first opened. I am not sure why. I added a recursive command that draws on a second pass
+	to work around the issue. This is not ideal but it at least gets things rendering again.
+
+** FIX Color Scheme Genereator
+   Fix for: [[https://github.com/ihdavids/orgextended/issues/83][Generated color schemas (partially) use camelCase instead of snake_case]]
+
+   If you follow the [[https://github.com/ihdavids/orgextended_docs/blob/master/setup.org#color-scheme-generator][Color Scheme Generator]] instructions the generator seems to sometimes generate a:
+   lineHighlight global vs line_highlight. This is an odd quirk that seems to manifest itself when parsing some
+   existing color schemes. That camelCase version comes FROM the parsed version of the color scheme and I am not sure why.
+   We now account for this and export a line_highlight variant that matches the lineHighlight version in the globals.
+
+   

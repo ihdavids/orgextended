@@ -670,6 +670,12 @@ class OrgCreateColorSchemeFromActiveCommand(sublime_plugin.TextCommand):
 		if(not findscope(cs, 'orgmode.preamble')):
 			bg = cs['globals']['background']
 			cs['rules'].append({"scope": "orgmode.preamble","foreground": bg, "background": bg})	
+		if('globals' in cs and 'line_highlight' not in cs['globals']):
+			# Patch up lineHighlight, I have no idea why the themes seem to be using
+			# Camel case for this but this ensures that if the CamelCase version is there
+			# we use a color scheme compatible snake case version
+			if 'lineHighlight' in cs['globals']:
+				cs['globals']['line_highlight'] = cs['globals']['lineHighlight']
 
 	def run(self, edit):
 		self.settings = sublime.load_settings('Preferences.sublime-settings')
