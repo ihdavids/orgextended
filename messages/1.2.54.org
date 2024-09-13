@@ -45,6 +45,18 @@
 	when the tab is first opened. I am not sure why. I added a recursive command that draws on a second pass
 	to work around the issue. This is not ideal but it at least gets things rendering again.
 
+** FIX Todo View Not Rendering in ST4
+   Fix for: [[https://github.com/ihdavids/orgextended/issues/80][Org Todo View command shows an empty file, despite TODOs existing in tracked files]] 
+   This seems to have been the same issue as the Day View Rendering bug.
+   When the tab pops up the first write attempt to the buffer seems to not be accepted until control 
+   has been returned to ST. I have made the command recursive to fix the issue.
+
+   - The same problem also existed with Org Agenda Custom View which is consumed by Org Choose Custom View
+
+   Overall these are all the same issue and something that has developed in modern versions of Sublime Text. I am not sure 
+   what has caused this but I suspect some of the read only features I am using are perhaps asynchronous events in some fashion and
+   I may be racing with some internal message pump I do not fully understand vs my plugin thread.
+
 ** FIX Agenda Week View Lineup With Week
    Some previous changes to the week view had it a week off from the current day.
    This has been fixed
@@ -56,6 +68,7 @@
    lineHighlight global vs line_highlight. This is an odd quirk that seems to manifest itself when parsing some
    existing color schemes. That camelCase version comes FROM the parsed version of the color scheme and I am not sure why.
    We now account for this and export a line_highlight variant that matches the lineHighlight version in the globals.
+
 
    
 ** List Sort Docs
@@ -80,4 +93,3 @@
 
    had a problem when list types alternated from unordered lists to checked lists.
    This is not perfect but has been improved and should now no longer be combined.
-   

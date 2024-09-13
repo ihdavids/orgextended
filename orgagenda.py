@@ -1837,9 +1837,18 @@ class CompositeView(AgendaBaseView):
 
 # ================================================================================
 class OrgTodoViewCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        todo = TodoView(TODO_VIEW)
+    # This recursive crap seems to be an ST4 issue that
+    # I don't fully understand yet. But am working around.
+    def onDone(self, edit, todo):
         todo.DoRenderView(edit)
+
+    def run(self, edit, draw=False):
+        if(draw and self.view.name() == TODO_VIEW):
+            todo = FindMappedView(self.view)
+            self.onDone(edit, todo)
+        else:
+            todo = TodoView(TODO_VIEW)
+            todo.view.run_command("org_todo_view", {"draw": True})
 
 # ================================================================================
 # Right now this is a composite view... Need to allow the user to define
@@ -1868,7 +1877,7 @@ class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
             views = [CalendarView("Calendar",False), WeekView("Week", False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
             #views = [AgendaView("Agenda", False), TodoView("Global Todo List", False)]
             agenda = CompositeView(VIEW_NAME, views)
-            agenda.view.run_command("org_agenda_day_view", {"draw": True})
+            agenda.view.run_command("org_agenda_day_view", {"draw": True, "pos":pos})
 
 # ================================================================================
 # Goto the file in the current window (ENTER)
@@ -1995,6 +2004,8 @@ class CalendarViewRegistry:
         if len(vlist) == 1:
             vlist[0].name = name + " [" + vlist[0].name + "]"
         cview = CompositeView(name, vlist)
+        cview.view.set_name(name)
+        ViewMappings[cview.view.name()] = cview
         return cview
 
 viewRegistry = CalendarViewRegistry()
@@ -2002,8 +2013,19 @@ viewRegistry = CalendarViewRegistry()
 
 # ================================================================================
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
-    def run(self, edit, toShow="Default", onDone=None):
-        pos = None
+    def onDone(self, edit, agenda, onDone, pos):
+        agenda.DoRenderView(edit)
+        #if(self.view.name() == "Agenda"):
+        if pos:
+            agenda.RestoreCursor(pos)
+        log.info("Custom view refreshed")
+        evt.EmitIf(onDone)
+
+    def run(self, edit, toShow="Default", onDone=None, draw=False, pos=None):
+        if draw:
+            agenda = FindMappedView(self.view)
+            self.onDone(edit, agenda, onDone, pos)
+            return
         #if(self.view.name() == "Agenda"):
         pos = self.view.sel()[0]
         ReloadAllUnsavedBuffers()
@@ -2012,14 +2034,15 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
         nameOfShow = toShow
         if(toShow == "Default"):
             nameOfShow = "Agenda"
+
         agenda = viewRegistry.CreateCompositeView(views, nameOfShow)
+        #agenda.view.run_command("org_agenda_custom_view", {"toShow":toShow, "onDone": onDone, "draw": True, "pos": pos})
+        #: TODO FIX THIS SO WE CAN PASS IT THROUGH
+        print(str(pos))
+        agenda.view.run_command("org_agenda_custom_view", {"draw": True, "onDone": onDone, "toShow": toShow})
+
         #agenda = CompositeView("Agenda", views)
         #agenda = AgendaView(AGENDA_VIEW)
-        agenda.DoRenderView(edit)
-        #if(self.view.name() == "Agenda"):
-        agenda.RestoreCursor(pos)
-        log.info("Custom view refreshed")
-        evt.EmitIf(onDone)
 
 
 # ================================================================================
