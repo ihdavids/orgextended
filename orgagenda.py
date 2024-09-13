@@ -1841,14 +1841,19 @@ class OrgTodoViewCommand(sublime_plugin.TextCommand):
     # I don't fully understand yet. But am working around.
     def onDone(self, edit, todo):
         todo.DoRenderView(edit)
+        if self.pos is not None:
+            todo.RestoreCursor(self.pos)
 
-    def run(self, edit, draw=False):
+    def run(self, edit, draw=False, pos=None):
         if(draw and self.view.name() == TODO_VIEW):
             todo = FindMappedView(self.view)
+            self.pos = pos
             self.onDone(edit, todo)
         else:
+            if self.view.name() == TODO_VIEW:
+                pos = self.view.sel()[0].begin()
             todo = TodoView(TODO_VIEW)
-            todo.view.run_command("org_todo_view", {"draw": True})
+            todo.view.run_command("org_todo_view", {"draw": True, "pos":pos})
 
 # ================================================================================
 # Right now this is a composite view... Need to allow the user to define
