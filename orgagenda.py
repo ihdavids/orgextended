@@ -932,9 +932,9 @@ def bystartnodedatekey(a):
     #dt = n.scheduled.start
     if(isinstance(dt,orgdate.OrgDate)):
         dt=dt.start
-    if(isinstance(dt, datetime.date)):
-        return datetime.datetime.combine(dt.today(), datetime.datetime.min.time())
-    return dt
+    elif(isinstance(dt, datetime.date)):
+        return datetime.datetime.combine(dt.today(), datetime.datetime.min.time()).timestamp()
+    return dt.timestamp()
 
 def getdatefromnode(n):
     dt = datetime.datetime.min
@@ -1327,18 +1327,26 @@ class AgendaView(AgendaBaseView):
                         didNotInsert = False
                 before = False
             else:
+                # Filter timestamps so we can sort by timestamp
+                foundItems = []
                 for entry in self.entries:
                     n = entry['node']
-                    filename = entry['file'].AgendaFilenameTag()
                     ts = IsInHour(n,h,self.now)
                     if(ts and (not 'found' in entry or (not before and entry['found'] == 'b'))):
-                        if(before):
-                            entry['found'] = 'b'
-                        else:
-                            entry['found'] = 'a'
-                        self.MarkEntryAt(entry, ts)
-                        self.RenderAgendaEntry(edit,filename,n,h,ts)
-                        didNotInsert = False
+                        entry['ts'] = ts
+                        foundItems.append(entry)
+                foundItems.sort(key=bystartnodedatekey)
+                for entry in foundItems:
+                    n = entry['node']
+                    filename = entry['file'].AgendaFilenameTag()
+                    ts = entry['ts']
+                    if(before):
+                        entry['found'] = 'b'
+                    else:
+                        entry['found'] = 'a'
+                    self.MarkEntryAt(entry, ts)
+                    self.RenderAgendaEntry(edit,filename,n,h,ts)
+                    didNotInsert = False
             if(didNotInsert):
                 empty = " " * 12
                 blocks = self.GetAgendaBlocks(None,h)
