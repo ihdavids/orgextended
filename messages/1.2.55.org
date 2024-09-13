@@ -1,0 +1,54 @@
+* 1.2.55
+  1.2.54 was a maintenance release with the goal of sorting some of the more 
+  painful reported issues people were struggling with.
+
+  This release is about trying to clear the Issue list of any requested features.
+  This is all in preparation for my next big personal feature push.
+
+  I have been sort of forced to work in VSCode for the last few years and as such I have
+  built a similar plugin to this one for VSCode (although I have not officially released it)
+
+  That plugin took a slightly different route. As I was faced with the daunting task of 
+  duplicating what I had done here, I realized I had been foolish. LSP is a model I should have
+  taken a page from, right from the get go. 
+
+  So While there are a ton of highlighting, editing 
+  and general movement commands built into the VSCode plugin the database and many of
+  the auto formatting, refiling, capturing etc is done in a sort of org mode server over a rest
+  api. It has always bugged me that this plugin is limited by the editor integration and
+  while this brings org outside of emacs, its still locked into yet another editor.
+
+  My plan is to migrate to some of the ideas I had with the VSCode version wrapping the existing
+  DB in an abstraction so it can consume and work with the orgs server.
+  I hope to offer a choice, either use the built in python DB
+  in this plugin, OR choose to run the orgs server (it's written in Go) externally and get
+  a web portal into your org files and command line capture and other CLI goodness as well
+  as the editor integration. This will be a 2.0 offering of this plugin.
+
+  orgs has other really great features. It has a JIRA integration that allows the creation of JIRA
+  tickets from org files and syncing JIRA to an org file. It has a nice auto git sync option
+  and some new exporters like a latex exporter that supports the DnD2Latex project, impressjs 
+  AND reveal exporter and an extensible, universal todo query language instead of the hacky thing
+  I built into the Agenda system in this plugin.
+
+  My end game here is that I would like to provide an LSP like setup for org-mode that 
+  can be used from any editor, but takes org outside of my editor in a variety of ways.
+  This will have the benefit that:
+
+  - Org is in your editor and can be ported to others without re-inventing the wheel.
+  - Using Orgs allows for an HTML portal rendering your org files directly to your browser or phone
+    helping with the challenge of using org on mobile.
+  - Support the org-protocol capture mechanism
+  - Access, refile, tag and search your orgs from your command line.
+  - Supports integration into other tools like JIRA, Trello, Confluence, Todoist, Ad nauseum.
+  - Supports a framework for exporting from org to other formats and importing from other formats to org.
+  - Provides really powerful and comprehensive search tools for your data.
+  - Is extensible enough I can integrate with beancount or other great text based finance tools with literate programming style
+    reports, combined with the exporters offering all the invoicing, and other integrations I really appreciate.
+  - Takes the dynamic burden of execution and refiling et al off the editor itself and pushes it squarely on a capable backend.
+    In the past, chasing after updates in how the editor handles reloading of files has been a serious issue.
+  - Is flexible enough, but also lightweight enough that you can use it in a ton of different creative ways.
+
+  Anyways, BEFORE I get to working on the orgs integration, I really wanted to spend some time to cleanup anything that 
+  has been frustrating those people that have been on this journey with me and have been trying to use this thing.
+  I sincerely hope you get value out of it.
