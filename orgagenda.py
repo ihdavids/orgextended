@@ -1857,7 +1857,7 @@ class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
     def onDone(self, edit, agenda):
         agenda.DoRenderView(edit)
         if(self.pos is not None):
-            agenda.RestoreCursor(pos)
+            agenda.RestoreCursor(self.pos)
         log.info("Day view refreshed")
 
     def run(self, edit, draw=False, pos=None):
@@ -1872,7 +1872,7 @@ class OrgAgendaDayViewCommand(sublime_plugin.TextCommand):
             return
         else:
             if(self.view.name() == VIEW_NAME):
-                self.pos = self.view.sel()[0]
+                pos = self.view.sel()[0].begin()
             # Save and restore the cursor
             views = [CalendarView("Calendar",False), WeekView("Week", False), AgendaView("Agenda", False), BlockedProjectsView("Blocked Projects",False), NextTasksProjectsView("Next",False), LooseTasksView("Loose Tasks",False)]
             #views = [AgendaView("Agenda", False), TodoView("Global Todo List", False)]
@@ -2015,7 +2015,6 @@ viewRegistry = CalendarViewRegistry()
 class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
     def onDone(self, edit, agenda, onDone, pos):
         agenda.DoRenderView(edit)
-        #if(self.view.name() == "Agenda"):
         if pos:
             agenda.RestoreCursor(pos)
         log.info("Custom view refreshed")
@@ -2027,7 +2026,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
             self.onDone(edit, agenda, onDone, pos)
             return
         #if(self.view.name() == "Agenda"):
-        pos = self.view.sel()[0]
+        pos = self.view.sel()[0].begin()
         ReloadAllUnsavedBuffers()
         views = sets.Get("AgendaCustomViews",{ "Default": ["Calendar", "Week", "Day", "Blocked Projects", "Next Tasks", "Loose Tasks"]})
         views = views[toShow]
@@ -2036,10 +2035,7 @@ class OrgAgendaCustomViewCommand(sublime_plugin.TextCommand):
             nameOfShow = "Agenda"
 
         agenda = viewRegistry.CreateCompositeView(views, nameOfShow)
-        #agenda.view.run_command("org_agenda_custom_view", {"toShow":toShow, "onDone": onDone, "draw": True, "pos": pos})
-        #: TODO FIX THIS SO WE CAN PASS IT THROUGH
-        print(str(pos))
-        agenda.view.run_command("org_agenda_custom_view", {"draw": True, "onDone": onDone, "toShow": toShow})
+        agenda.view.run_command("org_agenda_custom_view", {"draw": True, "onDone": onDone, "toShow": toShow, "pos": pos})
 
         #agenda = CompositeView("Agenda", views)
         #agenda = AgendaView(AGENDA_VIEW)
