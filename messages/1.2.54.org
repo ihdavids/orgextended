@@ -69,7 +69,13 @@
    existing color schemes. That camelCase version comes FROM the parsed version of the color scheme and I am not sure why.
    We now account for this and export a line_highlight variant that matches the lineHighlight version in the globals.
 
+** FIX Agenda View Overlap Sorting
+   Fix for: [[https://github.com/ihdavids/orgextended/issues/86][Overlapping events can appear out of order in the Agenda timeline]] 
 
+   Thanks to r4dian for reporting. 
+
+   This particular issue only seemed to happen if you moved to a previous day in the agenda. The time list was not being sorted properly
+   resulting in times appearing out of order during the day.
    
 ** List Sort Docs
    There was confusion over the simplistic Org Sort List command.
