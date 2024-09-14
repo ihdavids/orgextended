@@ -29,6 +29,7 @@
     {"caption": "Org Refile To EOF",           "command": "org_refile_to_file"          },
     {"caption": "Org Refile File and Heading", "command": "org_refile_to_file_and_headline"},
     {"caption": "Org Archive Subtree",         "command": "org_archive_subtree"         },
+    {"caption": "Org Archive All Done",        "command": "org_archive_all_done"        },
     {"caption": "Org Open Refile",             "command": "org_open_refile"             },
     {"caption": "Org Capture",  	           "command": "org_capture"                 },
     {"caption": "Org Rebuild Db",	           "command": "org_rebuild_db"              },

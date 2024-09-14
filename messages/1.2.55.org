@@ -52,3 +52,13 @@
   Anyways, BEFORE I get to working on the orgs integration, I really wanted to spend some time to cleanup anything that 
   has been frustrating those people that have been on this journey with me and have been trying to use this thing.
   I sincerely hope you get value out of it.
+
+** OrgCapture New File added TAGS instead of FILETAGS
+   - OrgCapture when it creates a new file was adding TAGS: refile vs FILETAGS: :refile:
+
+** Org Archive All Done Command
+	Stuk asked for a command to archive all todos with a DONE status.
+	This first version of the command is simplistic and hardcoded to DONE status but it will	
+	iterate through a buffer and archive all the DONE TODOS.
+
+    [[https://github.com/ihdavids/orgextended/issues/72][Archive all DONE tasks]]

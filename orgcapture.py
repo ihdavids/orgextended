@@ -164,7 +164,7 @@ def GetCapturePath(view, template):
             os.makedirs(dirName, exist_ok=True)
         if (not os.path.isfile(str(filename))):
             with open(filename, "w", encoding=sets. Get("captureWriteFormat", "utf-8")) as fp:
-                fp.write("#+TAGS: refile\n")
+                fp.write("#+FILETAGS: :refile:\n")
     except Exception as e:
         log.error("@@@@@@@@@@@@\nFailed to create capture file: " + str(filename) + "\n" + str(e))
     # Now make sure that file is loaded in the DB
@@ -305,7 +305,7 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
         fromFile.Save()
         fromFile.Reload()
 
-    def run(self, edit):
+    def run(self, edit, onDone=None):
         globalArchive = sets.Get("archive", "%s_archive::")
         node          = db.Get().AtInView(self.view)
         archive       = node.archive(globalArchive)
@@ -375,7 +375,22 @@ class OrgArchiveSubtreeCommand(sublime_plugin.TextCommand):
             # sublime.set_timeout_async(lambda: self.finish_archive_on_loaded(), 1000)
         else:
             log.error("Failed to archive subtree! Could not find source Node")
+        evt.EmitIf(onDone)
 
+class OrgArchiveAllDoneCommand(sublime_plugin.TextCommand):
+    def onDone(self):
+        self.view.run_command("org_archive_all_done")
+
+    def run(self, edit):
+        file = db.Get().Find(self.view)
+        if len(file) > 1:
+            for n in file[1:]:
+                if n.todo == "DONE":
+                    self.view.sel().clear()
+                    sp  = self.view.text_point(n.start_row,0)
+                    self.view.sel().add(sp)
+                    self.view.run_command("org_archive_subtree", {"onDone": evt.Make(self.onDone)})
+                    return
 
 def RefileCurNode(view, file, nodeIndex):
     (curRow, curCol) = view.curRowCol()
