@@ -6,7 +6,9 @@
 			"dateutil",
 			"requests",
 			"regex",
-			"websocket"
+			"websocket",
+			"urllib3",
+			"idna"
 		]
 	}
 }

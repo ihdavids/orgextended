@@ -1,0 +1,28 @@
+* 2.0.0
+  2.0 is about adding support for the orgs server.
+  The goal is bring my VSCode and sublime plugins into
+  alignment but mostly:
+
+  #+BEGIN_QUOTE
+  The orgs server is an attempt to move the org mode capabilities that are beyond just
+  editing an org file into a flexible shareable core that can be used here and outside 
+  of sublime to really help the org community to make the most of their org data everywhere.
+
+  One of org modes most useful feature is the ability to combine the various sources of input we
+  have: slack, email(mu4e), jira, your notes, ledger, todo lists, presentations, quick captures etc
+  into one searchable, taggable, exportable place that is easy to extend. In this, org mode is something special. 
+
+  I feel org mode's next trick in our modern fragmented digital world is to break free of an editor only tech (emacs) 
+  and really live everywhere you work. At the command line, on the web, on your phone AND in your editor.
+  #+END_QUOTE
+
+  A lot of the current existing orgs functionality is already implemented in this existing sublime text plugin. 
+  This is however, just a repeat of emacs. Locking all of this mess into one way of working with it. 
+  Orgs is looking to really break that paradigm.
+
+  Free and open yes, but also extensible and everywhere.
+
+  NOTE: We now depend on requests which added idna and urllib3
+        so please restart Sublime Text a few times when upgrading
+        to ensure dependencies are properly installed.
+
