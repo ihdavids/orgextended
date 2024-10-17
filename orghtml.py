@@ -560,9 +560,12 @@ class HtmlDoc(exp.OrgExporter):
           continue
         # Some languages we skip source by default
         skipLangs = sets.Get("htmlDefaultSkipSrc",[])
-        if(exp == None and language == skipLangs):
-          skipSrc = True
-          continue
+        if((exp == None or exp == "none" or exp == "default") and language in skipLangs):
+            self.skipSrc = True
+            return
+        # We keep track of the default state and override it to code if present
+        if exp == 'default':
+            exp = 'code'
         #params = {}
         #for ps in RE_FN_MATCH.finditer(paramstr):
         # params[ps.group(1)] = ps.group(2)
@@ -710,7 +713,7 @@ class OrgExportFileOrgHtmlCommand(sublime_plugin.TextCommand):
       self.index = index
     else:
       self.index = None
-    if(None == self.file):
+    if(self.file is None):
       log.error("Not an org file? Cannot build reveal document")
       evt.EmitIf(onDone)  
       return

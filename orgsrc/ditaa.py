@@ -26,7 +26,10 @@ def Execute(cmd,sets):
 	outpath     = os.path.dirname(cmd.filename)
 	sourcepath = os.path.dirname(cmd.sourcefile)
 	#commandLine = [r"java", "-jar", jarfile, mypath, "-o", output]
-	commandLine = [r"java", "-jar", jarfile, cmd.filename, "-o"]
+
+	java = "java"
+	java = sets.Get("java", java)
+	commandLine = [java, "-jar", jarfile, cmd.filename, "-o"]
 	print(str(commandLine))
 	#commandLine = [r"java", "-jar", jarfile, "-help"]
 	try:

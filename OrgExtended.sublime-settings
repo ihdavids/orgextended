@@ -368,7 +368,9 @@
     },
 
     // These are the default state for all source execution. You can change the defaults by changing this plist
-    "orgBabelDefaultHeaderArgs": ":session none :results replace :exports code :cache no :noweb no",
+    // Only exports curently supports default = code at the moment. It's a bit of a hack to avoid conflicts
+    // with the htmlDefaultSkipSrc option.
+    "orgBabelDefaultHeaderArgs": ":session none :results replace :exports default :cache no :noweb no",
 
     // During Html export some language types we skip exporting source by default unless the user
     // has explicitly overriden the export. This option lets you control which languages we do that for.

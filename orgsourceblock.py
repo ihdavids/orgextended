@@ -264,11 +264,11 @@ def BuildFullParamList(cmd,language,cmdArgs,node=None):
     # Handling
     plist.exList.AddList('results',['silent','replace','prepend','append'])
     # Exports
-    plist.exList.AddList('exports',['code','results','both','none'])
+    plist.exList.AddList('exports',['code','results','both','none', 'default'])
     plist.exList.AddBool('cache')
     plist.exList.AddBool('noweb')
     plist.exList.AddList('eval',['never','no','query','never-export','no-export','query-export'])
-    defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports code :cache no :noweb no")
+    defaultPlist = sets.Get("orgBabelDefaultHeaderArgs",":session none :results replace :exports default :cache no :noweb no")
     plist.AddFromPList(defaultPlist)
     view = None
     if(node == None):

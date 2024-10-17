@@ -99,9 +99,17 @@ class HtmlSourceBlockState(exp.SourceBlockState):
             return
         # Some languages we skip source by default
         skipLangs = sets.Get("revealDefaultSkipSrc",[])
-        if(exp == None and language == skipLangs):
+        if((exp == None or exp == "none" or exp == "default") and language in skipLangs):
             self.skipSrc = True
             return
+        skipLangs = sets.Get("htmlDefaultSkipSrc",[])
+        if((exp == None or exp == "none" or exp == "default") and language in skipLangs):
+            self.skipSrc = True
+            return
+
+        if exp == 'default':
+            exp = 'code'
+
         attribs = ""
         if(p.params.Has("data-noescape")):
             attribs += " data-noescape"
