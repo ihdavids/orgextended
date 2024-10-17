@@ -402,4 +402,11 @@
     // Turn this off if you do not want the system to try to auto
     // update backlinks for you in the backlinks display
     "backlinksUpdate": true,
+
+
+    // ============================================================
+    // Extended org mode functionality. 
+    // BREAK OUT of just a sublime text tool
+    //           lets empower org mode everywhere!
+    //"orgsUrl": "https://localhost:443"
 }
