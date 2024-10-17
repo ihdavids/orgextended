@@ -1,0 +1,7 @@
+* 1.2.56
+	- bugfix htmlDefaultSkipSrc was not being respected
+	  when exporting to html. A user noted that ditaa source
+	  blocks were exporting both the image and the source to
+	  html files even when ditaa was listed in this list.
+
+	  This has now been fixed
