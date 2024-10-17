@@ -1,7 +1,13 @@
 * 1.2.56
-	- bugfix htmlDefaultSkipSrc was not being respected
-	  when exporting to html. A user noted that ditaa source
-	  blocks were exporting both the image and the source to
-	  html files even when ditaa was listed in this list.
+** htmlDefaultSkipSrc Not Respected
+	BugFix htmlDefaultSkipSrc was not being respected
+	when exporting to html. Thanks to bradleysmith who found that ditaa source
+	blocks were exporting both the image and the source to
+	html files even when ditaa was listed as a source skip block
 
-	  This has now been fixed
+	The plist system by its nature overrides this list if explicitly stated. 
+	Internally we did not have a way of determining if a user had explicitly 
+	set an exports mode or if we were operating in the default
+	state. The system now has a default setting allowing this to work again.
+
+	[[https://github.com/ihdavids/orgextended/issues/90][htmlDefaultSkipSrc ignores ditaa]]
