@@ -1,11 +1,11 @@
 import sublime
 import sublime_plugin
-import os
-import base64
-import urllib.request
-import OrgExtended.asettings as sets 
+#import os
+#import base64
+#import urllib.request
+#import OrgExtended.asettings as sets 
 import OrgExtended.orgutil.util as util
-import uuid
+#import uuid
 import re
 import logging
 
