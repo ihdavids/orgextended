@@ -11,6 +11,7 @@ import logging
 import traceback
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
+import OrgExtended.orgs as orgs
 
 log = logging.getLogger(__name__)
 headingRe = re.compile("^([*]+) (.+)")
@@ -496,12 +497,22 @@ class OrgDb:
 
     # This is paired with FindFileInfo
     def AllFiles(self, view):
+        if orgs.haveOrgs():
+            return orgs.Get().AllFiles()
         files = []
         for o in self.Files:
             displayFn = o.displayName
             files.append(displayFn)
         return files
 
+    # DEPRECATED!!!! DO NOT USE
+    # TODO: Used by refile, we need to get rid of
+    #       the index concept entirely, This breaks
+    #       encapsulation and we need to move to a 
+    #       runtimeId concpet like OrgS uses
+    #
+    #       ST4 offers better ways of handling this
+    #       anyways.
     def FindFileByIndex(self, index):
         return self.Files[index]
 
@@ -590,6 +601,7 @@ class OrgDb:
             return v[0].At(v[1])
         return None
 
+    # TODO: ORGS Extend this one first
     def FindFileByFilename(self, filename):
         for f in self.Files:
             if (filename in f.filename):
