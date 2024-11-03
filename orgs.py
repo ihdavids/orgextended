@@ -3,6 +3,7 @@ import sublime_plugin
 import requests
 import logging
 import traceback
+import urllib3
 import OrgExtended.asettings as sets
 import OrgExtended.pymitter as evt
 
@@ -12,11 +13,24 @@ def getOrgs() -> str:
     url = sets.Get("orgsUrl", None)
     return url
 
+# For https over localhost you need a self signed
+# cert. This means we need to tell both sides that
+# the cert is okay.
+#
+# orgsNoVerify: true
+#
+# will fix that for self signed certs
+# But to avoid a bunch of warning you
+# may need to restart sublime
+def noVerify() -> bool:
+    return sets.Get("orgsNoVerify",False)
+
+
 def haveOrgs() -> bool:
     return getCon() is not None
 
 CONTENT_TYPE = 'Content-Type'
-CTYPE_JSON     = 'application/json'
+CTYPE_JSON     = 'application/json; charset=utf-8'
 CTYPE_TEXT     = 'text/plain; charset=utf-8'
 
 class NodeTarget:
@@ -37,7 +51,8 @@ class NodeTarget:
 
 class OrgS:
     def __init__(self):
-        pass
+        if noVerify():
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     def post(self, body):
         url = getOrgs()
@@ -45,11 +60,19 @@ class OrgS:
             # TODO: Is this what we should return?
             return None
         data = json.dumps(body)
-        response = requests.post(url, data=data)
+        headers = {
+            'Content-type': CTYPE_JSON,
+            'Accept': CTYPE_JSON
+        }
+        noverify = noVerify()
+        if noverify:
+            response = requests.post(url, headers=headers, data=data, verify=False)
+        else:
+            response = requests.post(url,  headers=headers,data=data)
         if not response.ok:
             log.error(f"ORGS POST ERROR: {response}")
         if(not CONTENT_TYPE in response.headers or response.headers[CONTENT_TYPE] != CTYPE_JSON):
-            log.warning(f"WARNING: Invalid response type from orgs? {response.headers[CONTENT_TYPE]}")
+            log.warning(f"WARNING: [POST] Invalid response type from orgs? {response.headers[CONTENT_TYPE]} [{url}]")
         return response.json()
         # TODO Handle creds
 
@@ -63,11 +86,15 @@ class OrgS:
             log.error("ORGS: Base url is none")
             return None
         url = base + url
-        response = requests.get(url, headers=headers)
+        noverify = noVerify()
+        if noverify:
+            response = requests.get(url, headers=headers, params=params, verify=False)
+        else:
+            response = requests.get(url, headers=headers, params=params)
         if not response.ok:
             log.error(f"ORGS GET ERROR: {response}")
         if(not CONTENT_TYPE in response.headers or response.headers[CONTENT_TYPE] != CTYPE_JSON):
-            log.warning(f"WARNING: Invalid response type from orgs? {response.headers[CONTENT_TYPE]}")
+            log.warning(f"WARNING: [GET] Invalid response type from orgs? {response.headers[CONTENT_TYPE]} [{url}]")
         return response.json()
         # TODO Handle creds
 
