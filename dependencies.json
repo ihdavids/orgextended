@@ -6,7 +6,8 @@
 			"dateutil",
 			"requests",
 			"regex",
-			"websocket"
+			"websocket",
+			"six"
 		]
 	}
 }
