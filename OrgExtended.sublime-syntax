@@ -227,7 +227,7 @@ contexts:
     - match: ^\s*Traceback \(most recent call last\):\s*$
       push: pythonstack
 
-    - match: (^|\s)\*[^*]+\*(^|\s)
+    - match: (^|\s)\*[^*]+\*($|\s)
       scope: markup.bold orgmode.bold
 
     - match: (^|\s)(/[^/]+/)($|\s)
