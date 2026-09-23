@@ -11,7 +11,6 @@ import OrgExtended.asettings as sets
 import OrgExtended.orgextension as ext
 from collections import defaultdict
 import struct
-import imghdr
 import urllib.request
 import yaml
 import OrgExtended.orgneovi as nvi
@@ -186,6 +185,19 @@ class OrgCreateLinkCommand(sublime_plugin.TextCommand):
 
 # global magic
 VIEWS_WITH_IMAGES = set()
+
+# The imghdr module was removed from the standard library in Python 3.13, and
+# Sublime Text build 4213 ships Python 3.14 as the plugin host. Sniff the three
+# formats get_image_size() understands from the header bytes it has already
+# read; these tests match what the old module returned for those types.
+def _image_type(head):
+    if head.startswith(b'\211PNG\r\n\032\n'):
+        return 'png'
+    if head[:6] in (b'GIF87a', b'GIF89a'):
+        return 'gif'
+    if head[6:10] in (b'JFIF', b'Exif') or head[:4] == b'\xff\xd8\xff\xdb':
+        return 'jpeg'
+    return None
 
 # Stolen from:
 # https://github.com/renerocksai/sublime_zk/blob/master/sublime_zk.py
@@ -386,16 +398,17 @@ class ImageHandler:
                     return width, height, ttype
                 if len(head) != 24:
                     return
-                if imghdr.what(img) == 'png':
+                itype = _image_type(head)
+                if itype == 'png':
                     ttype = "png"
                     check = struct.unpack('>i', head[4:8])[0]
                     if check != 0x0d0a1a0a:
                         return
                     width, height = struct.unpack('>ii', head[16:24])
-                elif imghdr.what(img) == 'gif':
+                elif itype == 'gif':
                     ttype = "gif"
                     width, height = struct.unpack('<HH', head[6:10])
-                elif imghdr.what(img) == 'jpeg':
+                elif itype == 'jpeg':
                     ttype = "jpeg"
                     try:
                         f.seek(0)  # Read 0xff next
