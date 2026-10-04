@@ -1,12 +1,12 @@
 {
 	"*": {
-		"*": [
+		">4205": [
 			"pathlib",
 			"pyyaml",
 			"dateutil",
 			"requests",
 			"regex",
-			"websocket",
+			"websocket-client",
 			"six"
 		]
 	}
